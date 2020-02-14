@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import eu.arrowhead.common.ApplicationInitListener;
 import eu.arrowhead.common.core.CoreSystemService;
+import eu.arrowhead.core.translator.service.FiwareService;
+import eu.arrowhead.core.translator.service.PluginService;
+import eu.arrowhead.core.translator.service.translator.TranslatorService;
 
 @Component
 public class TranslatorApplicationInitListener extends ApplicationInitListener {
@@ -41,14 +44,20 @@ public class TranslatorApplicationInitListener extends ApplicationInitListener {
         //-------------------------------------------------------------------------------------------------
 	@Override
 	protected void customInit(final ContextRefreshedEvent event) {
-		logger.debug("customInit started...");
+		logger.info("customInit started...");
+                final TranslatorService translatorService = applicationContext.getBean(TranslatorService.class);
+                translatorService.start();
+                final FiwareService fiwareService = applicationContext.getBean(FiwareService.class);
+                fiwareService.start();
+                final PluginService pluginService = applicationContext.getBean(PluginService.class);
+                pluginService.start();
 
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	protected void customDestroy() {
-		logger.debug("customDestroy started...");
+		logger.info("customDestroy started...");
 		
 	}
     

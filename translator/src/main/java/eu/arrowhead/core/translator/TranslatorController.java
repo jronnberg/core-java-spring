@@ -21,13 +21,23 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.arrowhead.common.CommonConstants;
 import eu.arrowhead.common.CoreCommonConstants;
 import eu.arrowhead.common.Defaults;
-import eu.arrowhead.core.translator.service.TranslatorService;
+import eu.arrowhead.common.exception.ArrowheadException;
+import eu.arrowhead.core.translator.service.FiwareService;
+import eu.arrowhead.core.translator.service.PluginService;
+import eu.arrowhead.core.translator.service.translator.TranslatorService;
+import eu.arrowhead.core.translator.service.translator.common.TranslatorSetup;
+import eu.arrowhead.core.translator.service.translator.common.TranslatorHubAccess;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Api(tags = {CoreCommonConstants.SWAGGER_TAG_ALL})
 @CrossOrigin(maxAge = Defaults.CORS_MAX_AGE, allowCredentials = Defaults.CORS_ALLOW_CREDENTIALS,
@@ -65,7 +75,11 @@ public class TranslatorController {
     
     
     @Autowired
+    private FiwareService fiwareService;
+    @Autowired
     private TranslatorService translatorService;
+    @Autowired
+    private PluginService pluginService;
 
     //=================================================================================================
     // methods
@@ -96,20 +110,25 @@ public class TranslatorController {
     }
 
     //-------------------------------------------------------------------------------------------------
-    @ApiOperation(value = "This method initiates the creation of a new translation hub, if none exists already, between two systems.", response = String.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
+    @ApiOperation(value = "This method initiates the creation of a new translation hub, if none exists already, between two systems.", response = TranslatorHubAccess.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_OK, message = CoreCommonConstants.SWAGGER_HTTP_200_MESSAGE),
         @ApiResponse(code = HttpStatus.SC_UNAUTHORIZED, message = CoreCommonConstants.SWAGGER_HTTP_401_MESSAGE),
         @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = CoreCommonConstants.SWAGGER_HTTP_500_MESSAGE)
     })
-    @PostMapping(path = PATH_TRANSLATOR_ROOT, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(path = PATH_TRANSLATOR_ROOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String postTranslator(@RequestBody final String request) {
-        return "POST: " + request;
+    public TranslatorHubAccess postTranslator(@RequestBody final TranslatorSetup setup, @RequestHeader("host") String host) {
+        try {
+            return translatorService.createTranslationHub(setup, host.substring(0, host.indexOf(":")));
+        } catch (Exception ex) {
+            logger.warn("Exception: "+ex.getLocalizedMessage());
+            throw new ArrowheadException("Exception", HttpStatus.SC_BAD_REQUEST, ex.getLocalizedMessage());
+        }
     }
 
     //-------------------------------------------------------------------------------------------------
-    @ApiOperation(value = "Public method to check all active hubs", response = String.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
+    @ApiOperation(value = "Public method to check all active hubs", response = ArrayList.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_OK, message = CoreCommonConstants.SWAGGER_HTTP_200_MESSAGE),
         @ApiResponse(code = HttpStatus.SC_UNAUTHORIZED, message = CoreCommonConstants.SWAGGER_HTTP_401_MESSAGE),
@@ -117,12 +136,12 @@ public class TranslatorController {
     })
     @GetMapping(PATH_TRANSLATOR_ALL)
     @ResponseBody
-    public String getTranslatorList() {
-        return "return all";
+    public ArrayList<TranslatorHubAccess> getTranslatorList(@RequestHeader("host") String host) {
+        return translatorService.getAllHubs(host.substring(0, host.indexOf(":")));
     }
 
     //-------------------------------------------------------------------------------------------------
-    @ApiOperation(value = "Public method to check for a specific hub provided his translatorId", response = String.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
+    @ApiOperation(value = "Public method to check for a specific hub provided his translatorId", response = TranslatorHubAccess.class, tags = {CoreCommonConstants.SWAGGER_TAG_CLIENT})
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_OK, message = CoreCommonConstants.SWAGGER_HTTP_200_MESSAGE),
         @ApiResponse(code = HttpStatus.SC_UNAUTHORIZED, message = CoreCommonConstants.SWAGGER_HTTP_401_MESSAGE),
@@ -130,8 +149,13 @@ public class TranslatorController {
     })
     @GetMapping(PATH_TRANSLATOR_BY_ID)
     @ResponseBody
-    public String getTranslator(@PathVariable(value = PATH_VARIABLE_ID) final int translatorId) {
-        return "return byt Id: " + translatorId;
+    public TranslatorHubAccess getTranslator(@RequestHeader("host") String host, @PathVariable(value = PATH_VARIABLE_ID) final int translatorId) {
+        try {
+            return translatorService.getHub(translatorId, host);
+        } catch (Exception ex) {
+            logger.warn("Exception: "+ex.getLocalizedMessage());
+            throw new ArrowheadException("Exception", HttpStatus.SC_BAD_REQUEST, ex.getLocalizedMessage());
+        }
     }
 
     //-------------------------------------------------------------------------------------------------

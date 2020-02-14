@@ -16,9 +16,9 @@ sleep ${time_to_sleep} #wait for the Service Registry to fully finish loading up
 #nohup java -jar $(find . -maxdepth 1 -name arrowhead-authorization-\*.jar | sort | tail -n1) &> sout_auth.log &
 #echo Authorization started
 #
-cd ../../gateway/target
-nohup java -Xmx64M -Xms64M -jar $(find . -maxdepth 1 -name arrowhead-gateway-\*.jar | sort | tail -n1) &> sout_gateway.log &
-echo Gateway started
+#cd ../../gateway/target
+#nohup java -Xmx64M -Xms64M -jar $(find . -maxdepth 1 -name arrowhead-gateway-\*.jar | sort | tail -n1) &> sout_gateway.log &
+#echo Gateway started
 #
 #cd ../../eventhandler/target
 #nohup java -jar $(find . -maxdepth 1 -name arrowhead-eventhandler-\*.jar | sort | tail -n1) &> sout_eventhandler.log &
