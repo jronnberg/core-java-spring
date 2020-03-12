@@ -116,7 +116,8 @@ Please be aware, that versions starting from 4.1.3 are __NOT__ backwards compati
         * [Endpoints](#choreographer_endpoints)
 	       * [Client](#choreographer_endpoints_client)
            * [Management](#choreographer_endpoints_mgmt)
-
+    13. [Plant Description Engine](#plantdescription)
+		
 <a name="quickstart" />
 
 ## Quick Start Guide
