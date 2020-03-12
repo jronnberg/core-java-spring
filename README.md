@@ -73,7 +73,8 @@ Please be aware, that 4.1.3 is __NOT__ backwards compatible with 4.1.2. If you h
 	       * [Client](#gateway_endpoints_client)
            * [Private](#gateway_endpoints_private)
            * [Management](#gateway_endpoints_mgmt)
-	
+    7. [Plant Description Engine](#plantdescription)
+		
 <a name="quickstart" />
 
 ## Quick Start Guide
