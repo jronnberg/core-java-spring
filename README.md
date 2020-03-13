@@ -5764,7 +5764,7 @@ __ActiveSession__ is the output.
 ## <a name="plantdescription_sdd">System Design Description Overview</a>
 
 This supporting core system has the purpose of choreographing the consumers and producers in the plant (System of Systems / Local cloud).
-An abstract view on which system the plant contains and how they are connected as consumers and producers is used to populate the [Orchestrator](#orchestrator) with store rules for each of the consumers. The abstract view does not contain any instance specific information, instead meta-data about each system is used to identify the service producers.
+An abstract view, on which systems the plant contains and how they are connected as consumers and producers, is used to populate the [Orchestrator](#orchestrator) with store rules for each of the consumers. The abstract view does not contain any instance specific information, instead meta-data about each system is used to identify the service producers.
 
 The plant description engine (PDE) can be configured with several variants of the plant description of which at most one can be active. The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternativ plants (plan A, plan B, etc).
 
