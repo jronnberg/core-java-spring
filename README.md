@@ -7961,20 +7961,75 @@ An abstract view on which system the plant contains and how they are connected a
 The plant description engine (PDE) can be configured with several variants of the plant description of which at most one can be active. The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. 
 
 
-
-
-
 ## <a name="plantdescription_usecases">Services and Use Cases</a>
 
-Use case 1: 
+## <a name="plantdescription_endpoints">Endpoints</a>
+
+The PDE offers one endpoint.
+
+Swagger API documentation is available on: `https://<host>:<port>` <br />
+The base URL for the requests: `http://<host>:<port>/pde`
+
+<a name="pde_endpoints_client" />
+
+### Client endpoint description<br />
+
+| Function | URL subpath | Method | Input | Output |
+| -------- | ----------- | ------ | ----- | ------ |
+| [Echo](#pde_endpoints_get_echo) | /echo  | GET | - | OK |
+| [Get all Plant Descriptions](#pde_endpoints_get_pd) | /pd | GET | - | [PlantDescriptionEntryList](#datastructures_plantdescriptionentrylist) |
+| [Add Plant Description](#pde_endpoints_post_pd) | /pd | POST | [PlanDescription](#datastructures_plantdescription) | [PlantDescriptionEntry](#datastructures_plantdescriptionentry) |
+| [Get Plant Description by ID](#pde_endpoints_get_pd_id) | /pd/{id} | GET | PlantDescriptionID | [PlanDescriptionEntry](#datastructures_plantdescriptionentry) |
+| [Replace an entry by ID](#pde_endpoints_put_pd) | /pd/{id} | PUT | [PlantDescription](#datastructures_plantdescription) | [PlantDescriptionEntry](#datastructures_plantdescriptionentry) |
+| [Modify an entry by ID](#pde_endpoints_patch_pd) | /pd/{id} | PATCH | Key value pairs of [PlantDescription](#datastructures_plantdescriptionpatch) | [PlantDescriptionEntry](#datastructures_plantdescriptionentry) |
+| [Delete Plant Description by ID](#pde_endpoints_delete_pd_id) | /pd/{id} | DELETE | PlantDescriptionID | - |
+
+<a name="pde_endpoints_get_echo" />
+
+### Echo
+```
+GET /pde/echo
+```
+
+Returns a "Got it" message with the purpose of testing the core service availability.
+
+            
+### <a name="pde_endpoints_get_pd">Get all Plant Descriptions</a>
+```
+GET /pde/pd
+```
+
+Returns a list of plant description entries. If `page` and `item_per_page` are not defined, returns
+all records. 
+
+Query params:
+
+| Field | Description | Mandatory |
+| ----- | ----------- | --------- |
+| `page` | zero based page index | no |
+| `item_per_page` | maximum number of items returned | no |
+| `sort_field` | sorts by the given column | no |
+| `direction` | direction of sorting | no |
+
+> **Note:** Default value for `sort_field` is `id`. All possible values are: 
+> * `id`
+> * `createdAt`
+> * `updatedAt`
+
+> **Note:** Default value for `direction` is `ASC`. All possible values are:
+> * `ASC`
+> * `DESC` 
 
 
 
+### <a name="pde_endpoints_post_pd">Add Plant Description</a>
+```
+POST /pde/pd
+```                       
 
-## <a name="plantdescription_endpoints">Endpointssystems</a>
+Creates a Plant Description Entry and returns the newly created entry.
 
-
-__PlantDescriptionEntry__  is the input
+__[PlantDescription](#datastructures_plantdescription)__  is the input
 
 
 ```json
@@ -7996,7 +8051,7 @@ __PlantDescriptionEntry__  is the input
 			]
 		},
 		{
-			"systemName": "Orchestraztion",
+			"systemName": "Orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
@@ -8016,15 +8071,7 @@ __PlantDescriptionEntry__  is the input
   			},
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{
-					"portName": "servicePort",
-					"serviceDefinition": "Provided Service",
-					"metadata": {
-						"additionalProp4": "string",
-						"additionalProp5": "string",
-						"additionalProp6": "string"
-					},
-				}	
+				{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
 			]
 		}
 		
@@ -8032,34 +8079,444 @@ __PlantDescriptionEntry__  is the input
 	"connections": [
 		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
 		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestraztion", "portName": "service_registry" },
+		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
 		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestraztion", "portName": "tokenGeneration" },
+		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
 		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestraztion", "portName": "authorizationControl" },
+		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
 		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
 
 		{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
 		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
 	]
+}
 ```
 
-### Plant description object
+Returns a __[PlantDescriptionEntryList](#datastructures_plantdescriptionentrylist)__ with one, the newly created, __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ 
+
+```json
+{
+  "count": 0,
+  "data": [
+	{
+		"id": 0,
+		"plantDescription": "ArrowHead core",
+		"active": false,
+		"systems": [
+			{
+				"systemName": "Service Registry",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
+				]
+			},
+			{
+				"systemName": "Authorization",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+				]
+			},
+			{
+				"systemName": "Orchestration",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+				]
+			},
+			{
+				"systemName": "Example producer with metadata",
+				"metadata": {
+					"additionalProp1": "string",
+					"additionalProp2": "string",
+					"additionalProp3": "string"
+	  			},
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
+				]
+			}
+		],
+		"connections": [
+			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+	
+			{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		],
+      "createdAt": "string",
+      "updatedAt": "string"
+	}
+]
+```
+
+            
+<a name="orchestrator_endpoints_get_store_id" />
+
+### <a name="pde_endpoints_get_pd">Get Plant Description by Id</a>
+```
+GET /pde/pd/{id}
+```             
+
+Returns the __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ specified by the ID path parameter.
+
+```json
+{
+	"id": 0,
+	"plantDescription": "ArrowHead core",
+	"active": false,
+	"systems": [
+		{
+			"systemName": "Service Registry",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
+			]
+		},
+		{
+			"systemName": "Authorization",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+			]
+		},
+		{
+			"systemName": "Orchestration",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+			]
+		},
+		{
+			"systemName": "Example producer with metadata",
+			"metadata": {
+				"additionalProp1": "string",
+				"additionalProp2": "string",
+				"additionalProp3": "string"
+  			},
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
+			]
+		}
+	],
+	"connections": [
+		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+
+		{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+	],
+  "createdAt": "string",
+  "updatedAt": "string"
+}
+```
+
+### <a name="pde_endpoints_put_pd">Replace a Plant Description by Id</a>
+```
+PUT /pde/pd/{id}
+```                       
+
+Replaces the __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ specified by the ID path parameter with the supplied __[PlantDescription](#datastructures_plantdescription)__.
+
+__[PlantDescription](#datastructures_plantdescription)__  is the input
+
+
+```json
+{
+	"plantDescription": "ArrowHead core",
+	"active": false,
+	"systems": [
+		{
+			"systemName": "Service Registry",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
+			]
+		},
+		{
+			"systemName": "Authorization",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+			]
+		},
+		{
+			"systemName": "Orchestration",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+			]
+		},
+		{
+			"systemName": "Example producer with metadata",
+			"metadata": {
+				"additionalProp1": "string",
+				"additionalProp2": "string",
+				"additionalProp3": "string"
+  			},
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
+			]
+		}
+		
+	],
+	"connections": [
+		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+
+		{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+	]
+}
+```
+
+Returns a __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ 
+
+```json
+{
+  "count": 0,
+  "data": [
+	{
+		"id": 0,
+		"plantDescription": "ArrowHead core",
+		"active": false,
+		"systems": [
+			{
+				"systemName": "Service Registry",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
+				]
+			},
+			{
+				"systemName": "Authorization",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+				]
+			},
+			{
+				"systemName": "Orchestration",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+				]
+			},
+			{
+				"systemName": "Example producer with metadata",
+				"metadata": {
+					"additionalProp1": "string",
+					"additionalProp2": "string",
+					"additionalProp3": "string"
+	  			},
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
+				]
+			}
+		],
+		"connections": [
+			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+	
+			{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		],
+      "createdAt": "string",
+      "updatedAt": "string"
+	}
+]
+```
+
+### <a name="pde_endpoints_put_pd">Update a Plant Description by Id</a>
+```
+PATCH /pde/pd/{id}
+```                       
+
+Updates the __[Plant Description Entry](#datastructures_plantdescriptionentry)__ specified by the ID path parameter with the supplied __[Plant Description update](#datastructures_plantdescriptionpatch)__.
+
+__[Plant Description update](#datastructures_plantdescriptionpatch)__  is the input
+
+
+```json
+{
+	"active": true
+}
+```
+
+Returns a __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ 
+
+```json
+{
+  "count": 0,
+  "data": [
+	{
+		"id": 0,
+		"plantDescription": "ArrowHead core",
+		"active": true,
+		"systems": [
+			{
+				"systemName": "Service Registry",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
+				]
+			},
+			{
+				"systemName": "Authorization",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+				]
+			},
+			{
+				"systemName": "Orchestration",
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+				]
+			},
+			{
+				"systemName": "Example producer with metadata",
+				"metadata": {
+					"additionalProp1": "string",
+					"additionalProp2": "string",
+					"additionalProp3": "string"
+	  			},
+				"ports": [
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
+				]
+			}
+		],
+		"connections": [
+			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+	
+			{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
+			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		],
+      "createdAt": "string",
+      "updatedAt": "string"
+	}
+]
+```
+
+### <a name="pde_endpoints_delete_pd">Delete Plant Description by Id</a>
+```
+DELETE /pde/pd/{id}
+```             
+
+Removes the __[PlantDescriptionEntry](#datastructures_plantdescriptionentry)__ specified by the ID path parameter.
+
+
+## <a name="plantdescription_endpoints">Data structures</a>
+
+
+
+### <a name="datastructures_plantdescriptionentrylist">Plant Description Entry list</a>
+<a name="datastructures_plantdescriptionentrylist" />
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Identity of the plant description | true | | 
-| `systems` | Array | List of System objects, see table below | true | |
-| `connections` | Array | list of Connection objects between system ports, see table below | true | | 
+| `count` | Number of records found | true ||
+| `data` | Array of [PlanDescriptionEntry](#datastructures_plantdescriptionentry) | true ||
 
-### System object
+### <a name="datastructures_plantdescription">Plant Description</a>
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `plantDescription` | String | Plant description name | true | | 
+| `active` | Boolean | Is this the active plant description | false | false |
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | true ||
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | true ||
+
+### <a name="datastructures_plantdescriptionpatch">Plant Description update</a>
+
+Currently only the following values can be updated. If a field is not present the current value will be used.
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `plantDescription` | String | Plant description name | false || 
+| `active` | Boolean | Is this the active plant description | false ||
+
+### <a name="datastructures_plantdescriptionentry">Plant Description Entry</a>
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `id` | String | Id of the entry | true ||
+| `plantDescription` | String | Plant description name| true || 
+| `active` | Boolean | Is this the active plant description | true ||
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | true ||
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | true ||
+| `createdAt` | Creation date of the entry | true ||
+| `updatedAt` | When the entry was last updated | true ||
+
+### <a name="datastructures_plantdescription_system">System object</a>
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemName` | String | Identity of the system | true | | 
 | `metadata` | Object | Metadata - key-value pairs | false | |
-| `ports` | Array | List of Port objects provided by the system, see table below | true | |
+| `ports` | Array | Array of [Port objects](#datastructures_plantdescription_port) | true ||
 
-### Port object
+### <a name="datastructures_plantdescription_port">Port object</a>
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
 | `portName` | String | Identity of the port | true | |
@@ -8067,13 +8524,13 @@ __PlantDescriptionEntry__  is the input
 | `metadata` | Object | Metadata - key-value pairs | false | |
 | `consumer` | Boolean | Is the port a consumer port | false | false |
 
-### Connection object
+### <a name="datastructures_plantdescription_conenction">Connection object</a>
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `consumer` | Object | The consumer end SystemPort of the connection, see table below | true | | 
-| `producer` | Object | The producer end SysetmPort of the connection, see table below | true | | 
+| `consumer` | Object | The consumer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
+| `producer` | Object | The producer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
 
-### SystemPort object
+### <a name="datastructures_plantdescription_systemport">SystemPort object</a>
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemName` | String | Identity of the system | true | | 
