@@ -8000,6 +8000,9 @@ Returns a "Pong" message with the purpose of testing the service availability.
 | [Replace an entry by ID](#pde_endpoints_put_pd) | /pd/{id} | PUT | [Plant Description](#datastructures_plantdescription) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
 | [Modify an entry by ID](#pde_endpoints_patch_pd) | /pd/{id} | PATCH | Key value pairs of [Plant Description](#datastructures_plantdescriptionpatch) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
 | [Delete Plant Description by ID](#pde_endpoints_delete_pd) | /pd/{id} | DELETE | - | - |
+| [Get all PDE alarms](#pde_endpoints_get_alarm) | /alarm | GET | - | [Alarm list](#datastructures_pdealarmlist) |
+| [Get PDE alarm by id](#pde_endpoints_get_alarm_id) | /alarm/{id} | GET | - | [Alarm](#datastructures_pdealarm) |
+| [Modify a PDE alarm by id](#pde_endpoints_patch_alarm) | /alarm/{id} | PATCH |  Key value pairs of [Alarm](#datastructures_pdealarmpatch) | [Alarm](#datastructures_pdealarm) |
 
 
 #### <a name="pde_endpoints_get_pd">Get all Plant Descriptions</a>
@@ -8014,7 +8017,7 @@ Query params:
 
 | Field | Description | Mandatory |
 | ----- | ----------- | --------- |
-| `page` | zero based page index | no |
+| `page` | zero based page index | nomodified |
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
@@ -8589,7 +8592,9 @@ Query params:
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
-| `filter_field` | filter by a given column | no | 
+| `filter_field` | filter by a given column | no |
+| `filter_value` | value to filter by | no |
+
 
 > **Note:** Default value for `sort_field` is `id`. All possible values are: 
 > * `id`
@@ -8600,78 +8605,78 @@ Query params:
 > * `ASC`
 > * `DESC` 
 
-Returns a __[Plant Description Entry List](#datastructures_plantdescriptionentrylist)__ with all __[Plant Description Entries](#datastructures_plantdescriptionentry)__ present in the PDE.
+> **Note:**  Possible values for `filter_field` are: 
+> * `systemName`
+> * `acknowledged`
+> * `severity`
+
+Returns a __[PDE Alarm List](#datastructures_pdealarmlist)__ with all __[PDE Alarms](#datastructures_pdealarm)__ present in the PDE.
 
 ```json
 {
-  "count": 1,
-  "data": [
-	{
-		"id": 0,
-		"plantDescription": "ArrowHead core",
-		"active": false,
-		"systems": [
-			{
-				"systemName": "Service Registry",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
-				]
-			},
-			{
-				"systemName": "Authorization",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
-				]
-			},
-			{					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
-			
-				"systemName": "Orchestration",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
-					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
-				]
-			},
-			{
+	"count": 1,
+	"data": [
+		{
+				"id": 0,
 				"systemName": "Example producer with metadata",
-				"metadata": {
-					"additionalProp1": "string",
-					"additionalProp2": "string",
-					"additionalProp3": "string"
-	  			},
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
-					{ "portName": "servicePort", "serviceDefinition": "Provided Service" }	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
-				]
+				"acknowledged": false,
+				"severity": "major",
+				"description": "System not registered in Service Registry",
+				"raisedAt": "2020-03-13T16:54:00.511Z",
+				"modifiedAt": "2020-03-13T16:54:00.511Z"
 			}
-		],
-		"connections": [
-			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
-	
-			{ "consumer": { "systemName": "Example producer with metadata", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		],
-      "createdAt": "string",
-      "updatedAt": "string"
-	}
-]
+	]
+}
+```
+
+#### <a name="pde_endpoints_get_alarm_id">Get PDE alarm by Id</a>
+```
+GET /pde/alarm/{id}
+```
+
+Returns the __[PDE Alarms](#datastructures_pdealarm)__ specified by the ID path parameter.
+
+```json
+{
+	"id": 0,
+	"systemName": "Example producer with metadata",
+	"acknowledged": false,
+	"severity": "major",
+	"description": "System not registered in Service Registry",
+	"raisedAt": "2020-03-13T16:54:00.511Z",
+	"modifiedAt": "2020-03-13T16:54:00.511Z"
+}
+```
+
+#### <a name="pde_endpoints_patch_alarm">Update PDE alarm by Id</a>
+```
+PATCH /pde/alarm/{id}
+```
+
+Updates the __[PDE Alarm](#datastructures_pdealarm)__ specified by the ID path parameter with the supplied __[PDE Alarm update](#datastructures_pdealarmpatch)__.
+
+__[PDE Alarm update](#datastructures_pdealarmpatch)__ is the input
+
+
+```json
+{
+	"acknowledged": true
+}
+```
+
+Returns the updated __[PDE Alarms](#datastructures_pdealarm)__.
+
+```json
+{
+	"id": 0,
+	"systemName": "Example producer with metadata",
+	"acknowledged": true,
+	"severity": "major",
+	"description": "No service registered in Service Registry",
+	"raisedAt": "2020-03-13T16:54:00.511Z",
+	"modifiedAt": "2020-03-13T17:34:00.325Z"
+	"acknowledgedAt": "2020-03-13T17:34:00.325Z"
+}
 ```
 
 
@@ -8681,10 +8686,10 @@ Returns a __[Plant Description Entry List](#datastructures_plantdescriptionentry
 
 ### <a name="datastructures_plantdescriptionentrylist">Plant Description Entry list</a>
 
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Int | Number of records found | true ||
-| `data` | Array | Array of [Plan Description Entry](#datastructures_plantdescriptionentry) | true ||
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `count` | Int | Number of records found |
+| `data` | Array | Array of [Plan Description Entry](#datastructures_plantdescriptionentry) |
 
 ### <a name="datastructures_plantdescription">Plant Description</a>
 
@@ -8706,15 +8711,15 @@ Currently only the following values can be updated. If a field is not present th
 
 ### <a name="datastructures_plantdescriptionentry">Plant Description Entry</a>
 
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Int | Id of the entry | true ||
-| `plantDescription` | String | Plant description name| true || 
-| `active` | Boolean | Is this the active plant description | true ||
-| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | true ||
-| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | true ||
-| `createdAt` | Creation date of the entry | true ||
-| `updatedAt` | When the entry was last updated | true ||
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `id` | Int | Id of the entry |
+| `plantDescription` | String | Plant description name| 
+| `active` | Boolean | Is this the active plant description |
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) |
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) |
+| `createdAt` | String | Creation date of the entry |
+| `updatedAt` | String | When the entry was last updated |
 
 ### <a name="datastructures_plantdescription_system">System object</a>
 | Field | Type | Description | Mandatory | Default value | 
@@ -8742,4 +8747,33 @@ Currently only the following values can be updated. If a field is not present th
 | `systemName` | String | Identity of the system | true | | 
 | `portName` | String | Identity of the port | true | |
 
+
+### <a name="datastructures_plantalarmlist">PDE alarm list</a>
+
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `count` | Int | Number of records found |
+| `data` | Array | Array of [PDE alarms](#datastructures_pdealarm) |
+
+### <a name="datastructures_pdealarm">PDE Alarm object</a>
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `id` | Int | Id of the alarm |
+| `systemName` | String | Identity of the system |
+| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |
+| `severity` | String | `indeterminate/critical/major/minor/warning/cleared` |
+| `description` | String | Description of the problem |
+| `raisedAt` | String | Creation date of the entry |
+| `updatedAt` | String | When the entry was last updated |
+| `clearedAt` | String | When the entry was cleared |
+| `acknowledgedAt` | String | When the entry was acknowledged |
+
+
+### <a name="datastructures_pdealarmpatch">PDE Alarm update</a>
+
+Currently only the following values can be updated. If a field is not present the current value will be used.
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |false||
 
