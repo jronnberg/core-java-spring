@@ -7984,11 +7984,11 @@ The PDE consumes the following services:
 [Orchestrator]:../../README.md#orchestrator
 [Orchestration]:../../README.md#orchestrator
 [Orchestration Store Management]:../../README.md#orchestrator
-[Plant Description Alarm]:plant-description-alarm-sd.md
-[Plant Description Alarm JSON]:plant-description-alarm-idd-http-json.md
-[Plant Description Management]:plant-description-management-sd.md
-[Plant Description Management JSON]:plant-description-management-idd-http-json.md
-[Plant Description Engine HTTP(S)/JSON - System Description (SysD)]:documention/plant-description-engine/plant-description-engine-sysd.md
+[Plant Description Alarm]:documentation/plant-description-engine/plant-description-alarm-sd.md
+[Plant Description Alarm JSON]:documentation/plant-description-engine/plant-description-alarm-idd-http-json.md
+[Plant Description Management]:documentation/plant-description-engine/plant-description-management-sd.md
+[Plant Description Management JSON]:documentation/plant-description-engine/plant-description-management-idd-http-json.md
+[Plant Description Engine HTTP(S)/JSON - System Description (SysD)]:documentation/plant-description-engine/plant-description-engine-sysd.md
 [Service Discovery]:../../README.md#serviceregistry_usecases
 [Service Registry]:../../README.md#serviceregistry
   
