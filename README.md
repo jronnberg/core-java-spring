@@ -5761,59 +5761,104 @@ __ActiveSession__ is the output.
  
 
  
-## <a name="plantdescription_sdd">System Design Description Overview</a>
+## <a name="plantdescription_sysd">System Description (SysD)</a>
 
 This supporting core system has the purpose of choreographing the consumers and producers in the plant (System of Systems / Local cloud).
 An abstract view, on which systems the plant contains and how they are connected as consumers and producers, is used to populate the [Orchestrator](#orchestrator) with store rules for each of the consumers. The abstract view does not contain any instance specific information, instead meta-data about each system is used to identify the service producers.
 
 The plant description engine (PDE) can be configured with several variants of the plant description of which at most one can be active. The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternativ plants (plan A, plan B, etc).
 
-The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable end-point](#monitorable_endpoint) and hence also register in the service registry.
+The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable](#monitorable) service and hence also register in the service registry.
 
-## <a name="plantdescription_usecases">Services and Use Cases</a>
+## <a name="plantdescription_services">Services</a>
 
-## <a name="plantdescription_endpoints">End-points</a>
-
-The PDE offers two end-points, the client end-point and the monitorable end-point.
+The PDE produces three different services:
+ + the [Monitorable](#monitorable) service
+ + the [Plant Description Management](#plantdescription_pdm) service
+ + the [Plant Description Alarm](#plantdescription_pda) service 
 
 Swagger API documentation is available on: `https://<host>:<port>` <br />
 The base URL for the requests: `http://<host>:<port>/pde`
 
 
-### <a name="monitorable_endpoint">Monitorable end-point description</a>
+### <a name="monitorable">Monitorable</a>
 
 | Function | URL subpath | Method | Input | Output |
 | -------- | ----------- | ------ | ----- | ------ |
-| [Ping](#monitorable_endpoints_get_ping) | /ping  | GET | - | OK |
+| [Ping](#monitorable_get_ping) | /ping  | GET | - | OK |
+| [Get System data](#monitorable_get_systemdata) | /systemdata  | GET | - | [System data](#datastructures_monitorable_systemdata) |
+| [Get Inventory Id](#monitorable_get_inventoryid) | /inventoryid  | GET | - | [Inventory id](#datastructures_monitorable_inventoryid) |
 
 
-
-#### <a name="monitorable_endpoints_get_ping">Ping</a>
+#### <a name="monitorable_get_ping">Ping</a>
 ```
 GET {base URL}/ping
 ```
 
 Returns a "Pong" message with the purpose of testing the service availability.
 
+#### <a name="monitorable_get_systemdata">Get System data</a>
+```
+GET {base URL}/systemdata
+```
+
+Returns __[System data](#datastructures_monitorable_systemdata)__.
+
+```json
+{
+  "systemdata": {
+		"key1": "value1",
+		"key2": 0,
+		"key3": { "subkey1": "string" }
+	}
+}
+```
+
+#### <a name="monitorable_get_inventoryid">Get Inventory id</a>
+```
+GET {base URL}/inventoryid
+```
+
+Returns __[Inventory id](#datastructures_monitorable_inventoryid)__.
+
+```json
+{
+  "inventoryid": "my inventory id 007"
+}
+```
+
+#### <a name="monitorable_datastructures">Monitorable Data structures</a>
+
+##### <a name="datastructures_monitorable_systemdata">System data</a>
+
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `systemdata` | Object | System specific data - key-value pairs |
+
+##### <a name="datastructures_monitorable_inventoryid">Inventory id</a>
+
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `inventoryid` | String | The systems Id in an [Inventory] system |
 
 
 
-### <a name="pde_endpoints_client">Client endpoint description</a>
+
+
+
+### <a name="plantdescription_pdm">Plant Description Management</a>
 
 | Function | URL subpath | Method | Input | Output |
 | -------- | ----------- | ------ | ----- | ------ |
-| [Get all Plant Descriptions](#pde_endpoints_get_pd) | /pd | GET | - | [Plant Description Entry List](#datastructures_plantdescriptionentrylist) |
-| [Add Plant Description](#pde_endpoints_post_pd) | /pd | POST | [Plant Description](#datastructures_plantdescription) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
-| [Get Plant Description by ID](#pde_endpoints_get_pd_id) | /pd/{id} | GET | - | [Plant Description Entry](#datastructures_plantdescriptionentry) |
-| [Replace an entry by ID](#pde_endpoints_put_pd) | /pd/{id} | PUT | [Plant Description](#datastructures_plantdescription) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
-| [Modify an entry by ID](#pde_endpoints_patch_pd) | /pd/{id} | PATCH | Key value pairs of [Plant Description](#datastructures_plantdescriptionpatch) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
-| [Delete Plant Description by ID](#pde_endpoints_delete_pd) | /pd/{id} | DELETE | - | - |
-| [Get all PDE alarms](#pde_endpoints_get_alarm) | /alarm | GET | - | [Alarm list](#datastructures_pdealarmlist) |
-| [Get PDE alarm by id](#pde_endpoints_get_alarm_id) | /alarm/{id} | GET | - | [Alarm](#datastructures_pdealarm) |
-| [Modify a PDE alarm by id](#pde_endpoints_patch_alarm) | /alarm/{id} | PATCH |  Key value pairs of [Alarm](#datastructures_pdealarmpatch) | [Alarm](#datastructures_pdealarm) |
+| [Get all Plant Descriptions](#pdm_get_pd) | /pd | GET | - | [Plant Description Entry List](#datastructures_plantdescriptionentrylist) |
+| [Add Plant Description](#pdm_post_pd) | /pd | POST | [Plant Description](#datastructures_plantdescription) | [Plant Description Entry List](#datastructures_plantdescriptionentrylist) |
+| [Get Plant Description by ID](#pdm_get_pd_id) | /pd/{id} | GET | - | [Plant Description Entry](#datastructures_plantdescriptionentry) |
+| [Replace an entry by ID](#pdm_put_pd) | /pd/{id} | PUT | [Plant Description](#datastructures_plantdescription) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
+| [Modify an entry by ID](#pdm_patch_pd) | /pd/{id} | PATCH | Key value pairs of [Plant Description](#datastructures_plantdescriptionpatch) | [Plant Description Entry](#datastructures_plantdescriptionentry) |
+| [Delete Plant Description by ID](#pdm_delete_pd) | /pd/{id} | DELETE | - | - |
 
 
-#### <a name="pde_endpoints_get_pd">Get all Plant Descriptions</a>
+#### <a name="pdm_get_pd">Get all Plant Descriptions</a>
 ```
 GET /pde/pd
 ```
@@ -5914,7 +5959,7 @@ Returns a __[Plant Description Entry List](#datastructures_plantdescriptionentry
 ```
 
 
-#### <a name="pde_endpoints_post_pd">Add Plant Description</a>
+#### <a name="pdm_post_pd">Add Plant Description</a>
 ```
 POST /pde/pd
 ```                       
@@ -6061,7 +6106,7 @@ Returns a __[Plant Description Entry List](#datastructures_plantdescriptionentry
 ]
 ```
 
-#### <a name="pde_endpoints_get_pd_id">Get Plant Description by Id</a>
+#### <a name="pdm_get_pd_id">Get Plant Description by Id</a>
 ```
 GET /pde/pd/{id}
 ```             
@@ -6135,7 +6180,7 @@ Returns the __[Plant Description Entry](#datastructures_plantdescriptionentry)__
 }
 ```
 
-#### <a name="pde_endpoints_put_pd">Replace a Plant Description by Id</a>
+#### <a name="pdm_put_pd">Replace a Plant Description by Id</a>
 ```
 PUT /pde/pd/{id}
 ```                       
@@ -6286,7 +6331,7 @@ Returns a __[Plant Description Entry](#datastructures_plantdescriptionentry)__
 ]
 ```
 
-#### <a name="pde_endpoints_patch_pd">Update a Plant Description by Id</a>
+#### <a name="pdm_patch_pd">Update a Plant Description by Id</a>
 ```
 PATCH /pde/pd/{id}
 ```                       
@@ -6375,7 +6420,7 @@ Returns a __[Plant Description Entry](#datastructures_plantdescriptionentry)__
 ]
 ```
 
-#### <a name="pde_endpoints_delete_pd">Delete Plant Description by Id</a>
+#### <a name="pdm_delete_pd">Delete Plant Description by Id</a>
 ```
 DELETE /pde/pd/{id}
 ```             
@@ -6383,8 +6428,85 @@ DELETE /pde/pd/{id}
 Removes the __[Plant Description Entry](#datastructures_plantdescriptionentry)__ specified by the ID path parameter.
 
 
+### <a name="plantdescription_datastructures">Plant Description Management Data structures</a>
 
-#### <a name="pde_endpoints_get_alarm">Get all PDE alarms</a>
+#### <a name="datastructures_plantdescriptionentrylist">Plant Description Entry list</a>
+
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `count` | Int | Number of records found |
+| `data` | Array | Array of [Plan Description Entry](#datastructures_plantdescriptionentry) |
+
+#### <a name="datastructures_plantdescription">Plant Description</a>
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `plantDescription` | String | Plant description name | true | |
+| `active` | Boolean | Is this the active plant description | false | false |
+| `include` | Array | Array of Int with Ids of other PDs that are included in this PD | false | [] |
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | true ||
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | true ||
+
+#### <a name="datastructures_plantdescriptionpatch">Plant Description update</a>
+
+Currently only the following values can be updated. If a field is not present the current value will be used.
+
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `plantDescription` | String | Plant description name | false || 
+| `active` | Boolean | Is this the active plant description | false ||
+| `include` | Array | Array of Int with Ids of other PDs that are included in this PD | false ||
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | false ||
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | false ||
+
+#### <a name="datastructures_plantdescriptionentry">Plant Description Entry</a>
+
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `id` | Int | Id of the entry |
+| `plantDescription` | String | Plant description name| 
+| `active` | Boolean | Is this the active plant description |
+| `include` | Array | Array of Int with Ids of other PDs that are included in this PD |
+| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) |
+| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) |
+| `createdAt` | String | Creation date of the entry |
+| `updatedAt` | String | When the entry was last updated |
+
+#### <a name="datastructures_plantdescription_system">System object</a>
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `systemName` | String | Identity of the system | true | | 
+| `metadata` | Object | Metadata - key-value pairs | false | |
+| `ports` | Array | Array of [Port objects](#datastructures_plantdescription_port) | true ||
+
+#### <a name="datastructures_plantdescription_port">Port object</a>
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `portName` | String | Identity of the port | true | |
+| `serviceDefinition` | String | Service definition identity | true | |
+| `consumer` | Boolean | Is the port a consumer port | false | false |
+
+#### <a name="datastructures_plantdescription_conenction">Connection object</a>
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `consumer` | Object | The consumer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
+| `producer` | Object | The producer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
+
+#### <a name="datastructures_plantdescription_systemport">SystemPort object</a>
+| Field | Type | Description | Mandatory | Default value | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `systemName` | String | Identity of the system | true | | 
+| `portName` | String | Identity of the port | true | |
+
+### <a name="plantdescription_pda">Plant Description Alarm</a>
+
+| Function | URL subpath | Method | Input | Output |
+| -------- | ----------- | ------ | ----- | ------ |
+| [Get all PDE alarms](#pda_get_alarm) | /alarm | GET | - | [Alarm list](#datastructures_pdealarmlist) |
+| [Get PDE alarm by id](#pda_get_alarm_id) | /alarm/{id} | GET | - | [Alarm](#datastructures_pdealarm) |
+| [Modify a PDE alarm by id](#pda_patch_alarm) | /alarm/{id} | PATCH |  Key value pairs of [Alarm](#datastructures_pdealarmpatch) | [Alarm](#datastructures_pdealarm) |
+
+#### <a name="pda_get_alarm">Get all PDE alarms</a>
 ```
 GET /pde/alarm
 ```
@@ -6437,7 +6559,7 @@ Returns a __[PDE Alarm List](#datastructures_pdealarmlist)__ with all __[PDE Ala
 }
 ```
 
-#### <a name="pde_endpoints_get_alarm_id">Get PDE alarm by Id</a>
+#### <a name="pda_get_alarm_id">Get PDE alarm by Id</a>
 ```
 GET /pde/alarm/{id}
 ```
@@ -6456,7 +6578,7 @@ Returns the __[PDE Alarms](#datastructures_pdealarm)__ specified by the ID path 
 }
 ```
 
-#### <a name="pde_endpoints_patch_alarm">Update PDE alarm by Id</a>
+#### <a name="pda_patch_alarm">Update PDE alarm by Id</a>
 ```
 PATCH /pde/alarm/{id}
 ```
@@ -6487,83 +6609,16 @@ Returns the updated __[PDE Alarms](#datastructures_pdealarm)__.
 }
 ```
 
+### <a name="plantdescription_alarm_datastructures">Plant Description Alarm Data structures</a>
 
-## <a name="plantdescription_datastructures">PDE Data structures</a>
-
-
-
-### <a name="datastructures_plantdescriptionentrylist">Plant Description Entry list</a>
-
-| Field | Type | Description | 
-| ----- | ---- | ----------- |
-| `count` | Int | Number of records found |
-| `data` | Array | Array of [Plan Description Entry](#datastructures_plantdescriptionentry) |
-
-### <a name="datastructures_plantdescription">Plant Description</a>
-
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | true | | 
-| `active` | Boolean | Is this the active plant description | false | false |
-| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) | true ||
-| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) | true ||
-
-### <a name="datastructures_plantdescriptionpatch">Plant Description update</a>
-
-Currently only the following values can be updated. If a field is not present the current value will be used.
-
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | false || 
-| `active` | Boolean | Is this the active plant description | false ||
-
-### <a name="datastructures_plantdescriptionentry">Plant Description Entry</a>
-
-| Field | Type | Description | 
-| ----- | ---- | ----------- |
-| `id` | Int | Id of the entry |
-| `plantDescription` | String | Plant description name| 
-| `active` | Boolean | Is this the active plant description |
-| `systems` | Array | Array of [System objects](#datastructures_plantdescription_system) |
-| `connections` | Array | Array of [Connection objects](#datastructures_plantdescription_connection) |
-| `createdAt` | String | Creation date of the entry |
-| `updatedAt` | String | When the entry was last updated |
-
-### <a name="datastructures_plantdescription_system">System object</a>
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `metadata` | Object | Metadata - key-value pairs | false | |
-| `ports` | Array | Array of [Port objects](#datastructures_plantdescription_port) | true ||
-
-### <a name="datastructures_plantdescription_port">Port object</a>
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `portName` | String | Identity of the port | true | |
-| `serviceDefinition` | String | Service definition identity | true | |
-| `consumer` | Boolean | Is the port a consumer port | false | false |
-
-### <a name="datastructures_plantdescription_conenction">Connection object</a>
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `consumer` | Object | The consumer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
-| `producer` | Object | The producer end [SystemPort](#datastructures_plantdescription_systemport) of the connection | true | | 
-
-### <a name="datastructures_plantdescription_systemport">SystemPort object</a>
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `portName` | String | Identity of the port | true | |
-
-
-### <a name="datastructures_plantalarmlist">PDE alarm list</a>
+#### <a name="datastructures_plantalarmlist">PDE alarm list</a>
 
 | Field | Type | Description | 
 | ----- | ---- | ----------- |
 | `count` | Int | Number of records found |
 | `data` | Array | Array of [PDE alarms](#datastructures_pdealarm) |
 
-### <a name="datastructures_pdealarm">PDE Alarm object</a>
+#### <a name="datastructures_pdealarm">PDE Alarm object</a>
 | Field | Type | Description | 
 | ----- | ---- | ----------- |
 | `id` | Int | Id of the alarm |
@@ -6577,7 +6632,7 @@ Currently only the following values can be updated. If a field is not present th
 | `acknowledgedAt` | String | When the entry was acknowledged |
 
 
-### <a name="datastructures_pdealarmpatch">PDE Alarm update</a>
+#### <a name="datastructures_pdealarmpatch">PDE Alarm update</a>
 
 Currently only the following values can be updated. If a field is not present the current value will be used.
 
