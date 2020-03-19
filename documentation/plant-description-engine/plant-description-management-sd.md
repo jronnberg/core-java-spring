@@ -48,10 +48,10 @@ in this section, there is also a list of implicit [primitive](#primitives) types
 which are used to represent things like dates.
 
 ### struct Connection
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | true | | 
-| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | true | | 
+| Field | Type | Description | Mandatory | 
+| ----- | ---- | ----------- | --------- |
+| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | true | 
+| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | true | 
 
 
 ### struct PlantDescription
@@ -66,35 +66,35 @@ which are used to represent things like dates.
 
 ### struct PlantDescriptionEntry
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Note | 
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the entry | true | |
 | `plantDescription` | String | Plant description name| true | | 
 | `active` | Boolean | Is this the active plant description | true | |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | [] |
-| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | true ||
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | Only present if  not empty |
+| `systems` | Array\<[SystemEntry](#struct-systementry)> | Array with systems expected to be present in the plant | true ||
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | true ||
 | `createdAt` | DateTime | Creation date of the entry | true | |
 | `updatedAt` | DateTime | When the entry was last updated | true | |
 
 ### struct PlantDescriptionEntryList
 
-| Field | Type | Description | Mandatory | Default value |
-| ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | true | |
-| `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries | true | |
+| Field | Type | Description | 
+| ----- | ---- | ----------- |
+| `count` | Number | Number of records found |
+| `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
 
 ### struct PlantDescriptionUpdate
 
 Currently only the following values can be updated. If a field is not present the current value will remain unchanged.
 
-| Field | Type | Description | Mandatory | Default value | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | false || 
-| `active` | Boolean | Is this the active plant description |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | [] |
-| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | true ||
-| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | true ||
+| Field | Type | Description | Mandatory | 
+| ----- | ---- | ----------- | --------- |
+| `plantDescription` | String | Plant description name | false | 
+| `active` | Boolean | Is this the active plant description | false |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false |
+| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | false |
+| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | false |
 
 ### struct Port
 | Field | Type | Description | Mandatory | Default value | 
@@ -107,8 +107,19 @@ Currently only the following values can be updated. If a field is not present th
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemName` | String | Identity of the system | true | | 
-| `metadata` | Object | Metadata - key-value pairs | false | |
+| `metadata` | Custom | Metadata - key-value pairs | false | null |
 | `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | true ||
+
+### struct SystemEntry
+| Field | Type | Description | Mandatory | Note | 
+| ----- | ---- | ----------- | --------- | ------------- |
+| `systemName` | String | Identity of the system | true | | 
+| `metadata` | Custom | Metadata - key-value pairs | false | Only present if specified |
+| `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | true ||
+| `systemData` | Custom | System specific data - key-value pairs | false | Only if provided by Monitorable |
+| `inventoryId` | String | The systems Id in an Inventory system | false | Only if provided by Monitorable |
+| `inventoryData` | Custom | Inventory specific data - key-value pairs | false | Only if provided by Inventory  |
+
 
 ### struct SystemPort
 | Field | Type | Description | Mandatory | Default value | 
@@ -128,6 +139,7 @@ document claiming to implement this service.
 | ---- | ----------- |
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Boolean | One out of `true` or `false`. |
+| Custom | Any suitable type chosen by the implementor of the service.|
 | DateTime | Pinpoints a specific moment in time. |
 | Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
 | String | An arbitrary UTF-8 string. |
