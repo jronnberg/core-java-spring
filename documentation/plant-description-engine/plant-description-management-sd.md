@@ -50,32 +50,32 @@ which are used to represent things like dates.
 ### struct Connection
 | Field | Type | Description | Mandatory | 
 | ----- | ---- | ----------- | --------- |
-| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | true | 
-| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | true | 
+| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | `true` | 
+| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | `true` | 
 
 
 ### struct PlantDescription
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | true | |
-| `active` | Boolean | Is this the active plant description | false | false |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | [] |
-| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | true ||
-| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | true ||
+| `plantDescription` | String | Plant description name | `true` | |
+| `active` | Boolean | Is this the active plant description | `false` | `false` |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | [] |
+| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `true` ||
+| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 
 ### struct PlantDescriptionEntry
 
 | Field | Type | Description | Mandatory | Note | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the entry | true | |
-| `plantDescription` | String | Plant description name| true | | 
-| `active` | Boolean | Is this the active plant description | true | |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | Only present if  not empty |
-| `systems` | Array\<[SystemEntry](#struct-systementry)> | Array with systems expected to be present in the plant | true ||
-| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | true ||
-| `createdAt` | DateTime | Creation date of the entry | true | |
-| `updatedAt` | DateTime | When the entry was last updated | true | |
+| `id` | Number | Id of the entry | `true` | |
+| `plantDescription` | String | Plant description name| `true` | | 
+| `active` | Boolean | Is this the active plant description | `true` | |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if  not empty |
+| `systems` | Array\<[SystemEntry](#struct-systementry)> | Array with systems expected to be present in the plant | `true` ||
+| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
+| `createdAt` | DateTime | Creation date of the entry | `true` | |
+| `updatedAt` | DateTime | When the entry was last updated | `true` | |
 
 ### struct PlantDescriptionEntryList
 
@@ -90,42 +90,42 @@ Currently only the following values can be updated. If a field is not present th
 
 | Field | Type | Description | Mandatory | 
 | ----- | ---- | ----------- | --------- |
-| `plantDescription` | String | Plant description name | false | 
-| `active` | Boolean | Is this the active plant description | false |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false |
-| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | false |
-| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | false |
+| `plantDescription` | String | Plant description name | `false` | 
+| `active` | Boolean | Is this the active plant description | `false` |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` |
+| `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `false` |
+| `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `false` |
 
 ### struct Port
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `portName` | String | Identity of the port | true | |
-| `serviceDefinition` | String | Service definition identity | true | |
-| `consumer` | Boolean | Is the port a consumer port | false | false |
+| `portName` | String | Identity of the port | `true` | |
+| `serviceDefinition` | String | Service definition identity | `true` | |
+| `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
 
 ### struct System
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `metadata` | Custom | Metadata - key-value pairs | false | null |
-| `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | true ||
+| `systemName` | String | Identity of the system | `true` | | 
+| `metadata` | Custom | Metadata - key-value pairs | `false` | null |
+| `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | `true` ||
 
 ### struct SystemEntry
 | Field | Type | Description | Mandatory | Note | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `metadata` | Custom | Metadata - key-value pairs | false | Only present if specified |
-| `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | true ||
-| `systemData` | Custom | System specific data - key-value pairs | false | Only if provided by Monitorable |
-| `inventoryId` | String | The systems Id in an Inventory system | false | Only if provided by Monitorable |
-| `inventoryData` | Custom | Inventory specific data - key-value pairs | false | Only if provided by Inventory  |
+| `systemName` | String | Identity of the system | `true` | | 
+| `metadata` | Custom | Metadata - key-value pairs | `false` | Only present if specified |
+| `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | `true` ||
+| `systemData` | Custom | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
+| `inventoryId` | String | The systems Id in an Inventory system | `false` | Only present if provided by Monitorable |
+| `inventoryData` | Custom | Inventory specific data - key-value pairs | `false` | Only present if provided by Inventory  |
 
 
 ### struct SystemPort
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `portName` | String | Identity of the port | true | |
+| `systemName` | String | Identity of the system | `true` | | 
+| `portName` | String | Identity of the port | `true` | |
 
 
 
