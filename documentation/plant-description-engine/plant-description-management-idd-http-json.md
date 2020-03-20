@@ -530,8 +530,8 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `consumer` | [SystemPort](#systemport) | The consumer end SystemPort of the connection | true | | 
-| `producer` | [SystemPort](#systemport) | The producer end SystemPort of the connection | true | | 
+| `consumer` | [SystemPort](#systemport) | The consumer end SystemPort of the connection | `true` | | 
+| `producer` | [SystemPort](#systemport) | The producer end SystemPort of the connection | `true` | | 
 
 
 ### PlantDescription
@@ -539,33 +539,33 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | true | |
-| `active` | Boolean | Is this the active plant description | false | false |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | [] |
-| `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | true ||
-| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | true ||
+| `plantDescription` | String | Plant description name | `true` | |
+| `active` | Boolean | Is this the active plant description | `false` | `false` |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | [] |
+| `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `true` ||
+| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 
 ### PlantDescriptionEntry
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the entry | true ||
-| `plantDescription` | String | Plant description name| true || 
-| `active` | Boolean | Is this the active plant description | true ||
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | Only present if not empty|
-| `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | true ||
-| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | true ||
-| `createdAt` | [DateTime](#alias-datetime--string) | Creation date of the entry | true ||
-| `updatedAt` | [DateTime](#alias-datetime--string) | When the entry was last updated | true ||
+| `id` | Number | Id of the entry | `true` ||
+| `plantDescription` | String | Plant description name| `true` || 
+| `active` | Boolean | Is this the active plant description | `true` ||
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if not empty|
+| `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | `true` ||
+| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
+| `createdAt` | [DateTime](#alias-datetime--string) | Creation date of the entry | `true` ||
+| `updatedAt` | [DateTime](#alias-datetime--string) | When the entry was last updated | `true` ||
 
 ### PlantDescriptionEntryList
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | true || 
-| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | true || 
+| `count` | Number | Number of records found | `true` || 
+| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` || 
 
 ### PlantDescriptionUpdate
 JSON object with the following fields:
@@ -574,49 +574,49 @@ Currently only the following values can be updated. If a field is not present th
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | false || 
-| `active` | Boolean | Is this the active plant description | false ||
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | false | |
-| `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | false ||
-| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | false ||
+| `plantDescription` | String | Plant description name | `false` || 
+| `active` | Boolean | Is this the active plant description | `false` ||
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | |
+| `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `false` ||
+| `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `false` ||
 
 ### Port
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `portName` | String | Identity of the port | true | |
-| `serviceDefinition` | String | Service definition identity | true | |
-| `consumer` | Boolean | Is the port a consumer port | false | false |
+| `portName` | String | Identity of the port | `true` | |
+| `serviceDefinition` | String | Service definition identity | `true` | |
+| `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
 
 ### System
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `metadata` | Object | Metadata - key-value pairs | false | null |
-| `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | true ||
+| `systemName` | String | Identity of the system | `true` | | 
+| `metadata` | Object | Metadata - key-value pairs | `false` | null |
+| `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
 
 ### SystemEntry
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Note | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `metadata` | Object | Metadata - key-value pairs | false | Only present if specified |
-| `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | true ||
-| `systemData` | Object | System specific data - key-value pairs | false | Only if provided by Monitorable |
-| `inventoryId` | String | The systems Id in an Inventory system | false | Only if provided by Monitorable |
-| `inventoryData` | Object | Inventory specific data - key-value pairs | false | Only if provided by Inventory  |
+| `systemName` | String | Identity of the system | `true` | | 
+| `metadata` | Object | Metadata - key-value pairs | `false` | Only present if specified |
+| `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
+| `systemData` | Object | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
+| `inventoryId` | String | The systems Id in an Inventory system | `false` | Only present if provided by Monitorable |
+| `inventoryData` | Object | Inventory specific data - key-value pairs | `false` | Only present if provided by Inventory  |
 
 ### SystemPort
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | true | | 
-| `portName` | String | Identity of the port | true | |
+| `systemName` | String | Identity of the system | `true` | | 
+| `portName` | String | Identity of the port | `true` | |
 
 
 ### Primitives

@@ -161,15 +161,15 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the alarm | true | |
-| `systemName` | String | Identity of the system | true | |
-| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | true | |
-| `severity` | String | One out of `indeterminate/critical/major/minor/warning/cleared` | true | |
-| `description` | String | Description of the problem | true | |
-| `raisedAt` | [DateTime](#alias-datetime--string) | When the alarm was first raised | true | |
-| `updatedAt` | [DateTime](#alias-datetime--string) | When the alarm was last updated | true | |
-| `clearedAt` | [DateTime](#alias-datetime--string) | When the alarm was cleared | false | |
-| `acknowledgedAt` | [DateTime](#alias-datetime--string) | When the alarm was acknowledged | false | |
+| `id` | Number | Id of the alarm | `true` | |
+| `systemName` | String | Identity of the system | `true` | |
+| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | `true` | |
+| `severity` | String | One out of `indeterminate/critical/major/minor/warning/cleared` | `true` | |
+| `description` | String | Description of the problem | `true` | |
+| `raisedAt` | [DateTime](#alias-datetime--string) | When the alarm was first raised | `true` | |
+| `updatedAt` | [DateTime](#alias-datetime--string) | When the alarm was last updated | `true` | |
+| `clearedAt` | [DateTime](#alias-datetime--string) | When the alarm was cleared | `false` | |
+| `acknowledgedAt` | [DateTime](#alias-datetime--string) | When the alarm was acknowledged | `false` | |
 
 
 ### PDEAlarmList
@@ -177,15 +177,15 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | true | |
-| `data` | Array\<[PDEAlarm](#pdealarm)> | Array of [PDE Alarms](#pdealarm) | true | |
+| `count` | Number | Number of records found | `true` | |
+| `data` | Array\<[PDEAlarm](#pdealarm)> | Array of [PDE Alarms](#pdealarm) | `true` | |
 
 ### PDEAlarmUpdate
 JSON object with the following fields. Currently only the following values can be updated. If a field is not present the current value will be used.
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |false||
+| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |`false`||
 
 
 ### Primitives

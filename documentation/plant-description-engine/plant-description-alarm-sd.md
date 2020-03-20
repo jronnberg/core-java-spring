@@ -63,7 +63,7 @@ Currently only the following values can be updated. If a field is not present th
 
 | Field | Type | Description | Mandatory | Default value | 
 | ----- | ---- | ----------- | --------- | ------------- |
-| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |false||
+| `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | `false` ||
 
 ### Primitives
 Types and structures mentioned throughout this document that are assumed to be available to implementations
