@@ -17,7 +17,7 @@ subsection first names the HTTP method and path used to call the interface, afte
 interface from the [Plant Description Alarm] service description document, output type, as well as errors that can be thrown. The
 interface is expected to respond with HTTP status code 200 OK for all successful calls. 
 
-### POST /{baseURI}/pd
+### POST /{baseURI}/mgmt/pd
  - __Interface: AddPlantDescription__
  - __Input: [PlantDescription](#plantdescription)__
  - __Output: [PlantDescriptionEntryList](#plantdescriptionentrylist)__
@@ -27,7 +27,7 @@ Called to add a Plant Description to the PDE.
 Example of valid invocation:
 
 ```json
-POST /pde/pd HTTP/1.1
+POST /pde/mgmt/pd HTTP/1.1
 Accept: application/json
 Content-Length: 2342
 Content-Type: application/json
@@ -140,7 +140,7 @@ Content-Type: application/json
 }
 ```
 
-### DELETE {baseURI}/pd/{id}
+### DELETE {baseURI}/mgmt/pd/{id}
  - __Interface: DeletePlantDescription__
 
 Called to delete the __[PlantDescriptionEntry](#plantdescriptionentry)__ specified by the `id` path parameter.
@@ -148,7 +148,7 @@ Called to delete the __[PlantDescriptionEntry](#plantdescriptionentry)__ specifi
 Example of valid invocation:
 
 ```json
-DELETE /pde/pd/1 HTTP/1.1
+DELETE /pde/mgmt/pd/1 HTTP/1.1
 ````
 
 
@@ -159,7 +159,7 @@ HTTP/1.1 200 OK
 Content-Length: 0
 ```
 
-### GET {baseURI}/pd
+### GET {baseURI}/mgmt/pd
  - __Interface:	GetAllPlantDescriptions__
  - __Output: [PlantDescriptionEntryList](#plantdescriptionentrylist)__
 	 
@@ -176,6 +176,8 @@ Query params:
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
+| `filter_field` | filter by a given column | no |
+| `filter_value` | value to filter by | no |
 
 > **Note:** Default value for `sort_field` is `id`. All possible values are: 
 > * `id`
@@ -186,10 +188,13 @@ Query params:
 > * `ASC`
 > * `DESC` 
 
+> **Note:**  Possible values for `filter_field` are: 
+> * `active`
+
 Example of valid invocation:
 
 ```json
-GET /pde/pd HTTP/1.1
+GET /pde/mgmt/pd HTTP/1.1
 Accept: application/json
 ```
 
@@ -255,7 +260,7 @@ Content-Type: application/json
 }
 ```
 
-### Get {baseURI}/pd/{id}
+### Get {baseURI}/mgmt/pd/{id}
  - __Interface: GetPlantDescription__
  - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
 
@@ -264,7 +269,7 @@ Called to acquire the __[PlantDescriptionEntry](#plantdescriptionentry)__ specif
 Example of valid invocation:
 
 ```json
-GET /pde/pd/1 HTTP/1.1
+GET /pde/mgmt/pd/1 HTTP/1.1
 Accept: application/json
 ````
 
@@ -326,7 +331,7 @@ Content-Type: application/json
 ```
 
 
-### PUT /{baseURI}/pd
+### PUT /{baseURI}/mgmt/pd
  - __Interface: ReplacePlantDescription__
  - __Input: [PlantDescription](#plantdescription)__
  - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
@@ -336,7 +341,7 @@ Called to replace the Plant Description Entry specified by the `id` parameter wi
 Example of valid invocation:
 
 ```json
-PUT /pde/pd/1 HTTP/1.1
+PUT /pde/mgmt/pd/1 HTTP/1.1
 Accept: application/json
 Content-Length: 2342
 Content-Type: application/json
@@ -444,7 +449,7 @@ Content-Type: application/json
 }
 ```
 
-### PATCH /{baseURI}/pd
+### PATCH /{baseURI}/mgmt/pd
  - __Interface: UpdatePlantDescription__
  - __Input: [PlantDescriptionUpdate](#plantdescriptionupdate)__
  - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
@@ -454,7 +459,7 @@ Called to update the Plant Description Entry specified by the `id` parameter wit
 Example of valid invocation:
 
 ```json
-PUT /pde/pd/1 HTTP/1.1
+PUT /pde/mgmt/pd/1 HTTP/1.1
 Accept: application/json
 Content-Length: 23
 Content-Type: application/json
@@ -640,17 +645,17 @@ types.
 #### alias DateTime = String
 Pinpoints a moment in time by providing a formatted string that conforms to the
 [RFC 3339] specification, which could be regarded as a simplification of the ISO 8601
-standard. Naively, the format could expressed as ”YYYY-MM-DDTHH:MM:SS.sssZ”,
-where ”YYYY” denotes year (4 digits),
-”MM” denotes month starting from 01,
-”DD” denotes day starting from 01,
-”HH” denotes hour in the 24-hour format (00-23),
-”MM” denotes minute (00-59),
-”SS” denotes second (00-59) and
-”sss” denotes second fractions (000-999).
-”T” is used as separator between the date and the time,
-while ”Z” denotes the UTC time zone.
-At least three fraction digits should be used, which gives millisecond precision. An example of a valid date/time string is ”2019-09-19T15:20:50.521Z”.
+standard. Naively, the format could expressed as `YYYY-MM-DDTHH:MM:SS.sssZ`,
+where `YYYY` denotes year (4 digits),
+`MM` denotes month starting from 01,
+`DD` denotes day starting from 01,
+`HH` denotes hour in the 24-hour format (00-23),
+`MM` denotes minute (00-59),
+`SS` denotes second (00-59) and
+`sss` denotes second fractions (000-999).
+`T` is used as separator between the date and the time,
+while `Z` denotes the UTC time zone.
+At least three fraction digits should be used, which gives millisecond precision. An example of a valid date/time string is `2019-09-19T15:20:50.521Z`.
 Other forms or variants, including the use of other time zones, is adviced against.
 
 
