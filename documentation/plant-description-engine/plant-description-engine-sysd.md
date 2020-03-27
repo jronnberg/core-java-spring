@@ -10,6 +10,8 @@ This document describes the HTTP/{TLS}/JSON Plant Description Engine (PDE) Arrow
 This supporting core system has the purpose of choreographing the consumers and producers in the plant (System of Systems / Local cloud).
 An abstract view, on which systems the plant contains and how they are connected as consumers and producers, is used to populate the [Orchestrator] with store rules for each of the consumers. The abstract view does not contain any instance specific information, instead meta-data about each system is used to identify the service producers.
 
+For a description of how a system of systems that includes a Plant Description Engine (PDE) interacts with the PDE see the [System of Systems description]. 
+
 The plant description engine (PDE) can be configured, using the [Plant Description Management JSON] service, with several variants of the plant description of which at most one can be active.
 The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternativ plants (plan A, plan B, etc).
 
@@ -51,4 +53,4 @@ The PDE consumes the following [HTTP]/[JSON] services:
 [Plant Description Management JSON]:plant-description-management-idd-http-json.md
 [Service Discovery]:../../README.md#serviceregistry_usecases
 [Service Registry]:../../README.md#serviceregistry
-  
+[System of Systems description]:plant-description-sosd.md

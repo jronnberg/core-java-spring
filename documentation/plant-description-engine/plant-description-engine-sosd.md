@@ -1,7 +1,7 @@
 # Plant Description Engine - System of Systems Description (SosD)
 
 ## Abstract
-This document describes how a system of systems the includes a Plant Description Engine (PDE) interacts with the PDE.
+This document describes how a system of systems that includes a Plant Description Engine (PDE) interacts with the PDE.
 
 ## Overview
 
@@ -261,7 +261,7 @@ Secondly, in order for the PDE to be allowed to use the OrchestrationStoreManage
 
 ### Simplified plant description
 
-The plant description shown above includes all links between systems in the plant. However, for some of those communication links the Orchestrator is not involved and therefore they are not required to be part of the plant description.
+The plant description shown above includes all links between systems in the plant. However, for some of those communication links the Orchestrator is not involved and therefore they are not strictly required to be part of the plant description.
 
 A merged and cleaned plant description would look like this
 
@@ -339,32 +339,7 @@ A merged and cleaned plant description would look like this
 ```
 
  
-
-This supporting core system has the purpose of choreographing the consumers and producers in the plant (System of Systems / Local cloud).
-An abstract view, on which systems the plant contains and how they are connected as consumers and producers, is used to populate the [Orchestrator] with store rules for each of the consumers. The abstract view does not contain any instance specific information, instead meta-data about each system is used to identify the service producers.
-
-The plant description engine (PDE) can be configured, using the [Plant Description Management JSON] service, with several variants of the plant description of which at most one can be active.
-The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternativ plants (plan A, plan B, etc).
-
-The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable] service and hence also register in the service registry. The [Plant Description Monitor JSON] service can be used to inspect and manage any raised alarms.
-
-Tentatively, in the future the PDE can gather system specific data from all systems in the plant that produces the [Monitorable] service. Furthermore, the PDE could collect information from an [Inventory]. Both of these additional data could then be returned by the [Plant Description Monitor JSON] service. 
-
-## Services
-
-The PDE produces three different services:
- + the [Monitorable JSON] service
- + the [Plant Description Management JSON] service
- + the [Plant Description Monitor JSON] service
- 
-The PDE consumes the following services:
- + the [Service Discovery] service produced by the [Service Registry] core system
- + the [Orchestration Store Management] service produced by the [Orchestrator] core system
- + the [Orchestration] service produced by the [Orchestrator] core system
- + the [AuthorizationControl] service produced by the [Authorization] core system
- + the [Inventory service] produced by an [Inventory] system (TBD)
- + the [Monitorable JSON] service produced by the systems in the plant (TBD)
-    
+   
   
 [Authorization]:../../README.md#authorization
 [AuthorizationControl]:../../README.md#authorization
