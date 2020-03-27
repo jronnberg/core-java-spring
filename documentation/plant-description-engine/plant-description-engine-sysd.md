@@ -13,7 +13,7 @@ An abstract view, on which systems the plant contains and how they are connected
 For a description of how a system of systems that includes a Plant Description Engine (PDE) interacts with the PDE see the [System of Systems description]. 
 
 The plant description engine (PDE) can be configured, using the [Plant Description Management JSON] service, with several variants of the plant description of which at most one can be active.
-The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternativ plants (plan A, plan B, etc).
+The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternative plants (plan A, plan B, etc).
 
 The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable] service and hence also register in the service registry. The [Plant Description Monitor JSON] service can be used to inspect and manage any raised alarms.
 
@@ -21,8 +21,7 @@ Tentatively, in the future the PDE can gather system specific data from all syst
 
 ## Services
 
-The PDE produces three different [HTTP]/[JSON] services:
- + the [Monitorable JSON] service
+The PDE produces two different [HTTP]/[JSON] services:
  + the [Plant Description Management JSON] service
  + the [Plant Description Monitor JSON] service
  
@@ -30,14 +29,11 @@ The PDE consumes the following [HTTP]/[JSON] services:
  + the [Service Discovery] service produced by the [Service Registry] core system
  + the [Orchestration Store Management] service produced by the [Orchestrator] core system
  + the [Orchestration] service produced by the [Orchestrator] core system
- + the [AuthorizationControl] service produced by the [Authorization] core system
+ + the [Monitorable JSON] service produced by the systems in the plant
  + the [Inventory service] produced by an [Inventory] system (TBD)
- + the [Monitorable JSON] service produced by the systems in the plant (TBD)
     
   
 
-[Authorization]:../../README.md#authorization
-[AuthorizationControl]:../../README.md#authorization
 [HTTP]:https://doi.org/10.17487/RFC7230
 [Inventory service]:TBD
 [Inventory]:TBD

@@ -24,7 +24,7 @@ We will as an example consider a plant that has the four core systems and 5 cust
    This system should always be connected to a system producing X. 
    It should also be connected to either a system that provides Y or a system the provides Z but not both. 
    
-The four custom systems A-D also provides the [Monitorable] service. Furthermore, D also provides the [OrchestrationPush] service.
+The four custom systems A-D also provides the [Monitorable] service.
 
 
 ## The plant description(s) describing the example system
@@ -62,8 +62,7 @@ This corresponds to a Plant Description with the core systems:
 				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
+true }	
 			]
 		},
 		{
@@ -72,8 +71,6 @@ This corresponds to a Plant Description with the core systems:
 				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },	
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement", "consumer": true },
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush"},	
-				{ "portName": "orchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities"},	
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor"},
 				{ "portName": "management", "serviceDefinition": "Plant Description Management"},
 			]
@@ -97,11 +94,6 @@ This corresponds to a Plant Description with the core systems:
 		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
 		{ "consumer": { "systemName": "Plant Description Engine", "portName": "orchestrationStoreManagement" },
 		  "producer": { "systemName": "Orchestration", "portName": "orchestrationStoreManagement" }}
-
-		{ "consumer": { "systemName": "Orchestration", "portName": "orchestrationPush" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "orchestrationPush" }}
-		{ "consumer": { "systemName": "Orchestration", "portName": "orchestrationCapabilities" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "orchestrationCapabilities" }}
 	]
 }
 ```
@@ -178,9 +170,6 @@ This corresponds to a bare plant description that include the core and contains 
 		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
 		{ "consumer": { "systemName": "D", "portName": "orchestrationService" },
 		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
-
-		{ "consumer": { "systemName": "Orchestration", "portName": "orchestrationPush" },
-		  "producer": { "systemName": "D", "portName": "orchestrationPush" }},
 
 		{ "consumer": { "systemName": "Operations Center", "portName": "service_discovery" },
 		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
@@ -350,7 +339,6 @@ A merged and cleaned plant description would look like this
 [Orchestrator]:../../README.md#orchestrator
 [Orchestration]:../../README.md#orchestrator
 [Orchestration Store Management]:../../README.md#orchestrator
-[OrchestrationPush]:../../README.md#orchestrator
 [Plant Description Engine]:plant-description-sysd.md
 [Plant Description Monitor]:plant-description-monitor-sd.md
 [Plant Description Management]:plant-description-management-sd.md
