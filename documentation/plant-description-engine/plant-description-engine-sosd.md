@@ -250,7 +250,7 @@ Secondly, in order for the PDE to be allowed to use the OrchestrationStoreManage
 
 ### Simplified plant description
 
-The plant description shown above includes all links between systems in the plant. However, for some of those communication links the Orchestrator is not involved and therefore they are not strictly required to be part of the plant description.
+The plant description shown above includes all links between systems in the plant. However, for some of those communication links the Orchestrator is not called and therefore they are not strictly required in the plant description.
 
 A merged and cleaned plant description would look like this
 
@@ -327,18 +327,56 @@ A merged and cleaned plant description would look like this
 }
 ```
 
+
+## Interactions between systems
+
+To setup a fully functional system of systems that includes a PDE there are a number of message interaction between the systems necessary.
+
+### Service registration for systems that produce a service
+
+Whenever a systems that provides a service, starts up if must register its services in the [Service Registry]. To do this is locates the Service Registry either by configuration or by using the [DNS]. The system connects to the [Service Discovery] service and uses the [Register](../../README.md#serviceregistry_endpoints_post_register) end point to register its provided services. The system also uses the [Query](../../README.md#serviceregistry_endpoints_post_query) end point to retrieve information about the [Authorization] system. Especially the public key in the `authenticationInfo` is needed to verify authorization tokens when other systems connect to its service.
+
+### Service lookup for systems that consumes a service
+
+Whenever a systems that should consume a service, starts up if must locate the [Orchestration] end point to query the [Orchestrator] about which systems to connect to. This is done by locating the Service Registry either by configuration or by using the [DNS]. The system then connects to the [Service Discovery] service and uses the [Query](../../README.md#serviceregistry_endpoints_post_query) to retrieve information about the [Orchestration] service.
+
+It then connects to the Orchestrator and uses the [Orchestration] end point to query about each specific service it needs. The Orchestrator in turn queries the Service Discovery service for providers of the requested service. Using its store rules the Orchestrator selects the systems that should be used to provide the service. It then uses the [Authorization] system to [Check an Intracloud rule](../../README.md#authorization_endpoints_post_intracloud_check) end point to authorize the consuming system and the [Genrate Token](../../README.md#authoritation_endpoints_post_token) end point generate the needed token for each of the providing systems.
+
+When the consuming system receives an Orchestration Response from the Orchestrator it decodes the authorization tokens received and connects to the providing system sending along the decrypted authorization token which is checked by the provider using the Authorization systems public key. If that matches the connection between consumer and provider is established.
+
+
+### Updating the Plant description
+
+The PDE should contain at least one Plant Description (PD) of the plant. The operator (operation center system) uses the Orchestrator to lookup the system (PDE) providing the [Plant Description Management] service. Then connects to the PDE and uses the [AddPlantDescription](plant-description-management-sd.md#interface-addplantdescriptionplantdescription-plantdescriptionentrylist) end point to add a PD.
+When the operator has activated a PD using {[Add](plant-description-management-sd.md#interface-addplantdescriptionplantdescription-plantdescriptionentrylist)/[Replace](plant-description-management-sd.md#interface-replaceplantdescriptionid-plantdescription-plantdescriptionentry)/[Update](plant-description-management-sd.md#interface-updateplantdescriptionid-plantdescriptionupdate-plantdescriptionentry)}PlantDescription end point, the PDE connects to the [Orchestration Store Management] service.
+
+The PDE then start with removing any store rules, using the [Delete Store Entries by ID](../../README.md#orchestrator_endpoints_delete_store_id) end point, that it has previously stored which should no longer be present. These removed store rules was added for another active PD. It then adds new store rules, using the  [Add Store Entries](../../README.md#orchestrator_endpoints_post_store) end point, for all the connections present in the newly activated PD.
  
+Whenever the Orchestrator is updated it uses the [Orchestration Push] service, of all the systems that has registered as a producer of that service, to inform them about any updates that concerns them. If a consumer system has not registered the [Orchestration Push] service it must poll the Orchestrator regurlarly to keep updated.
+ 
+ ### Monitoring the plant
+ 
+The PDE queries the Orchestrator about any systems that it should monitor using the [Monitorable] service. The PDE regularly [Ping](monitorable-sd.md#interface-ping-ok) the monitored systems and raises an alarm if the system does not respond. 
+
+If the monitored system provides any [SystemData](monitorable-sd.md#interface-getsystemdata-systemdata) this data is stored by the PDE and returned as part of the Plant Description Entries provided by the [Plant Description Monitor] service.
+
+If there is an [Inventory] system present in the plant that produces the [Inventory service] and the PDE is connected to it in the active PD, the PDE connects to the [Inventory service]. The PDE queries it for [InventoryData] for the systems that the PDE monitors, according to the active PD. If the system has provided an [Inventory ID](monitorable-sd.md#interface-getinventoryid-inventoryid) this is used in the Inventory query otherwise only MetaData about the system is used. Any found [InventoryData] is stored by the PDE and returned as part of the Plant Description Entries provided by the [Plant Description Monitor] service.
+
+
+
    
   
 [Authorization]:../../README.md#authorization
 [AuthorizationControl]:../../README.md#authorization
-[Inventory service]:TBD
+[DNS]:https://en.wikipedia.org/wiki/Domain_Name_System
 [Inventory]:TBD
+[InventoryData]:TBD
+[Inventory service]:TBD
 [Monitorable]:monitorable-sd.md
-[Monitorable JSON]:monitorable-idd-http-json.md
 [Orchestrator]:../../README.md#orchestrator
-[Orchestration]:../../README.md#orchestrator
+[Orchestration]:../../README.md#orchestrator_endpoints_post_orchestration
 [Orchestration Store Management]:../../README.md#orchestrator
+[Orchestration Push]:../../README.md#orchestrator_usecases
 [Plant Description Engine]:plant-description-sysd.md
 [Plant Description Monitor]:plant-description-monitor-sd.md
 [Plant Description Management]:plant-description-management-sd.md
