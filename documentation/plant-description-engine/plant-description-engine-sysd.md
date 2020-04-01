@@ -12,12 +12,12 @@ An abstract view, on which systems the plant contains and how they are connected
 
 For a description of how a system of systems that includes a Plant Description Engine (PDE) interacts with the PDE see the [System of Systems description]. 
 
-The plant description engine (PDE) can be configured, using the [Plant Description Management JSON] service, with several variants of the plant description of which at most one can be active.
+The plant description engine (PDE) can be configured, using the [Plant Description Management] service, with several variants of the plant description of which at most one can be active.
 The active plant description is used to populate the orchestrator and if no plant description is active the orchestrator does not contain any store rules populated by the PDE. This can be used to establish alternative plants (plan A, plan B, etc).
 
-The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable] service and hence also register in the service registry. The [Plant Description Monitor JSON] service can be used to inspect and manage any raised alarms.
+The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable] service and hence also register in the service registry. The [Plant Description Monitor] service can be used to inspect and manage any raised alarms.
 
-Tentatively, in the future the PDE can gather system specific data from all systems in the plant that produces the [Monitorable] service. Furthermore, the PDE could collect information from an [Inventory]. Both of these additional data could then be returned by the [Plant Description Monitor JSON] service. 
+Tentatively, in the future the PDE can gather system specific data from all systems in the plant that produces the [Monitorable] service. Furthermore, the PDE could collect information from an Inventory using the [Inventory] service. Both of these additional data would then be returned by the [Plant Description Monitor] service. 
 
 ## Services
 
@@ -30,13 +30,13 @@ The PDE consumes the following [HTTP]/[JSON] services:
  + the [Orchestration Store Management] service produced by the [Orchestrator] core system
  + the [Orchestration] service produced by the [Orchestrator] core system
  + the [Monitorable JSON] service produced by the systems in the plant
- + the [Inventory service] produced by an [Inventory] system (TBD)
+ + the [Inventory JSON] service produced by an Inventory system
     
   
 
 [HTTP]:https://doi.org/10.17487/RFC7230
-[Inventory service]:TBD
-[Inventory]:TBD
+[Inventory]:inventory-sd.md
+[Inventory JSON]:inventory-idd-http-json.md
 [JSON]:https://doi.org/10.17487/RFC7159
 [Monitorable]:monitorable-sd.md
 [Monitorable JSON]:monitorable-idd-http-json.md
