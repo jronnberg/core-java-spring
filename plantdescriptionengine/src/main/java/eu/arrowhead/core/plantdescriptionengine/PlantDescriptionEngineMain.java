@@ -11,11 +11,16 @@ import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.http.HttpStatus;
 import se.arkalix.http.service.HttpService;
+import se.arkalix.http.service.HttpServiceRequest;
+import se.arkalix.http.service.HttpServiceResponse;
 import se.arkalix.dto.DtoWriteException;
 import se.arkalix.security.X509KeyStore;
 import se.arkalix.security.X509TrustStore;
+import se.arkalix.util.concurrent.Future;
 
 public class PlantDescriptionEngineMain {
+
+    private static PlantDescriptionDto currentDescription = null;
 
     private static void toFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
         final String filename = "plant-description.json";
@@ -57,24 +62,44 @@ public class PlantDescriptionEngineMain {
         return system;
     }
 
-    private static HttpService getService() {
+    private static Future<HttpServiceResponse> onDescriptionPost(
+        HttpServiceRequest request, HttpServiceResponse response
+    ) {
+        return request.bodyAs(PlantDescriptionDto.class)
+        .map(body -> {
+            try {
+                // Write the plant description to disk
+                toFile(body);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            currentDescription = body;
+            return response.status(HttpStatus.CREATED).body(body);
+        });
+    }
+
+    private static Future<?> onDescriptionsGet(
+        HttpServiceRequest request, HttpServiceResponse response
+    ) {
+        if (currentDescription == null) {
+            response.status(HttpStatus.NOT_FOUND);
+        } else {
+            response.status(HttpStatus.OK).body(currentDescription);
+        }
+        return Future.done();
+    }
+
+    private static HttpService getServices() {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
             .security(SecurityDescriptor.CERTIFICATE)
             .basePath("/pde")
-            .post("/mgmt/#id", (request, response) ->
-                request.bodyAs(PlantDescriptionDto.class)
-                    .map(body -> {
-                        // Write the plant description to disk
-                        try {
-                            toFile(body);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-                        }
-                        return response.status(HttpStatus.CREATED).body(body);
-                    }));
+            .get("/mgmt/pd", (request, response) ->
+                onDescriptionsGet(request, response))
+            .post("/mgmt/pd/#id", (request, response) ->
+                onDescriptionPost(request, response));
     }
 
     public static void main(final String[] args) {
@@ -95,6 +120,7 @@ public class PlantDescriptionEngineMain {
         }
 
         System.out.println("Providing services...");
-        system.provide(getService()).onFailure(Throwable::printStackTrace);
+        system.provide(getServices())
+            .onFailure(Throwable::printStackTrace);
     }
 }
