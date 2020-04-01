@@ -3,94 +3,98 @@ package eu.arrowhead.core.plantdescriptionengine;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 
+import se.arkalix.ArSystem;
+import se.arkalix.descriptor.EncodingDescriptor;
+import se.arkalix.descriptor.SecurityDescriptor;
+import se.arkalix.http.HttpStatus;
+import se.arkalix.http.service.HttpService;
 import se.arkalix.dto.DtoWriteException;
+import se.arkalix.security.X509KeyStore;
+import se.arkalix.security.X509TrustStore;
 
 public class PlantDescriptionEngineMain {
 
-    public static PlantDescriptionDto createDescription() {
-
-        PdePortDto serviceDiscoveryPort = new PdePortBuilder()
-            .portName("service_discovery")
-            .serviceDefinition("Service Discovery")
-            .consumer(false)
-            .build();
-        System.out.println("* " + serviceDiscoveryPort.asString());
-
-        PdePortDto authorizationPort = new PdePortBuilder()
-            .portName("service_discovery")
-            .serviceDefinition("Service Discovery")
-            .consumer(false)
-            .build();
-        System.out.println("* " + serviceDiscoveryPort.asString());
-
-        PdeConnectionEndPointDto consumer = new PdeConnectionEndPointBuilder()
-            .systemName("Authorization")
-            .portName("service_discovery")
-            .build();
-        System.out.println("* " + consumer.asString());
-
-        PdeConnectionEndPointDto producer = new PdeConnectionEndPointBuilder()
-            .systemName("Service Registry")
-            .portName("service_discovery")
-            .build();
-        System.out.println("* " + producer.asString());
-
-        PdeConnectionDto connection = new PdeConnectionBuilder()
-            .consumer(consumer)
-            .producer(producer)
-            .build();
-        System.out.println("* " + connection.asString());
-
-        PdeSystemDto serviceRegistrySystem = new PdeSystemBuilder()
-            .systemName("Service Registry")
-            .ports(Arrays.asList(serviceDiscoveryPort))
-            .build();
-        System.out.println("* " + serviceRegistrySystem.asString());
-
-        PdeSystemDto authorizationSystem = new PdeSystemBuilder()
-            .systemName("Authorization")
-            .ports(Arrays.asList(authorizationPort))
-            .build();
-        System.out.println("* " + authorizationSystem.asString());
-
-        PlantDescriptionDto description = new PlantDescriptionBuilder()
-            .id(1).plantDescription("ArrowHead core")
-            .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
-            .connections(Arrays.asList(connection))
-            .build();
-        System.out.println("* " + description.asString());
-
-        return description;
+    private static void toFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
+        final String filename = "plant-description.json";
+        final FileOutputStream out = new FileOutputStream(new File(filename));
+        final DtoWriter writer = new DtoWriter(out);
+        description.writeJson(writer);
+        out.close();
     }
 
-    private static void writeToFile(List<PlantDescriptionDto> descriptions) throws DtoWriteException, IOException {
-        FileOutputStream out = new FileOutputStream(new File("plant-description.json"));
-        DtoWriter writer = new DtoWriter(out);
-        for (var description : descriptions) {
-            description.writeJson(writer);
-        }
-        out.close();
+    /**
+     * @param password       Password of the private key associated with the
+     *                       certificate in key store.
+     * @param keyStorePath   Path to the keystore representing the systems own
+     *                       identity.
+     * @param trustStorePath Path to the trust store representing all identities
+     *                       that are to be trusted by the system.
+     * @return An Arrowhead Framework system.
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    private static ArSystem getArSystem(char[] password, String keyStorePath, String trustStorePath)
+            throws GeneralSecurityException, IOException {
+
+        X509KeyStore keyStore = null;
+        X509TrustStore trustStore = null;
+
+        keyStore = new X509KeyStore.Loader()
+            .keyPassword(password)
+            .keyStorePath(Path.of(keyStorePath))
+            .keyStorePassword(password).load();
+        trustStore = X509TrustStore.read(Path.of(trustStorePath), password);
+
+        var system = new ArSystem.Builder()
+            .keyStore(keyStore)
+            .trustStore(trustStore)
+            .localPort(28081)
+            .build();
+
+        return system;
+    }
+
+    private static HttpService getService() {
+        return new HttpService()
+            .name("plant-description-management-service")
+            .encodings(EncodingDescriptor.JSON)
+            .security(SecurityDescriptor.CERTIFICATE)
+            .basePath("/pde")
+            .post("/mgmt/#id", (request, response) ->
+                request.bodyAs(PlantDescriptionDto.class)
+                    .map(body -> {
+                        // Write the plant description to disk
+                        try {
+                            toFile(body);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                        }
+                        return response.status(HttpStatus.CREATED).body(body);
+                    }));
     }
 
     public static void main(final String[] args) {
 
-        System.out.println("Creating a plant description:");
+        if (args.length != 2) {
+            System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
+            System.exit(1);
+        }
 
-        final PlantDescriptionDto description = createDescription();
-
-        System.out.println("Writing description to file...");
+        final var password = new char[] { '1', '2', '3', '4', '5', '6' };
+        ArSystem system = null;
 
         try {
-            writeToFile(Arrays.asList(description));
-        } catch (DtoWriteException | IOException e) {
+            system = getArSystem(password, args[0], args[1]);
+        } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
             System.exit(74);
         }
 
-        System.out.println("Done.");
-
+        System.out.println("Providing services...");
+        system.provide(getService()).onFailure(Throwable::printStackTrace);
     }
 }
