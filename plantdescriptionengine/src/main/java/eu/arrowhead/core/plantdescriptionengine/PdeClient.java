@@ -120,7 +120,7 @@ public class PdeClient {
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
                 .header("accept", "application/json"))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionDto.class))
+                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionListDto.class))
                 .map(body -> {
                     System.err.println("\nGET result:");
                     System.err.println(body.asString());

@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
+import java.util.Map;
 
 import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -18,12 +20,24 @@ import se.arkalix.security.X509KeyStore;
 import se.arkalix.security.X509TrustStore;
 import se.arkalix.util.concurrent.Future;
 
+import java.util.ArrayList;
+
 public class PlantDescriptionEngineMain {
 
-    private static PlantDescriptionDto currentDescription = null;
+    // File path to the directory for storing JSON representations of plant
+    // descriptions:
+    final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
 
-    private static void toFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
-        final String filename = "plant-description.json";
+    private static Map<Integer, PlantDescriptionDto> plantDescriptionsById = new HashMap<Integer, PlantDescriptionDto>();
+
+    private static PlantDescriptionListDto getPlantDescriptionsDto() {
+        return new PlantDescriptionListBuilder()
+            .descriptions(new ArrayList<PlantDescriptionDto>(plantDescriptionsById.values()))
+            .build();
+    }
+
+    private static void writeToFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
+        final String filename = DESCRIPTION_DIRECTORY + description.id() + ".json";
         final FileOutputStream out = new FileOutputStream(new File(filename));
         final DtoWriter writer = new DtoWriter(out);
         description.writeJson(writer);
@@ -65,28 +79,25 @@ public class PlantDescriptionEngineMain {
     private static Future<HttpServiceResponse> onDescriptionPost(
         HttpServiceRequest request, HttpServiceResponse response
     ) {
-        return request.bodyAs(PlantDescriptionDto.class)
-        .map(body -> {
-            try {
-                // Write the plant description to disk
-                toFile(body);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            currentDescription = body;
-            return response.status(HttpStatus.CREATED).body(body);
-        });
+        return request
+            .bodyAs(PlantDescriptionDto.class)
+            .map(body -> {
+                try {
+                    writeToFile(body);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                Integer id = Integer.parseInt(request.pathParameter(0));
+                plantDescriptionsById.put(id, body);
+                return response.status(HttpStatus.CREATED).body(body);
+            });
     }
 
     private static Future<?> onDescriptionsGet(
         HttpServiceRequest request, HttpServiceResponse response
     ) {
-        if (currentDescription == null) {
-            response.status(HttpStatus.NOT_FOUND);
-        } else {
-            response.status(HttpStatus.OK).body(currentDescription);
-        }
+        response.status(HttpStatus.OK).body(getPlantDescriptionsDto());
         return Future.done();
     }
 
@@ -107,6 +118,11 @@ public class PlantDescriptionEngineMain {
         if (args.length != 2) {
             System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
             System.exit(1);
+        }
+
+        File directory = new File(DESCRIPTION_DIRECTORY);
+        if (!directory.exists()){
+            directory.mkdir();
         }
 
         final var password = new char[] { '1', '2', '3', '4', '5', '6' };
