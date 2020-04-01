@@ -12,7 +12,7 @@ For more information about the service, please refer to the service description 
 The rest of this document describes how to realize the [PDM] service using [HTTP], optionally with [TLS], and [JSON], both in terms of its [interfaces](#service-interfaces) and its [information model](#information-model).
 
 ## Service Interfaces
-This section describes the interfaces that must be exposed by [Plant Description Alarm] services. In particular, the below
+This section describes the interfaces that must be exposed by [Plant Description Monitor] services. In particular, the below
 subsection first names the HTTP method and path used to call the interface, after which it names an abstract
 interface from the [Plant Description Alarm] service description document, output type, as well as errors that can be thrown. The
 interface is expected to respond with HTTP status code 200 OK for all successful calls. 
@@ -665,6 +665,7 @@ Other forms or variants, including the use of other time zones, is adviced again
 [PDM]:plant-description-management-sd.md
 [PDE]:plant-description-engine-sysd.md
 [Plant Description Management]:plant-description-management-sd.md
+[Plant Description Monitor]:plant-description-monitor-sd.md
 [Plant Description Engine]:plant-description-engine-sysd.md
 [RFC 3339]:https://doi.org/10.17487/RFC3339
 [TLS]:https://doi.org/10.17487/RFC8446
