@@ -112,8 +112,8 @@ public class PdeClient {
                 .body(DtoEncoding.JSON, description))
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
                 .map(body -> {
-                    System.err.println("\nPOST result:");
-                    System.err.println(body.asString());
+                    System.out.println("\nPOST result:");
+                    System.out.println(body.asString());
                     return null;
                 })
                 .onFailure(throwable -> {
@@ -126,10 +126,10 @@ public class PdeClient {
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
                 .header("accept", "application/json"))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntriesDto.class))
+                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
                 .map(body -> {
-                    System.err.println("\nGET result:");
-                    System.err.println(body.asString());
+                    System.out.println("\nGET result:");
+                    System.out.println(body.asString());
                     return null;
                 })
                 .onFailure(throwable -> {

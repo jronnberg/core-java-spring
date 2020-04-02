@@ -32,10 +32,11 @@ public class PdeManagementMain {
 
     private static Map<Integer, PlantDescriptionEntryDto> entriesById = new HashMap<>();
 
-    private static PlantDescriptionEntriesDto getPlantDescriptionsDto() {
+    private static PlantDescriptionEntryListDto getPlantDescriptionsDto() {
         List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
-        return new PlantDescriptionEntriesBuilder()
-            .entries(entryList)
+        return new PlantDescriptionEntryListBuilder()
+            .count(entryList.size()) // TODO: This shouldn't be necessary?
+            .data(entryList)
             .build();
     }
 
