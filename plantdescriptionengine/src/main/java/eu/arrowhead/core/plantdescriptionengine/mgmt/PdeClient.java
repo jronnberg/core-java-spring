@@ -36,7 +36,7 @@ public class PdeClient {
 
         PdePortDto authorizationPort = new PdePortBuilder()
             .portName("service_discovery")
-            .serviceDefinition("Service heeeeeej")
+            .serviceDefinition("Service Discovery")
             .consumer(false)
             .build();
 
