@@ -16,10 +16,12 @@ interface PlantDescription {
 
     int id();
     String plantDescription();
+    boolean active();
+    List<Integer> include();
     List<PdeSystem> systems();
     List<PdeConnection> connections();
 
     default String asString() {
-        return "PlantDescription[id=" + id() + ",plantDescription=" + plantDescription() + "]";
+        return "PlantDescription[id=" + id() + ",plantDescription=" + plantDescription() + ",active=" + active() + "]";
     }
 }
