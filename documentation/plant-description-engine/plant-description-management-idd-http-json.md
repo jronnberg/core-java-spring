@@ -559,7 +559,7 @@ JSON object with the following fields:
 | `plantDescription` | String | Plant description name| `true` || 
 | `active` | Boolean | Is this the active plant description | `true` ||
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if not empty|
-| `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | `true` ||
+| `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | [DateTime](#alias-datetime--string) | Creation date of the entry | `true` ||
 | `updatedAt` | [DateTime](#alias-datetime--string) | When the entry was last updated | `true` ||
@@ -602,18 +602,6 @@ JSON object with the following fields:
 | `systemName` | String | Identity of the system | `true` | | 
 | `metadata` | Object | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
-
-### SystemEntry
-JSON object with the following fields:
-
-| Field | Type | Description | Mandatory | Note | 
-| ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
-| `metadata` | Object | Metadata - key-value pairs | `false` | Only present if specified |
-| `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
-| `systemData` | Object | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
-| `inventoryId` | String | The systems Id in an Inventory system | `false` | Only present if provided by Monitorable |
-| `inventoryData` | Object | Inventory specific data - key-value pairs | `false` | Only present if provided by Inventory  |
 
 ### SystemPort
 JSON object with the following fields:
