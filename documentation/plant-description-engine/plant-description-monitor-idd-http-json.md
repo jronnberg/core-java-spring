@@ -6,10 +6,10 @@ This document describes the HTTP/{TLS}/JSON variant of a service that can be use
 ## Overview
 This document describes the HTTP/{TLS}/JSON variant of the
 [Plant Description Monitor] (PDMon) service, which allows for arbitrary
-Arrowhead Framework systems to monitor alarms raised by the [PDE] core system.
+Arrowhead Framework systems to monitor alarms raised by the [Plant Description Engine] ([PDE]) core system.
 Readers of this document are assumed to be familiar with the [PDMon] service.
 For more information about the service, please refer to the service description document [PDMon].
-The rest of this document describes how to realize the [PDA] service using [HTTP], optionally with [TLS], and [JSON], both in terms of its [interfaces](#service-interfaces) and its [information model](#information-model).
+The rest of this document describes how to realize the [PDMon] service using [HTTP], optionally with [TLS], and [JSON], both in terms of its [interfaces](#service-interfaces) and its [information model](#information-model).
 
 ## Service Interfaces
 This section describes the interfaces that must be exposed by [Plant Description Monitor] services. In particular, the below
@@ -18,7 +18,7 @@ interface from the [Plant Description Monitor] service description document, out
 interface is expected to respond with HTTP status code 200 OK for all successful calls. 
 
 ### GET {baseURI}/monitor/alarm
- - __Interface:	GetAllPDAAlarms__
+ - __Interface:	GetAllPDEAlarms__
  - __Output: [PDEAlarmList](#pdealarmlist)__
 	 
 Called to acquire a list of PDE alarms raised by the PDE.
@@ -84,7 +84,7 @@ Content-Type: application/json
 ```
 
 ### GET {baseURI}/monitor/alarm/{id}
- - __Interface:	GetPDAAlarm__
+ - __Interface:	GetPDEAlarm__
  - __Output: [PDEAlarm](#pdealarm)__
 	 
 Called to acquire the __[PDEAlarm](#pdealarm)__ specified by the `id` path parameter.
@@ -113,7 +113,7 @@ Content-Type: application/json
 ```
 
 ### PATCH {baseURI}/monitor/alarm/{id}
- - __Interface:	UpdatePDAAlarm__
+ - __Interface:	UpdatePDEAlarm__
  - __Input: [PDEAlarmUpdate](#pdealarmupdate)__
  - __Output: [PDEAlarm](#pdealarm)__
 
@@ -431,7 +431,6 @@ Other forms or variants, including the use of other time zones, is adviced again
 [Connection]:plant-description-management-idd-http-json.md#connection
 [HTTP]:https://doi.org/10.17487/RFC7230
 [JSON]:https://doi.org/10.17487/RFC7159
-[PDA]:plant-description-alarm-sd.md
 [PDE]:plant-description-engine-sysd.md
 [Plant Description Management]:plant-description-management-sd.md
 [Plant Description Monitor]:plant-description-monitor-sd.md

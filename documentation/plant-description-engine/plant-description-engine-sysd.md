@@ -49,4 +49,4 @@ The PDE consumes the following [HTTP]/[JSON] services:
 [Plant Description Management JSON]:plant-description-management-idd-http-json.md
 [Service Discovery]:../../README.md#serviceregistry_usecases
 [Service Registry]:../../README.md#serviceregistry
-[System of Systems description]:plant-description-sosd.md
+[System of Systems description]:plant-description-engine-sosd.md

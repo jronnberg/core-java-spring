@@ -22,7 +22,8 @@ We will as an example consider a plant that has the four core systems and 5 cust
  - C that produces service Z
  - D that consumes services X, Y and Z.
    This system should always be connected to a system producing X. 
-   It should also be connected to either a system that provides Y or a system the provides Z but not both. 
+   It should also be connected to either a system that provides Y or a system the provides Z but not both.
+ - Invent system that produces the [Inventory] service.
    
 The four custom systems A-D also provides the [Monitorable] service.
 
@@ -61,7 +62,7 @@ This corresponds to a Plant Description with the core systems:
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
 				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "orchestraDtionStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
 true }	
 			]
 		},
@@ -71,6 +72,7 @@ true }
 				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },	
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement", "consumer": true },
+				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }	
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor"},
 				{ "portName": "management", "serviceDefinition": "Plant Description Management"},
 			]
@@ -107,7 +109,7 @@ This corresponds to a bare plant description that include the core and contains 
 ```json
 {
 	"id": 2,
-	"plantDescription": "Example plant - bare",
+	"plantDescription": "Example plant - bare",, "consumer": true 
 	"include": [ 1 ],
 	"systems": [
 		{
@@ -152,6 +154,13 @@ This corresponds to a bare plant description that include the core and contains 
 				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }	
 				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }	
 			]
+		},
+		{
+			"systemName": "Invent",
+			"ports": [
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "inventory", "serviceDefinition": "Inventory"}	
+			]
 		}
 		
 	],
@@ -175,6 +184,11 @@ This corresponds to a bare plant description that include the core and contains 
 		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
 		{ "consumer": { "systemName": "Operations Center", "portName": "orchestrationService" },
 		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
+
+		{ "consumer": { "systemName": "Invent", "portName": "service_discovery" },
+		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemName": "Plant Description Engine", "portName": "inventory" },
+		  "producer": { "systemName": "Invent", "portName": "inventory" }},
 	]
 }
 ```
@@ -265,6 +279,7 @@ A merged and cleaned plant description would look like this
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor"},
 				{ "portName": "management", "serviceDefinition": "Plant Description Management"},
 				{ "portName": "monitorable", "serviceDefinition": "Monitorable", "consumer": true }
+				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }	
 			]
 		},
 		{
@@ -303,6 +318,12 @@ A merged and cleaned plant description would look like this
 				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }	
 				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }	
 			]
+		},
+		{
+			"systemName": "Invent",
+			"ports": [
+				{ "portName": "inventory", "serviceDefinition": "Inventory"}	
+			]
 		}
 		
 	],
@@ -322,7 +343,11 @@ A merged and cleaned plant description would look like this
 		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
 		  "producer": { "systemName": "C", "portName": "monitorable" }},
 		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "D", "portName": "monitorable" }}
+		  "producer": { "systemName": "D", "portName": "monitorable" }},
+		  
+		{ "consumer": { "systemName": "Plant Description Engine", "portName": "inventory" },
+		  "producer": { "systemName": "Invent", "portName": "inventory" }},
+
 	]
 }
 ```
