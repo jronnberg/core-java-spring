@@ -5762,38 +5762,38 @@ The plant description engine (PDE) can be configured with several variants of th
 
 The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm. For a consumer system to be monitored the system must produce the [Monitorable] service and hence also register in the service registry.
 
-Please see the [Plant Description Engine HTTP(S)/JSON - System Description (SysD)] for further details.
+Please see the [Plant Description Engine - System of systems Description (SosD)] and [Plant Description Engine HTTP(S)/JSON - System Description (SysD)] for further details.
 
 ## Services
 
-The PDE produces three different services:
- + the [Monitorable] service
+The PDE produces two different services:
  + the [Plant Description Management] service
- + the [Plant Description Alarm] service
+ + the [Plant Description Monitor] service
  
 The PDE consumes the following services:
  + the [Service Discovery] service produced by the [Service Registry] core system
  + the [Orchestration Store Management] service produced by the [Orchestrator] core system
  + the [Orchestration] service produced by the [Orchestrator] core system
  + the [AuthorizationControl] service produced by the [Authorization] core system
- + the [Inventory service] produced by an [Inventory] system (TBD)
- + the [Monitorable] service produced by the systems in the plant (TBD)
+ + the [Inventory] service produced by an Inventory system
+ + the [Monitorable] service produced by the systems in the plant
     
   
-[Authorization]:../../README.md#authorization
-[AuthorizationControl]:../../README.md#authorization
-[Inventory service]:TBD
-[Inventory]:TBD
-[Monitorable]:monitorable-sd.md
-[Monitorable JSON]:monitorable-idd-http-json.md
-[Orchestrator]:../../README.md#orchestrator
-[Orchestration]:../../README.md#orchestrator
-[Orchestration Store Management]:../../README.md#orchestrator
-[Plant Description Alarm]:documentation/plant-description-engine/plant-description-alarm-sd.md
-[Plant Description Alarm JSON]:documentation/plant-description-engine/plant-description-alarm-idd-http-json.md
+[Authorization]:README.md#authorization
+[AuthorizationControl]:README.md#authorization
+[Inventory]:documentation/plant-description-engine/inventory-sd.md
+[Inventory JSON]:documentation/plant-description-engine/inventory-idd-http-json.md
+[Monitorable]:documentation/plant-description-engine/monitorable-sd.md
+[Monitorable JSON]:documentation/plant-description-engine/monitorable-idd-http-json.md
+[Orchestrator]:README.md#orchestrator
+[Orchestration]:README.md#orchestrator
+[Orchestration Store Management]:README.md#orchestrator
+[Plant Description Monitor]:documentation/plant-description-engine/plant-description-monitor-sd.md
+[Plant Description Monitor JSON]:documentation/plant-description-engine/plant-description-monitor-idd-http-json.md
 [Plant Description Management]:documentation/plant-description-engine/plant-description-management-sd.md
 [Plant Description Management JSON]:documentation/plant-description-engine/plant-description-management-idd-http-json.md
 [Plant Description Engine HTTP(S)/JSON - System Description (SysD)]:documentation/plant-description-engine/plant-description-engine-sysd.md
-[Service Discovery]:../../README.md#serviceregistry_usecases
-[Service Registry]:../../README.md#serviceregistry
+[Plant Description Engine - System of systems Description (SosD)]:documentation/plant-description-engine/plant-description-engine-sosd.md
+[Service Discovery]:README.md#serviceregistry_usecases
+[Service Registry]:README.md#serviceregistry
   

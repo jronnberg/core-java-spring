@@ -4,7 +4,7 @@
 This document describes an abstract service, which, if implemented by an application system, can be used to manage Plant Descriptions in the [Plant Description Engine] core system.
 
 ## Overview
-This document describes an abstract Arrowhead Framework service meant to enable management of Plant Descriptions in the [Plant Description Engine]([PDE]) core system.
+This document describes an abstract Arrowhead Framework service meant to enable management of Plant Descriptions in the [Plant Description Engine] ([PDE]) core system.
 
 A [Plant Description](#struct-plantdescription) (PD) is used to represent the expected Arrowhead Framework Systems and their interconnections in a plant.
 
