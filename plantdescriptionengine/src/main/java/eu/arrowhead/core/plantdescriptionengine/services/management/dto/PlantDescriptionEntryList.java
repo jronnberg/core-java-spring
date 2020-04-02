@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +13,15 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
-public interface PlantDescriptionEntries {
+public interface PlantDescriptionEntryList {
 
-    List<PlantDescriptionEntry> entries();
+    int count();
+    List<PlantDescriptionEntry> data();
 
     default String asString() {
         String result = "[";
         List<String> strings = new ArrayList<>();
-        for (var entry : entries()) {
+        for (var entry : data()) {
             strings.add(entry.asString());
         }
         result += String.join(",", strings);
