@@ -7969,7 +7969,6 @@ The PDE consumes the following services:
  + the [Service Discovery] service produced by the [Service Registry] core system
  + the [Orchestration Store Management] service produced by the [Orchestrator] core system
  + the [Orchestration] service produced by the [Orchestrator] core system
- + the [AuthorizationControl] service produced by the [Authorization] core system
  + the [Inventory] service produced by an Inventory system
  + the [Monitorable] service produced by the systems in the plant
     
