@@ -14,12 +14,11 @@ public class DtoWriter implements BinaryWriter {
     }
 
     public int writeOffset() {
-        // TODO: Implement
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     public void writeOffset(final int offset) {
-        // TODO: Implement
+        throw new UnsupportedOperationException();
     }
 
     public void write(final byte b) {
