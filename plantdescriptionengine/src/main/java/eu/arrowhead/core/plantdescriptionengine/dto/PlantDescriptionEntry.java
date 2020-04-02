@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.dto;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,22 +22,21 @@ public interface PlantDescriptionEntry {
     List<Integer> include();
     List<PdeSystem> systems();
     List<PdeConnection> connections();
-    // createdAt(); TODO: Add
-    // updatedAt(); TODO: Add
+    // OffsetDateTime createdAt();
+    // OffsetDateTime updatedAt();
 
     static PlantDescriptionEntryDto from(PlantDescriptionDto description) {
         List<PdeSystemDto> systems = new ArrayList<>();
         List<PdeConnectionDto> connections = new ArrayList<>();
 
-        /*
         for (PdeSystem system : description.systems()) {
             systems.add((PdeSystemDto)system);
         }
         for (PdeConnection connection : description.connections()) {
             connections.add((PdeConnectionDto)connection);
         }
-        */
 
+        // final OffsetDateTime now = OffsetDateTime.now();
         return new PlantDescriptionEntryBuilder()
             .id(description.id())
             .plantDescription(description.plantDescription())
@@ -44,6 +44,8 @@ public interface PlantDescriptionEntry {
             .include(description.include())
             .systems(systems)
             .connections(connections)
+            // .createdAt(now)
+            //.updatedAt(now)
             .build();
     }
 
