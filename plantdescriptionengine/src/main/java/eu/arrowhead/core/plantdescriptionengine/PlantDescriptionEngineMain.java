@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import se.arkalix.ArSystem;
@@ -28,18 +29,19 @@ public class PlantDescriptionEngineMain {
     // descriptions:
     final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
 
-    private static Map<Integer, PlantDescriptionDto> plantDescriptionsById = new HashMap<Integer, PlantDescriptionDto>();
+    private static Map<Integer, PlantDescriptionEntryDto> entriesById = new HashMap<>();
 
-    private static PlantDescriptionListDto getPlantDescriptionsDto() {
-        return new PlantDescriptionListBuilder()
-            .descriptions(new ArrayList<PlantDescriptionDto>(plantDescriptionsById.values()))
+    private static PlantDescriptionEntryListDto getPlantDescriptionsDto() {
+        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
+        return new PlantDescriptionEntryListBuilder()
+            .entries(entryList)
             .build();
     }
 
     private static void writeToFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
         final String filename = DESCRIPTION_DIRECTORY + description.id() + ".json";
         final FileOutputStream out = new FileOutputStream(new File(filename));
-        final DtoWriter writer = new DtoWriter(out);
+        final DtoWriter writer = new DtoWriter(out); // Replace with ByteBufWriter!
         description.writeJson(writer);
         out.close();
     }
@@ -89,7 +91,8 @@ public class PlantDescriptionEngineMain {
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 Integer id = Integer.parseInt(request.pathParameter(0));
-                plantDescriptionsById.put(id, body);
+                PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(body);
+                entriesById.put(id, entry);
                 return response.status(HttpStatus.CREATED).body(body);
             });
     }

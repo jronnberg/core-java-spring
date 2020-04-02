@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.nio.file.Path;
 
 import se.arkalix.dto.DtoEncoding;
@@ -63,6 +64,8 @@ public class PdeClient {
 
         PlantDescriptionDto description = new PlantDescriptionBuilder()
             .id(1).plantDescription("ArrowHead core")
+            .active(true)
+            .include(Collections.<Integer> emptyList())
             .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
             .connections(Arrays.asList(connection))
             .build();
@@ -104,7 +107,7 @@ public class PdeClient {
                 .method(HttpMethod.POST)
                 .uri(uri)
                 .body(DtoEncoding.JSON, description))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionDto.class))
+                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
                 .map(body -> {
                     System.err.println("\nPOST result:");
                     System.err.println(body.asString());
@@ -120,7 +123,7 @@ public class PdeClient {
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
                 .header("accept", "application/json"))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionListDto.class))
+                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
                 .map(body -> {
                     System.err.println("\nGET result:");
                     System.err.println(body.asString());
