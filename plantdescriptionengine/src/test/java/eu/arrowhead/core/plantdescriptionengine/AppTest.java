@@ -1,3 +1,4 @@
+package eu.arrowhead.core.plantdescriptionengine;
 // package eu.arrowhead.core.plantdescriptionengine;
 
 // import static org.junit.Assert.assertTrue;
