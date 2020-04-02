@@ -39,12 +39,11 @@ public class PdeManagementMain {
             .build();
     }
 
-    private static void writeToFile(PlantDescriptionDto description) throws DtoWriteException, IOException {
-        final String filename = DESCRIPTION_DIRECTORY + description.id() + ".json";
+    private static void writeToFile(PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
+        final String filename = DESCRIPTION_DIRECTORY + entry.id() + ".json";
         final FileOutputStream out = new FileOutputStream(new File(filename));
         final DtoWriter writer = new DtoWriter(out);
-
-        description.writeJson(writer);
+        entry.writeJson(writer);
         out.close();
     }
 
@@ -85,17 +84,17 @@ public class PdeManagementMain {
     ) {
         return request
             .bodyAs(PlantDescriptionDto.class)
-            .map(body -> {
+            .map(description -> {
+                Integer id = Integer.parseInt(request.pathParameter(0));
+                PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description);
                 try {
-                    writeToFile(body);
+                    writeToFile(entry);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-                Integer id = Integer.parseInt(request.pathParameter(0));
-                PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(body);
                 entriesById.put(id, entry);
-                return response.status(HttpStatus.CREATED).body(body);
+                return response.status(HttpStatus.CREATED).body(entry);
             });
     }
 
