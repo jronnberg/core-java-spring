@@ -19,13 +19,18 @@ public interface PlantDescriptionEntry {
     int id();
     String plantDescription();
     boolean active();
-    List<Integer> include();
+    List<Integer> include(); // TODO: Check how this works with Optional
     List<PdeSystem> systems();
     List<PdeConnection> connections();
     Instant createdAt();
     Instant updatedAt();
 
-    static PlantDescriptionEntryDto from(PlantDescriptionDto description) {
+    /**
+     * @param description The plant description to base this entry on.
+     * @param id Identifier to be used for the new entry.
+     * @return A new plant entry based on the given description.
+     */
+    static PlantDescriptionEntryDto from(PlantDescriptionDto description, int id) {
         List<PdeSystemDto> systems = new ArrayList<>();
         List<PdeConnectionDto> connections = new ArrayList<>();
 
@@ -39,10 +44,12 @@ public interface PlantDescriptionEntry {
 
         final Instant now = Instant.now();
 
+        var x = description.active();
+
         return new PlantDescriptionEntryBuilder()
-            .id(description.id())
+            .id(id)
             .plantDescription(description.plantDescription())
-            .active(description.active())
+            .active(description.active().orElse(false))
             .include(description.include())
             .systems(systems)
             .connections(connections)

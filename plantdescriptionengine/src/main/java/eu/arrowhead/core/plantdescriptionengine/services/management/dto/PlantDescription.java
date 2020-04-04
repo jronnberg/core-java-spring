@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
 
 import java.util.List;
+import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
@@ -13,15 +14,13 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface PlantDescription {
-
-    int id();
     String plantDescription();
-    boolean active();
-    List<Integer> include();
+    Optional<Boolean> active();
+    List<Integer> include(); // TODO: How do lists work with Optional?
     List<PdeSystem> systems();
     List<PdeConnection> connections();
 
     default String asString() {
-        return "PlantDescription[id=" + id() + ",plantDescription=" + plantDescription() + "]";
+        return "PlantDescription[plantDescription=" + plantDescription() + "]";
     }
 }

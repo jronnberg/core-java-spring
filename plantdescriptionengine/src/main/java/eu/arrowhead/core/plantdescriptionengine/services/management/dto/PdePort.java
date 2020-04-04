@@ -5,6 +5,8 @@ import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
+import java.util.Optional;
+
 /**
  * Data Transfer Object (DTO) interface for plant description system ports.
  */
@@ -18,7 +20,7 @@ public interface PdePort {
     /**
      * Indicates whether this port is used to consume or produce services.
      */
-    Boolean consumer();
+    Optional<Boolean> consumer();
 
     default String asString() {
         return "PdePort[portName=" + portName() + ",serviceDefinition=" + serviceDefinition() +

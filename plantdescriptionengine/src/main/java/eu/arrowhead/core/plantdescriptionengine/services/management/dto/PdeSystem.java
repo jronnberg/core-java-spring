@@ -16,6 +16,7 @@ public interface PdeSystem {
 
     String systemName();
     List<PdePort> ports();
+    // TODO: Add metadata
 
     default String asString() {
         return "PdeSystem[systemName=" + systemName() + "]";

@@ -66,7 +66,7 @@ public class PdeClient {
             .build();
 
         PlantDescriptionDto description = new PlantDescriptionBuilder()
-            .id(99).plantDescription("ArrowHead core")
+            .plantDescription("ArrowHead core")
             .active(true)
             .include(Collections.<Integer> emptyList())
             .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
@@ -103,7 +103,7 @@ public class PdeClient {
 
             final var pdeSocketAddress = new InetSocketAddress("localhost", 28081);
             PlantDescriptionDto description = createDescription();
-            String uri = "/pde/mgmt/pd/" + description.id();
+            String uri = "/pde/mgmt/pd";
 
             // Post a plant description
             client.send(pdeSocketAddress, new HttpClientRequest()
@@ -125,6 +125,8 @@ public class PdeClient {
             client.send(pdeSocketAddress, new HttpClientRequest()
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
+                .queryParameter("page", "4")
+                .queryParameter("item_per_page", "3")
                 .header("accept", "application/json"))
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
                 .map(body -> {
@@ -135,6 +137,7 @@ public class PdeClient {
                 .onFailure(throwable -> {
                     System.err.println("\nGET failure:");
                     throwable.printStackTrace();
+                    System.out.println("----------------------");
                 });
         }
         catch (final Throwable e) {
