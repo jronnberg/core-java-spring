@@ -16,34 +16,41 @@ public class QueryParamParser {
     private Map<String, Integer> intValues = new HashMap<>();
     private Map<String, String> stringValues = new HashMap<>();
 
-    private String errorMessage;
+    private List<ParseError> errors = new ArrayList<ParseError>();
 
-    public QueryParamParser(List<QueryParameter> required, List<QueryParameter> accepted) {
+    public QueryParamParser(List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request) {
+
+        if (required == null) {
+            required = new ArrayList<>();
+        }
+
+        if (accepted == null) {
+            accepted = new ArrayList<>();
+        }
+
         this.required = required;
         this.accepted = accepted;
+        parse(request);
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public boolean hasError() {
+        return errors.size() > 0;
     }
 
-    public boolean parse(HttpServiceRequest request) {
+    void report(ParseError error) {
+        errors.add(error);
+    }
+
+    private void parse(HttpServiceRequest request) {
         for (var param : required) {
-            if (!param.parse(request, this, true)) {
-                errorMessage = param.getErrorMessage();
-                return false;
-            }
+            param.parse(request, this, true);
         }
         for (var param : accepted) {
-            if (!param.parse(request, this, false)) {
-                errorMessage = param.getErrorMessage();
-                return false;
-            }
+            param.parse(request, this, false);
         }
-        return true;
     }
 
-	public void putInt(String key, Integer value) {
+	void putInt(String key, Integer value) {
         intValues.put(key, value);
     }
 
@@ -52,7 +59,7 @@ public class QueryParamParser {
         return Optional.ofNullable(i);
     }
 
-    public void putString(String key, String value) {
+    void putString(String key, String value) {
         stringValues.put(key, value);
     }
 
@@ -60,5 +67,13 @@ public class QueryParamParser {
         String s = stringValues.get(name);
         return Optional.ofNullable(s);
     }
+
+	public String getErrorMessage() {
+        List<String> errorMessages = new ArrayList<>();
+        for (ParseError error : errors) {
+            errorMessages.add("'" + error.getMessage() + "'");
+        }
+        return String.join(", ", errorMessages);
+	}
 
 }

@@ -18,53 +18,48 @@ public class IntParameter extends QueryParameter {
         return !scanner.hasNext();
     }
 
-    public IntParameter(Builder builder) {
-        super(builder);
+    public IntParameter(String name) {
+        super(name);
     }
 
     @Override
-    public boolean parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
+    public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
 
         for (var param : requiredParameters) {
-            try {
-                Optional<String> value = request.queryParameter(param);
-                if (value.isEmpty()) {
-                    errorMessage = "Missing parameter " + param + ".";
-                    return false;
-                }
-            } catch (NullPointerException e) { // TODO: This should be unnecessary
-                errorMessage = "Missing parameter " + param + ".";
-                return false;
-            }
+            param.parse(request, parser, true);
         }
 
-        Optional<String> possibleValue = request.queryParameter(name);
+        Optional<String> possibleValue;
+
+        try {
+            // TODO: Find out why 'request.queryParameter' throws
+            // NullPointerExceptions. If this is an implementation error,
+            // remove this try/catch when it has been fixed. Otherwise,
+            // find a nicer way to work around it.
+            possibleValue = request.queryParameter(name);
+        } catch (NullPointerException e) {
+            if (required) {
+                parser.report(new ParseError("Missing parameter: " + name + "."));
+            }
+            return;
+        }
 
         if (possibleValue.isEmpty()) {
-            if (!required) {
-                return true;
-            } else {
-                errorMessage = "Missing parameter: " + name + ".";
-                return false;
+            if (required) {
+                parser.report(new ParseError("Missing parameter: " + name + "."));
             }
+            return;
         }
 
         String value = possibleValue.get();
+
         if (!isInteger(value)) {
-            errorMessage = "Query parameter " + name +
-                " must be a valid string, got " + value + ".";
-            return false;
+            parser.report(new ParseError("Query parameter " + name +
+                " must be a valid string, got " + value + "."));
         }
 
-        parser.putInt(name, Integer.parseInt(value));
-        return true;
-    }
-
-    public static class Builder extends eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter.Builder {
-
-        public IntParameter build() {
-            return new IntParameter(this);
+        if (!parser.hasError()) {
+            parser.putInt(name, Integer.parseInt(value));
         }
-
     }
 }

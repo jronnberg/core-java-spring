@@ -125,23 +125,27 @@ public class PdeManagementMain {
         HttpServiceRequest request, HttpServiceResponse response
     ) {
 
-        List<QueryParameter> requiredParameters = Arrays.asList(
-            new IntParameter.Builder()
-                .name("page")
-                .ifPresentRequire("item_per_page")
-                .build(),
-            new IntParameter.Builder()
-                 .name("item_per_page")
-                 .build()
+        List<QueryParameter> requiredParameters = null;
+        List<QueryParameter> acceptedParameters = Arrays.asList(
+            new IntParameter("page")
+                .ifPresentRequire(
+                    new IntParameter("item_per_page")
+                ),
+            new StringParameter("sort_field")
+                .in(Arrays.asList("active", "createdAt", "updatedAt")),
+            new StringParameter("direction")
+                .in(Arrays.asList("ASC", "DESC")),
+            new StringParameter("filter_field")
+                .in(Arrays.asList("active")),
+            new StringParameter("filter_value")
         );
 
-        List<QueryParameter> acceptedParameters = new ArrayList<>();
+        var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
 
-        var parser = new QueryParamParser(requiredParameters, acceptedParameters);
-
-        if (!parser.parse(request)) {
+        if (parser.hasError()) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(parser.getErrorMessage());
+            System.err.println("Encountered errors while parsing HTTP request, " + parser.getErrorMessage());
             return Future.done(); // Or failure? Error message to user?
         }
 
@@ -162,7 +166,7 @@ public class PdeManagementMain {
             .status(HttpStatus.OK)
             .body(
                 new PlantDescriptionEntryListBuilder()
-                .count(entryList.size()) // TODO: This shouldn't be necessary?
+                .count(entryList.size()) // TODO: This shouldn't be necessary
                 .data(entryList)
                 .build()
             );

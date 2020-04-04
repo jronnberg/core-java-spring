@@ -126,7 +126,7 @@ public class PdeClient {
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
                 .queryParameter("page", "4")
-                .queryParameter("item_per_page", "3")
+                .queryParameter("item_pser_page", "3")
                 .header("accept", "application/json"))
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
                 .map(body -> {
