@@ -44,8 +44,6 @@ public interface PlantDescriptionEntry {
 
         final Instant now = Instant.now();
 
-        var x = description.active();
-
         return new PlantDescriptionEntryBuilder()
             .id(id)
             .plantDescription(description.plantDescription())
