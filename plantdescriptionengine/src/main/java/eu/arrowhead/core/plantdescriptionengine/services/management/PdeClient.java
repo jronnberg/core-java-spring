@@ -76,6 +76,61 @@ public class PdeClient {
         return description;
     }
 
+    private static void deleteDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
+        client.send(address, new HttpClientRequest()
+                .method(HttpMethod.DELETE)
+                .uri(baseUri + descriptionId))
+                .map(body -> {
+                    System.out.println("\nDELETE result:");
+                    System.out.println(body);
+                    return null;
+                })
+                .onFailure(throwable -> {
+                    System.err.println("\nDELETE failure:");
+                    throwable.printStackTrace();
+                });
+    }
+
+    private static void getDescriptions(InetSocketAddress address, String baseUri, HttpClient client) {
+        client.send(address, new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri("/pde/mgmt/pd")
+            .queryParameter("page", "4")
+            .queryParameter("item_per_page", "3")
+            .queryParameter("sort_field", "createdAt")
+            .queryParameter("direction", "DESC")
+            .queryParameter("filter_field", "active")
+            .queryParameter("filter_value", "false")
+            .header("accept", "application/json"))
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
+            .map(body -> {
+                System.out.println("\nGET result:");
+                System.out.println(body.asString());
+                return null;
+            })
+            .onFailure(throwable -> {
+                System.err.println("\nGET failure:");
+                throwable.printStackTrace();
+            });
+    }
+
+    private static void postDescription(InetSocketAddress address, String baseUri, HttpClient client) {
+        client.send(address, new HttpClientRequest()
+        .method(HttpMethod.POST)
+        .uri(baseUri)
+        .body(DtoEncoding.JSON, createDescription()))
+        .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
+        .map(body -> {
+            System.out.println("\nPOST result:");
+            System.out.println(body.asString());
+            return null;
+        })
+        .onFailure(throwable -> {
+            System.err.println("\nPOST failure:");
+            throwable.printStackTrace();
+        });
+    }
+
     public static void main(final String[] args) {
         if (args.length != 2) {
             System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
@@ -102,46 +157,21 @@ public class PdeClient {
                 .build();
 
             final var pdeSocketAddress = new InetSocketAddress("localhost", 28081);
-            PlantDescriptionDto description = createDescription();
-            String uri = "/pde/mgmt/pd";
+            String baseUri = "/pde/mgmt/pd/";
 
-            // Post a plant description
-            client.send(pdeSocketAddress, new HttpClientRequest()
-                .method(HttpMethod.POST)
-                .uri(uri)
-                .body(DtoEncoding.JSON, description))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
-                .map(body -> {
-                    System.out.println("\nPOST result:");
-                    System.out.println(body.asString());
-                    return null;
-                })
-                .onFailure(throwable -> {
-                    System.err.println("\nPOST failure:");
-                    throwable.printStackTrace();
-                });
+            getDescriptions(pdeSocketAddress, baseUri, client);
+            Thread.sleep(1000);
+            postDescription(pdeSocketAddress, baseUri, client);
+            Thread.sleep(1000);
+            postDescription(pdeSocketAddress, baseUri, client);
+            Thread.sleep(1000);
+            deleteDescription(pdeSocketAddress, baseUri, client, 1);
+            deleteDescription(pdeSocketAddress, baseUri, client, 2);
+            deleteDescription(pdeSocketAddress, baseUri, client, 3);
+            deleteDescription(pdeSocketAddress, baseUri, client, 4);
+            Thread.sleep(1000);
+            getDescriptions(pdeSocketAddress, baseUri, client);
 
-            // Get current plant descriptions
-            client.send(pdeSocketAddress, new HttpClientRequest()
-                .method(HttpMethod.GET)
-                .uri("/pde/mgmt/pd")
-                .queryParameter("page", "4")
-                .queryParameter("item_per_page", "3")
-                .queryParameter("sort_field", "createdAt")
-                .queryParameter("direction", "DESC")
-                .queryParameter("filter_field", "active")
-                .queryParameter("filter_value", "falsse")
-                .header("accept", "application/json"))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
-                .map(body -> {
-                    System.out.println("\nGET result:");
-                    System.out.println(body.asString());
-                    return null;
-                })
-                .onFailure(throwable -> {
-                    System.err.println("\nGET failure:");
-                    throwable.printStackTrace();
-                });
         }
         catch (final Throwable e) {
             e.printStackTrace();
