@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.requestvalidation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,22 +9,30 @@ import se.arkalix.http.service.HttpServiceRequest;
 public class StringParameter extends QueryParameter {
 
     private List<String> legalValues = null;
+    private String defaultValue = null;
 
     public StringParameter(String name) {
         super(name);
     }
 
-    public StringParameter in(List<String> legalValues) {
+    public StringParameter legalValues(List<String> legalValues) {
         this.legalValues = legalValues;
+        return this;
+    }
+
+    public StringParameter legalValue(String value) {
+        this.legalValues = new ArrayList<String>();
+        this.legalValues.add(value);
+        return this;
+    }
+
+    public StringParameter setDefault(String s) {
+        this.defaultValue = s;
         return this;
     }
 
     @Override
     public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
-
-        for (var param : requiredParameters) {
-            param.parse(request, parser, true);
-        }
 
         Optional<String> possibleValue;
         try {
@@ -36,6 +45,9 @@ public class StringParameter extends QueryParameter {
             if (required) {
                 parser.report(new ParseError("Missing parameter: " + name + "."));
             }
+            if (defaultValue != null) {
+                parser.putString(name, defaultValue);
+            }
             return;
         }
 
@@ -43,7 +55,14 @@ public class StringParameter extends QueryParameter {
             if (required) {
                 parser.report(new ParseError("Missing parameter: " + name + "."));
             }
+            if (defaultValue != null) {
+                parser.putString(name, defaultValue);
+            }
             return;
+        }
+
+        for (var param : requiredParameters) {
+            param.parse(request, parser, true);
         }
 
         String value = possibleValue.get();

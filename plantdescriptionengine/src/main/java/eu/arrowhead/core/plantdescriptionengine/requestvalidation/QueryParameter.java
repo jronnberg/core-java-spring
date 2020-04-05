@@ -10,7 +10,7 @@ public abstract class QueryParameter {
     protected String name;
     protected List<QueryParameter> requiredParameters = new ArrayList<>();
 
-    public QueryParameter ifPresentRequire(QueryParameter param) {
+    public QueryParameter requires(QueryParameter param) {
         requiredParameters.add(param);
         return this;
     }

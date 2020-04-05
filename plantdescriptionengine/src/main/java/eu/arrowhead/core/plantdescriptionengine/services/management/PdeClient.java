@@ -126,7 +126,11 @@ public class PdeClient {
                 .method(HttpMethod.GET)
                 .uri("/pde/mgmt/pd")
                 .queryParameter("page", "4")
-                .queryParameter("item_pser_page", "3")
+                .queryParameter("item_per_page", "3")
+                .queryParameter("sort_field", "createdAt")
+                .queryParameter("direction", "DESC")
+                .queryParameter("filter_field", "active")
+                .queryParameter("filter_value", "falsse")
                 .header("accept", "application/json"))
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
                 .map(body -> {
@@ -137,7 +141,6 @@ public class PdeClient {
                 .onFailure(throwable -> {
                     System.err.println("\nGET failure:");
                     throwable.printStackTrace();
-                    System.out.println("----------------------");
                 });
         }
         catch (final Throwable e) {

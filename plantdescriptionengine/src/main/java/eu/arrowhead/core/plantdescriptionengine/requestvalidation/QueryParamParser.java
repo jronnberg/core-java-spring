@@ -14,6 +14,7 @@ public class QueryParamParser {
     private List<QueryParameter> accepted = new ArrayList<>();
 
     private Map<String, Integer> intValues = new HashMap<>();
+    private Map<String, Boolean> boolValues = new HashMap<>();
     private Map<String, String> stringValues = new HashMap<>();
 
     private List<ParseError> errors = new ArrayList<ParseError>();
@@ -59,6 +60,15 @@ public class QueryParamParser {
         return Optional.ofNullable(i);
     }
 
+    void putBoolean(String key, Boolean value) {
+        boolValues.put(key, value);
+    }
+
+    public Optional<Boolean> getBoolean(String name) {
+        Boolean value = boolValues.get(name);
+        return Optional.ofNullable(value);
+    }
+
     void putString(String key, String value) {
         stringValues.put(key, value);
     }
@@ -71,7 +81,7 @@ public class QueryParamParser {
 	public String getErrorMessage() {
         List<String> errorMessages = new ArrayList<>();
         for (ParseError error : errors) {
-            errorMessages.add("'" + error.getMessage() + "'");
+            errorMessages.add("<" + error.getMessage() + ">");
         }
         return String.join(", ", errorMessages);
 	}

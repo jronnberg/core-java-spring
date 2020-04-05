@@ -1,35 +1,26 @@
 package eu.arrowhead.core.plantdescriptionengine.requestvalidation;
 
 import java.util.Optional;
-import java.util.Scanner;
 
 import se.arkalix.http.service.HttpServiceRequest;
 
-public class IntParameter extends QueryParameter {
+public class BooleanParameter extends QueryParameter {
 
-    /**
-     * @return True if the provided string is a base 10 integer.
-     */
-    private static boolean isInteger(String s) {
-        int radix = 10;
-        Scanner scanner = new Scanner(s.trim());
+    private Boolean defaultValue = null; // Use generics?
 
-        if (!scanner.hasNextInt(radix)) {
-            return false;
-        }
-        scanner.nextInt(radix);
-        return !scanner.hasNext();
+    public BooleanParameter(String name) {
+        super(name);
     }
 
-    public IntParameter(String name) {
-        super(name);
+    public BooleanParameter setDefault(boolean value) {
+        this.defaultValue = value;
+        return this;
     }
 
     @Override
     public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
 
         Optional<String> possibleValue;
-
         try {
             // TODO: Find out why 'request.queryParameter' throws
             // NullPointerExceptions. If this is an implementation error,
@@ -40,12 +31,18 @@ public class IntParameter extends QueryParameter {
             if (required) {
                 parser.report(new ParseError("Missing parameter: " + name + "."));
             }
+            if (defaultValue != null) {
+                parser.putBoolean(name, defaultValue);
+            }
             return;
         }
 
         if (possibleValue.isEmpty()) {
             if (required) {
                 parser.report(new ParseError("Missing parameter: " + name + "."));
+            }
+            if (defaultValue != null) {
+                parser.putBoolean(name, defaultValue);
             }
             return;
         }
@@ -55,14 +52,10 @@ public class IntParameter extends QueryParameter {
         }
 
         String value = possibleValue.get();
-
-        if (!isInteger(value)) {
-            parser.report(new ParseError("Query parameter " + name +
-                " must be a valid string, got " + value + "."));
+        if (!(value.equals("true") || value.equals("false"))) {
+            parser.report(new ParseError(name + " must be true or false, not " + value + "."));
         }
 
-        if (!parser.hasError()) {
-            parser.putInt(name, Integer.parseInt(value));
-        }
+        parser.putBoolean(name, value == "true");
     }
 }
