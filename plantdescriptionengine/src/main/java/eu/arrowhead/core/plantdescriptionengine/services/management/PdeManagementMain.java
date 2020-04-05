@@ -109,8 +109,33 @@ public class PdeManagementMain {
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 entriesById.put(entry.id(), entry);
-                return response.status(HttpStatus.CREATED).body(entry);
+                return response
+                    .status(HttpStatus.CREATED)
+                    .body(getCurrentEntryList());
             });
+    }
+
+    /**
+     * Handles a HTTP request to delete an existing Plant Description from the
+     * PDE.
+     * @param request HTTP request containing a PlantDescription.
+     * @param response HTTP response object.
+     */
+    private static Future<?> onDescriptionDelete(
+        final HttpServiceRequest request, final HttpServiceResponse response
+    ) {
+        int id;
+
+        try {
+            id = Integer.parseInt(request.pathParameter(0));
+            entriesById.remove(id);
+            response.status(HttpStatus.OK);
+            response.body("ok");
+          } catch (NumberFormatException e) {
+            response.status(HttpStatus.BAD_REQUEST);
+            response.body(" is not a valid plant description entry ID.");
+          }
+        return Future.done();
     }
 
     /**
@@ -120,7 +145,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<?> handleGetEntries(
+    private static Future<?> onDescriptionsGet(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         final List<QueryParameter> requiredParameters = null;
@@ -152,7 +177,7 @@ public class PdeManagementMain {
         if (sortField.isPresent()) {
             final String sortDirection = parser.getString("direction").get();
             final boolean sortAscending = sortDirection == "ASC" ? true : false;
-            // TODO: Implement the sorting...
+            // TODO: Implement sorting...
             System.out.println("Sort list on " + sortField.get() + " " + sortDirection);
         }
 
@@ -170,13 +195,20 @@ public class PdeManagementMain {
 
         response
             .status(HttpStatus.OK)
-            .body(
-                new PlantDescriptionEntryListBuilder()
+            .body(new PlantDescriptionEntryListBuilder()
                 .count(entryList.size()) // TODO: This shouldn't be necessary
                 .data(entryList)
                 .build()
             );
         return Future.done();
+    }
+
+    private static PlantDescriptionEntryListDto getCurrentEntryList() {
+        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
+        return new PlantDescriptionEntryListBuilder()
+            .count(entryList.size()) // TODO: This shouldn't be necessary
+            .data(entryList)
+            .build();
     }
 
     private static HttpService getServices() {
@@ -185,8 +217,9 @@ public class PdeManagementMain {
             .encodings(EncodingDescriptor.JSON)
             .security(SecurityDescriptor.CERTIFICATE)
             .basePath("/pde")
-            .get("/mgmt/pd", (request, response) -> handleGetEntries(request, response))
-            .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response));
+            .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
+            .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response))
+            .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response));
     }
 
     public static void main(final String[] args) {

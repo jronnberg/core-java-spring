@@ -23,13 +23,13 @@ public interface PlantDescriptionEntryList {
     // TODO: Check if data() is a copy or reference
 
     default String asString() {
-        String result = "[";
+        String result = "PlantDescriptionEntryList[count=" + count() + ",data=[";
         List<String> strings = new ArrayList<>();
         for (var entry : data()) {
-            strings.add(entry.asString());
+            strings.add(String.valueOf(entry.id()));
         }
         result += String.join(",", strings);
-        result += "]";
+        result += "]]";
         return result;
     }
 }
