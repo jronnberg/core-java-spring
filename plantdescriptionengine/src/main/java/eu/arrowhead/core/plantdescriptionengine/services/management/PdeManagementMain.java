@@ -3,15 +3,14 @@ package eu.arrowhead.core.plantdescriptionengine.services.management;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
@@ -50,7 +49,7 @@ public class PdeManagementMain {
 
     private static Map<Integer, PlantDescriptionEntryDto> entriesById = new HashMap<>();
 
-    private static void writeToFile(PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
+    private static void writeToFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
         final String filename = DESCRIPTION_DIRECTORY + entry.id() + ".json";
         final FileOutputStream out = new FileOutputStream(new File(filename));
         final DtoWriter writer = new DtoWriter(out);
@@ -69,7 +68,7 @@ public class PdeManagementMain {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    private static ArSystem getArSystem(char[] password, String keyStorePath, String trustStorePath)
+    private static ArSystem getArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
             throws GeneralSecurityException, IOException {
 
         X509KeyStore keyStore = null;
@@ -81,7 +80,7 @@ public class PdeManagementMain {
             .keyStorePassword(password).load();
         trustStore = X509TrustStore.read(Path.of(trustStorePath), password);
 
-        var system = new ArSystem.Builder()
+        final var system = new ArSystem.Builder()
             .keyStore(keyStore)
             .trustStore(trustStore)
             .localPort(28081)
@@ -97,15 +96,15 @@ public class PdeManagementMain {
      *                 PlantDescriptionEntryList.
      */
     private static Future<HttpServiceResponse> onDescriptionPost(
-        HttpServiceRequest request, HttpServiceResponse response
+        final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         return request
             .bodyAs(PlantDescriptionDto.class)
             .map(description -> {
-                PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, getNextId());
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, getNextId());
                 try {
                     writeToFile(entry);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -122,39 +121,46 @@ public class PdeManagementMain {
      *                 PlantDescriptionEntryList.
      */
     private static Future<?> handleGetEntries(
-        HttpServiceRequest request, HttpServiceResponse response
+        final HttpServiceRequest request, final HttpServiceResponse response
     ) {
-
-        List<QueryParameter> requiredParameters = null;
-        List<QueryParameter> acceptedParameters = Arrays.asList(
+        final List<QueryParameter> requiredParameters = null;
+        final List<QueryParameter> acceptedParameters = Arrays.asList(
             new IntParameter("page")
-                .ifPresentRequire(
-                    new IntParameter("item_per_page")
-                ),
+                .requires(new IntParameter("item_per_page")),
             new StringParameter("sort_field")
-                .in(Arrays.asList("active", "createdAt", "updatedAt")),
+                .legalValues(Arrays.asList("active", "createdAt", "updatedAt")),
             new StringParameter("direction")
-                .in(Arrays.asList("ASC", "DESC")),
+                .legalValues(Arrays.asList("ASC", "DESC"))
+                .setDefault("ASC"),
             new StringParameter("filter_field")
-                .in(Arrays.asList("active")),
-            new StringParameter("filter_value")
+                .legalValue("active")
+                .requires(new BooleanParameter("filter_value"))
         );
 
-        var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+        final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
 
         if (parser.hasError()) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(parser.getErrorMessage());
-            System.err.println("Encountered errors while parsing HTTP request, " + parser.getErrorMessage());
-            return Future.done(); // Or failure? Error message to user?
+            System.err.println("Encountered the following error(s) while parsing an HTTP request: " + parser.getErrorMessage());
+            return Future.done();
         }
 
         List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
 
-        Optional<Integer> maybePage = parser.getInt("page");
+        final Optional<String> sortField = parser.getString("sort_field");
+        if (sortField.isPresent()) {
+            final String sortDirection = parser.getString("direction").get();
+            final boolean sortAscending = sortDirection == "ASC" ? true : false;
+            // TODO: Implement the sorting...
+            System.out.println("Sort list on " + sortField.get() + " " + sortDirection);
+        }
+
+
+        final Optional<Integer> maybePage = parser.getInt("page");
         if (maybePage.isPresent()) {
-            int page = maybePage.get();
-            int itemsPerPage = parser.getInt("item_per_page").get();
+            final int page = maybePage.get();
+            final int itemsPerPage = parser.getInt("item_per_page").get();
             int from = page * itemsPerPage;
             int to = from + itemsPerPage;
             from = Math.min(from, 0);
@@ -190,7 +196,7 @@ public class PdeManagementMain {
             System.exit(1);
         }
 
-        File directory = new File(DESCRIPTION_DIRECTORY);
+        final File directory = new File(DESCRIPTION_DIRECTORY);
         if (!directory.exists()){
             directory.mkdir();
         }

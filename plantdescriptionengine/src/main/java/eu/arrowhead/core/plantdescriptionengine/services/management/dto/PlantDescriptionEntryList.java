@@ -18,6 +18,10 @@ public interface PlantDescriptionEntryList {
     int count();
     List<PlantDescriptionEntry> data();
 
+    // TODO: Add functions for sorting and filtering
+
+    // TODO: Check if data() is a copy or reference
+
     default String asString() {
         String result = "[";
         List<String> strings = new ArrayList<>();
