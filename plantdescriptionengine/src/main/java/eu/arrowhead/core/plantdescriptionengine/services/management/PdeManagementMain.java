@@ -116,6 +116,44 @@ public class PdeManagementMain {
     }
 
     /**
+     * Handles a HTTP request to replace a Plant Description in the PDE.
+     * @param request HTTP request containing a PlantDescription.
+     * @param response HTTP response containing the current
+     *                 PlantDescriptionEntryList.
+     */
+    private static Future<HttpServiceResponse> onDescriptionPut(
+        final HttpServiceRequest request, final HttpServiceResponse response
+    ) {
+        return request
+            .bodyAs(PlantDescriptionDto.class)
+            .map(description -> {
+                int id;
+
+                try {
+                    id = Integer.parseInt(request.pathParameter(0));
+                } catch (NumberFormatException e) {
+                    response.status(HttpStatus.BAD_REQUEST);
+                    response.body(" is not a valid plant description entry ID.");
+                    return response.status(HttpStatus.BAD_REQUEST);
+                }
+
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
+
+                try {
+                    writeToFile(entry);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                entriesById.put(entry.id(), entry);
+                return response
+                    .status(HttpStatus.CREATED)
+                    .body(entry);
+            });
+    }
+
+    /**
      * Handles a HTTP request to delete an existing Plant Description from the
      * PDE.
      * @param request HTTP request containing a PlantDescription.
@@ -219,7 +257,8 @@ public class PdeManagementMain {
             .basePath("/pde")
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
             .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response))
-            .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response));
+            .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))
+            .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response));
     }
 
     public static void main(final String[] args) {

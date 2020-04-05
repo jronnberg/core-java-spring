@@ -131,6 +131,23 @@ public class PdeClient {
         });
     }
 
+    private static void putDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
+        client.send(address, new HttpClientRequest()
+        .method(HttpMethod.PUT)
+        .uri(baseUri + descriptionId)
+        .body(DtoEncoding.JSON, createDescription()))
+        .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
+        .map(body -> {
+            System.out.println("\nPUT result:");
+            System.out.println(body.asString());
+            return null;
+        })
+        .onFailure(throwable -> {
+            System.err.println("\nPUT failure:");
+            throwable.printStackTrace();
+        });
+    }
+
     public static void main(final String[] args) {
         if (args.length != 2) {
             System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
@@ -165,12 +182,10 @@ public class PdeClient {
             Thread.sleep(1000);
             postDescription(pdeSocketAddress, baseUri, client);
             Thread.sleep(1000);
-            deleteDescription(pdeSocketAddress, baseUri, client, 1);
-            deleteDescription(pdeSocketAddress, baseUri, client, 2);
-            deleteDescription(pdeSocketAddress, baseUri, client, 3);
-            deleteDescription(pdeSocketAddress, baseUri, client, 4);
+            deleteDescription(pdeSocketAddress, baseUri, client, 0);
             Thread.sleep(1000);
             getDescriptions(pdeSocketAddress, baseUri, client);
+            putDescription(pdeSocketAddress, baseUri, client, 1);
 
         }
         catch (final Throwable e) {
