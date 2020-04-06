@@ -15,7 +15,7 @@ A plant (System of Systems / Local cloud) is assumed to include the following sy
  - Some Producer systems
  - Some Consumer systems
 
-We will as an example consider a plant that has the four core systems and 5 custom systems:
+We will as an example consider a plant that has the four core systems and six custom systems:
  - Operations Center that manages and monitors the Plant Description Engine
  - A that produces service X
  - B that produces service Y

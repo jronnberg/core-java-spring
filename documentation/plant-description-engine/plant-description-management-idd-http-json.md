@@ -331,12 +331,12 @@ Content-Type: application/json
 ```
 
 
-### PUT /{baseURI}/mgmt/pd
+### PUT /{baseURI}/mgmt/pd{id}
  - __Interface: ReplacePlantDescription__
  - __Input: [PlantDescription](#plantdescription)__
  - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
 
-Called to replace the Plant Description Entry specified by the `id` parameter with the Plant Description in the `PlantDescription` parameter.
+Called to replace the Plant Description Entry specified by the `id` path parameter with the Plant Description in the `PlantDescription` parameter.
 
 Example of valid invocation:
 
@@ -449,12 +449,12 @@ Content-Type: application/json
 }
 ```
 
-### PATCH /{baseURI}/mgmt/pd
+### PATCH /{baseURI}/mgmt/pd/{id}
  - __Interface: UpdatePlantDescription__
  - __Input: [PlantDescriptionUpdate](#plantdescriptionupdate)__
  - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
 
-Called to update the Plant Description Entry specified by the `id` parameter with the information in the `PlantDescriptionUpdate` parameter.
+Called to update the Plant Description Entry specified by the `id` path parameter with the information in the `PlantDescriptionUpdate` parameter.
 
 Example of valid invocation:
 
