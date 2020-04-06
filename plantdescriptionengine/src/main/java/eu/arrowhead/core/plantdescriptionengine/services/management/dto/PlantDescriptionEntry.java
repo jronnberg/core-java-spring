@@ -76,8 +76,8 @@ public interface PlantDescriptionEntry {
 
         return new PlantDescriptionEntryBuilder()
             .id(oldEntry.id())
-            .plantDescription(newFields.plantDescription())
-            .active(newFields.active())
+            .plantDescription(newFields.plantDescription().orElse(oldEntry.plantDescription()))
+            .active(newFields.active().orElse(oldEntry.active()))
             .include(newFields.include())
             .systems(systems)
             .connections(connections)
