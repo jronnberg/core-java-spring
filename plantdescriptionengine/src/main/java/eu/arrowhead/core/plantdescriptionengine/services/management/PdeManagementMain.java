@@ -49,6 +49,14 @@ public class PdeManagementMain {
 
     private static Map<Integer, PlantDescriptionEntryDto> entriesById = new HashMap<>();
 
+    private static PlantDescriptionEntryListDto getCurrentEntryList() {
+        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
+        return new PlantDescriptionEntryListBuilder()
+            .count(entryList.size()) // TODO: This shouldn't be necessary
+            .data(entryList)
+            .build();
+    }
+
     private static void writeToFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
         final String filename = DESCRIPTION_DIRECTORY + entry.id() + ".json";
         final FileOutputStream out = new FileOutputStream(new File(filename));
@@ -58,10 +66,10 @@ public class PdeManagementMain {
     }
 
     /**
-     * @param password       Password of the private key associated with the
-     *                       certificate in key store.
-     * @param keyStorePath   Path to the keystore representing the systems own
-     *                       identity.
+     * @param password Password of the private key associated with the
+     *                 certificate in key store.
+     * @param keyStorePath Path to the keystore representing the systems own
+     *                     identity.
      * @param trustStorePath Path to the trust store representing all identities
      *                       that are to be trusted by the system.
      * @return An Arrowhead Framework system.
@@ -90,7 +98,7 @@ public class PdeManagementMain {
     }
 
     /**
-     * Handles a HTTP request to add a new Plant Description to the PDE.
+     * Handles an HTTP request to add a new Plant Description to the PDE.
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
@@ -116,7 +124,7 @@ public class PdeManagementMain {
     }
 
     /**
-     * Handles a HTTP request to replace a Plant Description in the PDE.
+     * Handles an HTTP request to replace a Plant Description in the PDE.
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
@@ -133,7 +141,7 @@ public class PdeManagementMain {
                     id = Integer.parseInt(request.pathParameter(0));
                 } catch (NumberFormatException e) {
                     response.status(HttpStatus.BAD_REQUEST);
-                    response.body(" is not a valid plant description entry ID.");
+                    response.body(request.pathParameter(0) + " is not a valid plant description entry ID.");
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 
@@ -154,7 +162,7 @@ public class PdeManagementMain {
     }
 
     /**
-     * Handles a HTTP request to delete an existing Plant Description from the
+     * Handles an HTTP request to delete an existing Plant Description from the
      * PDE.
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response object.
@@ -171,13 +179,48 @@ public class PdeManagementMain {
             response.body("ok");
           } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(" is not a valid plant description entry ID.");
+            response.body(request.pathParameter(0) + " is not a valid plant description entry ID.");
           }
         return Future.done();
     }
 
     /**
-     * Handles a HTTP call to acquire a list of Plant Description Entries
+     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by
+     * the id path parameter.
+     * @param request HTTP request object.
+     * @param response HTTP response containing the current
+     *                 PlantDescriptionEntryList.
+     */
+    private static Future<?> onDescriptionGet(
+        final HttpServiceRequest request, final HttpServiceResponse response
+    ) {
+
+        String idString = request.pathParameter(0);
+        int id;
+
+        try {
+            id = Integer.parseInt(idString);
+        } catch (NumberFormatException e) {
+            response.status(HttpStatus.BAD_REQUEST);
+            response.body(idString + " is not a valid plant description entry ID.");
+            response.status(HttpStatus.BAD_REQUEST);
+            return Future.done();
+        }
+
+        final PlantDescriptionEntryDto entry = entriesById.get(id);
+
+        if (entry == null) {
+            response.body("There is no plant description entry with ID " + idString + ".");
+            response.status(HttpStatus.BAD_REQUEST);
+            return Future.done();
+        }
+
+        response.status(HttpStatus.OK).body(entry);
+        return Future.done();
+    }
+
+    /**
+     * Handles an HTTP call to acquire a list of Plant Description Entries
      * present in the PDE.
      * @param request HTTP request object.
      * @param response HTTP response containing the current
@@ -241,20 +284,13 @@ public class PdeManagementMain {
         return Future.done();
     }
 
-    private static PlantDescriptionEntryListDto getCurrentEntryList() {
-        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
-        return new PlantDescriptionEntryListBuilder()
-            .count(entryList.size()) // TODO: This shouldn't be necessary
-            .data(entryList)
-            .build();
-    }
-
     private static HttpService getServices() {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
             .security(SecurityDescriptor.CERTIFICATE)
             .basePath("/pde")
+            .get("/mgmt/pd/#id", (request, response) -> onDescriptionGet(request, response))
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
             .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response))
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))

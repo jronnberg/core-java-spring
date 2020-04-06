@@ -91,6 +91,23 @@ public class PdeClient {
                 });
     }
 
+    private static void getDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
+        client.send(address, new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri("/pde/mgmt/pd/" + descriptionId)
+            .header("accept", "application/json"))
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
+            .map(body -> {
+                System.out.println("\nGET result:");
+                System.out.println(body.asString());
+                return null;
+            })
+            .onFailure(throwable -> {
+                System.err.println("\nGET failure:");
+                throwable.printStackTrace();
+            });
+    }
+
     private static void getDescriptions(InetSocketAddress address, String baseUri, HttpClient client) {
         client.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
@@ -185,8 +202,10 @@ public class PdeClient {
             deleteDescription(pdeSocketAddress, baseUri, client, 0);
             Thread.sleep(1000);
             getDescriptions(pdeSocketAddress, baseUri, client);
+            Thread.sleep(1000);
             putDescription(pdeSocketAddress, baseUri, client, 1);
-
+            Thread.sleep(1000);
+            getDescription(pdeSocketAddress, baseUri, client, 1);
         }
         catch (final Throwable e) {
             e.printStackTrace();
