@@ -56,6 +56,36 @@ public interface PlantDescriptionEntry {
             .build();
     }
 
+    /**
+     * @param oldEntry Target plant description entry to update.
+     * @param newFields A plant description update.
+     * @return A copy of the target plant description updated with the fields
+     *         specified in newFields.
+     */
+    static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
+        List<PdeSystemDto> systems = new ArrayList<>();
+        List<PdeConnectionDto> connections = new ArrayList<>();
+
+        for (PdeSystem system : newFields.systems()) {
+            systems.add((PdeSystemDto)system);
+        }
+
+        for (PdeConnection connection : newFields.connections()) {
+            connections.add((PdeConnectionDto)connection);
+        }
+
+        return new PlantDescriptionEntryBuilder()
+            .id(oldEntry.id())
+            .plantDescription(newFields.plantDescription())
+            .active(newFields.active())
+            .include(newFields.include())
+            .systems(systems)
+            .connections(connections)
+            .createdAt(oldEntry.createdAt())
+            .updatedAt(Instant.now())
+            .build();
+    }
+
     default String asString() {
         return "PlantDescriptionEntry[id=" + id() + ",plantDescription=" + plantDescription() + "]";
     }

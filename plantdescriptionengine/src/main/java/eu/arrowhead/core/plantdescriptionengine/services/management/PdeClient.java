@@ -76,6 +76,59 @@ public class PdeClient {
         return description;
     }
 
+    /**
+     * @return An example plant description update.
+     */
+    public static PlantDescriptionUpdateDto createDescriptionUpdate() {
+
+        PdePortDto serviceDiscoveryPort = new PdePortBuilder()
+            .portName("service_discovery_updated")
+            .serviceDefinition("Service Discovery Updated")
+            .consumer(false)
+            .build();
+
+        PdePortDto authorizationPort = new PdePortBuilder()
+            .portName("service_discovery_updated")
+            .serviceDefinition("Service Discovery Updated")
+            .consumer(false)
+            .build();
+
+        PdeConnectionEndpointDto consumer = new PdeConnectionEndpointBuilder()
+            .systemName("Authorization Updated")
+            .portName("service_discovery_updated")
+            .build();
+
+        PdeConnectionEndpointDto producer = new PdeConnectionEndpointBuilder()
+            .systemName("Service Registry Updated")
+            .portName("service_discovery_updated")
+            .build();
+
+        PdeConnectionDto connection = new PdeConnectionBuilder()
+            .consumer(consumer)
+            .producer(producer)
+            .build();
+
+        PdeSystemDto serviceRegistrySystem = new PdeSystemBuilder()
+            .systemName("Service Registry Updated")
+            .ports(Arrays.asList(serviceDiscoveryPort))
+            .build();
+
+        PdeSystemDto authorizationSystem = new PdeSystemBuilder()
+            .systemName("Authorization Updated")
+            .ports(Arrays.asList(authorizationPort))
+            .build();
+
+        PlantDescriptionUpdateDto update = new PlantDescriptionUpdateBuilder()
+            .plantDescription("ArrowHead core updated")
+            .active(false)
+            .include(Collections.<Integer> emptyList())
+            .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
+            .connections(Arrays.asList(connection))
+            .build();
+
+        return update;
+    }
+
     private static void deleteDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
         client.send(address, new HttpClientRequest()
                 .method(HttpMethod.DELETE)
@@ -165,6 +218,23 @@ public class PdeClient {
         });
     }
 
+    private static void patchDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
+        client.send(address, new HttpClientRequest()
+        .method(HttpMethod.PATCH)
+        .uri(baseUri + descriptionId)
+        .body(DtoEncoding.JSON, createDescriptionUpdate()))
+        .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
+        .map(body -> {
+            System.out.println("\nPATCH result:");
+            System.out.println(body.asString());
+            return null;
+        })
+        .onFailure(throwable -> {
+            System.err.println("\nPATCH failure:");
+            throwable.printStackTrace();
+        });
+    }
+
     public static void main(final String[] args) {
         if (args.length != 2) {
             System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
@@ -206,6 +276,9 @@ public class PdeClient {
             putDescription(pdeSocketAddress, baseUri, client, 1);
             Thread.sleep(1000);
             getDescription(pdeSocketAddress, baseUri, client, 1);
+            Thread.sleep(1000);
+            patchDescription(pdeSocketAddress, baseUri, client, 1);
+
         }
         catch (final Throwable e) {
             e.printStackTrace();

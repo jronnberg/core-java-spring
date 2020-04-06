@@ -124,7 +124,7 @@ public class PdeManagementMain {
     }
 
     /**
-     * Handles an HTTP request to replace a Plant Description in the PDE.
+     * Handles an HTTP request to replace a Plant Description Entry in the PDE.
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
@@ -158,6 +158,55 @@ public class PdeManagementMain {
                 return response
                     .status(HttpStatus.CREATED)
                     .body(entry);
+            });
+    }
+
+    /**
+     * Handles an HTTP request to update the Plant Description Entry specified
+     * by the id parameter with the information in the PlantDescriptionUpdate
+     * parameter.
+     * @param request HTTP request containing a PlantDescriptionUpdate.
+     * @param response HTTP response containing the current
+     *                 PlantDescriptionEntryList.
+     */
+    private static Future<?> onDescriptionPatch(
+        final HttpServiceRequest request, final HttpServiceResponse response
+    ) {
+        return request
+            .bodyAs(PlantDescriptionUpdateDto.class)
+            .map(newFields -> {
+                String idString = request.pathParameter(0);
+                int id;
+
+                try {
+                    id = Integer.parseInt(idString);
+                } catch (NumberFormatException e) {
+                    response.status(HttpStatus.BAD_REQUEST);
+                    response.body(idString + " is not a valid plant description entry ID.");
+                    return response.status(HttpStatus.BAD_REQUEST);
+                }
+
+                final PlantDescriptionEntryDto entry = entriesById.get(id);
+
+                if (entry == null) {
+                    response.body("There is no plant description entry with ID " + idString + ".");
+                    response.status(HttpStatus.BAD_REQUEST);
+                    return Future.done();
+                }
+
+                final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
+
+                try {
+                    writeToFile(updatedEntry);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                entriesById.put(updatedEntry.id(), updatedEntry);
+                return response
+                    .status(HttpStatus.CREATED)
+                    .body(updatedEntry);
             });
     }
 
@@ -277,8 +326,8 @@ public class PdeManagementMain {
         response
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
-                .count(entryList.size()) // TODO: This shouldn't be necessary
-                .data(entryList)
+            .count(entryList.size()) // TODO: This shouldn't be necessary
+            .data(entryList)
                 .build()
             );
         return Future.done();
@@ -294,7 +343,8 @@ public class PdeManagementMain {
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
             .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response))
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))
-            .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response));
+            .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response))
+            .patch("/mgmt/pd/#id", (request, response) -> onDescriptionPatch(request, response));
     }
 
     public static void main(final String[] args) {
