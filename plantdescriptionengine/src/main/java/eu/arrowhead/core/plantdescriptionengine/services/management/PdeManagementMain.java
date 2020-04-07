@@ -3,7 +3,9 @@ package eu.arrowhead.core.plantdescriptionengine.services.management;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.List;
@@ -57,12 +59,24 @@ public class PdeManagementMain {
             .build();
     }
 
+    /**
+     * @return The path to use for writing Plant Description Entries to disk.
+     */
+    private static String getFilename(int entryId) {
+        return DESCRIPTION_DIRECTORY + entryId + ".json";
+    }
+
     private static void writeToFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
-        final String filename = DESCRIPTION_DIRECTORY + entry.id() + ".json";
+        final String filename = getFilename(entry.id());
         final FileOutputStream out = new FileOutputStream(new File(filename));
         final DtoWriter writer = new DtoWriter(out);
         entry.writeJson(writer);
         out.close();
+    }
+
+    private static void deleteEntryFile(int entryId) throws IOException {
+        final String filename = getFilename(entryId);
+        Files.delete(Paths.get(filename));
     }
 
     /**
@@ -169,7 +183,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<?> onDescriptionPatch(
+    private static Future<HttpServiceResponse> onDescriptionPatch(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         return request
@@ -189,9 +203,9 @@ public class PdeManagementMain {
                 final PlantDescriptionEntryDto entry = entriesById.get(id);
 
                 if (entry == null) {
-                    response.body("There is no plant description entry with ID " + idString + ".");
-                    response.status(HttpStatus.BAD_REQUEST);
-                    return Future.done();
+                    return response
+                        .body("There is no plant description entry with ID " + idString + ".")
+                        .status(HttpStatus.BAD_REQUEST);
                 }
 
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
@@ -223,13 +237,26 @@ public class PdeManagementMain {
 
         try {
             id = Integer.parseInt(request.pathParameter(0));
-            entriesById.remove(id);
-            response.status(HttpStatus.OK);
-            response.body("ok");
-          } catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(request.pathParameter(0) + " is not a valid plant description entry ID.");
-          }
+            return Future.done();
+        }
+
+        try {
+            deleteEntryFile(id);
+        } catch (IOException e) {
+            System.err.println(e);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.body("Encountered an error while deleting entry file.");
+            return Future.done();
+        }
+
+        entriesById.remove(id);
+
+        response.status(HttpStatus.OK);
+        response.body("ok");
+
         return Future.done();
     }
 

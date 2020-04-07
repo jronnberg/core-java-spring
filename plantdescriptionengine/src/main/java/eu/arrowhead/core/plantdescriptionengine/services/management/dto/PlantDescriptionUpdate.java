@@ -15,10 +15,10 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface PlantDescriptionUpdate {
 
-    List<PdeSystem> systems();
-    List<PdeConnection> connections();
     Optional<String> plantDescription();
     Optional<Boolean> active();
+    List<PdeSystem> systems();
+    List<PdeConnection> connections();
     List<Integer> include(); // TODO: Check how this works with Optional
 
     default String asString() {
