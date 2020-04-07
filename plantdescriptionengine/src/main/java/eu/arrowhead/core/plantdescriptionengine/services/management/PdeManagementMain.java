@@ -328,33 +328,34 @@ public class PdeManagementMain {
             return Future.done();
         }
 
-        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
+        List<PlantDescriptionEntryDto> entries = new ArrayList<>(entriesById.values());
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
             final String sortDirection = parser.getString("direction").get();
             final boolean sortAscending = (sortDirection.equals("ASC") ? true : false);
-            PlantDescriptionEntry.sort(entryList, sortField.get(), sortAscending);
+            PlantDescriptionEntry.sort(entries, sortField.get(), sortAscending);
         }
 
-        final Optional<Integer> maybePage = parser.getInt("page");
-        if (maybePage.isPresent()) {
-            final int page = maybePage.get();
-            final int itemsPerPage = parser.getInt("item_per_page").get();
-            int from = page * itemsPerPage;
-            int to = from + itemsPerPage;
-            from = Math.min(from, 0);
-            to = Math.min(to, entryList.size());
-            entryList = entryList.subList(from, to);
+        final Optional<Integer> page = parser.getInt("page");
+        if (page.isPresent()) {
+            int itemsPerPage = parser.getInt("item_per_page").get();
+            int from = Math.min(page.get() * itemsPerPage, 0);
+            int to = Math.min(from + itemsPerPage, entries.size());
+            entries = entries.subList(from, to);
+        }
+
+        if (parser.getString("filter_field").isPresent()) {
+            boolean filterValue = parser.getBoolean("filter_value").get();
+            PlantDescriptionEntry.filterOnActive(entries, filterValue);
         }
 
         response
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
-            .count(entryList.size()) // TODO: This shouldn't be necessary
-            .data(entryList)
-                .build()
-            );
+                .count(entries.size()) // TODO: This shouldn't be necessary
+                .data(entries)
+                .build());
         return Future.done();
     }
 

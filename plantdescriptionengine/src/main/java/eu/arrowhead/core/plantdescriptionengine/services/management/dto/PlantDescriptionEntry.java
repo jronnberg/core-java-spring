@@ -133,7 +133,16 @@ public interface PlantDescriptionEntry {
         } else {
             Collections.sort(entries, comparator.reversed());
         }
+    }
 
+    static void filterOnActive(
+        List<? extends PlantDescriptionEntry> entries, boolean active
+    ) {
+        if (active) {
+            entries.removeIf(entry -> !entry.active());
+        } else {
+            entries.removeIf(entry -> entry.active());
+        }
     }
 
     default String asString() {
