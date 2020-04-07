@@ -71,7 +71,7 @@ which are used to represent things like dates.
 | `id` | Number | Id of the entry | `true` | |
 | `plantDescription` | String | Plant description name| `true` | | 
 | `active` | Boolean | Is this the active plant description | `true` | |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if  not empty |
+| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `true` | |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | DateTime | Creation date of the entry | `true` | |
