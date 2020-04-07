@@ -310,7 +310,7 @@ public class PdeManagementMain {
             new IntParameter("page")
                 .requires(new IntParameter("item_per_page")),
             new StringParameter("sort_field")
-                .legalValues(Arrays.asList("active", "createdAt", "updatedAt")),
+                .legalValues(Arrays.asList("id", "createdAt", "updatedAt")),
             new StringParameter("direction")
                 .legalValues(Arrays.asList("ASC", "DESC"))
                 .setDefault("ASC"),
@@ -333,11 +333,9 @@ public class PdeManagementMain {
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
             final String sortDirection = parser.getString("direction").get();
-            final boolean sortAscending = sortDirection == "ASC" ? true : false;
-            // TODO: Implement sorting...
-            System.out.println("Sort list on " + sortField.get() + " " + sortDirection);
+            final boolean sortAscending = (sortDirection.equals("ASC") ? true : false);
+            PlantDescriptionEntry.sort(entryList, sortField.get(), sortAscending);
         }
-
 
         final Optional<Integer> maybePage = parser.getInt("page");
         if (maybePage.isPresent()) {

@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.requestvalidation;
 
-public class ParseError {
+class ParseError {
 
     private final String message;
 

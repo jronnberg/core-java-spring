@@ -17,9 +17,9 @@ public interface PlantDescriptionUpdate {
 
     Optional<String> plantDescription();
     Optional<Boolean> active();
-    List<PdeSystem> systems();
-    List<PdeConnection> connections();
-    List<Integer> include(); // TODO: Check how this works with Optional
+    List<PdeSystem> systems(); // Make optional
+    List<PdeConnection> connections(); // Make optional
+    List<Integer> include(); // Make optional
 
     default String asString() {
         return "PlantDescriptionUpdate[plantDescription=" + plantDescription().orElse("N/A") + "]";
