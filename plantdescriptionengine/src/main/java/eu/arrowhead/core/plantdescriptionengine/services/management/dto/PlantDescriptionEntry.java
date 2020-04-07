@@ -2,6 +2,8 @@ package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import se.arkalix.dto.DtoReadableAs;
@@ -16,10 +18,31 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface PlantDescriptionEntry {
 
+    final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
+        @Override
+        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
+            return e1.id() - e2.id();
+        }
+    };
+
+    final static Comparator<PlantDescriptionEntry> CREATED_AT_COMPARATOR = new Comparator<>() {
+        @Override
+        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
+            return e1.createdAt().compareTo(e2.createdAt());
+        }
+    };
+
+    final static Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = new Comparator<>() {
+        @Override
+        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
+            return e1.updatedAt().compareTo(e2.updatedAt());
+        }
+    };
+
     int id();
     String plantDescription();
     boolean active();
-    List<Integer> include(); // TODO: Check how this works with Optional
+    List<Integer> include();
     List<PdeSystem> systems();
     List<PdeConnection> connections();
     Instant createdAt();
@@ -84,6 +107,33 @@ public interface PlantDescriptionEntry {
             .createdAt(oldEntry.createdAt())
             .updatedAt(Instant.now())
             .build();
+    }
+
+    static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
+
+        System.out.println("Sort " + sortAscending + " on field " + sortField);
+
+        Comparator<PlantDescriptionEntry> comparator = null;
+        switch (sortField) {
+            case "id":
+                comparator = ID_COMPARATOR;
+                break;
+            case "createdAt":
+                comparator = CREATED_AT_COMPARATOR;
+                break;
+            case "updatedAt":
+                comparator = UPDATED_AT_COMPARATOR;
+                break;
+            default:
+                assert false : sortField + " is not a valid sort field for Plant Description Entries.";
+        }
+
+        if (sortAscending) {
+            Collections.sort(entries, comparator);
+        } else {
+            Collections.sort(entries, comparator.reversed());
+        }
+
     }
 
     default String asString() {
