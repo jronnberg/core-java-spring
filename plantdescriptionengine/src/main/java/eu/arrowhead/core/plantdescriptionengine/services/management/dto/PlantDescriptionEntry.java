@@ -111,8 +111,6 @@ public interface PlantDescriptionEntry {
 
     static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
 
-        System.out.println("Sort " + sortAscending + " on field " + sortField);
-
         Comparator<PlantDescriptionEntry> comparator = null;
         switch (sortField) {
             case "id":
