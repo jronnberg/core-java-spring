@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
-import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.http.HttpStatus;
@@ -27,32 +25,40 @@ import se.arkalix.http.service.HttpService;
 import se.arkalix.http.service.HttpServiceRequest;
 import se.arkalix.http.service.HttpServiceResponse;
 import se.arkalix.dto.DtoWriteException;
-import se.arkalix.security.X509KeyStore;
-import se.arkalix.security.X509TrustStore;
 import se.arkalix.util.concurrent.Future;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PdeManagementMain {
+public class PdeManagementService {
 
     // Integer for storing the next plant description entry ID to be used:
     private static AtomicInteger nextId = new AtomicInteger(0);
 
+    // File path to the directory for storing JSON representations of plant
+    // descriptions:
+    final String descriptionDirectory;
+
     /**
      * @return A new Plant Description Entry ID.
+     * TODO: Use some other implementation for this
      */
     private static int getNextId() {
         return nextId.incrementAndGet();
     }
 
-    // File path to the directory for storing JSON representations of plant
-    // descriptions:
-    final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
+    private Map<Integer, PlantDescriptionEntryDto> entriesById = new ConcurrentHashMap<>();
 
-    private static Map<Integer, PlantDescriptionEntryDto> entriesById = new ConcurrentHashMap<>();
+    /**
+     * Constructor of a PdeManagementService.
+     * @param descriptionDirectory Filepath to a directory in which Plant
+     *                             Description entries will be stored. This must
+     */
+    public PdeManagementService(String descriptionDirectory) {
+        this.descriptionDirectory = descriptionDirectory;
+    }
 
-    private static PlantDescriptionEntryListDto getCurrentEntryList() {
+    private PlantDescriptionEntryListDto getCurrentEntryList() {
         List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
         return new PlantDescriptionEntryListBuilder()
             .data(entryList)
@@ -62,53 +68,30 @@ public class PdeManagementMain {
     /**
      * @return The path to use for writing Plant Description Entries to disk.
      */
-    private static String getFilename(int entryId) {
-        return DESCRIPTION_DIRECTORY + entryId + ".json";
+    private String getFilePath(int entryId) {
+        return descriptionDirectory + entryId + ".json";
     }
 
-    private static void writeToFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
-        final String filename = getFilename(entry.id());
-        final FileOutputStream out = new FileOutputStream(new File(filename));
+    private void writeEntryFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
+        // TODO: Make non-blocking (return Futures)
+
+        Path path = Paths.get(getFilePath(entry.id()));
+        // Create the file and parent directories, if they do not already exist:
+        Files.createDirectories(path.getParent());
+        File file = path.toFile();
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        final FileOutputStream out = new FileOutputStream(file);
         final DtoWriter writer = new DtoWriter(out);
         entry.writeJson(writer);
         out.close();
     }
 
-    private static void deleteEntryFile(int entryId) throws IOException {
-        final String filename = getFilename(entryId);
+    private void deleteEntryFile(int entryId) throws IOException {
+        // TODO: Make non-blocking (return Futures)
+        final String filename = getFilePath(entryId);
         Files.delete(Paths.get(filename));
-    }
-
-    /**
-     * @param password Password of the private key associated with the
-     *                 certificate in key store.
-     * @param keyStorePath Path to the keystore representing the systems own
-     *                     identity.
-     * @param trustStorePath Path to the trust store representing all identities
-     *                       that are to be trusted by the system.
-     * @return An Arrowhead Framework system.
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    private static ArSystem getArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
-            throws GeneralSecurityException, IOException {
-
-        X509KeyStore keyStore = null;
-        X509TrustStore trustStore = null;
-
-        keyStore = new X509KeyStore.Loader()
-            .keyPassword(password)
-            .keyStorePath(Path.of(keyStorePath))
-            .keyStorePassword(password).load();
-        trustStore = X509TrustStore.read(Path.of(trustStorePath), password);
-
-        final var system = new ArSystem.Builder()
-            .keyStore(keyStore)
-            .trustStore(trustStore)
-            .localPort(28081)
-            .build();
-
-        return system;
     }
 
     /**
@@ -117,7 +100,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<HttpServiceResponse> onDescriptionPost(
+    private Future<HttpServiceResponse> onDescriptionPost(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         return request
@@ -125,7 +108,7 @@ public class PdeManagementMain {
             .map(description -> {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, getNextId());
                 try {
-                    writeToFile(entry);
+                    writeEntryFile(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -143,7 +126,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<HttpServiceResponse> onDescriptionPut(
+    private Future<HttpServiceResponse> onDescriptionPut(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         return request
@@ -162,7 +145,7 @@ public class PdeManagementMain {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
 
                 try {
-                    writeToFile(entry);
+                    writeEntryFile(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -183,7 +166,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<HttpServiceResponse> onDescriptionPatch(
+    private Future<HttpServiceResponse> onDescriptionPatch(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         return request
@@ -211,7 +194,7 @@ public class PdeManagementMain {
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
 
                 try {
-                    writeToFile(updatedEntry);
+                    writeEntryFile(updatedEntry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -230,7 +213,7 @@ public class PdeManagementMain {
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response object.
      */
-    private static Future<?> onDescriptionDelete(
+    private Future<?> onDescriptionDelete(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         int id;
@@ -267,7 +250,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<?> onDescriptionGet(
+    private Future<?> onDescriptionGet(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
 
@@ -302,7 +285,7 @@ public class PdeManagementMain {
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
-    private static Future<?> onDescriptionsGet(
+    private Future<?> onDescriptionsGet(
         final HttpServiceRequest request, final HttpServiceResponse response
     ) {
         final List<QueryParameter> requiredParameters = null;
@@ -363,7 +346,7 @@ public class PdeManagementMain {
      * @return A HTTP Service that handles requests for retrieving and updating
      *         Plant Description data.
      */
-    private static HttpService getService() {
+    public HttpService getService() {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
@@ -375,32 +358,5 @@ public class PdeManagementMain {
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))
             .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response))
             .patch("/mgmt/pd/#id", (request, response) -> onDescriptionPatch(request, response));
-    }
-
-    public static void main(final String[] args) {
-
-        if (args.length != 2) {
-            System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
-            System.exit(1);
-        }
-
-        final File directory = new File(DESCRIPTION_DIRECTORY);
-        if (!directory.exists()){
-            directory.mkdir();
-        }
-
-        final var password = new char[] { '1', '2', '3', '4', '5', '6' };
-        ArSystem system = null;
-
-        try {
-            system = getArSystem(password, args[0], args[1]);
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-            System.exit(74);
-        }
-
-        System.out.println("Providing services...");
-        system.provide(getService())
-            .onFailure(Throwable::printStackTrace);
     }
 }
