@@ -7,10 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
@@ -35,26 +36,25 @@ import java.util.Arrays;
 
 public class PdeManagementMain {
 
-    // ID to use for the next plant description entry:
-    private static int nextId = 0;
+    // Integer for storing the next plant description entry ID to be used:
+    private static AtomicInteger nextId = new AtomicInteger(0);
 
     /**
-     * @return A to use for the next plant description that is created.
+     * @return A new Plant Description Entry ID.
      */
     private static int getNextId() {
-        return nextId++;
+        return nextId.incrementAndGet();
     }
 
     // File path to the directory for storing JSON representations of plant
     // descriptions:
     final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
 
-    private static Map<Integer, PlantDescriptionEntryDto> entriesById = new HashMap<>();
+    private static Map<Integer, PlantDescriptionEntryDto> entriesById = new ConcurrentHashMap<>();
 
     private static PlantDescriptionEntryListDto getCurrentEntryList() {
         List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
         return new PlantDescriptionEntryListBuilder()
-            .count(entryList.size()) // TODO: This shouldn't be necessary
             .data(entryList)
             .build();
     }
@@ -324,7 +324,8 @@ public class PdeManagementMain {
         if (parser.hasError()) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(parser.getErrorMessage());
-            System.err.println("Encountered the following error(s) while parsing an HTTP request: " + parser.getErrorMessage());
+            System.err.println("Encountered the following error(s) while parsing an HTTP request: " +
+                parser.getErrorMessage());
             return Future.done();
         }
 
@@ -353,13 +354,16 @@ public class PdeManagementMain {
         response
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
-                .count(entries.size()) // TODO: This shouldn't be necessary
                 .data(entries)
                 .build());
         return Future.done();
     }
 
-    private static HttpService getServices() {
+    /**
+     * @return A HTTP Service that handles requests for retrieving and updating
+     *         Plant Description data.
+     */
+    private static HttpService getService() {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
@@ -396,7 +400,7 @@ public class PdeManagementMain {
         }
 
         System.out.println("Providing services...");
-        system.provide(getServices())
+        system.provide(getService())
             .onFailure(Throwable::printStackTrace);
     }
 }
