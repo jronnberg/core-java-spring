@@ -15,10 +15,10 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface PlantDescriptionEntryList {
 
-    int count();
     List<PlantDescriptionEntry> data();
-
-    // TODO: Add functions for sorting and filtering
+    default int count() {
+        return data().size();
+    }
 
     // TODO: Check if data() is a copy or reference
 

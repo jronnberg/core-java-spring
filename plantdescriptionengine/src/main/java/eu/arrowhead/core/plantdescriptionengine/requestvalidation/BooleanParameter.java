@@ -56,6 +56,6 @@ public class BooleanParameter extends QueryParameter {
             parser.report(new ParseError(name + " must be true or false, not " + value + "."));
         }
 
-        parser.putBoolean(name, value == "true");
+        parser.putBoolean(name, value.equals("true"));
     }
 }
