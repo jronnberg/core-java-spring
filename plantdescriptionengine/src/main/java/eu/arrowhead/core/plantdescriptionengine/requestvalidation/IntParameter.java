@@ -5,6 +5,12 @@ import java.util.Scanner;
 
 import se.arkalix.http.service.HttpServiceRequest;
 
+/**
+ * An instance of this class embodies a set of requirements placed on a single
+ * HttpServiceRequest query parameter, where the value is expected to be an
+ * integer. Used in conjunction with QueryParamParser for validating and parsing
+ * query parameters.
+ */
 public class IntParameter extends QueryParameter {
 
     /**
@@ -21,10 +27,16 @@ public class IntParameter extends QueryParameter {
         return !scanner.hasNext();
     }
 
+    /**
+    * {@inheritDoc}
+    */
     public IntParameter(String name) {
         super(name);
     }
 
+    /**
+    * {@inheritDoc}
+    */
     @Override
     public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
 
