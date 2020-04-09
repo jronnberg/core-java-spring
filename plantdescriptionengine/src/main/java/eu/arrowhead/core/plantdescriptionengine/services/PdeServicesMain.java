@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
+import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
 import se.arkalix.ArSystem;
 import se.arkalix.security.X509KeyStore;
 import se.arkalix.security.X509TrustStore;
@@ -47,6 +48,12 @@ public class PdeServicesMain {
         return system;
     }
 
+    /**
+     * Main method of the Plant Description Engine.
+     * Provides Plant Description management and monitoring services to the
+     * Arrowhead system.
+     * @param args
+     */
     public static void main(final String[] args) {
 
         if (args.length != 2) {
@@ -64,7 +71,8 @@ public class PdeServicesMain {
             System.exit(74);
         }
 
-        PdeManagementService pdeManager = new PdeManagementService(DESCRIPTION_DIRECTORY);
+        var entryStore = new PlantDescriptionEntryStore(DESCRIPTION_DIRECTORY);
+        var pdeManager = new PdeManagementService(entryStore);
 
         System.out.println("Providing services...");
         arSystem.provide(pdeManager.getService())

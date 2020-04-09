@@ -1,16 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.services.management;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
@@ -20,20 +14,14 @@ import se.arkalix.http.HttpStatus;
 import se.arkalix.http.service.HttpService;
 import se.arkalix.http.service.HttpServiceRequest;
 import se.arkalix.http.service.HttpServiceResponse;
-import se.arkalix.dto.DtoWriteException;
 import se.arkalix.util.concurrent.Future;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class PdeManagementService {
 
+    private PlantDescriptionEntryStore entryStore;
+
     // Integer for storing the next plant description entry ID to be used:
     private static AtomicInteger nextId = new AtomicInteger(0);
-
-    // File path to the directory for storing JSON representations of plant
-    // descriptions:
-    final String descriptionDirectory;
 
     /**
      * @return A new Plant Description Entry ID.
@@ -43,51 +31,13 @@ public class PdeManagementService {
         return nextId.incrementAndGet();
     }
 
-    private Map<Integer, PlantDescriptionEntryDto> entriesById = new ConcurrentHashMap<>();
-
     /**
      * Constructor of a PdeManagementService.
-     * @param descriptionDirectory Filepath to a directory in which Plant
-     *                             Description entries will be stored. This must
+     * @param entryStore Storage object for keeping track of Plant Description
+     *                   entries.
      */
-    public PdeManagementService(String descriptionDirectory) {
-        this.descriptionDirectory = descriptionDirectory;
-    }
-
-    private PlantDescriptionEntryListDto getCurrentEntryList() {
-        List<PlantDescriptionEntryDto> entryList = new ArrayList<>(entriesById.values());
-        return new PlantDescriptionEntryListBuilder()
-            .data(entryList)
-            .build();
-    }
-
-    /**
-     * @return The path to use for writing Plant Description Entries to disk.
-     */
-    private String getFilePath(int entryId) {
-        return descriptionDirectory + entryId + ".json";
-    }
-
-    private void writeEntryFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
-        // TODO: Make non-blocking (return Futures)
-
-        Path path = Paths.get(getFilePath(entry.id()));
-        // Create the file and parent directories, if they do not already exist:
-        Files.createDirectories(path.getParent());
-        File file = path.toFile();
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        final FileOutputStream out = new FileOutputStream(file);
-        final DtoWriter writer = new DtoWriter(out);
-        entry.writeJson(writer);
-        out.close();
-    }
-
-    private void deleteEntryFile(int entryId) throws IOException {
-        // TODO: Make non-blocking (return Futures)
-        final String filename = getFilePath(entryId);
-        Files.delete(Paths.get(filename));
+    public PdeManagementService(PlantDescriptionEntryStore entryStore) {
+        this.entryStore = entryStore;
     }
 
     /**
@@ -104,15 +54,14 @@ public class PdeManagementService {
             .map(description -> {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, getNextId());
                 try {
-                    writeEntryFile(entry);
+                    entryStore.put(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-                entriesById.put(entry.id(), entry);
                 return response
                     .status(HttpStatus.CREATED)
-                    .body(getCurrentEntryList());
+                    .body(entryStore.getListDto());
             });
     }
 
@@ -141,13 +90,11 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
 
                 try {
-                    writeEntryFile(entry);
+                    entryStore.put(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-
-                entriesById.put(entry.id(), entry);
                 return response
                     .status(HttpStatus.CREATED)
                     .body(entry);
@@ -179,7 +126,7 @@ public class PdeManagementService {
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 
-                final PlantDescriptionEntryDto entry = entriesById.get(id);
+                final PlantDescriptionEntryDto entry = entryStore.get(id);
 
                 if (entry == null) {
                     return response
@@ -190,13 +137,12 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
 
                 try {
-                    writeEntryFile(updatedEntry);
+                    entryStore.put(updatedEntry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
-                entriesById.put(updatedEntry.id(), updatedEntry);
                 return response
                     .status(HttpStatus.CREATED)
                     .body(updatedEntry);
@@ -223,15 +169,13 @@ public class PdeManagementService {
         }
 
         try {
-            deleteEntryFile(id);
+            entryStore.remove(id);
         } catch (IOException e) {
             System.err.println(e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.body("Encountered an error while deleting entry file.");
             return Future.done();
         }
-
-        entriesById.remove(id);
 
         response.status(HttpStatus.OK);
         response.body("ok");
@@ -262,7 +206,7 @@ public class PdeManagementService {
             return Future.done();
         }
 
-        final PlantDescriptionEntryDto entry = entriesById.get(id);
+        final PlantDescriptionEntryDto entry = entryStore.get(id);
 
         if (entry == null) {
             response.body("There is no plant description entry with ID " + idString + ".");
@@ -308,7 +252,7 @@ public class PdeManagementService {
             return Future.done();
         }
 
-        List<PlantDescriptionEntryDto> entries = new ArrayList<>(entriesById.values());
+        List<PlantDescriptionEntryDto> entries = entryStore.getEntries();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
