@@ -8,10 +8,10 @@ This document describes an abstract Arrowhead Framework service meant to enable 
 
 The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm.
 
-The PDE can, tentatively, also gather system data and inventory data about the systems in the plant. If that is gathered it can be retrieved using this services. 
- 
+The PDE can, tentatively, also gather system data and inventory data about the systems in the plant. If that is gathered it can be retrieved using this services.
+
 This service is produced by the PDE and can be consumed by, for example, a dash-board to manage the alarms that the PDE raises.
- 
+
 
 ## Service Interfaces
 This section lists the interfaces that must be exposed by the [PDE] in alphabetical order. In particular, each
@@ -20,14 +20,14 @@ order. The input type is named inside parentheses, while the output type is prec
 output types are only denoted when accepted or returned, respectively, by the interface in question.
 All abstract data types named in this section are defined in the [Information model](#information-model) section.
 
-### interface GetAllPDEAlarms(): [PDEAlarmList](#struct-pdealarmlist)
+### interface GetAllPdeAlarms(): [PdeAlarmList](#struct-pdealarmlist)
 Called to acquire a list of PDE alarms raised by the PDE.
 
-### interface GetPDEAlarm(id): [PDEAlarm](#struct-pdealarm)
-Called to acquire the __[PDEAlarm](#struct-pdealarm)__ specified by the `id` parameter.
+### interface GetPdeAlarm(id): [PdeAlarm](#struct-pdealarm)
+Called to acquire the __[PdeAlarm](#struct-pdealarm)__ specified by the `id` parameter.
 
-### interface UpdatePDEAlarm(id, [PDEAlarmUpdate](#struct-pdealarmupdate)): [PDEAlarm](#struct-pdealarm)
-Called to update the PDE Alarm specified by the `id` parameter with the information in the `PDEAlarmUpdate` parameter.
+### interface UpdatePdeAlarm(id, [PdeAlarmUpdate](#struct-pdealarmupdate)): [PdeAlarm](#struct-pdealarm)
+Called to update the PDE Alarm specified by the `id` parameter with the information in the `PdeAlarmUpdate` parameter.
 The newly updated PDE Alarm is returned.
 
 ### interface GetAllPlantDescriptions(): [PlantDescriptionEntryList](#struct-plantdescriptionentrylist)
@@ -48,8 +48,8 @@ Some of the types are identical to types defined in the [Plant Description Manag
 As a complement to the explicitly defined types in this section, there is also a list of implicit [primitive](#primitives) types,
 which are used to represent things like dates.
 
-### struct PDEAlarm
-| Field | Type | Description | 
+### struct PdeAlarm
+| Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | Number | Id of the alarm |
 | `systemName` | String | Identity of the system |
@@ -61,28 +61,28 @@ which are used to represent things like dates.
 | `clearedAt` | DateTime | When the alarm was cleared |
 | `acknowledgedAt` | DateTime | When the alarm was acknowledged |
 
-### struct PDEAlarmList
+### struct PdeAlarmList
 
-| Field | Type | Description | 
+| Field | Type | Description |
 | ----- | ---- | ----------- |
 | `count` | Number | Number of records found |
 | `data` | Array | Array of [PDE alarms](#struct-pdealarm) |
 
-### struct PDEAlarmUpdate
+### struct PdeAlarmUpdate
 
 Currently only the following values can be updated. If a field is not present the current value will remain unchanged.
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | `false` ||
 
 
 ### struct PlantDescriptionEntry
 
-| Field | Type | Description | Mandatory | Note | 
+| Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the entry | `true` | |
-| `plantDescription` | String | Plant description name| `true` | | 
+| `plantDescription` | String | Plant description name| `true` | |
 | `active` | Boolean | Is this the active plant description | `true` | |
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if  not empty |
 | `systems` | Array\<[SystemEntry](#struct-systementry)> | Array with systems expected to be present in the plant | `true` ||
@@ -92,15 +92,15 @@ Currently only the following values can be updated. If a field is not present th
 
 ### struct PlantDescriptionEntryList
 
-| Field | Type | Description | 
+| Field | Type | Description |
 | ----- | ---- | ----------- |
 | `count` | Number | Number of records found |
 | `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
 
 ### struct SystemEntry
-| Field | Type | Description | Mandatory | Note | 
+| Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemName` | String | Identity of the system | `true` | |
 | `metadata` | Custom | Metadata - key-value pairs | `false` | Only present if specified |
 | `ports` | Array\<[Port]> | Array with service ports exposed by the system | `true` ||
 | `systemData` | Custom | System specific data - key-value pairs | `false` | Only present if provided by [Monitorable] service of the system |
@@ -113,7 +113,7 @@ Types and structures mentioned throughout this document that are assumed to be a
 of this service. The concrete interpretations of each of these types and structures must be provided by any IDD
 document claiming to implement this service.
 
-| Type | Description | 
+| Type | Description |
 | ---- | ----------- |
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Boolean | One out of `true` or `false`. |
