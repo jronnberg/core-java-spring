@@ -15,16 +15,16 @@ The rest of this document describes how to realize the [PDMon] service using [HT
 This section describes the interfaces that must be exposed by [Plant Description Monitor] services. In particular, the below
 subsection first names the HTTP method and path used to call the interface, after which it names an abstract
 interface from the [Plant Description Monitor] service description document, output type, as well as errors that can be thrown. The
-interface is expected to respond with HTTP status code 200 OK for all successful calls. 
+interface is expected to respond with HTTP status code 200 OK for all successful calls.
 
 ### GET {baseURI}/monitor/alarm
- - __Interface:	GetAllPDEAlarms__
- - __Output: [PDEAlarmList](#pdealarmlist)__
-	 
+ - __Interface:	GetAllPdeAlarms__
+ - __Output: [PdeAlarmList](#pdealarmlist)__
+
 Called to acquire a list of PDE alarms raised by the PDE.
 
 Returns a list of PDE alarms. If `page` and `item_per_page` are not defined, returns
-all records. 
+all records.
 
 Query params:
 
@@ -38,21 +38,21 @@ Query params:
 | `filter_value` | value to filter by | no |
 
 
-> **Note:** Default value for `sort_field` is `id`. All possible values are: 
+> **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
 > * `createdAt`
 > * `updatedAt`
 
 > **Note:** Default value for `direction` is `ASC`. All possible values are:
 > * `ASC`
-> * `DESC` 
+> * `DESC`
 
-> **Note:**  Possible values for `filter_field` are: 
+> **Note:**  Possible values for `filter_field` are:
 > * `systemName`
 > * `acknowledged`
 > * `severity`
 
-> **Note:**  If `filter_field` is set to `severity`, in addition to the possible values of `severity`, these values are possible for `filter_value`: 
+> **Note:**  If `filter_field` is set to `severity`, in addition to the possible values of `severity`, these values are possible for `filter_value`:
 > * `not_cleared` - Use to get all alarms that are not `cleared`
 
 Example of valid invocation:
@@ -84,10 +84,10 @@ Content-Type: application/json
 ```
 
 ### GET {baseURI}/monitor/alarm/{id}
- - __Interface:	GetPDEAlarm__
- - __Output: [PDEAlarm](#pdealarm)__
-	 
-Called to acquire the __[PDEAlarm](#pdealarm)__ specified by the `id` path parameter.
+ - __Interface:	GetPdeAlarm__
+ - __Output: [PdeAlarm](#pdealarm)__
+
+Called to acquire the __[PdeAlarm](#pdealarm)__ specified by the `id` path parameter.
 
 Example of valid invocation:
 ```json
@@ -113,9 +113,9 @@ Content-Type: application/json
 ```
 
 ### PATCH {baseURI}/monitor/alarm/{id}
- - __Interface:	UpdatePDEAlarm__
- - __Input: [PDEAlarmUpdate](#pdealarmupdate)__
- - __Output: [PDEAlarm](#pdealarm)__
+ - __Interface:	UpdatePdeAlarm__
+ - __Input: [PdeAlarmUpdate](#pdealarmupdate)__
+ - __Output: [PdeAlarm](#pdealarm)__
 
 Called to update the PDE Alarm specified by the `id` parameter with the information in the the request body.
 The newly updated PDE Alarm is returned.
@@ -153,11 +153,11 @@ Content-Type: application/json
 ### GET {baseURI}/monitor/pd
  - __Interface:	GetAllPlantDescriptions__
  - __Output: [PlantDescriptionEntryList](#plantdescriptionentrylist)__
-	 
+
 Called to acquire a list of Plant Description Entries present in the PDE.
 
 Returns a list of Plant Description Entries. If `page` and `item_per_page` are not defined, returns
-all records. 
+all records.
 
 Query params:
 
@@ -170,16 +170,16 @@ Query params:
 | `filter_field` | filter by a given column | no |
 | `filter_value` | value to filter by | no |
 
-> **Note:** Default value for `sort_field` is `id`. All possible values are: 
+> **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
 > * `createdAt`
 > * `updatedAt`
 
 > **Note:** Default value for `direction` is `ASC`. All possible values are:
 > * `ASC`
-> * `DESC` 
+> * `DESC`
 
-> **Note:**  Possible values for `filter_field` are: 
+> **Note:**  Possible values for `filter_field` are:
 > * `active`
 
 Example of valid invocation:
@@ -207,30 +207,30 @@ Content-Type: application/json
 			{
 				"systemName": "Service Registry",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Authorization",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Orchestration",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 		],
@@ -279,30 +279,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -328,10 +328,10 @@ Some of the types are identical to types defined in the [Plant Description Manag
 As a complement to the explicitly defined types
 in this section, there is also a list of implicit [primitive](#primitives) types.
 
-### PDEAlarm
+### PdeAlarm
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the alarm | `true` | |
 | `systemName` | String | Identity of the system | `true` | |
@@ -344,28 +344,28 @@ JSON object with the following fields:
 | `acknowledgedAt` | [DateTime](#alias-datetime--string) | When the alarm was acknowledged | `false` | |
 
 
-### PDEAlarmList
+### PdeAlarmList
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `count` | Number | Number of records found | `true` | |
-| `data` | Array\<[PDEAlarm](#pdealarm)> | Array of [PDE Alarms](#pdealarm) | `true` | |
+| `data` | Array\<[PdeAlarm](#pdealarm)> | Array of [PDE Alarms](#pdealarm) | `true` | |
 
-### PDEAlarmUpdate
+### PdeAlarmUpdate
 JSON object with the following fields. Currently only the following values can be updated. If a field is not present the current value will be used.
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `acknowledged` | Boolean | Has the alarm been acknowledged by an operator |`false`||
 
 ### PlantDescriptionEntry
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the entry | `true` ||
-| `plantDescription` | String | Plant description name| `true` || 
+| `plantDescription` | String | Plant description name| `true` ||
 | `active` | Boolean | Is this the active plant description | `true` ||
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if not empty|
 | `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | `true` ||
@@ -376,17 +376,17 @@ JSON object with the following fields:
 ### PlantDescriptionEntryList
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | `true` || 
-| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` || 
+| `count` | Number | Number of records found | `true` ||
+| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### SystemEntry
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Note | 
+| Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemName` | String | Identity of the system | `true` | |
 | `metadata` | Object | Metadata - key-value pairs | `false` | Only present if specified |
 | `ports` | Array\<[Port]> | Array with service ports exposed by the system | `true` ||
 | `systemData` | Object | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
