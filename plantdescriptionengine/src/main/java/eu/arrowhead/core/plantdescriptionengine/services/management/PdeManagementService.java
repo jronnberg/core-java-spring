@@ -9,11 +9,11 @@ import java.util.Arrays;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
 import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.descriptor.SecurityDescriptor;
-import se.arkalix.http.HttpStatus;
-import se.arkalix.http.service.HttpService;
-import se.arkalix.http.service.HttpServiceRequest;
-import se.arkalix.http.service.HttpServiceResponse;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpService;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
+import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
@@ -28,7 +28,7 @@ public class PdeManagementService {
      * TODO: Use some other implementation for this
      */
     private static int getNextId() {
-        return nextId.incrementAndGet();
+        return nextId.getAndIncrement();
     }
 
     /**
@@ -130,8 +130,8 @@ public class PdeManagementService {
 
                 if (entry == null) {
                     return response
-                        .body("There is no plant description entry with ID " + idString + ".")
-                        .status(HttpStatus.BAD_REQUEST);
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("There is no plant description entry with ID " + idString + ".");
                 }
 
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
@@ -290,7 +290,7 @@ public class PdeManagementService {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
-            .security(SecurityDescriptor.CERTIFICATE)
+            .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")
             .get("/mgmt/pd/#id", (request, response) -> onDescriptionGet(request, response))
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))

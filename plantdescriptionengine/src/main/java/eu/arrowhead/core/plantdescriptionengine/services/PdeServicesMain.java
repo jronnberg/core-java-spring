@@ -3,12 +3,13 @@ package eu.arrowhead.core.plantdescriptionengine.services;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
 import se.arkalix.ArSystem;
-import se.arkalix.security.X509KeyStore;
-import se.arkalix.security.X509TrustStore;
+import se.arkalix.security.identity.OwnedIdentity;
+import se.arkalix.security.identity.TrustStore;
 
 public class PdeServicesMain {
 
@@ -27,20 +28,19 @@ public class PdeServicesMain {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    private static ArSystem initArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
+    public static ArSystem initArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
             throws GeneralSecurityException, IOException {
 
-        X509KeyStore keyStore = null;
-        X509TrustStore trustStore = null;
-
-        keyStore = new X509KeyStore.Loader()
+        final var identity = new OwnedIdentity.Loader()
             .keyPassword(password)
             .keyStorePath(Path.of(keyStorePath))
-            .keyStorePassword(password).load();
-        trustStore = X509TrustStore.read(Path.of(trustStorePath), password);
+            .keyStorePassword(password)
+            .load();
+        final var trustStore = TrustStore.read(Path.of(trustStorePath), password);
+        Arrays.fill(password, '\0');
 
         final var system = new ArSystem.Builder()
-            .keyStore(keyStore)
+            .identity(identity)
             .trustStore(trustStore)
             .localPort(28081)
             .build();

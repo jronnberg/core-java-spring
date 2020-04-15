@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import se.arkalix.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceRequest;
 
 /**
  * Class for parsing and validating the query parameters of HttpServiceRequests.

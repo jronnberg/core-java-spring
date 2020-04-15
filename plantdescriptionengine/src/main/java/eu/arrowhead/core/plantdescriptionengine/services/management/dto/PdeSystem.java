@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
@@ -16,7 +17,7 @@ public interface PdeSystem {
 
     String systemName();
     List<PdePort> ports();
-    // TODO: Add metadata
+    Map<String, String> metadata();
 
     default String asString() {
         return "PdeSystem[systemName=" + systemName() + "]";

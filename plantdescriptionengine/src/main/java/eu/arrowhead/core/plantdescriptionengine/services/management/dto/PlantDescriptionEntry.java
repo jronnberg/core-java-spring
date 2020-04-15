@@ -42,7 +42,7 @@ public interface PlantDescriptionEntry {
     int id();
     String plantDescription();
     boolean active();
-    List<Integer> include();
+    // List<Integer> include(); TODO: Add this
     List<PdeSystem> systems();
     List<PdeConnection> connections();
     Instant createdAt();
@@ -71,7 +71,7 @@ public interface PlantDescriptionEntry {
             .id(id)
             .plantDescription(description.plantDescription())
             .active(description.active().orElse(false))
-            .include(description.include())
+            // .include(description.include()) TODO: Add this
             .systems(systems)
             .connections(connections)
             .createdAt(now)
@@ -101,7 +101,7 @@ public interface PlantDescriptionEntry {
             .id(oldEntry.id())
             .plantDescription(newFields.plantDescription().orElse(oldEntry.plantDescription()))
             .active(newFields.active().orElse(oldEntry.active()))
-            .include(newFields.include())
+            // .include(newFields.include()) TODO: Add this
             .systems(systems)
             .connections(connections)
             .createdAt(oldEntry.createdAt())
