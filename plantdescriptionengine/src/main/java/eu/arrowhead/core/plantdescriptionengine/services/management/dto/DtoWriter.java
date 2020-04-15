@@ -36,4 +36,9 @@ public class DtoWriter implements BinaryWriter {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public int writableBytes() {
+        throw new UnsupportedOperationException();
+    }
 }

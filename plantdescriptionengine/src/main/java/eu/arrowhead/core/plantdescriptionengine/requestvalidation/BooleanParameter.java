@@ -2,7 +2,8 @@ package eu.arrowhead.core.plantdescriptionengine.requestvalidation;
 
 import java.util.Optional;
 
-import se.arkalix.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceRequest;
+
 
 /**
  * An instance of this class embodies a set of requirements placed on a single

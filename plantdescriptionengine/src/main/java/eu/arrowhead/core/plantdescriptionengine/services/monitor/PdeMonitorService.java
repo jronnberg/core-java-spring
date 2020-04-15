@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.services.monitor;
 
 import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.descriptor.SecurityDescriptor;
-import se.arkalix.http.HttpStatus;
-import se.arkalix.http.service.HttpService;
-import se.arkalix.http.service.HttpServiceRequest;
-import se.arkalix.http.service.HttpServiceResponse;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpService;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
+import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
 public class PdeMonitorService {
@@ -30,7 +30,7 @@ public class PdeMonitorService {
         return new HttpService()
             .name("plant-description-management-service")
             .encodings(EncodingDescriptor.JSON)
-            .security(SecurityDescriptor.CERTIFICATE)
+            .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")
             .get("/monitor/alarm", (request, response) -> onAlarmsGet(request, response));
     }

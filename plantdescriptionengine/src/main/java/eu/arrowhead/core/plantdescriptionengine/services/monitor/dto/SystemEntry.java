@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.monitor.dto;
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
@@ -15,11 +16,11 @@ import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PdePort;
 public interface SystemEntry {
 
     String systemName();
-    // TODO: Add metadata field
+    Map<String, String> metadata(); // TODO: Make optional
     List<PdePort> ports();
-    // TODO: Add systemData field
+    Map<String, String> systemData(); // TODO: Make optional
     Optional<String> inventoryId();
-    // TODO: Add inventoryData field
+    Map<String, String> inventoryData(); // TODO: Make optional
 
     default String asString() {
         return "SystemEntry[systemName=" + systemName() + "]";
