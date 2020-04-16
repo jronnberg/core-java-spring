@@ -20,8 +20,6 @@ public interface PlantDescriptionEntryList {
         return data().size();
     }
 
-    // TODO: Check if data() is a copy or reference
-
     default String asString() {
         String result = "PlantDescriptionEntryList[count=" + count() + ",data=[";
         List<String> strings = new ArrayList<>();
