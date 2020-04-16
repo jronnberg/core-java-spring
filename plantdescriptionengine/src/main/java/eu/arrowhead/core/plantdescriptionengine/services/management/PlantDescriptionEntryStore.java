@@ -110,6 +110,4 @@ public class PlantDescriptionEntryStore {
         return new ArrayList<>(entries.values());
     }
 
-    // TODO: Move filtering and sorting from PlantDescriptionEntry.java to here?
-
 }

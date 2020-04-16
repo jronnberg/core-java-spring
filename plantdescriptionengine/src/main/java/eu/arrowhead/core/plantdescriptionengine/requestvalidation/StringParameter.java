@@ -46,22 +46,7 @@ public class StringParameter extends QueryParameter {
     @Override
     public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
 
-        Optional<String> possibleValue;
-        try {
-            // TODO: Find out why 'request.queryParameter' throws
-            // NullPointerExceptions. If this is an implementation error,
-            // remove this try/catch when it has been fixed. Otherwise,
-            // find a nicer way to work around it.
-            possibleValue = request.queryParameter(name);
-        } catch (NullPointerException e) {
-            if (required) {
-                parser.report(new ParseError("Missing parameter: " + name + "."));
-            }
-            if (defaultValue != null) {
-                parser.putString(name, defaultValue);
-            }
-            return;
-        }
+        Optional<String> possibleValue = request.queryParameter(name);
 
         if (possibleValue.isEmpty()) {
             if (required) {
