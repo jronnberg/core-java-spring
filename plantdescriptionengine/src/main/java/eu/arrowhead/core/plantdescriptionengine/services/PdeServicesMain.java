@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.services;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagemen
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCoreIntegrator;
+import se.arkalix.dto.DtoReadException;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
@@ -23,10 +25,10 @@ public class PdeServicesMain {
     final static int SERVICE_REGISTRY_PORT = 39915;
 
     /**
-     * @param password Password of the private key associated with the
-     *                 certificate in key store.
-     * @param keyStorePath Path to the keystore representing the systems own
-     *                     identity.
+     * @param password       Password of the private key associated with the
+     *                       certificate in key store.
+     * @param keyStorePath   Path to the keystore representing the systems own
+     *                       identity.
      * @param trustStorePath Path to the trust store representing all identities
      *                       that are to be trusted by the system.
      * @return An Arrowhead Framework system.
@@ -80,6 +82,14 @@ public class PdeServicesMain {
         }
 
         var entryStore = new PlantDescriptionEntryStore(DESCRIPTION_DIRECTORY);
+        try {
+            // Read Plant Description entries from file.
+            entryStore.readEntries();
+
+        } catch (IOException | DtoReadException e) {
+            e.printStackTrace();
+            System.exit(74);
+        }
         var pdeManager = new PdeManagementService(entryStore);
 
         System.out.println("Providing services...");

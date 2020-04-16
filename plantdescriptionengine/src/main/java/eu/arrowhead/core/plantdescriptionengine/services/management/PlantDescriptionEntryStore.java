@@ -9,13 +9,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.DtoWriter;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryListDto;
+import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.DtoWriteException;
+import se.arkalix.dto.binary.ByteArrayReader;
 
 public class PlantDescriptionEntryStore {
 
@@ -26,7 +29,32 @@ public class PlantDescriptionEntryStore {
     private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     public PlantDescriptionEntryStore(String descriptionDirectory) {
+        Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
         this.descriptionDirectory = descriptionDirectory;
+    }
+
+    /**
+     * Clears current state and reads Plant Description Entries from file.
+     *
+     * @throws IOException
+     * @throws DtoReadException
+     */
+    public void readEntries() throws IOException, DtoReadException {
+        // TODO: Make non-blocking (return Future)
+        entries.clear();
+        File directory = new File(descriptionDirectory);
+        directory.mkdir();
+
+        File[] directoryListing = directory.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                byte[] bytes = Files.readAllBytes(child.toPath());
+                PlantDescriptionEntryDto entry = PlantDescriptionEntryDto.readJson(new ByteArrayReader(bytes));
+                entries.put(entry.id(), entry);
+            }
+        } else {
+            throw new IOException(descriptionDirectory + " is not a valid directory.");
+        }
     }
 
     private void writeEntryFile(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
