@@ -2,14 +2,16 @@ package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import se.arkalix.dto.binary.BinaryWriter;
 
 public class DtoWriter implements BinaryWriter {
 
-    private OutputStream writer;
+    private final OutputStream writer;
 
     public DtoWriter(OutputStream writer) {
+        Objects.requireNonNull(writer, "Expected OutputStream");
         this.writer = writer;
     }
 
