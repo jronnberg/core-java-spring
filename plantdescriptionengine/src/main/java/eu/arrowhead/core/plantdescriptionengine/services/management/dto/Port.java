@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
-public interface PdePort {
+public interface Port {
 
     String portName();
     String serviceDefinition();
@@ -23,7 +23,7 @@ public interface PdePort {
     Optional<Boolean> consumer();
 
     default String asString() {
-        return "PdePort[portName=" + portName() + ",serviceDefinition=" + serviceDefinition() +
+        return "Port[portName=" + portName() + ",serviceDefinition=" + serviceDefinition() +
             ",consumer=" + consumer() + "]";
     }
 }

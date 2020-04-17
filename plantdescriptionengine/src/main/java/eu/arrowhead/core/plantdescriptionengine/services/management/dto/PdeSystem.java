@@ -18,7 +18,7 @@ public interface PdeSystem {
 
     String systemName();
     Optional<Map<String, String>> metadata();
-    List<PdePort> ports();
+    List<Port> ports();
 
     default String asString() {
         return "PdeSystem[systemName=" + systemName() + "]";

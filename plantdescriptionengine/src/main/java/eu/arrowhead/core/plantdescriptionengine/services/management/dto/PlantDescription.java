@@ -18,7 +18,7 @@ public interface PlantDescription {
     Optional<Boolean> active();
     Optional<List<Integer>> include();
     List<PdeSystem> systems();
-    List<PdeConnection> connections();
+    List<Connection> connections();
 
     default String asString() {
         return "PlantDescription[plantDescription=" + plantDescription() + "]";
