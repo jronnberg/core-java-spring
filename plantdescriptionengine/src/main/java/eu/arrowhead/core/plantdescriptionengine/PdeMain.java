@@ -48,11 +48,17 @@ public class PdeMain {
         final var serviceRegistryAddress = new InetSocketAddress(SERVICE_REGISTRY_ADDRESS, SERVICE_REGISTRY_PORT);
 
         final var system = new ArSystem.Builder()
-            .identity(identity)
-            .trustStore(trustStore)
-            .plugins(HttpJsonCoreIntegrator.viaServiceRegistryAt(serviceRegistryAddress))
+            .name("PDE-demo")
+            .insecure()
             .localPort(PORT)
             .build();
+
+        // final var system = new ArSystem.Builder()
+        //     .identity(identity)
+        //     .trustStore(trustStore)
+        //     .plugins(HttpJsonCoreIntegrator.viaServiceRegistryAt(serviceRegistryAddress))
+        //     .localPort(PORT)
+        //     .build();
 
         return system;
     }
