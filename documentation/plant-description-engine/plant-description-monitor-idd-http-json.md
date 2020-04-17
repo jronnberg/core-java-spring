@@ -367,7 +367,6 @@ JSON object with the following fields:
 | `id` | Number | Id of the entry | `true` ||
 | `plantDescription` | String | Plant description name| `true` ||
 | `active` | Boolean | Is this the active plant description | `true` ||
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if not empty|
 | `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection]> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | [DateTime](#alias-datetime--string) | Creation date of the entry | `true` ||

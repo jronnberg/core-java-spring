@@ -84,7 +84,6 @@ Currently only the following values can be updated. If a field is not present th
 | `id` | Number | Id of the entry | `true` | |
 | `plantDescription` | String | Plant description name| `true` | |
 | `active` | Boolean | Is this the active plant description | `true` | |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | Only present if  not empty |
 | `systems` | Array\<[SystemEntry](#struct-systementry)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection]> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | DateTime | Creation date of the entry | `true` | |
