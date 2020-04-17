@@ -9,18 +9,18 @@ import java.util.Optional;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PdePort;
+import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Port;
 
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface SystemEntry {
 
     String systemName();
-    Map<String, String> metadata(); // TODO: Make optional
-    List<PdePort> ports();
-    Map<String, String> systemData(); // TODO: Make optional
+    Optional<Map<String, String>> metadata();
+    List<Port> ports();
+    Optional<Map<String, String>> systemData();
     Optional<String> inventoryId();
-    Map<String, String> inventoryData(); // TODO: Make optional
+    Optional<Map<String, String>> inventoryData();
 
     default String asString() {
         return "SystemEntry[systemName=" + systemName() + "]";
