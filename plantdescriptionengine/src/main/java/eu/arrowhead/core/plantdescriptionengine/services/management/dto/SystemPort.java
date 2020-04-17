@@ -11,12 +11,12 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
-public interface PdeConnectionEndpoint {
+public interface SystemPort {
 
     String systemName();
     String portName();
 
     default String asString() {
-        return "PdeConnectionEndpoint[systemName=" + systemName() + ",portName=" + portName() + "]";
+        return "SystemPortEndpoint[systemName=" + systemName() + ",portName=" + portName() + "]";
     }
 }

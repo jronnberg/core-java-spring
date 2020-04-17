@@ -16,7 +16,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PlantDescription {
     String plantDescription();
     Optional<Boolean> active();
-    // List<Integer> include(); // TODO: Add this field, make optional
+    Optional<List<Integer>> include();
     List<PdeSystem> systems();
     List<PdeConnection> connections();
 
