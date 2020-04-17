@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.services;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;

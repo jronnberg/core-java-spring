@@ -13,8 +13,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface PdeConnection {
 
-    PdeConnectionEndpoint consumer();
-    PdeConnectionEndpoint producer();
+    SystemPort consumer();
+    SystemPort producer();
 
     default String asString() {
         return "PdeConnection[consumer=" + consumer().asString() + ",producer=" + producer().asString() + "]";
