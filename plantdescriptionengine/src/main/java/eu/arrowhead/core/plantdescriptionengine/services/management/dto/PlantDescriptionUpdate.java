@@ -18,7 +18,7 @@ public interface PlantDescriptionUpdate {
     Optional<String> plantDescription();
     Optional<Boolean> active();
     Optional<List<PdeSystem>> systems();
-    Optional<List<PdeConnection>> connections();
+    Optional<List<Connection>> connections();
     Optional<List<Integer>> include();
 
     default String asString() {

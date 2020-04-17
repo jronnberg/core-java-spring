@@ -11,12 +11,12 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
-public interface PdeConnection {
+public interface Connection {
 
     SystemPort consumer();
     SystemPort producer();
 
     default String asString() {
-        return "PdeConnection[consumer=" + consumer().asString() + ",producer=" + producer().asString() + "]";
+        return "Connection[consumer=" + consumer().asString() + ",producer=" + producer().asString() + "]";
     }
 }

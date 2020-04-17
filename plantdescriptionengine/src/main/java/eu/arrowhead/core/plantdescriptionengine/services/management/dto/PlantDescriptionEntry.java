@@ -44,7 +44,7 @@ public interface PlantDescriptionEntry {
     boolean active();
     List<Integer> include();
     List<PdeSystem> systems();
-    List<PdeConnection> connections();
+    List<Connection> connections();
     Instant createdAt();
     Instant updatedAt();
 
@@ -55,14 +55,14 @@ public interface PlantDescriptionEntry {
      */
     static PlantDescriptionEntryDto from(PlantDescriptionDto description, int id) {
         List<PdeSystemDto> systems = new ArrayList<>();
-        List<PdeConnectionDto> connections = new ArrayList<>();
+        List<ConnectionDto> connections = new ArrayList<>();
 
         for (PdeSystem system : description.systems()) {
             systems.add((PdeSystemDto)system);
         }
 
-        for (PdeConnection connection : description.connections()) {
-            connections.add((PdeConnectionDto)connection);
+        for (Connection connection : description.connections()) {
+            connections.add((ConnectionDto)connection);
         }
 
         final Instant now = Instant.now();
@@ -87,7 +87,7 @@ public interface PlantDescriptionEntry {
      */
     static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
         List<PdeSystemDto> systems = new ArrayList<>();
-        List<PdeConnectionDto> connections = new ArrayList<>();
+        List<ConnectionDto> connections = new ArrayList<>();
 
         if (newFields.systems().isPresent()) {
             for (PdeSystem system : newFields.systems().get()) {
@@ -96,8 +96,8 @@ public interface PlantDescriptionEntry {
         }
 
         if (newFields.connections().isPresent()) {
-            for (PdeConnection connection : newFields.connections().get()) {
-                connections.add((PdeConnectionDto)connection);
+            for (Connection connection : newFields.connections().get()) {
+                connections.add((ConnectionDto)connection);
             }
         }
 
