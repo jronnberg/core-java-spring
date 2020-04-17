@@ -377,7 +377,9 @@ When the operator has activated a PD using {[Add](plant-description-management-s
 
 The PDE then start with removing any store rules, using the [Delete Store Entries by ID](../../README.md#orchestrator_endpoints_delete_store_id) end point, that it has previously stored which should no longer be present. These removed store rules was added for another active PD. It then adds new store rules, using the  [Add Store Entries](../../README.md#orchestrator_endpoints_post_store) end point, for all the connections present in the newly activated PD.
  
-Whenever the Orchestrator is updated it uses the [Orchestration Push] service, of all the systems that has registered as a producer of that service, to inform them about any updates that concerns them. If a consumer system has not registered the [Orchestration Push] service it must poll the Orchestrator regurlarly to keep updated.
+Whenever the Orchestrator is updated it uses the [Orchestration Push] service, of all the systems that has registered as a producer of that service, to inform them about any updates that concerns them. If a consumer system has not registered the [Orchestration Push] service it must poll the Orchestrator regularly to keep updated.
+
+At the moment the [Orchestration Store Management] service requires `consumerSystemId` as part of the `StoreRule`. This means that in order to be able to add a store rule for a consumer system, it must be registered in the systems registry.  Hence either the PDE must know instance information (ip address and port) for all systems and register them, or the systems must register before the PDE can add store rules. In the next version of the Orchestrator this will be changed and instead the consumer system will be identified using `systemName`. Furthermore, both consumer and provider systems will be possible to identify using `MeteData` instead of `systemName`.
  
 ### Monitoring the plant
  
