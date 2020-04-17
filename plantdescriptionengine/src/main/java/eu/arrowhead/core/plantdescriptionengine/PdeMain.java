@@ -19,7 +19,6 @@ public class PdeMain {
     // File path to the directory for storing JSON representations of plant
     // descriptions:
     final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
-    final static int PORT = 28081;
     final static String SERVICE_REGISTRY_ADDRESS = "172.39.9.15";
     final static int SERVICE_REGISTRY_PORT = 39915;
 
@@ -34,7 +33,7 @@ public class PdeMain {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    public static ArSystem initArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
+    public static ArSystem initArSystem(final char[] password, final String keyStorePath, final String trustStorePath, final int port)
             throws GeneralSecurityException, IOException {
 
         final var identity = new OwnedIdentity.Loader()
@@ -50,7 +49,7 @@ public class PdeMain {
         final var system = new ArSystem.Builder()
             .name("PDE-demo")
             .insecure()
-            .localPort(PORT)
+            .localPort(port)
             .build();
 
         // final var system = new ArSystem.Builder()
@@ -71,16 +70,17 @@ public class PdeMain {
      */
     public static void main(final String[] args) {
 
-        if (args.length != 2) {
-            System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
+        if (args.length != 3) {
+            System.err.println("Requires three command line arguments: KeyStorePath, trustStorePath and port.");
             System.exit(1);
         }
 
         final var password = new char[] { '1', '2', '3', '4', '5', '6' };
         ArSystem arSystem = null;
+        final int port = Integer.parseInt(args[2]);
 
         try {
-            arSystem = initArSystem(password, args[0], args[1]);
+            arSystem = initArSystem(password, args[0], args[1], port);
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
             System.exit(74);
