@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
@@ -20,17 +19,6 @@ import se.arkalix.util.concurrent.Future;
 public class PdeManagementService {
 
     private PlantDescriptionEntryStore entryStore;
-
-    // Integer for storing the next plant description entry ID to be used:
-    private static AtomicInteger nextId = new AtomicInteger(0);
-
-    /**
-     * @return A new Plant Description Entry ID.
-     * TODO: Use some other implementation for this
-     */
-    private static int getNextId() {
-        return nextId.getAndIncrement();
-    }
 
     /**
      * Constructor of a PdeManagementService.
@@ -54,7 +42,7 @@ public class PdeManagementService {
         return request
             .bodyAs(PlantDescriptionDto.class)
             .map(description -> {
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, getNextId());
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryStore.getNextId());
                 try {
                     entryStore.put(entry);
                 } catch (final IOException e) {
