@@ -134,7 +134,7 @@ public class PdeManagementService {
                 }
 
                 return response
-                    .status(HttpStatus.CREATED)
+                    .status(HttpStatus.OK)
                     .body(updatedEntry);
             });
     }

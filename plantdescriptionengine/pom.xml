@@ -62,7 +62,7 @@
 
                 <archive>
                     <manifest>
-                    <mainClass>eu.arrowhead.core.plantdescriptionengine.PlantDescriptionEngineMain</mainClass>
+                      <mainClass>eu.arrowhead.core.plantdescriptionengine.PdeMain</mainClass>
                     </manifest>
                   </archive>
 

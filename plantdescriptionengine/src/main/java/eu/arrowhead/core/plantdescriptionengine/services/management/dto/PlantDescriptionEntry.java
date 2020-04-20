@@ -86,31 +86,31 @@ public interface PlantDescriptionEntry {
      *         specified in newFields.
      */
     static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
-        List<PdeSystemDto> systems = new ArrayList<>();
-        List<ConnectionDto> connections = new ArrayList<>();
 
-        if (newFields.systems().isPresent()) {
-            for (PdeSystem system : newFields.systems().get()) {
-                systems.add((PdeSystemDto)system);
-            }
-        }
-
-        if (newFields.connections().isPresent()) {
-            for (Connection connection : newFields.connections().get()) {
-                connections.add((ConnectionDto)connection);
-            }
-        }
-
-        return new PlantDescriptionEntryBuilder()
+        var builder = new PlantDescriptionEntryBuilder()
             .id(oldEntry.id())
             .plantDescription(newFields.plantDescription().orElse(oldEntry.plantDescription()))
             .active(newFields.active().orElse(oldEntry.active()))
             .include(newFields.include().orElse(oldEntry.include()))
-            .systems(systems)
-            .connections(connections)
             .createdAt(oldEntry.createdAt())
-            .updatedAt(Instant.now())
-            .build();
+            .updatedAt(Instant.now());
+
+        // The methods 'systems' and 'connections' return instances of
+        // PdeSystem and Connection. This must be cast to their runtime-types
+        // before they can be added to the old entry:
+        List<PdeSystemDto> systems = new ArrayList<>();
+        for (PdeSystem system : newFields.systems().orElse(oldEntry.systems())) {
+            systems.add((PdeSystemDto)system);
+        }
+        builder.systems(systems);
+
+        List<ConnectionDto> connections = new ArrayList<>();
+        for (Connection connection : newFields.connections().orElse(oldEntry.connections())) {
+            connections.add((ConnectionDto)connection);
+        }
+        builder.connections(connections);
+
+        return builder.build();
     }
 
     static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
