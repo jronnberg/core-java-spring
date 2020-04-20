@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.management;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Arrays;
@@ -37,6 +38,7 @@ public class PdeManagementService {
      *                   entries.
      */
     public PdeManagementService(PlantDescriptionEntryStore entryStore) {
+        Objects.requireNonNull(entryStore, "Expected PlantDescriptionEntryStore");
         this.entryStore = entryStore;
     }
 
@@ -168,6 +170,12 @@ public class PdeManagementService {
             return Future.done();
         }
 
+        if (entryStore.get(id) == null) {
+            response.status(HttpStatus.NOT_FOUND);
+            response.body("Plant Description with ID " + id + " not found.");
+            return Future.done();
+        }
+
         try {
             entryStore.remove(id);
         } catch (IOException e) {
@@ -209,8 +217,8 @@ public class PdeManagementService {
         final PlantDescriptionEntryDto entry = entryStore.get(id);
 
         if (entry == null) {
-            response.body("There is no plant description entry with ID " + idString + ".");
-            response.status(HttpStatus.BAD_REQUEST);
+            response.body("Plant Description with ID " + id + " not found.");
+            response.status(HttpStatus.NOT_FOUND);
             return Future.done();
         }
 
