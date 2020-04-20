@@ -179,12 +179,12 @@ public class PdeClient {
         client.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/pde/mgmt/pd")
-            .queryParameter("page", "4")
-            .queryParameter("item_per_page", "3")
+            // .queryParameter("page", "4")
+            // .queryParameter("item_per_page", "3")
             .queryParameter("sort_field", "createdAt")
             .queryParameter("direction", "DESC")
-            .queryParameter("filter_field", "active")
-            .queryParameter("filter_value", "false")
+            // .queryParameter("filter_field", "active")
+            // .queryParameter("filter_value", "false")
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
             .map(body -> {
@@ -278,8 +278,8 @@ public class PdeClient {
             String baseUri = "/pde/mgmt/pd/";
 
             getDescriptions(pdeSocketAddress, baseUri, client);
-            Thread.sleep(1000);
-            postDescription(pdeSocketAddress, baseUri, client);
+            // Thread.sleep(1000);
+            // postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
             // postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
