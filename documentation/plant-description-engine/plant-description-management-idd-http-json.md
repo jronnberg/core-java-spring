@@ -15,7 +15,7 @@ The rest of this document describes how to realize the [PDM] service using [HTTP
 This section describes the interfaces that must be exposed by [PDM] services. In particular, the below
 subsection first names the HTTP method and path used to call the interface, after which it names an abstract
 interface from the [PDM] service description document, output type, as well as errors that can be thrown. The
-interface is expected to respond with HTTP status code 200 OK for all successful calls. 
+interface is expected to respond with HTTP status code 200 OK for all successful calls.
 
 ### POST /{baseURI}/mgmt/pd
  - __Interface: AddPlantDescription__
@@ -38,30 +38,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"},
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true },
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -96,30 +96,30 @@ Content-Type: application/json
 			{
 				"systemName": "Service Registry",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Authorization",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Orchestration",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			}
 		],
@@ -162,11 +162,11 @@ Content-Length: 0
 ### GET {baseURI}/mgmt/pd
  - __Interface:	GetAllPlantDescriptions__
  - __Output: [PlantDescriptionEntryList](#plantdescriptionentrylist)__
-	 
+
 Called to acquire a list of Plant Description Entries present in the PDE.
 
 Returns a list of Plant Description Entries. If `page` and `item_per_page` are not defined, returns
-all records. 
+all records.
 
 Query params:
 
@@ -179,16 +179,16 @@ Query params:
 | `filter_field` | filter by a given column | no |
 | `filter_value` | value to filter by | no |
 
-> **Note:** Default value for `sort_field` is `id`. All possible values are: 
+> **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
 > * `createdAt`
 > * `updatedAt`
 
 > **Note:** Default value for `direction` is `ASC`. All possible values are:
 > * `ASC`
-> * `DESC` 
+> * `DESC`
 
-> **Note:**  Possible values for `filter_field` are: 
+> **Note:**  Possible values for `filter_field` are:
 > * `active`
 
 Example of valid invocation:
@@ -216,30 +216,30 @@ Content-Type: application/json
 			{
 				"systemName": "Service Registry",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Authorization",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 			{
 				"systemName": "Orchestration",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
 		],
@@ -288,30 +288,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -352,30 +352,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -407,30 +407,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -484,30 +484,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }	
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}	
+				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
 	],
@@ -533,16 +533,16 @@ As a complement to the explicitly defined types in this section, there is also a
 ### Connection
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `consumer` | [SystemPort](#systemport) | The consumer end SystemPort of the connection | `true` | | 
-| `producer` | [SystemPort](#systemport) | The producer end SystemPort of the connection | `true` | | 
+| `consumer` | [SystemPort](#systemport) | The consumer end SystemPort of the connection | `true` | |
+| `producer` | [SystemPort](#systemport) | The producer end SystemPort of the connection | `true` | |
 
 
 ### PlantDescription
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `plantDescription` | String | Plant description name | `true` | |
 | `active` | Boolean | Is this the active plant description | `false` | `false` |
@@ -553,10 +553,10 @@ JSON object with the following fields:
 ### PlantDescriptionEntry
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the entry | `true` ||
-| `plantDescription` | String | Plant description name| `true` || 
+| `plantDescription` | String | Plant description name| `true` ||
 | `active` | Boolean | Is this the active plant description | `true` ||
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `true` | |
 | `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `true` ||
@@ -567,19 +567,19 @@ JSON object with the following fields:
 ### PlantDescriptionEntryList
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | `true` || 
-| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` || 
+| `count` | Number | Number of records found | `true` ||
+| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### PlantDescriptionUpdate
 JSON object with the following fields:
 
 Currently only the following values can be updated. If a field is not present the current value will remain unchanged.
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `plantDescription` | String | Plant description name | `false` || 
+| `plantDescription` | String | Plant description name | `false` ||
 | `active` | Boolean | Is this the active plant description | `false` ||
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | |
 | `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `false` ||
@@ -588,7 +588,7 @@ Currently only the following values can be updated. If a field is not present th
 ### Port
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `portName` | String | Identity of the port | `true` | |
 | `serviceDefinition` | String | Service definition identity | `true` | |
@@ -597,18 +597,18 @@ JSON object with the following fields:
 ### System
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemName` | String | Identity of the system | `true` | |
 | `metadata` | Object | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
 
 ### SystemPort
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemName` | String | Identity of the system | `true` | |
 | `portName` | String | Identity of the port | `true` | |
 
 

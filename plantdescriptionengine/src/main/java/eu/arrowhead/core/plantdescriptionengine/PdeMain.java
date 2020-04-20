@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services;
+package eu.arrowhead.core.plantdescriptionengine;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,7 +14,7 @@ import se.arkalix.dto.DtoReadException;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
-public class PdeServicesMain {
+public class PdeMain {
 
     // File path to the directory for storing JSON representations of plant
     // descriptions:

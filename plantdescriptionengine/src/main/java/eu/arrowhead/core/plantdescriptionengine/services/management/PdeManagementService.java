@@ -174,8 +174,6 @@ public class PdeManagementService {
         }
 
         response.status(HttpStatus.OK);
-        response.body("ok");
-
         return Future.done();
     }
 
