@@ -28,7 +28,7 @@ public class PdeMonitorService {
      */
     public HttpService getService() {
         return new HttpService()
-            .name("plant-description-management-service")
+            .name("plant-description-monitor-service")
             .encodings(EncodingDescriptor.JSON)
             .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")

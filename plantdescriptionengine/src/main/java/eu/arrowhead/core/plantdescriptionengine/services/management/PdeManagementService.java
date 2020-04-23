@@ -8,20 +8,26 @@ import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
+import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
+import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.consumer.HttpConsumer;
+import se.arkalix.net.http.consumer.HttpConsumerRequest;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
+import se.arkalix.query.ServiceQuery;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
 
-    private PlantDescriptionEntryStore entryStore;
+    private final PlantDescriptionEntryStore entryStore;
 
     /**
      * Constructor of a PdeManagementService.
+     *
      * @param entryStore Storage object for keeping track of Plant Description
      *                   entries.
      */
@@ -293,4 +299,37 @@ public class PdeManagementService {
             .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response))
             .patch("/mgmt/pd/#id", (request, response) -> onDescriptionPatch(request, response));
     }
+
+    /**
+     * TODO: Describe
+     * @param arSystem   An Arrowhead Framework (AHF) system.
+     */
+	public void consumeServices(ArSystem arSystem) {
+        Objects.requireNonNull(arSystem, "Expected ArSystem");
+        try {
+            System.out.println("Sleeping");
+            Thread.sleep(2000);
+            System.out.println("Waking");
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        ServiceQuery serviceQuery = arSystem.consume();
+
+        serviceQuery
+            .name("echo")
+            .encodings(EncodingDescriptor.JSON)
+            .using(HttpConsumer.factory())
+            .flatMap(consumer -> consumer.send(new HttpConsumerRequest()
+                .method(HttpMethod.POST)
+                .body("test")
+                .uri("/echo/echoes")))
+            .flatMap(response -> response.bodyAsClassIfSuccess(PingDto.class))
+            .ifSuccess(ping -> System.out.println("Success: "))
+            .onFailure(throwable -> {
+                System.out.println("\n\n\nFailed ------------------------\n");
+                throwable.printStackTrace();
+            });
+	}
 }
