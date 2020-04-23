@@ -20,8 +20,8 @@ public class PdeMain {
     // descriptions:
     final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
     final static int PORT = 28081;
-    final static String SERVICE_REGISTRY_ADDRESS = "172.39.9.15";
-    final static int SERVICE_REGISTRY_PORT = 39915;
+    final static String SERVICE_REGISTRY_ADDRESS = "127.0.0.1";
+    final static int SERVICE_REGISTRY_PORT = 8443;
 
     /**
      * @param password       Password of the private key associated with the
@@ -94,5 +94,7 @@ public class PdeMain {
         System.out.println("Providing services...");
         arSystem.provide(pdeManager.getService())
             .onFailure(Throwable::printStackTrace);
+
+        pdeManager.consumeServices(arSystem);
     }
 }

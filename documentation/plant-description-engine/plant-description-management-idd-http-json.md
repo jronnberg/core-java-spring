@@ -60,7 +60,7 @@ Content-Type: application/json
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true },
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
@@ -118,7 +118,7 @@ Content-Type: application/json
 					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+					{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
 					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			}
@@ -238,7 +238,7 @@ Content-Type: application/json
 					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+					{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
 					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 				]
 			},
@@ -310,7 +310,7 @@ Content-Type: application/json
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
@@ -352,7 +352,7 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
@@ -361,7 +361,7 @@ Content-Type: application/json
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"},
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
@@ -374,7 +374,7 @@ Content-Type: application/json
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
@@ -429,7 +429,7 @@ Content-Type: application/json
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true },
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
@@ -459,7 +459,7 @@ Called to update the Plant Description Entry specified by the `id` path paramete
 Example of valid invocation:
 
 ```json
-PUT /pde/mgmt/pd/1 HTTP/1.1
+PATCH /pde/mgmt/pd/1 HTTP/1.1
 Accept: application/json
 Content-Length: 23
 Content-Type: application/json
@@ -484,7 +484,7 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		},
@@ -506,7 +506,7 @@ Content-Type: application/json
 				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
 				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "orchestrationCapabiliteis", "serviceDefinition": "OrchestrationCapabiliteis", "consumer": true }
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
 				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
 			]
 		}
