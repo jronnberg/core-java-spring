@@ -51,6 +51,7 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryStore.getNextId());
                 try {
                     entryStore.put(entry);
+                    orchestratorClient.onPlantDescriptionUpdate(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -277,8 +278,8 @@ public class PdeManagementService {
         response
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
-                .data(entries)
-                .build());
+            .data(entries)
+            .build());
         return Future.done();
     }
 
@@ -288,7 +289,7 @@ public class PdeManagementService {
      */
     public HttpService getService() {
         return new HttpService()
-            .name("plant-description-management-service")
+            .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
             .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")
@@ -298,13 +299,6 @@ public class PdeManagementService {
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))
             .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response))
             .patch("/mgmt/pd/#id", (request, response) -> onDescriptionPatch(request, response));
-    }
-
-    /**
-     * TODO: Remove
-     */
-    public void postRule() {
-        orchestratorClient.postRule();
     }
 
 }

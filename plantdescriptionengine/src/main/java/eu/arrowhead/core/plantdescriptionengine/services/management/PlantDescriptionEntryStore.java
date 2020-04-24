@@ -30,11 +30,7 @@ import se.arkalix.dto.binary.ByteArrayReader;
  */
 public class PlantDescriptionEntryStore {
 
-    private enum State {
-        UNINITIALIZED, INITIALIZED;
-    }
-
-    State state = State.UNINITIALIZED;
+    boolean initialized = false;
 
     // File path to the directory for storing JSON representations of plant
     // descriptions:
@@ -45,17 +41,13 @@ public class PlantDescriptionEntryStore {
     // Integer for storing the next plant description entry ID to be used:
     private AtomicInteger nextId = new AtomicInteger(0);
 
-    /**
-     * TODO: Explain that it must be initialized before it is used
-     * @param descriptionDirectory
-     */
     public PlantDescriptionEntryStore(String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
         this.descriptionDirectory = descriptionDirectory;
     }
 
     private void ensureInitialized() {
-        if (state != State.INITIALIZED) {
+        if (!initialized) {
             throw new IllegalStateException("This instance has not been initialized using the 'readEntries' method.");
         }
     }
@@ -75,8 +67,7 @@ public class PlantDescriptionEntryStore {
      * @throws DtoReadException
      */
     public void readEntries() throws IOException, DtoReadException {
-        // TODO: Make non-blocking (return Future)
-        state = State.UNINITIALIZED;
+        initialized = false;
         entries.clear();
         File directory = new File(descriptionDirectory);
         directory.mkdir();
@@ -97,7 +88,7 @@ public class PlantDescriptionEntryStore {
                 }
             }
             nextId.set(greatestId + 1);
-            state = State.INITIALIZED;
+            initialized = true;
         } else {
             throw new IOException(descriptionDirectory + " is not a valid directory.");
         }

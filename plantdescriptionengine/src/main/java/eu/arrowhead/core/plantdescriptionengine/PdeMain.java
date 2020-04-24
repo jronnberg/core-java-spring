@@ -11,6 +11,8 @@ import javax.net.ssl.SSLException;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCoreIntegrator;
 import se.arkalix.dto.DtoReadException;
@@ -88,19 +90,13 @@ public class PdeMain {
             e.printStackTrace();
         }
 
-        var orchestratorClient = new OrchestratorClient(client);
-        var pdeManager = new PdeManagementService(entryStore, orchestratorClient);
+        final CloudDto cloud = new CloudBuilder().name("xarepo").operator("xarepo").build(); // TODO: Remove hardcoded cloud
+        final var orchestratorClient = new OrchestratorClient(client, cloud);
+        final var pdeManager = new PdeManagementService(entryStore, orchestratorClient);
 
         System.out.println("Providing services...");
         arSystem.provide(pdeManager.getService())
             .onFailure(Throwable::printStackTrace);
-
-        try {
-            Thread.sleep(1000);
-            pdeManager.postRule();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
 
     }
 }
