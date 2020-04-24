@@ -6,11 +6,15 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
+import javax.net.ssl.SSLException;
+
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCoreIntegrator;
 import se.arkalix.dto.DtoReadException;
+import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
@@ -22,40 +26,6 @@ public class PdeMain {
     final static int PORT = 28081;
     final static String SERVICE_REGISTRY_ADDRESS = "127.0.0.1";
     final static int SERVICE_REGISTRY_PORT = 8443;
-
-    /**
-     * @param password       Password of the private key associated with the
-     *                       certificate in key store.
-     * @param keyStorePath   Path to the keystore representing the systems own
-     *                       identity.
-     * @param trustStorePath Path to the trust store representing all identities
-     *                       that are to be trusted by the system.
-     * @return An Arrowhead Framework system.
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    public static ArSystem initArSystem(final char[] password, final String keyStorePath, final String trustStorePath)
-            throws GeneralSecurityException, IOException {
-
-        final var identity = new OwnedIdentity.Loader()
-            .keyPassword(password)
-            .keyStorePath(Path.of(keyStorePath))
-            .keyStorePassword(password)
-            .load();
-        final var trustStore = TrustStore.read(Path.of(trustStorePath), password);
-        Arrays.fill(password, '\0');
-
-        final var serviceRegistryAddress = new InetSocketAddress(SERVICE_REGISTRY_ADDRESS, SERVICE_REGISTRY_PORT);
-
-        final var system = new ArSystem.Builder()
-            .identity(identity)
-            .trustStore(trustStore)
-            .plugins(HttpJsonCoreIntegrator.viaServiceRegistryAt(serviceRegistryAddress))
-            .localPort(PORT)
-            .build();
-
-        return system;
-    }
 
     /**
      * Main method of the Plant Description Engine.
@@ -71,30 +41,66 @@ public class PdeMain {
         }
 
         final var password = new char[] { '1', '2', '3', '4', '5', '6' };
-        ArSystem arSystem = null;
+
+        TrustStore trustStore = null;
+        OwnedIdentity identity = null;
 
         try {
-            arSystem = initArSystem(password, args[0], args[1]);
+            trustStore = TrustStore.read(Path.of(args[1]), password);
+            identity = new OwnedIdentity.Loader()
+                .keyPassword(password)
+                .keyStorePath(Path.of(args[0]))
+                .keyStorePassword(password)
+                .load();
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
             System.exit(74);
         }
 
+        Arrays.fill(password, '\0');
+
+        final var arSystem = new ArSystem.Builder()
+            .identity(identity)
+            .trustStore(trustStore)
+            .plugins(HttpJsonCoreIntegrator
+                .viaServiceRegistryAt(new InetSocketAddress(SERVICE_REGISTRY_ADDRESS, SERVICE_REGISTRY_PORT)))
+            .localPort(PORT)
+            .build();
+
         var entryStore = new PlantDescriptionEntryStore(DESCRIPTION_DIRECTORY);
         try {
             // Read Plant Description entries from file.
             entryStore.readEntries();
-
         } catch (IOException | DtoReadException e) {
             e.printStackTrace();
             System.exit(74);
         }
-        var pdeManager = new PdeManagementService(entryStore);
+
+        HttpClient client = null;
+
+        try {
+            client = new HttpClient.Builder()
+                .identity(identity)
+                .trustStore(trustStore)
+                .build();
+        } catch (SSLException e) {
+            System.exit(74);
+            e.printStackTrace();
+        }
+
+        var orchestratorClient = new OrchestratorClient(client);
+        var pdeManager = new PdeManagementService(entryStore, orchestratorClient);
 
         System.out.println("Providing services...");
         arSystem.provide(pdeManager.getService())
             .onFailure(Throwable::printStackTrace);
 
-        pdeManager.consumeServices(arSystem);
+        try {
+            Thread.sleep(1000);
+            pdeManager.postRule();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
     }
 }

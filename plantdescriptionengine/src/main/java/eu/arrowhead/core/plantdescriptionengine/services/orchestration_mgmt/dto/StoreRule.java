@@ -19,7 +19,7 @@ public interface StoreRule {
     Optional<Map<String, String>> attribute();
 
     ProviderSystem providerSystem();
-    Cloud Cloud();
+    Cloud cloud();
     String serviceInterfaceName();
 
     Integer priority();
