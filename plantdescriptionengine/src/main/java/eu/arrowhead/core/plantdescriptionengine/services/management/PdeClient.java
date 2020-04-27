@@ -5,17 +5,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.Path;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
 
 import se.arkalix.dto.DtoEncoding;
+import se.arkalix.dto.DtoWriteException;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
-
 
 /**
  * Simple HttpClient used in the development of the plant description engine.
@@ -29,26 +33,26 @@ public class PdeClient {
      */
     public static PlantDescriptionDto createDescription() {
 
-        PortDto serviceDiscoveryPort = new PortBuilder()
-            .portName("service_discovery")
-            .serviceDefinition("Service Discovery")
+        PortDto pdePort = new PortBuilder()
+            .portName("pde_mgmt")
+            .serviceDefinition("pde-mgmt")
             .consumer(false)
             .build();
 
-        PortDto authorizationPort = new PortBuilder()
-            .portName("service_discovery")
-            .serviceDefinition("Service Discovery")
+        PortDto fakePort = new PortBuilder()
+            .portName("pde_mgmt")
+            .serviceDefinition("pde-mgmt")
             .consumer(false)
             .build();
 
         SystemPortDto consumer = new SystemPortBuilder()
-            .systemName("Authorization")
-            .portName("service_discovery")
+            .systemName("fake_system")
+            .portName("pde_mgmt")
             .build();
 
         SystemPortDto producer = new SystemPortBuilder()
-            .systemName("Service Registry")
-            .portName("service_discovery")
+            .systemName("sysop")
+            .portName("pde_mgmt")
             .build();
 
         ConnectionDto connection = new ConnectionBuilder()
@@ -56,27 +60,21 @@ public class PdeClient {
             .producer(producer)
             .build();
 
-        Map<String, String> metadata = new HashMap<String, String>();
-        metadata.put("first", "Melvin");
-        metadata.put("second", "Vilmer");
-
-        PdeSystemDto serviceRegistrySystem = new PdeSystemBuilder()
-            .systemName("Service Registry")
-            .ports(Arrays.asList(serviceDiscoveryPort))
-            .metadata(metadata)
+        PdeSystemDto pde = new PdeSystemBuilder()
+            .systemName("sysop")
+            .ports(Arrays.asList(pdePort))
             .build();
 
-        PdeSystemDto authorizationSystem = new PdeSystemBuilder()
-            .systemName("Authorization")
-            .ports(Arrays.asList(authorizationPort))
-            .metadata(metadata)
+        PdeSystemDto fakeSystem = new PdeSystemBuilder()
+            .systemName("fake_system")
+            .ports(Arrays.asList(fakePort))
             .build();
 
         PlantDescriptionDto description = new PlantDescriptionBuilder()
             .plantDescription("ArrowHead core")
             .active(true)
             .include(Arrays.asList(1,2,3))
-            .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
+            .systems(Arrays.asList(pde, fakeSystem))
             .connections(Arrays.asList(connection))
             .build();
 
@@ -278,8 +276,8 @@ public class PdeClient {
             String baseUri = "/pde/mgmt/pd/";
 
             getDescriptions(pdeSocketAddress, baseUri, client);
-            // Thread.sleep(1000);
-            // postDescription(pdeSocketAddress, baseUri, client);
+            Thread.sleep(1000);
+            postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
             // postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
