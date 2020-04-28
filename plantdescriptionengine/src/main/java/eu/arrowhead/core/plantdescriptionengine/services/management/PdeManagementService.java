@@ -20,7 +20,6 @@ import se.arkalix.util.concurrent.Future;
 public class PdeManagementService {
 
     private final PlantDescriptionEntryStore entryStore;
-    private final OrchestratorClient orchestratorClient;
 
     /**
      * Constructor of a PdeManagementService.
@@ -33,7 +32,11 @@ public class PdeManagementService {
         Objects.requireNonNull(entryStore, "Expected PlantDescriptionEntryStore");
         Objects.requireNonNull(orchestratorClient, "Expected OrchestratorClient");
         this.entryStore = entryStore;
-        this.orchestratorClient = orchestratorClient;
+
+        // Register the orchestrator client to Plant Description update events.
+        // This will cause it to interact with the Orchestrator whenever a
+        // Plant description entry is added, updated or removed.
+        entryStore.addListener(orchestratorClient);
     }
 
     /**
@@ -51,7 +54,6 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryStore.getNextId());
                 try {
                     entryStore.put(entry);
-                    orchestratorClient.onPlantDescriptionUpdate(entry);
                 } catch (final IOException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);

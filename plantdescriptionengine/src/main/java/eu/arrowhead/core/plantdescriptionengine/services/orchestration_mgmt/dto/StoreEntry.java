@@ -22,9 +22,9 @@ public interface StoreEntry {
 	ServiceDefinition serviceDefinition();
     SrSystem consumerSystem();
     Boolean foreign();
-    
+
     SrSystem providerSystem();
-    ProviderCloud providerCloud();
+    // ProviderCloud providerCloud(); // TODO: Put back. This was removed due to a bug in AR Kalix, which will soon be fixed.
     ServiceInterface serviceInterface();
 
     Integer priority();
