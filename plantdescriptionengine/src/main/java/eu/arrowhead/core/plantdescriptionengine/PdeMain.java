@@ -1,10 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Properties;
 
 import javax.net.ssl.SSLException;
 
@@ -21,14 +23,6 @@ import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
 public class PdeMain {
-
-    // File path to the directory for storing JSON representations of plant
-    // descriptions:
-    final static String DESCRIPTION_DIRECTORY = "plant-descriptions/";
-    final static int PORT = 28081;
-    final static String SERVICE_REGISTRY_ADDRESS = "127.0.0.1";
-    final static int SERVICE_REGISTRY_PORT = 8443;
-
     /**
      * Main method of the Plant Description Engine.
      * Provides Plant Description management and monitoring services to the
@@ -37,39 +31,57 @@ public class PdeMain {
      */
     public static void main(final String[] args) {
 
-        if (args.length != 2) {
-            System.err.println("Requires two command line arguments: <keyStorePath> and <trustStorePath>");
-            System.exit(1);
-        }
+        Properties prop = new Properties();
 
-        final var password = new char[] { '1', '2', '3', '4', '5', '6' };
+        try {
+            InputStream inputStream = ClassLoader.getSystemResourceAsStream("application.properties");
+            prop.load(inputStream);
+        } catch (IOException ex) {
+            System.out.println("Failed to read application.properties.");
+            System.exit(74);
+        }
 
         TrustStore trustStore = null;
         OwnedIdentity identity = null;
 
+        final String trustStorePath = prop.getProperty("server.ssl.trust-store");
+        final char[] trustStorePassword = prop.getProperty("server.ssl.trust-store-password").toCharArray();
+
+        final String keyStorePath = prop.getProperty("server.ssl.key-store");
+        final char[] keyPassword = prop.getProperty("server.ssl.key-store-password").toCharArray();
+        final char[] keyStorePassword = prop.getProperty("server.ssl.key-store-password").toCharArray();
+
         try {
-            trustStore = TrustStore.read(Path.of(args[1]), password);
+            trustStore = TrustStore.read(trustStorePath, trustStorePassword);
             identity = new OwnedIdentity.Loader()
-                .keyPassword(password)
-                .keyStorePath(Path.of(args[0]))
-                .keyStorePassword(password)
+                .keyPassword(keyPassword)
+                .keyStorePath(keyStorePath)
+                .keyStorePassword(keyStorePassword)
                 .load();
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
             System.exit(74);
         }
 
-        Arrays.fill(password, '\0');
+        Arrays.fill(keyPassword, '\0');
+        Arrays.fill(keyStorePassword, '\0');
+        Arrays.fill(trustStorePassword, '\0');
+
+        final int pdePort = Integer.parseInt(prop.getProperty("server.port"));
+        final String serviceRegistryAddress = prop.getProperty("service_registry.address");
+        final int serviceRegistryPort = Integer.parseInt(prop.getProperty("service_registry.port"));
 
         final var arSystem = new ArSystem.Builder()
             .identity(identity)
             .trustStore(trustStore)
             .plugins(HttpJsonCoreIntegrator
-                .viaServiceRegistryAt(new InetSocketAddress(SERVICE_REGISTRY_ADDRESS, SERVICE_REGISTRY_PORT)))
-            .localPort(PORT)
+                .viaServiceRegistryAt(new InetSocketAddress(serviceRegistryAddress, serviceRegistryPort)))
+            .localPort(pdePort)
             .build();
 
-        var entryStore = new PlantDescriptionEntryStore(DESCRIPTION_DIRECTORY);
+        final String plantDescriptionsDirectory = prop.getProperty("plant_descriptions");
+        var entryStore = new PlantDescriptionEntryStore(plantDescriptionsDirectory);
+
         try {
             // Read Plant Description entries from file.
             entryStore.readEntries();
