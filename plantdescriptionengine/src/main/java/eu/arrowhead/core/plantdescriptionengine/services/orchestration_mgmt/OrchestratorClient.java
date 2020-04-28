@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Connection;
@@ -15,11 +16,13 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.ProviderSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
+import se.arkalix.util.concurrent.Futures;
 
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
@@ -46,7 +49,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
-    private void postRule(Connection connection, List<PdeSystem> systems) {
+    private Future<StoreEntryListDto> postRule(Connection connection, List<PdeSystem> systems) {
         SystemPort producerPort = connection.producer();
         SystemPort consumerPort = connection.consumer();
         PdeSystem producer = null;
@@ -80,7 +83,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             // TODO: Again, validate the plant description and remove this check.
         }
 
-        client.send(orchestratorAddress, new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/mgmt/store")
+        return client.send(orchestratorAddress, new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/mgmt/store")
             .body(DtoEncoding.JSON, List.of(new StoreRuleBuilder().serviceDefinitionName(serviceDefinitionName)
                 .priority(1) // TODO: Change!
                 .consumerSystemId(20) // TODO: Look up!
@@ -95,22 +98,14 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 .build())
             )
             .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsString())
-            .map(body -> {
-                System.out.println("\nPOST result from orchestrator:");
-                System.out.println(body);
-                return null;
-            }).onFailure(throwable -> {
-                System.err.println("\nPOST failure:");
-                throwable.printStackTrace();
-            });
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
-    private Future<Void> deleteStoreEntry(int id) {
+    private Future<Void> deleteRule(int id) {
         return client.send(orchestratorAddress, new HttpClientRequest()
             .method(HttpMethod.DELETE)
             .uri("/orchestrator/mgmt/store/" + id))
-            .flatMap(x -> {
+            .flatMap(response -> {
                 return Future.done();
             });
     }
@@ -118,43 +113,34 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private Future<Void> removeAllRules() {
         return getStoreEntries()
             .flatMap(entryList -> {
-                for (var entry : entryList.data()) {
-                    System.out.println("Deleting entry " + entry.id());
-                    deleteStoreEntry(entry.id())
-                    .ifSuccess(x -> {
-                        System.out.println("YES! KILLED " + entry.id());
-                    }).wait();
+                if (entryList.count() == 0) {
+                    System.out.println("No Orchestrator rules exist.");
+                    return Future.done();
                 }
-                System.out.println("Deleted all entries.");
-                return Future.done();
+
+                var deletions = entryList.data()
+                    .stream()
+                    .map(entry -> deleteRule(entry.id()))
+                    .collect(Collectors.toList());
+
+                return Futures.serialize(deletions)
+                    .flatMap(result -> {
+                        System.out.println("All orchestrator rules deleted.");
+                        return Future.done();
+                    });
             });
-
-        /*
-        .ifSuccess(body -> {
-            System.err.println(body.asString());
-        })
-        .onFailure(throwable -> {
-            throwable.printStackTrace();
-        });
-        System.out.println("Gererp");
-        */
-
-        /*
-        return getStoreEntries().map(storeEntryList -> {
-            for (var entry : storeEntryList.data()) {
-                System.out.println("Destroying " + entry.id());
-                deleteStoreEntry(entry.id()).wait();
-            }
-            return storeEntryList;
-        });
-        */
     }
 
-    private void postRules(PlantDescriptionEntry entry) {
-        List<PdeSystem> systems = entry.systems();
-        for (Connection connection : entry.connections()) {
-            postRule(connection, systems);
-        }
+    private Future<List<StoreRuleDto>> postRules(PlantDescriptionEntry entry) {
+        var rulePosts = entry.connections()
+            .stream()
+            .map(connection -> postRule(connection, entry.systems()))
+            .collect(Collectors.toList());
+
+        return Futures.serialize(rulePosts)
+            .flatMap(result -> {
+                return Future.done();
+            });
     }
 
     @Override
@@ -163,9 +149,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         .ifSuccess(x -> {
             // For each Plant description entry, post its rules:
             // TODO: Only post rules for the active entry
-            for (var entry : entries) {
-                postRules(entry);
-            }
+            var tasks = entries.stream()
+                .map(entry -> postRules(entry))
+                .collect(Collectors.toList());
+
+            Futures.serialize(tasks)
+                .flatMap(result -> {
+                    System.out.println("Orchestration rules for all entries posted.");
+                    return Future.done();
+                })
+                .onFailure(Throwable::printStackTrace);
+
         })
         .onFailure(throwable -> {
             throwable.printStackTrace();

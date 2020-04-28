@@ -1,8 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -31,11 +29,12 @@ public class PdeMain {
      */
     public static void main(final String[] args) {
 
-        Properties prop = new Properties();
+        Properties appProps = new Properties();
+        Properties demoProps = new Properties();
 
         try {
-            InputStream inputStream = ClassLoader.getSystemResourceAsStream("application.properties");
-            prop.load(inputStream);
+            appProps.load(ClassLoader.getSystemResourceAsStream("application.properties"));
+            demoProps.load(ClassLoader.getSystemResourceAsStream("demo.properties"));
         } catch (IOException ex) {
             System.out.println("Failed to read application.properties.");
             System.exit(74);
@@ -44,12 +43,12 @@ public class PdeMain {
         TrustStore trustStore = null;
         OwnedIdentity identity = null;
 
-        final String trustStorePath = prop.getProperty("server.ssl.trust-store");
-        final char[] trustStorePassword = prop.getProperty("server.ssl.trust-store-password").toCharArray();
+        final String trustStorePath = appProps.getProperty("server.ssl.trust-store");
+        final char[] trustStorePassword = appProps.getProperty("server.ssl.trust-store-password").toCharArray();
 
-        final String keyStorePath = prop.getProperty("server.ssl.key-store");
-        final char[] keyPassword = prop.getProperty("server.ssl.key-store-password").toCharArray();
-        final char[] keyStorePassword = prop.getProperty("server.ssl.key-store-password").toCharArray();
+        final String keyStorePath = appProps.getProperty("server.ssl.key-store");
+        final char[] keyPassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
+        final char[] keyStorePassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
 
         try {
             trustStore = TrustStore.read(trustStorePath, trustStorePassword);
@@ -67,9 +66,9 @@ public class PdeMain {
         Arrays.fill(keyStorePassword, '\0');
         Arrays.fill(trustStorePassword, '\0');
 
-        final int pdePort = Integer.parseInt(prop.getProperty("server.port"));
-        final String serviceRegistryAddress = prop.getProperty("service_registry.address");
-        final int serviceRegistryPort = Integer.parseInt(prop.getProperty("service_registry.port"));
+        final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
+        final String serviceRegistryAddress = appProps.getProperty("service_registry.address");
+        final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
 
         final var arSystem = new ArSystem.Builder()
             .identity(identity)
@@ -79,7 +78,7 @@ public class PdeMain {
             .localPort(pdePort)
             .build();
 
-        final String plantDescriptionsDirectory = prop.getProperty("plant_descriptions");
+        final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
         var entryStore = new PlantDescriptionEntryStore(plantDescriptionsDirectory);
 
         try {
@@ -102,8 +101,14 @@ public class PdeMain {
             e.printStackTrace();
         }
 
-        final CloudDto cloud = new CloudBuilder().name("xarepo").operator("xarepo").build(); // TODO: Remove hardcoded cloud
-        final var orchestratorClient = new OrchestratorClient(client, cloud);
+        final String cloudName = demoProps.getProperty("cloud.name");
+        final String cloudOperator = demoProps.getProperty("cloud.operator");
+        final CloudDto cloud = new CloudBuilder().name(cloudName).operator(cloudOperator).build();
+
+        final String orchestratorAddress = demoProps.getProperty("orchestrator.address");
+        final int orchestratorPort = Integer.parseInt(demoProps.getProperty("orchestrator.port"));
+        final var orchestratorClient = new OrchestratorClient(client, orchestratorAddress, orchestratorPort, cloud);
+
         final var pdeManager = new PdeManagementService(entryStore, orchestratorClient);
 
         System.out.println("Providing services...");
