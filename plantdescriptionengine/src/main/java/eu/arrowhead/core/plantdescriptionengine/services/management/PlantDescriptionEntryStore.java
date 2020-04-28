@@ -30,6 +30,8 @@ import se.arkalix.dto.binary.ByteArrayReader;
  */
 public class PlantDescriptionEntryStore {
 
+    List<PlantDescriptionUpdateListener> listeners = new ArrayList<>();
+
     boolean initialized = false;
 
     // File path to the directory for storing JSON representations of plant
@@ -125,9 +127,27 @@ public class PlantDescriptionEntryStore {
     }
 
     public void put(final PlantDescriptionEntryDto entry) throws DtoWriteException, IOException {
+        boolean isNew = !entries.containsKey(entry.id());
         ensureInitialized();
         writeEntryFile(entry);
         entries.put(entry.id(), entry);
+
+        // Notify listeners:
+        for (var listener : listeners) {
+            listener.onUpdate(getEntries());
+        }
+
+        /*
+        if (isNew) { // TODO: Do it like this instead:
+            for (var listener : listeners) {
+                listener.onPlantDescriptionAdded(entry);
+            }
+        } else {
+            for (var listener : listeners) {
+                listener.onPlantDescriptionUpdated(entry);
+            }
+        }
+        */
     }
 
     public PlantDescriptionEntryDto get(int id) {
@@ -139,6 +159,10 @@ public class PlantDescriptionEntryStore {
         ensureInitialized();
         deleteEntryFile(id);
         entries.remove(id);
+        for (var listener : listeners) {
+            // listener.onPlantDescriptionRemoved(id);
+            listener.onUpdate(getEntries());
+        }
     }
 
     public PlantDescriptionEntryListDto getListDto() {
@@ -151,6 +175,10 @@ public class PlantDescriptionEntryStore {
     public List<PlantDescriptionEntryDto> getEntries() {
         ensureInitialized();
         return new ArrayList<>(entries.values());
+    }
+
+    public void addListener(PlantDescriptionUpdateListener listener) {
+        listeners.add(listener);
     }
 
 }
