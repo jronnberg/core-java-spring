@@ -19,21 +19,22 @@ import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
-import se.arkalix.net.http.client.HttpClientResponse;
 import se.arkalix.util.concurrent.Future;
 
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     private final HttpClient client;
-    private final InetSocketAddress orchestratorAddress = new InetSocketAddress("localhost", 8441); // TODO: Remove
+    private final InetSocketAddress orchestratorAddress;
     private final CloudDto cloud;
 
-    public OrchestratorClient(HttpClient client, CloudDto cloud) {
+    public OrchestratorClient(HttpClient client, String orchestratorAddress, int orchestratorPort, CloudDto cloud) {
         Objects.requireNonNull(client, "Expected HttpClient");
-        Objects.requireNonNull(cloud, "Expected CloudDto");
+        Objects.requireNonNull(cloud, "Expected cloud");
+        Objects.requireNonNull(orchestratorAddress, "Expected orchestrator address");
 
         this.client = client;
         this.cloud = cloud;
+        this.orchestratorAddress = new InetSocketAddress(orchestratorAddress, orchestratorPort);
     }
 
     private Future<StoreEntryListDto> getStoreEntries() {
