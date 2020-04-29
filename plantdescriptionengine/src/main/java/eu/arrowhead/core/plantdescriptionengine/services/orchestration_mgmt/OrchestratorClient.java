@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
 import se.arkalix.dto.DtoEncoding;
+import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
@@ -49,12 +51,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
-    private Future<StoreEntryListDto> postRule(Connection connection, List<PdeSystem> systems) {
-        SystemPort producerPort = connection.producer();
-        SystemPort consumerPort = connection.consumer();
+    private StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
+
+        final Connection connection = entry.connections().get(connectionIndex);
+        final List<PdeSystem> systems = entry.systems();
+        final SystemPort producerPort = connection.producer();
+        final SystemPort consumerPort = connection.consumer();
+
         PdeSystem producer = null;
         PdeSystem consumer = null;
 
+        // Find the consumer and producer systems involved.
         for (PdeSystem system : systems) {
             String systemName = system.systemName();
 
@@ -65,11 +72,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
         }
 
-        if (producer == null || consumer == null) {
-            throw new NullPointerException("Port refers to non-existent system");
-            // TODO: Remove this and instead validate all plant descriptions.
-        }
+        // TODO: Remove this and instead validate all plant descriptions.
+        Objects.requireNonNull(producer, "Port refers to non-existent producer system");
+        Objects.requireNonNull(consumer, "Port refers to non-existent consumer system");
 
+        // Find the service definition name.
         String serviceDefinitionName = null;
 
         for (Port port : producer.ports()) {
@@ -78,27 +85,51 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
         }
 
-        if (serviceDefinitionName == null) {
-            throw new NullPointerException("Service definition name not found");
-            // TODO: Again, validate the plant description and remove this check.
+        // TODO: Again, validate the plant description and remove this check.
+        Objects.requireNonNull(serviceDefinitionName, "Expected service definition name");
+
+        // TODO: Remove these hard-coded values! ------------------------------>
+        int consumerId = 20;
+        String providerAddress = "0.0.0.0";
+        int providerPort = 2808;
+        int priority = 1;
+        String serviceInterfaceName = "HTTP-INSECURE-JSON";
+        // <--------------------------------------------------------------------
+
+        return new StoreRuleBuilder()
+            .serviceDefinitionName(serviceDefinitionName)
+            .priority(priority)
+            .consumerSystemId(consumerId)
+            .providerSystem(new ProviderSystemBuilder()
+                .systemName(producer.systemName())
+                .address(providerAddress)
+                .port(providerPort)
+                .build()
+            )
+            .serviceInterfaceName(serviceInterfaceName)
+            .cloud(cloud)
+            .build();
+    }
+
+    private Future<StoreEntryListDto> postRules(PlantDescriptionEntry entry) {
+
+        int numConnections = entry.connections().size();
+        List<DtoWritable> rules = new ArrayList<>();
+
+        for (int i = 0; i < numConnections; i++) {
+            rules.add(createRule(entry, i));
         }
 
-        return client.send(orchestratorAddress, new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/mgmt/store")
-            .body(DtoEncoding.JSON, List.of(new StoreRuleBuilder().serviceDefinitionName(serviceDefinitionName)
-                .priority(1) // TODO: Change!
-                .consumerSystemId(20) // TODO: Look up!
-                .providerSystem(new ProviderSystemBuilder()
-                    .systemName(producer.systemName())
-                    .address("0.0.0.0") // TODO: Look up!
-                    .port(28081) // TODO: Look up!
-                    .build()
-                )
-                .serviceInterfaceName("HTTP-INSECURE-JSON")
-                .cloud(cloud)
-                .build())
-            )
+        return client.send(orchestratorAddress, new HttpClientRequest()
+            .method(HttpMethod.POST)
+            .uri("/orchestrator/mgmt/store")
+            .body(DtoEncoding.JSON, rules)
             .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class))
+            .map(storeEntryList -> {
+                // rules.put(entry.id(), connectionIndex, storeEntry.id());
+                return storeEntryList;
+            });
     }
 
     private Future<Void> deleteRule(int id) {
@@ -131,35 +162,21 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             });
     }
 
-    private Future<List<StoreRuleDto>> postRules(PlantDescriptionEntry entry) {
-        var rulePosts = entry.connections()
-            .stream()
-            .map(connection -> postRule(connection, entry.systems()))
-            .collect(Collectors.toList());
-
-        return Futures.serialize(rulePosts)
-            .flatMap(result -> {
-                return Future.done();
-            });
-    }
-
     @Override
     public void onUpdate(List<PlantDescriptionEntryDto> entries) {
         removeAllRules()
-        .ifSuccess(x -> {
-            // For each Plant description entry, post its rules:
+        .ifSuccess(removeResult -> {
             // TODO: Only post rules for the active entry
-            var tasks = entries.stream()
+            var posts = entries.stream()
                 .map(entry -> postRules(entry))
                 .collect(Collectors.toList());
 
-            Futures.serialize(tasks)
-                .flatMap(result -> {
+            Futures.serialize(posts)
+                .flatMap(postResult -> {
                     System.out.println("Orchestration rules for all entries posted.");
                     return Future.done();
                 })
                 .onFailure(Throwable::printStackTrace);
-
         })
         .onFailure(throwable -> {
             throwable.printStackTrace();
