@@ -1,12 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.services.management;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
+import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -19,24 +19,24 @@ import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
 
-    private final PlantDescriptionEntryStore entryStore;
+    private final PlantDescriptionEntryMap entryMap;
 
     /**
      * Constructor of a PdeManagementService.
      *
-     * @param entryStore Storage object for keeping track of Plant Description
-     *                   entries.
+     * @param entryMap An object that maps ID:s to Plant Description
+     *                            Entries.
      * @param orchestratorClient
      */
-    public PdeManagementService(PlantDescriptionEntryStore entryStore, OrchestratorClient orchestratorClient) {
-        Objects.requireNonNull(entryStore, "Expected PlantDescriptionEntryStore");
-        Objects.requireNonNull(orchestratorClient, "Expected OrchestratorClient");
-        this.entryStore = entryStore;
+    public PdeManagementService(PlantDescriptionEntryMap entryMap, OrchestratorClient orchestratorClient) {
+        Objects.requireNonNull(entryMap, "Expected plant description map");
+        Objects.requireNonNull(orchestratorClient, "Expected orchestrator client");
+        this.entryMap = entryMap;
 
         // Register the orchestrator client to Plant Description update events.
         // This will cause it to interact with the Orchestrator whenever a
         // Plant description entry is added, updated or removed.
-        entryStore.addListener(orchestratorClient);
+        entryMap.addListener(orchestratorClient);
     }
 
     /**
@@ -51,16 +51,17 @@ public class PdeManagementService {
         return request
             .bodyAs(PlantDescriptionDto.class)
             .map(description -> {
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryStore.getNextId());
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry
+                    .from(description, entryMap.getUniqueId());
                 try {
-                    entryStore.put(entry);
-                } catch (final IOException e) {
+                    entryMap.put(entry);
+                } catch (final BackingStoreException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 return response
                     .status(HttpStatus.CREATED)
-                    .body(entryStore.getListDto());
+                    .body(entryMap.getListDto());
             });
     }
 
@@ -89,8 +90,8 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
 
                 try {
-                    entryStore.put(entry);
-                } catch (final IOException e) {
+                    entryMap.put(entry);
+                } catch (final BackingStoreException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -125,7 +126,7 @@ public class PdeManagementService {
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 
-                final PlantDescriptionEntryDto entry = entryStore.get(id);
+                final PlantDescriptionEntryDto entry = entryMap.get(id);
 
                 if (entry == null) {
                     return response
@@ -136,8 +137,8 @@ public class PdeManagementService {
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
 
                 try {
-                    entryStore.put(updatedEntry);
-                } catch (final IOException e) {
+                    entryMap.put(updatedEntry);
+                } catch (final BackingStoreException e) {
                     e.printStackTrace();
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -167,15 +168,15 @@ public class PdeManagementService {
             return Future.done();
         }
 
-        if (entryStore.get(id) == null) {
+        if (entryMap.get(id) == null) {
             response.status(HttpStatus.NOT_FOUND);
             response.body("Plant Description with ID " + id + " not found.");
             return Future.done();
         }
 
         try {
-            entryStore.remove(id);
-        } catch (IOException e) {
+            entryMap.remove(id);
+        } catch (BackingStoreException e) {
             System.err.println(e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.body("Encountered an error while deleting entry file.");
@@ -209,7 +210,7 @@ public class PdeManagementService {
             return Future.done();
         }
 
-        final PlantDescriptionEntryDto entry = entryStore.get(id);
+        final PlantDescriptionEntryDto entry = entryMap.get(id);
 
         if (entry == null) {
             response.body("Plant Description with ID " + id + " not found.");
@@ -255,7 +256,7 @@ public class PdeManagementService {
             return Future.done();
         }
 
-        List<PlantDescriptionEntryDto> entries = entryStore.getEntries();
+        List<PlantDescriptionEntryDto> entries = entryMap.getEntries();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
