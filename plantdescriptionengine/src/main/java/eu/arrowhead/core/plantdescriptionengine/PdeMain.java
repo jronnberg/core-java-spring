@@ -9,13 +9,15 @@ import java.util.Properties;
 import javax.net.ssl.SSLException;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
-import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryStore;
+import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.FileStore;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCoreIntegrator;
-import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
@@ -79,12 +81,13 @@ public class PdeMain {
             .build();
 
         final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
-        var entryStore = new PlantDescriptionEntryStore(plantDescriptionsDirectory);
+
+        BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
+        PlantDescriptionEntryMap entryMap = null;
 
         try {
-            // Read Plant Description entries from file.
-            entryStore.readEntries();
-        } catch (IOException | DtoReadException e) {
+            entryMap = new PlantDescriptionEntryMap(entryStore);
+        } catch (BackingStoreException e) {
             e.printStackTrace();
             System.exit(74);
         }
@@ -109,7 +112,7 @@ public class PdeMain {
         final int orchestratorPort = Integer.parseInt(demoProps.getProperty("orchestrator.port"));
         final var orchestratorClient = new OrchestratorClient(client, orchestratorAddress, orchestratorPort, cloud);
 
-        final var pdeManager = new PdeManagementService(entryStore, orchestratorClient);
+        final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
 
         System.out.println("Providing services...");
         arSystem.provide(pdeManager.getService())

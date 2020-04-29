@@ -5,16 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.Path;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
 
 import se.arkalix.dto.DtoEncoding;
-import se.arkalix.dto.DtoWriteException;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
@@ -277,7 +272,7 @@ public class PdeClient {
 
             getDescriptions(pdeSocketAddress, baseUri, client);
             Thread.sleep(1000);
-            postDescription(pdeSocketAddress, baseUri, client);
+            // postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
             // postDescription(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
@@ -285,7 +280,7 @@ public class PdeClient {
             // Thread.sleep(1000);
             // getDescriptions(pdeSocketAddress, baseUri, client);
             // Thread.sleep(1000);
-            // putDescription(pdeSocketAddress, baseUri, client, 1);
+            putDescription(pdeSocketAddress, baseUri, client, 1);
             // Thread.sleep(1000);
             // getDescription(pdeSocketAddress, baseUri, client, 1);
             // Thread.sleep(1000);
