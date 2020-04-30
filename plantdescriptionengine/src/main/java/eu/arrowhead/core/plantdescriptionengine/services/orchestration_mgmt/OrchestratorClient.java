@@ -91,7 +91,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         // TODO: Remove these hard-coded values! ------------------------------>
         int consumerId = 20;
         String providerAddress = "0.0.0.0";
-        int providerPort = 2808;
+        int providerPort = 28081;
         int priority = 1;
         String serviceInterfaceName = "HTTP-INSECURE-JSON";
         // <--------------------------------------------------------------------
@@ -141,11 +141,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             });
     }
 
+    // TODO: Remove this function.
     private Future<Void> removeAllRules() {
         return getStoreEntries()
             .flatMap(entryList -> {
                 if (entryList.count() == 0) {
-                    System.out.println("No Orchestrator rules exist.");
                     return Future.done();
                 }
 
