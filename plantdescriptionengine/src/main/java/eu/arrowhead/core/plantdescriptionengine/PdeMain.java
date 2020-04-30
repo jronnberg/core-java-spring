@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javax.net.ssl.SSLException;
 
+import eu.arrowhead.core.plantdescriptionengine.services.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStore;
@@ -42,15 +43,15 @@ public class PdeMain {
             System.exit(74);
         }
 
-        TrustStore trustStore = null;
-        OwnedIdentity identity = null;
-
         final String trustStorePath = appProps.getProperty("server.ssl.trust-store");
         final char[] trustStorePassword = appProps.getProperty("server.ssl.trust-store-password").toCharArray();
 
         final String keyStorePath = appProps.getProperty("server.ssl.key-store");
         final char[] keyPassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
         final char[] keyStorePassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
+
+        TrustStore trustStore = null;
+        OwnedIdentity identity = null;
 
         try {
             trustStore = TrustStore.read(trustStorePath, trustStorePassword);
@@ -61,7 +62,7 @@ public class PdeMain {
                 .load();
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-            System.exit(74);
+            System.exit(1);
         }
 
         Arrays.fill(keyPassword, '\0');
@@ -69,14 +70,15 @@ public class PdeMain {
         Arrays.fill(trustStorePassword, '\0');
 
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
-        final String serviceRegistryAddress = appProps.getProperty("service_registry.address");
+        final String serviceRegistryIp = appProps.getProperty("service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
+        final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
 
         final var arSystem = new ArSystem.Builder()
             .identity(identity)
             .trustStore(trustStore)
             .plugins(HttpJsonCoreIntegrator
-                .viaServiceRegistryAt(new InetSocketAddress(serviceRegistryAddress, serviceRegistryPort)))
+                .viaServiceRegistryAt(serviceRegistryAddress))
             .localPort(pdePort)
             .build();
 
@@ -89,19 +91,19 @@ public class PdeMain {
             entryMap = new PlantDescriptionEntryMap(entryStore);
         } catch (BackingStoreException e) {
             e.printStackTrace();
-            System.exit(74);
+            System.exit(1);
         }
 
-        HttpClient client = null;
+        HttpClient httpClient = null;
 
         try {
-            client = new HttpClient.Builder()
+            httpClient = new HttpClient.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
                 .build();
         } catch (SSLException e) {
-            System.exit(74);
             e.printStackTrace();
+            System.exit(1);
         }
 
         final String cloudName = demoProps.getProperty("cloud.name");
@@ -110,13 +112,19 @@ public class PdeMain {
 
         final String orchestratorAddress = demoProps.getProperty("orchestrator.address");
         final int orchestratorPort = Integer.parseInt(demoProps.getProperty("orchestrator.port"));
-        final var orchestratorClient = new OrchestratorClient(client, orchestratorAddress, orchestratorPort, cloud);
+        final var orchestratorClient = new OrchestratorClient(httpClient, orchestratorAddress, orchestratorPort, cloud);
 
         final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
 
-        System.out.println("Providing services...");
-        arSystem.provide(pdeManager.getService())
-            .onFailure(Throwable::printStackTrace);
+        SystemTracker.initialize(serviceRegistryAddress, httpClient).ifSuccess(result -> {
+            System.out.println("Providing services...");
+            arSystem.provide(pdeManager.getService())
+                .onFailure(Throwable::printStackTrace);
+        })
+        .onFailure(throwable -> {
+            throwable.printStackTrace();
+            System.exit(1);
+        });
 
     }
 }

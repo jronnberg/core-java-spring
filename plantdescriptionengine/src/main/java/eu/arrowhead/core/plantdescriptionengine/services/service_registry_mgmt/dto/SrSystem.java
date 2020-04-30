@@ -13,7 +13,7 @@ import java.util.Optional;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface SrSystem {
-	Optional<Integer> id();
+	Integer id(); // TODO: Should this be Optional?
     String systemName();
     String address();
     Integer port();

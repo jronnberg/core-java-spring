@@ -6,18 +6,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import eu.arrowhead.core.plantdescriptionengine.services.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Port;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.SystemPort;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.ProviderSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
@@ -54,59 +53,20 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
 
         final Connection connection = entry.connections().get(connectionIndex);
-        final List<PdeSystem> systems = entry.systems();
-        final SystemPort producerPort = connection.producer();
-        final SystemPort consumerPort = connection.consumer();
 
-        PdeSystem producer = null;
-        PdeSystem consumer = null;
-
-        // Find the consumer and producer systems involved.
-        for (PdeSystem system : systems) {
-            String systemName = system.systemName();
-
-            if (systemName.equals(producerPort.systemName())) {
-                producer = system;
-            } else if (systemName.equals(consumerPort.systemName())) {
-                consumer = system;
-            }
-        }
-
-        // TODO: Remove this and instead validate all plant descriptions.
-        Objects.requireNonNull(producer, "Port refers to non-existent producer system");
-        Objects.requireNonNull(consumer, "Port refers to non-existent consumer system");
-
-        // Find the service definition name.
-        String serviceDefinitionName = null;
-
-        for (Port port : producer.ports()) {
-            if (port.portName().equals(producerPort.portName())) {
-                serviceDefinitionName = port.serviceDefinition();
-            }
-        }
-
-        // TODO: Again, validate the plant description and remove this check.
-        Objects.requireNonNull(serviceDefinitionName, "Expected service definition name");
-
-        // TODO: Remove these hard-coded values! ------------------------------>
-        int consumerId = 20;
-        String providerAddress = "0.0.0.0";
-        int providerPort = 28081;
-        int priority = 1;
-        String serviceInterfaceName = "HTTP-INSECURE-JSON";
-        // <--------------------------------------------------------------------
+        SrSystem consumerSystem = SystemTracker.get(connection.consumer().systemName());
+        SrSystem providerSystem = SystemTracker.get(connection.producer().systemName());
 
         return new StoreRuleBuilder()
-            .serviceDefinitionName(serviceDefinitionName)
-            .priority(priority)
-            .consumerSystemId(consumerId)
+            .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
+            .priority(1) // TODO: Remove hard-coded value
+            .consumerSystemId(consumerSystem.id())
             .providerSystem(new ProviderSystemBuilder()
-                .systemName(producer.systemName())
-                .address(providerAddress)
-                .port(providerPort)
-                .build()
-            )
-            .serviceInterfaceName(serviceInterfaceName)
+                .systemName(providerSystem.systemName())
+                .address(providerSystem.address())
+                .port(providerSystem.port())
+                .build())
+            .serviceInterfaceName("HTTP-INSECURE-JSON") // TODO: Remove hard-coded value
             .cloud(cloud)
             .build();
     }
@@ -172,9 +132,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 .collect(Collectors.toList());
 
             Futures.serialize(posts)
-                .flatMap(postResult -> {
-                    System.out.println("Orchestration rules for all entries posted.");
-                    return Future.done();
+                .ifSuccess(result -> {
+                    System.out.println("Result of HTTP POST to the Orchestrator:");
+                    for (var storeEntryList : result) {
+                        System.out.println("  " + storeEntryList.asString());
+                    }
                 })
                 .onFailure(Throwable::printStackTrace);
         })

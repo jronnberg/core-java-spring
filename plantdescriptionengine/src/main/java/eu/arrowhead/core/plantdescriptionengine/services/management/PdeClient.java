@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
-
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.ServiceRegistryEntryListDto;
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystemDto;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.binary.ByteArrayReader;
