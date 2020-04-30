@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
@@ -145,6 +146,35 @@ public interface PlantDescriptionEntry {
         } else {
             entries.removeIf(entry -> entry.active());
         }
+    }
+
+    /**
+     * Helper function for finding service definition names.
+     *
+     * @param connectionIndex Index of a connection within this instance's
+     *                        connection list.
+     * @return Service definition name corresponding to the specified
+     *         connection.
+     */
+    public default String serviceDefinitionName(int connectionIndex) {
+        final SystemPort producerPort = connections().get(connectionIndex).producer();
+
+        String serviceDefinitionName = null;
+
+        for (PdeSystem system : systems()) {
+            if (!system.systemName().equals(producerPort.systemName())) {
+                continue;
+            }
+            for (Port port : system.ports()) {
+                if (port.portName().equals(producerPort.portName())) {
+                    serviceDefinitionName = port.serviceDefinition();
+                }
+            }
+        }
+
+        // TODO: Remove this and instead validate all plant descriptions.
+        Objects.requireNonNull(serviceDefinitionName, "Could not find producer serviceDefinitionName in Plant Description Entry");
+        return serviceDefinitionName;
     }
 
     default String asString() {
