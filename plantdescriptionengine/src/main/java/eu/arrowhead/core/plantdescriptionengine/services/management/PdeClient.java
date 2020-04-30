@@ -1,15 +1,17 @@
 package eu.arrowhead.core.plantdescriptionengine.services.management;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
 
 import se.arkalix.dto.DtoEncoding;
+import se.arkalix.dto.DtoReadException;
+import se.arkalix.dto.binary.ByteArrayReader;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
@@ -23,117 +25,41 @@ import se.arkalix.security.identity.TrustStore;
  */
 public class PdeClient {
 
-    /**
-     * @return An example plant description.
-     */
-    public static PlantDescriptionDto createDescription() {
+    private static final String defaultdescriptionFilepath = "demo-data/description_1.json";
+    private static final String defaultUpdateFilepath = "demo-data/update_1.json";
 
-        PortDto pdePort = new PortBuilder()
-            .portName("pde_mgmt")
-            .serviceDefinition("pde-mgmt")
-            .consumer(false)
-            .build();
-
-        PortDto fakePort = new PortBuilder()
-            .portName("pde_mgmt")
-            .serviceDefinition("pde-mgmt")
-            .consumer(false)
-            .build();
-
-        SystemPortDto consumer = new SystemPortBuilder()
-            .systemName("fake_system")
-            .portName("pde_mgmt")
-            .build();
-
-        SystemPortDto producer = new SystemPortBuilder()
-            .systemName("sysop")
-            .portName("pde_mgmt")
-            .build();
-
-        ConnectionDto connection = new ConnectionBuilder()
-            .consumer(consumer)
-            .producer(producer)
-            .build();
-
-        PdeSystemDto pde = new PdeSystemBuilder()
-            .systemName("sysop")
-            .ports(Arrays.asList(pdePort))
-            .build();
-
-        PdeSystemDto fakeSystem = new PdeSystemBuilder()
-            .systemName("fake_system")
-            .ports(Arrays.asList(fakePort))
-            .build();
-
-        PlantDescriptionDto description = new PlantDescriptionBuilder()
-            .plantDescription("ArrowHead core")
-            .active(true)
-            .include(Arrays.asList(1,2,3))
-            .systems(Arrays.asList(pde, fakeSystem))
-            .connections(Arrays.asList(connection))
-            .build();
-
+    public static PlantDescriptionDto readDescription(String filename) {
+        byte[] bytes = null;
+        PlantDescriptionDto description = null;
+        try {
+            bytes = Files.readAllBytes(Paths.get(filename));
+            description = PlantDescriptionDto.readJson(new ByteArrayReader(bytes));
+        } catch (DtoReadException | IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
         return description;
     }
 
-    /**
-     * @return An example plant description update.
-     */
-    public static PlantDescriptionUpdateDto createDescriptionUpdate() {
+    public static PlantDescriptionDto readDescription() {
+        return readDescription(defaultdescriptionFilepath);
+    }
 
-        PortDto serviceDiscoveryPort = new PortBuilder()
-            .portName("service_discovery_updated")
-            .serviceDefinition("Service Discovery Updated")
-            .consumer(false)
-            .build();
-
-        PortDto authorizationPort = new PortBuilder()
-            .portName("service_discovery_updated")
-            .serviceDefinition("Service Discovery Updated")
-            .consumer(false)
-            .build();
-
-        SystemPortDto consumer = new SystemPortBuilder()
-            .systemName("Authorization Updated")
-            .portName("service_discovery_updated")
-            .build();
-
-        SystemPortDto producer = new SystemPortBuilder()
-            .systemName("Service Registry Updated")
-            .portName("service_discovery_updated")
-            .build();
-
-        ConnectionDto connection = new ConnectionBuilder()
-            .consumer(consumer)
-            .producer(producer)
-            .build();
-
-        Map<String, String> metadata = new HashMap<String, String>();
-        metadata.put("a", "1");
-        metadata.put("b", "2");
-        metadata.put("c", "3");
-
-        PdeSystemDto serviceRegistrySystem = new PdeSystemBuilder()
-            .systemName("Service Registry Updated")
-            .ports(Arrays.asList(serviceDiscoveryPort))
-            .metadata(metadata)
-            .build();
-
-        PdeSystemDto authorizationSystem = new PdeSystemBuilder()
-            .systemName("Authorization Updated")
-            .ports(Arrays.asList(authorizationPort))
-            .metadata(metadata)
-            .build();
-
-        PlantDescriptionUpdateDto update = new PlantDescriptionUpdateBuilder()
-            .plantDescription("ArrowHead core updated")
-            .active(false)
-            .include(Collections.<Integer> emptyList())
-            .systems(Arrays.asList(serviceRegistrySystem, authorizationSystem))
-            .connections(Arrays.asList(connection))
-            .build();
-
+    public static PlantDescriptionUpdateDto readUpdate(String filename) {
+        byte[] bytes = null;
+        PlantDescriptionUpdateDto update = null;
+        try {
+            bytes = Files.readAllBytes(Paths.get(filename));
+            update = PlantDescriptionUpdateDto.readJson(new ByteArrayReader(bytes));
+        } catch (DtoReadException | IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
         return update;
+    }
+
+    public static PlantDescriptionUpdateDto readUpdate() {
+        return readUpdate(defaultUpdateFilepath);
     }
 
     private static void deleteDescription(InetSocketAddress address, String baseUri, HttpClient client, int descriptionId) {
@@ -195,7 +121,7 @@ public class PdeClient {
         client.send(address, new HttpClientRequest()
             .method(HttpMethod.POST)
             .uri(baseUri)
-            .body(DtoEncoding.JSON, createDescription()))
+            .body(DtoEncoding.JSON, readDescription()))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryListDto.class))
             .ifSuccess(body -> {
                 System.err.println("\nPOST result:");
@@ -211,7 +137,7 @@ public class PdeClient {
         client.send(address, new HttpClientRequest()
         .method(HttpMethod.PUT)
         .uri(baseUri + descriptionId)
-        .body(DtoEncoding.JSON, createDescription()))
+        .body(DtoEncoding.JSON, readDescription()))
         .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
         .map(body -> {
             System.out.println("\nPUT result:");
@@ -228,7 +154,7 @@ public class PdeClient {
         client.send(address, new HttpClientRequest()
             .method(HttpMethod.PATCH)
             .uri(baseUri + descriptionId)
-            .body(DtoEncoding.JSON, createDescriptionUpdate()))
+            .body(DtoEncoding.JSON, readUpdate()))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PlantDescriptionEntryDto.class))
             .map(body -> {
                 System.out.println("\nPATCH result:");

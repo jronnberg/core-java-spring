@@ -24,7 +24,7 @@ public interface StoreEntry {
     Boolean foreign();
 
     SrSystem providerSystem();
-    // ProviderCloud providerCloud(); // TODO: Put back. This was removed due to a bug in AR Kalix, which will soon be fixed.
+    Optional<ProviderCloud> providerCloud(); // TODO: Should this be Optional?
     ServiceInterface serviceInterface();
 
     Integer priority();

@@ -39,8 +39,8 @@ public class FileStore implements BackingStore {
      * @return The file path to use for reading or writing a Plant Description
      *         Entry to disk.
      */
-    private String getFilePath(int entryId) {
-        return descriptionDirectory + entryId + ".json";
+    private Path getFilePath(int entryId) {
+        return Paths.get(descriptionDirectory, entryId + ".json");
     }
 
     /**
@@ -79,7 +79,7 @@ public class FileStore implements BackingStore {
      */
     @Override
     public void write(final PlantDescriptionEntryDto entry) throws BackingStoreException {
-        Path path = Paths.get(getFilePath(entry.id()));
+        Path path = getFilePath(entry.id());
         // Create the file and parent directories, if they do not already exist:
         try {
             Files.createDirectories(path.getParent());
@@ -102,9 +102,9 @@ public class FileStore implements BackingStore {
 
     @Override
     public void remove(int entryId) throws BackingStoreException {
-        final String filename = getFilePath(entryId);
+        final Path filepath = getFilePath(entryId);
         try {
-            Files.delete(Paths.get(filename));
+            Files.delete(filepath);
         } catch (IOException e) {
             throw new BackingStoreException("Failed to delete Plant Description Entry file", e);
         }
