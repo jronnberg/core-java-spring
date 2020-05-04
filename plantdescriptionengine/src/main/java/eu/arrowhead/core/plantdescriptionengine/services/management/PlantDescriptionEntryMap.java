@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
@@ -20,6 +23,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDes
  * database).
  */
 public class PlantDescriptionEntryMap {
+    private static final Logger logger = LoggerFactory.getLogger(PlantDescriptionEntryMap.class);
 
     // List of instances that need to be informed of any changes to Plant
     // Description Entries.
@@ -48,7 +52,9 @@ public class PlantDescriptionEntryMap {
             maxId = Math.max(maxId, entry.id());
         }
         nextId.set(maxId + 1);
-        System.out.println("Using nextId " + nextId.get());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Using nextId = " + nextId.get());
+        }
     }
 
     /**
@@ -61,8 +67,11 @@ public class PlantDescriptionEntryMap {
     /**
      * Stores the given entry in memory and in the backingstore.
      * Any registered {@code PlantDescriptionUpdateListener} are notified.
+     *
      * @param entry Entry to store in the map.
-     * @throws BackingStoreException
+     * @throws BackingStoreException If the entry is not successfully stored in
+     *                               permanent storage. In this case, the entry
+     *                               will not be stored in memory either.
      */
     public void put(final PlantDescriptionEntryDto entry) throws BackingStoreException {
         backingStore.write(entry);

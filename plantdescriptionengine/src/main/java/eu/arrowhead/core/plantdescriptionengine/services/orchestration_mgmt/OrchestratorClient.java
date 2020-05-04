@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.arrowhead.core.plantdescriptionengine.services.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Connection;
@@ -26,6 +29,7 @@ import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Futures;
 
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
+    private static final Logger logger = LoggerFactory.getLogger(OrchestratorClient.class);
 
     private final HttpClient client;
     private final InetSocketAddress orchestratorAddress;
@@ -120,7 +124,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
                 return Futures.serialize(deletions)
                     .flatMap(result -> {
-                        System.out.println("All orchestrator rules deleted.");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("All orchestrator rules deleted.");
+                        }
                         return Future.done();
                     });
             });
@@ -130,16 +136,25 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     public void onUpdate(List<PlantDescriptionEntryDto> entries) {
         removeAllRules()
         .ifSuccess(removeResult -> {
-            // TODO: Only post rules for the active entry
             var posts = entries.stream()
+                .filter(entry -> entry.active())
                 .map(entry -> postRules(entry))
                 .collect(Collectors.toList());
 
+            if (!logger.isDebugEnabled()) {
+                return;
+            }
+
+            if (posts.size() == 0) {
+                logger.debug("No new rules posted to the orchestrator.");
+                return;
+            }
+
             Futures.serialize(posts)
                 .ifSuccess(result -> {
-                    System.out.println("Result of HTTP POST to the Orchestrator:");
+                    logger.debug("Result of HTTP POST to the Orchestrator:");
                     for (var storeEntryList : result) {
-                        System.out.println("  " + storeEntryList.asString());
+                        logger.debug("  " + storeEntryList.asString());
                     }
                 })
                 .onFailure(Throwable::printStackTrace);

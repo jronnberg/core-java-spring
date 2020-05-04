@@ -8,6 +8,9 @@ import java.util.Properties;
 
 import javax.net.ssl.SSLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.arrowhead.core.plantdescriptionengine.services.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryMap;
@@ -24,6 +27,8 @@ import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
 public class PdeMain {
+
+    private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
     /**
      *
@@ -129,7 +134,7 @@ public class PdeMain {
             final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
             final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
 
-            System.out.println("Providing services...");
+            logger.info("Providing services...");
             arSystem.provide(pdeManager.getService())
                 .onFailure(Throwable::printStackTrace);
         })
