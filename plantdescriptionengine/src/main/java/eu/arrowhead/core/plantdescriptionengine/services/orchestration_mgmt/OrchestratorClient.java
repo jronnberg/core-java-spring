@@ -54,8 +54,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = SystemTracker.get(connection.consumer().systemName());
-        SrSystem providerSystem = SystemTracker.get(connection.producer().systemName());
+        SrSystem consumerSystem = SystemTracker.INSTANCE.getSystem(connection.consumer().systemName());
+        SrSystem providerSystem = SystemTracker.INSTANCE.getSystem(connection.producer().systemName());
 
         return new StoreRuleBuilder()
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))

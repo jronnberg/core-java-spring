@@ -20,7 +20,7 @@ public interface ServiceRegistryEntry {
 	ServiceDefinition serviceDefinition();
     SrSystem provider();
     String serviceUri();
-    String endOfValidity();
+    Optional<String> endOfValidity(); // TODO: Should this be Optional?
     String secure();
     Optional<Map<String, String>> metadata();
     Integer version();
