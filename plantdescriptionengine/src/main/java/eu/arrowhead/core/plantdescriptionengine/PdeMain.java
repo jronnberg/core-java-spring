@@ -24,6 +24,31 @@ import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
 public class PdeMain {
+
+    /**
+     *
+     * @param identity Holds the Arrowhead certificate chain and private key
+     *                 required to manage an owned system or operator identity.
+     * @param trustStore Holds certificates associated with trusted Arrowhead
+     *                   systems, operators, clouds, companies and other
+     *                   authorities.
+     * @return Client useful for sending HTTP messages via TCP connections to
+     *         remote hosts.
+     */
+    private static HttpClient createHttpClient(OwnedIdentity identity, TrustStore trustStore) {
+        HttpClient client = null;
+        try {
+            client = new HttpClient.Builder()
+                .identity(identity)
+                .trustStore(trustStore)
+                .build();
+        } catch (SSLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return client;
+    }
+
     /**
      * Main method of the Plant Description Engine.
      * Provides Plant Description management and monitoring services to the
@@ -84,39 +109,26 @@ public class PdeMain {
 
         final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
-        BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
-        PlantDescriptionEntryMap entryMap = null;
-
-        try {
-            entryMap = new PlantDescriptionEntryMap(entryStore);
-        } catch (BackingStoreException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        HttpClient httpClient = null;
-
-        try {
-            httpClient = new HttpClient.Builder()
-                .identity(identity)
-                .trustStore(trustStore)
-                .build();
-        } catch (SSLException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        final String cloudName = demoProps.getProperty("cloud.name");
-        final String cloudOperator = demoProps.getProperty("cloud.operator");
-        final CloudDto cloud = new CloudBuilder().name(cloudName).operator(cloudOperator).build();
-
-        final String orchestratorAddress = demoProps.getProperty("orchestrator.address");
-        final int orchestratorPort = Integer.parseInt(demoProps.getProperty("orchestrator.port"));
-        final var orchestratorClient = new OrchestratorClient(httpClient, orchestratorAddress, orchestratorPort, cloud);
-
-        final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
+        final HttpClient httpClient = createHttpClient(identity, trustStore);
+        final CloudDto cloud = new CloudBuilder()
+            .name(demoProps.getProperty("cloud.name"))
+            .operator(demoProps.getProperty("cloud.operator"))
+            .build();
 
         SystemTracker.initialize(httpClient, serviceRegistryAddress).ifSuccess(result -> {
+
+            BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
+            PlantDescriptionEntryMap entryMap = null;
+            try {
+                entryMap = new PlantDescriptionEntryMap(entryStore);
+            } catch (BackingStoreException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
+            final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
+
             System.out.println("Providing services...");
             arSystem.provide(pdeManager.getService())
                 .onFailure(Throwable::printStackTrace);
