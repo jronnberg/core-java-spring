@@ -14,59 +14,81 @@ import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 
 /**
- * TODO: Currently only has static methods, this will be changed in the future.
+ * Singleton object used to keep track of registered Arrowhead systems.
+ *
+ * The Singleton pattern is implemented using an Enum, as described in Joshua
+ * Bloch's Effective Java.
  */
-public class SystemTracker {
+public enum SystemTracker {
 
-    private static HttpClient httpClient = null;
-    private static InetSocketAddress serviceRegistryAddress = null;
-    private static boolean initialized = false;
+    INSTANCE; // Singleton instance
 
-    private static Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    private HttpClient httpClient = null;
+    private InetSocketAddress serviceRegistryAddress = null;
+    private static boolean initialized;
 
-    private SystemTracker() {}
+    private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
 
-    private static Future<Void> retrieveSystems() {
+    /**
+     * @return A Future which will complete with a list of registered systems.
+     *
+     * The retrieved systems are stored locally, and can be accessed using
+     * {@link #getComponentAt(String) getSystem}.
+     */
+    public Future<Void> refreshSystems() {
+        if (!initialized) {
+            throw new IllegalStateException("SystemTracker has not been initialized.");
+        }
         return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/serviceregistry/mgmt/systems")
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
-            .map(systemList -> {
+            .flatMap(systemList -> {
                 for (var system : systemList.data()) {
                     systems.put(system.systemName(), system);
                 }
-                return systemList;
-            })
-            .flatMap(result -> {
-                initialized = true;
                 return Future.done();
             });
     }
 
-    public static Future<Void> initialize(InetSocketAddress aServiceRegistryAddress, HttpClient aHttpClient) {
+    /**
+     * Sets up the global singleton instance, retrieving systems from registry.
+     *
+     * {@link #refreshSystems()} can be called to keep the cached list of
+     * services up-to-date with the state of the Service Registry.
+     *
+     * @param httpClient Object for communicating with the Service Registry.
+     * @param serviceRegistryAddress Address of the Service Registry.
+     */
+    public static Future<Void> initialize(HttpClient httpClient, InetSocketAddress serviceRegistryAddress) {
         if (initialized) {
             throw new IllegalStateException("SystemTracker has already been initialized.");
         }
 
-        Objects.requireNonNull(aServiceRegistryAddress, "Expected service registry address");
-        Objects.requireNonNull(aHttpClient, "Expected HTTP client");
+        Objects.requireNonNull(serviceRegistryAddress, "Expected service registry address");
+        Objects.requireNonNull(httpClient, "Expected HTTP client");
 
-        serviceRegistryAddress = aServiceRegistryAddress;
-        httpClient = aHttpClient;
+        INSTANCE.serviceRegistryAddress = serviceRegistryAddress;
+        INSTANCE.httpClient = httpClient;
 
-        System.out.println("Attempting to retrieve systems");
+        initialized = true;
 
-        return retrieveSystems()
-            .flatMap(result -> {
-                initialized = true;
-                return Future.done();
-            });
+        return INSTANCE.refreshSystems();
     }
 
-    public static SrSystem get(String systemName) {
+    /**
+     * Retrieves the specified system.
+     * Note that the returned data will be stale if the system in question has
+     * changed state since the last call to {@link #refreshSystems()}.
+     *
+     *
+     * @param systemName Name of a system to be retrieved.
+     * @return The desired system, if it is present in the local cache.
+     */
+    public SrSystem getSystem(String systemName) {
         if (!initialized) {
-            throw new IllegalStateException("SystemtTracker has not been initialized.");
+            throw new IllegalStateException("SystemTracker has not been initialized.");
         }
         return systems.get(systemName);
     }

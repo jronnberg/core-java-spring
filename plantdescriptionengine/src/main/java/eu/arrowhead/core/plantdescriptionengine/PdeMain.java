@@ -116,7 +116,7 @@ public class PdeMain {
 
         final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
 
-        SystemTracker.initialize(serviceRegistryAddress, httpClient).ifSuccess(result -> {
+        SystemTracker.initialize(httpClient, serviceRegistryAddress).ifSuccess(result -> {
             System.out.println("Providing services...");
             arSystem.provide(pdeManager.getService())
                 .onFailure(Throwable::printStackTrace);
