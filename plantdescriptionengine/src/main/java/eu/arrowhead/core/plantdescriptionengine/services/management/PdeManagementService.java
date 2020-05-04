@@ -3,6 +3,10 @@ package eu.arrowhead.core.plantdescriptionengine.services.management;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
@@ -18,6 +22,7 @@ import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
+    private static final Logger logger = LoggerFactory.getLogger(PdeManagementService.class);
 
     private final PlantDescriptionEntryMap entryMap;
 
@@ -41,6 +46,7 @@ public class PdeManagementService {
 
     /**
      * Handles an HTTP request to add a new Plant Description to the PDE.
+     *
      * @param request HTTP request containing a PlantDescription.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
@@ -56,7 +62,7 @@ public class PdeManagementService {
                 try {
                     entryMap.put(entry);
                 } catch (final BackingStoreException e) {
-                    e.printStackTrace();
+                    logger.error("Failure when communicating with backing store.", e);
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 return response
@@ -177,7 +183,7 @@ public class PdeManagementService {
         try {
             entryMap.remove(id);
         } catch (BackingStoreException e) {
-            System.err.println(e);
+            logger.error("Failed to remove Plant Description Entry from backing store", e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.body("Encountered an error while deleting entry file.");
             return Future.done();
@@ -251,7 +257,7 @@ public class PdeManagementService {
         if (parser.hasError()) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(parser.getErrorMessage());
-            System.err.println("Encountered the following error(s) while parsing an HTTP request: " +
+            logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                 parser.getErrorMessage());
             return Future.done();
         }
