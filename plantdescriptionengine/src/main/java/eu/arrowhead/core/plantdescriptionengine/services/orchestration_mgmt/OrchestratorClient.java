@@ -30,15 +30,19 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final HttpClient client;
     private final InetSocketAddress orchestratorAddress;
     private final CloudDto cloud;
+    private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
 
-    public OrchestratorClient(HttpClient client, String orchestratorAddress, int orchestratorPort, CloudDto cloud) {
+    public OrchestratorClient(HttpClient client, CloudDto cloud) {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
-        Objects.requireNonNull(orchestratorAddress, "Expected orchestrator address");
 
         this.client = client;
         this.cloud = cloud;
-        this.orchestratorAddress = new InetSocketAddress(orchestratorAddress, orchestratorPort);
+
+        SrSystem orchestrator = SystemTracker.INSTANCE.getSystem(ORCHESTRATOR_SYSTEM_NAME);
+        Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
+
+        this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
     }
 
     private Future<StoreEntryListDto> getStoreEntries() {
