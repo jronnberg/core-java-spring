@@ -288,6 +288,7 @@ public class PdeManagementService {
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
             .data(entries)
+            .count(entries.size())
             .build());
         return Future.done();
     }

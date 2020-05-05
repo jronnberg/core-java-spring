@@ -16,9 +16,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PlantDescriptionEntryList {
 
     List<PlantDescriptionEntry> data();
-    default int count() {
-        return data().size();
-    }
+    int count();
 
     default String asString() {
         String result = "PlantDescriptionEntryList[count=" + count() + ",data=[";

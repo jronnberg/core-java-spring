@@ -100,8 +100,10 @@ public class PlantDescriptionEntryMap {
     }
 
     public PlantDescriptionEntryListDto getListDto() {
+        var data = new ArrayList<>(entries.values());
         return new PlantDescriptionEntryListBuilder()
-            .data(new ArrayList<>(entries.values()))
+            .data(data)
+            .count(data.size())
             .build();
     }
 
