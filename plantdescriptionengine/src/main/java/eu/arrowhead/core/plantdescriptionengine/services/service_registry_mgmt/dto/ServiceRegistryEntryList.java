@@ -16,9 +16,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface ServiceRegistryEntryList {
 
     List<ServiceRegistryEntry> data();
-    default int count() {
-        return data().size();
-    }
+    int count();
 
     default String asString() {
         String result = "ServiceRegistryEntryList[count=" + count() + ",data=[";
