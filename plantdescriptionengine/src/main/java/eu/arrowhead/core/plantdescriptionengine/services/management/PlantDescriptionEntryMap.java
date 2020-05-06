@@ -75,11 +75,17 @@ public class PlantDescriptionEntryMap {
      */
     public void put(final PlantDescriptionEntryDto entry) throws BackingStoreException {
         backingStore.write(entry);
+        boolean isNew = !entries.containsKey(entry.id());
+
         entries.put(entry.id(), entry);
 
         // Notify listeners:
         for (var listener : listeners) {
-            listener.onUpdate(getEntries());
+            if (isNew) {
+                listener.onPlantDescriptionAdded(entry);
+            } else {
+                listener.onPlantDescriptionUpdated(entry);
+            }
         }
     }
 
@@ -89,9 +95,11 @@ public class PlantDescriptionEntryMap {
 
     public void remove(int id) throws BackingStoreException {
         backingStore.remove(id);
-        entries.remove(id);
+        var entry = entries.remove(id);
+
+        // Notify listeners:
         for (var listener : listeners) {
-            listener.onUpdate(getEntries());
+            listener.onPlantDescriptionRemoved(entry);
         }
     }
 
