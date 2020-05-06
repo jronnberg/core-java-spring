@@ -9,13 +9,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.services.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.ProviderSystemBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryList;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
@@ -36,6 +37,16 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final CloudDto cloud;
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
 
+    private PlantDescriptionEntry activeEntry = null;
+
+    final RuleMap rules = new RuleMap();
+
+    /**
+     * Class constructor.
+     *
+     * @param client Object for sending HTTP messages to the orchestrator.
+     * @param cloud  DTO describing a Arrowhead Cloud.
+     */
     public OrchestratorClient(HttpClient client, CloudDto cloud) {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
@@ -49,15 +60,25 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
     }
 
+    /**
+     * @return A Future that will contain a list of store entries.
+     */
     private Future<StoreEntryListDto> getStoreEntries() {
-        return client.send(orchestratorAddress, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri("/orchestrator/mgmt/store")
-            .header("accept", "application/json")
-        )
-        .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+        return client
+                .send(orchestratorAddress,
+                        new HttpClientRequest().method(HttpMethod.GET).uri("/orchestrator/mgmt/store").header("accept",
+                                "application/json"))
+                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
+    /**
+     * Create an Orchestrator rule to be passed to the orchestrator.
+     *
+     * @param entry           Plant Description Entry to which the rule will belong.
+     * @param connectionIndex The index of the related connection within the entry's
+     *                        connection list.
+     * @return An Orchestrator rule that embodies the specified connection.
+     */
     private StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
 
         final Connection connection = entry.connections().get(connectionIndex);
@@ -79,89 +100,186 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .build();
     }
 
+    /**
+     * Posts Orchestrator rules for the given Plant Description Entry.
+     *
+     * For each connection in the given entry, a corresponding rule is posted to the
+     * orchestrator.
+     *
+     * @param entry A Plant Description Entry.
+     * @return A Future which will contain a list of the created rules.
+     */
     private Future<StoreEntryListDto> postRules(PlantDescriptionEntry entry) {
-
         int numConnections = entry.connections().size();
+
+        if (numConnections == 0) {
+            // Return immediately with an empty rule list:
+            return Future.success(emptyRuleList());
+        }
+
         List<DtoWritable> rules = new ArrayList<>();
 
         for (int i = 0; i < numConnections; i++) {
             rules.add(createRule(entry, i));
         }
 
-        return client.send(orchestratorAddress, new HttpClientRequest()
-            .method(HttpMethod.POST)
-            .uri("/orchestrator/mgmt/store")
-            .body(DtoEncoding.JSON, rules)
-            .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class))
-            .map(storeEntryList -> {
-                // rules.put(entry.id(), connectionIndex, storeEntry.id());
-                return storeEntryList;
-            });
+        return client
+            .send(orchestratorAddress, new HttpClientRequest()
+                .method(HttpMethod.POST)
+                .uri("/orchestrator/mgmt/store")
+                .body(DtoEncoding.JSON, rules)
+                .header("accept", "application/json"))
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
+    /**
+     * @return An empty {@code StoreEntryListDto}.
+     */
+    private StoreEntryListDto emptyRuleList() {
+        return new StoreEntryListBuilder().count(0).data(new ArrayList<>()).build();
+    }
+
+    /**
+     * Deletes a single orchestrator rule (StoreEntry).
+     *
+     * @param id The ID of an orchestrator rule to delete.
+     * @return A Future that performs the deletion.
+     */
     private Future<Void> deleteRule(int id) {
         return client.send(orchestratorAddress, new HttpClientRequest()
             .method(HttpMethod.DELETE)
             .uri("/orchestrator/mgmt/store/" + id))
-            .flatMap(response -> {
-                return Future.done();
-            });
-    }
-
-    // TODO: Remove this function.
-    private Future<Void> removeAllRules() {
-        return getStoreEntries()
-            .flatMap(entryList -> {
-                if (entryList.count() == 0) {
-                    return Future.done();
-                }
-
-                var deletions = entryList.data()
-                    .stream()
-                    .map(entry -> deleteRule(entry.id()))
-                    .collect(Collectors.toList());
-
-                return Futures.serialize(deletions)
-                    .flatMap(result -> {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("All orchestrator rules deleted.");
-                        }
-                        return Future.done();
-                    });
-            });
-    }
-
-    @Override
-    public void onUpdate(List<PlantDescriptionEntryDto> entries) {
-        removeAllRules()
-        .ifSuccess(removeResult -> {
-            var posts = entries.stream()
-                .filter(entry -> entry.active())
-                .map(entry -> postRules(entry))
-                .collect(Collectors.toList());
-
-            if (!logger.isDebugEnabled()) {
-                return;
-            }
-
-            if (posts.size() == 0) {
-                logger.debug("No new rules posted to the orchestrator.");
-                return;
-            }
-
-            Futures.serialize(posts)
-                .ifSuccess(result -> {
-                    logger.debug("Result of HTTP POST to the Orchestrator:");
-                    for (var storeEntryList : result) {
-                        logger.debug("  " + storeEntryList.asString());
-                    }
-                })
-                .onFailure(Throwable::printStackTrace);
-        })
-        .onFailure(throwable -> {
-            throwable.printStackTrace();
+        .flatMap(response -> {
+            return Future.done();
         });
+    }
+
+    /**
+     * Deletes all orchestrator rules for a given entry, if any. If the entry is
+     * null, a completed Future is immediately returned.
+     *
+     * @param entry The entry whose rules are to be deleted.
+     * @return A Future that performs the deletions.
+     */
+    private Future<Void> deleteRules(PlantDescriptionEntry entry) {
+        if (entry == null) {
+            return Future.done();
+        }
+
+        List<Integer> rulesToRemove = rules.get(entry.id());
+        var deletions = rulesToRemove.stream().map(ruleId -> deleteRule(ruleId)).collect(Collectors.toList());
+
+        return Futures.serialize(deletions).flatMap(result -> {
+            if (logger.isInfoEnabled()) {
+                logger.info("Orchestrator rules belonging to Plant Description Entry '" + entry.plantDescription()
+                        + "' deleted.");
+            }
+            return Future.done();
+        });
+    }
+
+    /**
+     * Logs the fact that the specified entry has been activated.
+     *
+     * @param entry A Plant Description Entry.
+     * @param ruleList The list of Orchestrator rules connected to the entry.
+     */
+    private void logEntryActivated(PlantDescriptionEntry entry, StoreEntryList ruleList) {
+        Objects.requireNonNull(entry, "Expected Plant Description Entry");
+
+        String entryName = entry.plantDescription();
+
+        if (ruleList.count() > 0) {
+            if (logger.isInfoEnabled()) {
+                String msg = "Orchestrator rules created for Plant Description '" + entryName + "': [";
+                List<String> ids = new ArrayList<>();
+                for (var rule : ruleList.data()) {
+                    ids.add(rule.id().toString());
+                }
+                msg += String.join(", ", ids) + "]";
+                logger.info(msg);
+            }
+        } else {
+            if (logger.isWarnEnabled()) {
+                logger.warn("The active Plant Description (" + entryName + ") does not have any connections.");
+            }
+        }
+    }
+
+    /**
+     * Logs the fact that a Plant Description Entry has been deactivated.
+     *
+     * @param entry A Plant Description Entry that has been deactivated.
+     */
+    private void logEntryDeactivated(PlantDescriptionEntry entry) {
+        if (logger.isInfoEnabled()) {
+            logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
+        }
+    }
+
+    /**
+     * Handles an update to a Plant Description Entry.
+     *
+     * @param entry The updated entry.
+     */
+    @Override
+    public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
+
+        boolean entryWasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
+        boolean shouldCreateRules = entry.active() && entry.connections().size() > 0;
+        boolean shouldDeleteCurrentRules = entry.active() || entryWasDeactivated;
+
+        final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteRules(activeEntry) : Future.done();
+        final Future<StoreEntryListDto> createRulesTask = shouldCreateRules
+            ? postRules(entry)
+            : Future.success(emptyRuleList());
+
+        deleteRulesTask.
+            flatMap(result -> createRulesTask)
+            .ifSuccess(ruleList -> {
+                if (entry.active()) {
+                    activeEntry = entry;
+                    rules.put(entry.id(), ruleList);
+                    logEntryActivated(entry, ruleList);
+                } else if (entryWasDeactivated) {
+                    activeEntry = null;
+                    logEntryDeactivated(entry);
+                }
+            })
+            .onFailure(throwable -> {
+                logger.error("Encountered an error while handling the new Plant Description '"
+                    + entry.plantDescription() + "'", throwable);
+            });
+    }
+
+    /**
+     * Handles the addition of a new Plant Description Entry.
+     *
+     * @param entry The added entry.
+     */
+    @Override
+    public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {
+        onPlantDescriptionUpdated(entry);
+    }
+
+    /**
+     * Handles the removal of a Plant Description Entry.
+     *
+     * @param entry The entry that has been removed.
+     */
+    @Override
+    public void onPlantDescriptionRemoved(PlantDescriptionEntry entry) {
+        deleteRules(entry)
+            .ifSuccess(result -> {
+                if (logger.isInfoEnabled()) {
+                    logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
+                        + entry.plantDescription() + "'");
+                }
+            })
+            .onFailure(throwable -> {
+                logger.error("Encountered an error while attempting to delete Plant Description '"
+                    + entry.plantDescription() + "'", throwable);
+            });
     }
 
 }
