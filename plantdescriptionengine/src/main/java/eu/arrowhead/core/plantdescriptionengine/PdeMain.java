@@ -20,7 +20,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.Orch
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import se.arkalix.ArSystem;
-import se.arkalix.core.plugin.HttpJsonCoreIntegrator;
+import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
@@ -31,8 +31,9 @@ public class PdeMain {
 
     /**
      *
-     * @param identity Holds the Arrowhead certificate chain and private key
-     *                 required to manage an owned system or operator identity.
+     * @param identity   Holds the Arrowhead certificate chain and private key
+     *                   required to manage an owned system or operator
+     *                   identity.
      * @param trustStore Holds certificates associated with trusted Arrowhead
      *                   systems, operators, clouds, companies and other
      *                   authorities.
@@ -54,9 +55,67 @@ public class PdeMain {
     }
 
     /**
+     * Loads an identity object.
+     * The provided arguments {@code keyPassword} and {@code keyStorePassword}
+     * are cleared for security reasons.
+     * If this function fails, the entire application is terminated.
+     *
+     * @param keyStorePath Sets path to file containing JVM-compatible key
+     *                     store.
+     * @param keyPassword Password of private key associated with
+     *                    designated certificate in key store.
+     * @param keyStorePassword Password of provided key store.
+     * @return An object holding the Arrowhead certificate chain and private key
+     *         required to manage an owned system or operator identity.
+     */
+    private static OwnedIdentity loadIdentity(String keyStorePath, char[] keyPassword, char[] keyStorePassword) {
+        OwnedIdentity identity = null;
+        try {
+            identity = new OwnedIdentity.Loader()
+                .keyStorePath(keyStorePath)
+                .keyPassword(keyPassword)
+                .keyStorePassword(keyStorePassword)
+                .load();
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error("Failed to load OwnedIdentity", e);
+            System.exit(1);
+        }
+
+        Arrays.fill(keyPassword, '\0');
+        Arrays.fill(keyStorePassword, '\0');
+
+        return identity;
+    }
+
+    /**
+     * Loads a trust store.
+     * The provided argument {@code password} is cleared for security reasons.
+     * If this function fails, the entire application is terminated.
+     *
+     * @param path Filesystem path to key store to load.
+     * @param password Key store password.
+     * @return Object holding certificates associated with trusted Arrowhead
+     *         systems, operators, clouds, companies and other authorities.
+     */
+    private static TrustStore loadTrustStore(String path, char[] password) {
+        TrustStore trustStore = null;
+        try {
+            trustStore = TrustStore.read(path, password);
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error("Failed to load OwnedIdentity", e);
+            System.exit(1);
+        }
+
+        Arrays.fill(password, '\0');
+
+        return trustStore;
+    }
+
+    /**
      * Main method of the Plant Description Engine.
      * Provides Plant Description management and monitoring services to the
      * Arrowhead system.
+     *
      * @param args
      */
     public static void main(final String[] args) {
@@ -72,31 +131,17 @@ public class PdeMain {
             System.exit(74);
         }
 
-        final String trustStorePath = appProps.getProperty("server.ssl.trust-store");
-        final char[] trustStorePassword = appProps.getProperty("server.ssl.trust-store-password").toCharArray();
+        final TrustStore providerTrustStore = loadTrustStore(
+            appProps.getProperty("server.ssl.provider-trust-store"),
+            appProps.getProperty("server.ssl.provider-trust-store-password").toCharArray()
+        );
 
-        final String keyStorePath = appProps.getProperty("server.ssl.key-store");
-        final char[] keyPassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
-        final char[] keyStorePassword = appProps.getProperty("server.ssl.key-store-password").toCharArray();
+        final OwnedIdentity providerIdentity = loadIdentity(
+            appProps.getProperty("server.ssl.provider-key-store"),
+            appProps.getProperty("server.ssl.provider-key-store-password").toCharArray(),
+            appProps.getProperty("server.ssl.provider-key-store-password").toCharArray()
+        );
 
-        TrustStore trustStore = null;
-        OwnedIdentity identity = null;
-
-        try {
-            trustStore = TrustStore.read(trustStorePath, trustStorePassword);
-            identity = new OwnedIdentity.Loader()
-                .keyPassword(keyPassword)
-                .keyStorePath(keyStorePath)
-                .keyStorePassword(keyStorePassword)
-                .load();
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        Arrays.fill(keyPassword, '\0');
-        Arrays.fill(keyStorePassword, '\0');
-        Arrays.fill(trustStorePassword, '\0');
 
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
         final String serviceRegistryIp = appProps.getProperty("service_registry.address");
@@ -104,16 +149,28 @@ public class PdeMain {
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
 
         final var arSystem = new ArSystem.Builder()
-            .identity(identity)
-            .trustStore(trustStore)
-            .plugins(HttpJsonCoreIntegrator
+            .identity(providerIdentity)
+            .trustStore(providerTrustStore)
+            .plugins(HttpJsonCloudPlugin
                 .viaServiceRegistryAt(serviceRegistryAddress))
             .localPort(pdePort)
             .build();
 
-        final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
-        final HttpClient httpClient = createHttpClient(identity, trustStore);
+        // Load sysop trust store
+        TrustStore consumerTrustStore = loadTrustStore(
+            appProps.getProperty("server.ssl.consumer-trust-store"),
+            appProps.getProperty("server.ssl.consumer-trust-store-password").toCharArray()
+        );
+
+        // Load sysop identity
+        OwnedIdentity consumerIdentity = loadIdentity(
+            appProps.getProperty("server.ssl.consumer-key-store"),
+            appProps.getProperty("server.ssl.consumer-key-password").toCharArray(),
+            appProps.getProperty("server.ssl.consumer-key-store-password").toCharArray()
+        );
+
+        final HttpClient httpClient = createHttpClient(consumerIdentity, consumerTrustStore);
         final CloudDto cloud = new CloudBuilder()
             .name(demoProps.getProperty("cloud.name"))
             .operator(demoProps.getProperty("cloud.operator"))
@@ -121,8 +178,10 @@ public class PdeMain {
 
         SystemTracker.initialize(httpClient, serviceRegistryAddress).ifSuccess(result -> {
 
+            final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
             BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
             PlantDescriptionEntryMap entryMap = null;
+
             try {
                 entryMap = new PlantDescriptionEntryMap(entryStore);
             } catch (BackingStoreException e) {
@@ -131,7 +190,13 @@ public class PdeMain {
             }
 
             final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
-            final var pdeManager = new PdeManagementService(entryMap, orchestratorClient);
+
+            // Register the orchestrator client to Plant Description update
+            // events. This will cause it to interact with the Orchestrator
+            // whenever a Plant description entry is added, updated or removed.
+            entryMap.addListener(orchestratorClient);
+
+            final var pdeManager = new PdeManagementService(entryMap);
 
             logger.info("Providing services...");
             arSystem.provide(pdeManager.getService())

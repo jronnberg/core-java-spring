@@ -12,7 +12,6 @@ import java.util.Arrays;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
@@ -31,17 +30,10 @@ public class PdeManagementService {
      *
      * @param entryMap An object that maps ID:s to Plant Description
      *                            Entries.
-     * @param orchestratorClient
      */
-    public PdeManagementService(PlantDescriptionEntryMap entryMap, OrchestratorClient orchestratorClient) {
+    public PdeManagementService(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected plant description map");
-        Objects.requireNonNull(orchestratorClient, "Expected orchestrator client");
         this.entryMap = entryMap;
-
-        // Register the orchestrator client to Plant Description update events.
-        // This will cause it to interact with the Orchestrator whenever a
-        // Plant description entry is added, updated or removed.
-        entryMap.addListener(orchestratorClient);
     }
 
     /**
