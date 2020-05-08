@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.FileStore;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
@@ -30,28 +29,73 @@ public class PdeMain {
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
     /**
-     *
-     * @param identity   Holds the Arrowhead certificate chain and private key
-     *                   required to manage an owned system or operator
-     *                   identity.
-     * @param trustStore Holds certificates associated with trusted Arrowhead
-     *                   systems, operators, clouds, companies and other
-     *                   authorities.
-     * @return Client useful for sending HTTP messages via TCP connections to
-     *         remote hosts.
+     * @param appProps Configurations used for this instance of the Plant
+     *                 Description Engine.
+     * @return HTTP client useful for sending messages to remote hosts.
      */
-    private static HttpClient createHttpClient(OwnedIdentity identity, TrustStore trustStore) {
+    private static HttpClient createHttpClient(Properties appProps) {
+        final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
         HttpClient client = null;
         try {
-            client = new HttpClient.Builder()
-                .identity(identity)
-                .trustStore(trustStore)
-                .build();
+            if (!secureMode) {
+                client = new HttpClient.Builder().insecure().build();
+            } else {
+                OwnedIdentity identity = loadIdentity(
+                    appProps.getProperty("server.ssl.consumer-key-store"),
+                    appProps.getProperty("server.ssl.consumer-key-password").toCharArray(),
+                    appProps.getProperty("server.ssl.consumer-key-store-password").toCharArray()
+                );
+
+                TrustStore trustStore = loadTrustStore(
+                    appProps.getProperty("server.ssl.consumer-trust-store"),
+                    appProps.getProperty("server.ssl.consumer-trust-store-password").toCharArray()
+                );
+
+                client = new HttpClient.Builder()
+                    .identity(identity)
+                    .trustStore(trustStore)
+                    .build();
+            }
         } catch (SSLException e) {
-            e.printStackTrace();
+            logger.error("Failed to create HTTP Client", e);
             System.exit(1);
         }
         return client;
+    }
+
+    /**
+     * @param appProps Configurations used for this instance of the Plant
+     *                 Description Engine.
+     * @param serviceRegistryAddress Address of the Service Registry.
+     * @return An Arrowhead Framework System.
+     */
+    private static ArSystem createArSystem(Properties appProps, InetSocketAddress serviceRegistryAddress) {
+
+        final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
+        final ArSystem.Builder systemBuilder = new ArSystem.Builder()
+            .localPort(pdePort)
+            .plugins(HttpJsonCloudPlugin
+                .viaServiceRegistryAt(serviceRegistryAddress));
+
+        final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
+
+        if (!secureMode) {
+            systemBuilder.name("pde-insecure").insecure(); // TODO: Use some other name?
+        } else {
+            final String trustStorePath = appProps.getProperty("server.ssl.provider-trust-store");
+            final char[] trustStorePassword = appProps.getProperty("server.ssl.provider-trust-store-password").toCharArray();
+            final String keyStorePath = appProps.getProperty("server.ssl.provider-key-store");
+            final char[] keyPassword = appProps.getProperty("server.ssl.provider-key-password").toCharArray();
+            final char[] keyStorePassword = appProps.getProperty("server.ssl.provider-key-store-password").toCharArray();
+
+            systemBuilder
+                .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
+                .trustStore(loadTrustStore(trustStorePath, trustStorePassword));
+
+        }
+
+        return systemBuilder.build();
+
     }
 
     /**
@@ -115,8 +159,6 @@ public class PdeMain {
      * Main method of the Plant Description Engine.
      * Provides Plant Description management and monitoring services to the
      * Arrowhead system.
-     *
-     * @param args
      */
     public static void main(final String[] args) {
 
@@ -131,79 +173,38 @@ public class PdeMain {
             System.exit(74);
         }
 
-        final TrustStore providerTrustStore = loadTrustStore(
-            appProps.getProperty("server.ssl.provider-trust-store"),
-            appProps.getProperty("server.ssl.provider-trust-store-password").toCharArray()
-        );
-
-        final OwnedIdentity providerIdentity = loadIdentity(
-            appProps.getProperty("server.ssl.provider-key-store"),
-            appProps.getProperty("server.ssl.provider-key-store-password").toCharArray(),
-            appProps.getProperty("server.ssl.provider-key-store-password").toCharArray()
-        );
-
-
-        final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
         final String serviceRegistryIp = appProps.getProperty("service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
 
-        final var arSystem = new ArSystem.Builder()
-            .identity(providerIdentity)
-            .trustStore(providerTrustStore)
-            .plugins(HttpJsonCloudPlugin
-                .viaServiceRegistryAt(serviceRegistryAddress))
-            .localPort(pdePort)
-            .build();
+        final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
+        final HttpClient httpClient = createHttpClient(appProps);
 
-
-        // Load sysop trust store
-        TrustStore consumerTrustStore = loadTrustStore(
-            appProps.getProperty("server.ssl.consumer-trust-store"),
-            appProps.getProperty("server.ssl.consumer-trust-store-password").toCharArray()
-        );
-
-        // Load sysop identity
-        OwnedIdentity consumerIdentity = loadIdentity(
-            appProps.getProperty("server.ssl.consumer-key-store"),
-            appProps.getProperty("server.ssl.consumer-key-password").toCharArray(),
-            appProps.getProperty("server.ssl.consumer-key-store-password").toCharArray()
-        );
-
-        final HttpClient httpClient = createHttpClient(consumerIdentity, consumerTrustStore);
         final CloudDto cloud = new CloudBuilder()
             .name(demoProps.getProperty("cloud.name"))
             .operator(demoProps.getProperty("cloud.operator"))
             .build();
 
-        SystemTracker.initialize(httpClient, serviceRegistryAddress).ifSuccess(result -> {
+        SystemTracker.initialize(httpClient, serviceRegistryAddress).flatMap(result -> {
 
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
-            BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
-            PlantDescriptionEntryMap entryMap = null;
-
-            try {
-                entryMap = new PlantDescriptionEntryMap(entryStore);
-            } catch (BackingStoreException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-
+            final BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
+            final var entryMap = new PlantDescriptionEntryMap(entryStore);
             final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
 
-            // Register the orchestrator client to Plant Description update
-            // events. This will cause it to interact with the Orchestrator
-            // whenever a Plant description entry is added, updated or removed.
+            // Register the Orchestrator client to Plant Description events.
+            // This will cause it to interact with the Orchestrator whenever a
+            // Plant Description Entry is added, updated or removed.
             entryMap.addListener(orchestratorClient);
 
             final var pdeManager = new PdeManagementService(entryMap);
+            final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
             logger.info("Providing services...");
-            arSystem.provide(pdeManager.getService())
-                .onFailure(Throwable::printStackTrace);
+            return arSystem.provide(pdeManager.getService(secureMode));
         })
         .onFailure(throwable -> {
-            throwable.printStackTrace();
+            logger.error("Failed to launch Plant Description Engine", throwable);
             System.exit(1);
         });
 

@@ -25,13 +25,32 @@ public class PdeMonitorService {
     /**
      * @return A HTTP Service used to monitor alarms raised by the Plant
      *         Description Engine core system.
+     *
+     * @param insecure Indicates whether the returned service should run in
+     *                 secure mode.
      */
-    public HttpService getService() {
-        return new HttpService()
+    public HttpService getService(boolean secure) {
+
+        var service = new HttpService()
             .name("plant-description-monitor-service")
             .encodings(EncodingDescriptor.JSON)
-            .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")
             .get("/monitor/alarm", (request, response) -> onAlarmsGet(request, response));
+
+        if (secure) {
+            service.accessPolicy(AccessPolicy.cloud());
+        } else {
+            service.accessPolicy(AccessPolicy.unrestricted());
+        }
+
+        return service;
+    }
+
+    /**
+     * @return A HTTP Service used to monitor alarms raised by the Plant
+     *         Description Engine core system, running in secure mode.
+     */
+    public HttpService getService() {
+        return getService(true);
     }
 }
