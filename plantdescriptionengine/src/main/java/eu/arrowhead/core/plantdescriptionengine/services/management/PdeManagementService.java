@@ -288,12 +288,14 @@ public class PdeManagementService {
     /**
      * @return A HTTP Service that handles requests for retrieving and updating
      *         Plant Description data.
+     *
+     * @param secure Indicates whether the returned service should run in secure
+     *               mode.
      */
-    public HttpService getService() {
-        return new HttpService()
+    public HttpService getService(boolean secure) {
+        HttpService service = new HttpService()
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
-            .accessPolicy(AccessPolicy.cloud())
             .basePath("/pde")
             .get("/mgmt/pd/#id", (request, response) -> onDescriptionGet(request, response))
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
@@ -301,6 +303,22 @@ public class PdeManagementService {
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))
             .put("/mgmt/pd/#id", (request, response) -> onDescriptionPut(request, response))
             .patch("/mgmt/pd/#id", (request, response) -> onDescriptionPatch(request, response));
+
+        if (secure) {
+            service.accessPolicy(AccessPolicy.cloud());
+        } else {
+            service.accessPolicy(AccessPolicy.unrestricted());
+        }
+
+        return service;
+    }
+
+    /**
+     * @return A HTTP Service that handles requests for retrieving and updating
+     *         Plant Description data, running in secure mode.
+     */
+    public HttpService getService() {
+        return getService(true);
     }
 
 }
