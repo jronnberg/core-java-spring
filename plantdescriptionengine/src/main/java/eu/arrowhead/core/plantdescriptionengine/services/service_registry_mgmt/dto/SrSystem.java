@@ -17,7 +17,7 @@ public interface SrSystem {
     String systemName();
     String address();
     Integer port();
-    String authenticationInfo();
+    Optional<String> authenticationInfo(); // TODO: Should this be Optional?
     Optional<String> createdAt();
     Optional<String> updatedAt();
 
