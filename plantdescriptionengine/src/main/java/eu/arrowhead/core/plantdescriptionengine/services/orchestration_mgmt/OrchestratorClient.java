@@ -80,11 +80,15 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return An Orchestrator rule that embodies the specified connection.
      */
     private StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
+        Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
         final Connection connection = entry.connections().get(connectionIndex);
 
         SrSystem consumerSystem = SystemTracker.INSTANCE.getSystem(connection.consumer().systemName());
         SrSystem providerSystem = SystemTracker.INSTANCE.getSystem(connection.producer().systemName());
+
+        Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemName() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemName() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
         return new StoreRuleBuilder()
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
@@ -207,17 +211,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Logs the fact that a Plant Description Entry has been deactivated.
-     *
-     * @param entry A Plant Description Entry that has been deactivated.
-     */
-    private void logEntryDeactivated(PlantDescriptionEntry entry) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
-        }
-    }
-
-    /**
      * Handles an update to a Plant Description Entry.
      *
      * @param entry The updated entry.
@@ -243,7 +236,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     logEntryActivated(entry, ruleList);
                 } else if (entryWasDeactivated) {
                     activeEntry = null;
-                    logEntryDeactivated(entry);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
+                    }
                 }
             })
             .onFailure(throwable -> {

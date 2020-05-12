@@ -73,14 +73,12 @@ public class PdeMain {
 
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .localPort(pdePort)
-            .plugins(HttpJsonCloudPlugin
-                .viaServiceRegistryAt(serviceRegistryAddress));
+            .localPort(pdePort);
 
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
         if (!secureMode) {
-            systemBuilder.name("pde-insecure").insecure(); // TODO: Use some other name?
+            systemBuilder.name("pde").insecure(); // TODO: Use some other name?
         } else {
             final String trustStorePath = appProps.getProperty("server.ssl.provider-trust-store");
             final char[] trustStorePassword = appProps.getProperty("server.ssl.provider-trust-store-password").toCharArray();
@@ -90,7 +88,9 @@ public class PdeMain {
 
             systemBuilder
                 .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
-                .trustStore(loadTrustStore(trustStorePath, trustStorePassword));
+                .trustStore(loadTrustStore(trustStorePath, trustStorePassword))
+                .plugins(HttpJsonCloudPlugin // TODO: This should be done in insecure mode as well.
+                    .viaServiceRegistryAt(serviceRegistryAddress));
 
         }
 
@@ -180,16 +180,15 @@ public class PdeMain {
         final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
         final HttpClient httpClient = createHttpClient(appProps);
 
-        final CloudDto cloud = new CloudBuilder()
-            .name(demoProps.getProperty("cloud.name"))
-            .operator(demoProps.getProperty("cloud.operator"))
-            .build();
-
         SystemTracker.initialize(httpClient, serviceRegistryAddress).flatMap(result -> {
 
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
             final BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
             final var entryMap = new PlantDescriptionEntryMap(entryStore);
+            final CloudDto cloud = new CloudBuilder()
+                .name(demoProps.getProperty("cloud.name"))
+                .operator(demoProps.getProperty("cloud.operator"))
+                .build();
             final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
 
             // Register the Orchestrator client to Plant Description events.

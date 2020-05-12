@@ -59,7 +59,7 @@ public class PdeManagementService {
                 }
                 return response
                     .status(HttpStatus.CREATED)
-                    .body(entryMap.getListDto());
+                    .body(entryMap.getListDto()); // TODO: Respond with the created entry instead?
             });
     }
 
