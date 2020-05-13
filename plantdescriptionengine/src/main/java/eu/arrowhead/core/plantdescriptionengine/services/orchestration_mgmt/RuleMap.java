@@ -19,7 +19,7 @@ public class RuleMap {
      * @return A list of ID:s for orchestrator rules corresponding to the
      *         entry's list of connections.
      */
-    List<Integer> get(int entryId) {
+    public List<Integer> get(int entryId) {
         return new ArrayList<Integer>(ruleLists.get(entryId));
     }
 
@@ -33,9 +33,6 @@ public class RuleMap {
      */
     public void put(int plantDescriptionEntryId, StoreEntryList rules) {
         List<Integer> entryRules = new ArrayList<>();
-        for (var storeEntry : rules.data()) {
-            entryRules.add(storeEntry.id());
-        }
         for (var storeEntry : rules.data()) {
             entryRules.add(storeEntry.id());
         }
