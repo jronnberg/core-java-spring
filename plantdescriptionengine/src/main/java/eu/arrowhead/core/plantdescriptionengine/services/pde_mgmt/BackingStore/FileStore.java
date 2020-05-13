@@ -44,8 +44,7 @@ public class FileStore implements BackingStore {
     }
 
     /**
-     * @return All entries in the backing storage.
-     * @throws BackingStoreException
+     * {@inheritDoc}
      */
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws BackingStoreException {
@@ -72,10 +71,8 @@ public class FileStore implements BackingStore {
         return result;
     }
 
-        /**
-     * Writes a single entry to backing storage.
-     *
-     * @param entry An entry to store.
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void write(final PlantDescriptionEntryDto entry) throws BackingStoreException {
@@ -100,6 +97,9 @@ public class FileStore implements BackingStore {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(int entryId) throws BackingStoreException {
         final Path filepath = getFilePath(entryId);

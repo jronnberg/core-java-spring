@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -36,16 +37,15 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final InetSocketAddress orchestratorAddress;
     private final CloudDto cloud;
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
-
     private PlantDescriptionEntry activeEntry = null;
-
-    final RuleMap rules = new RuleMap();
+    private final RuleMap ruleMap;
 
     /**
      * Class constructor.
      *
-     * @param client Object for sending HTTP messages to the orchestrator.
-     * @param cloud  DTO describing a Arrowhead Cloud.
+     * @param client Object for sending HTTP messages to the Orchestrator.
+     * @param cloud DTO describing a Arrowhead Cloud.
+     * @param RulebackingStore Non-volatile storage for Orchestrator Entries.
      */
     public OrchestratorClient(HttpClient client, CloudDto cloud) {
         Objects.requireNonNull(client, "Expected HttpClient");
@@ -53,6 +53,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         this.client = client;
         this.cloud = cloud;
+        ruleMap = new RuleMap();
 
         SrSystem orchestrator = SystemTracker.INSTANCE.getSystem(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -61,7 +62,63 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Create an Orchestrator rule to be passed to the orchestrator.
+     * Retrieve all active rules from the Orchestrator.
+     *
+     * @return A Future which will contain the requested rules.
+     */
+    private Future<StoreEntryListDto> getRules() {
+        return client.send(orchestratorAddress, new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri("/orchestrator/mgmt/store")
+            .header("accept", "application/json"))
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+    }
+
+    /**
+     * Initializes the Orchestrator client.
+     *
+     * @param entryMap
+     * @return
+     */
+    public Future<Void> initialize(PlantDescriptionEntryMap entryMap) {
+
+        entryMap.addListener(this);
+        activeEntry = entryMap.activeEntry();
+
+        // TODO: This is a temporary solution.
+        // Delete all rules in the orchestrator, create new ones for the active
+        // Plant Description Entry.
+        return getRules()
+            .flatMap(rules -> {
+                var deletions = rules.data()
+                    .stream()
+                    .map(rule -> deleteRule(rule.id()))
+                    .collect(Collectors.toList());
+
+                return Futures.serialize(deletions).flatMap(deletionResult -> {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Deleted all rules in Orchestrator.");
+                    }
+
+                    if (activeEntry == null) {
+                        return Future.done();
+                    }
+
+                    return postRules(activeEntry)
+                        .flatMap(postResult -> {
+                            if (logger.isInfoEnabled()) {
+                                logger.info("Created rules for Plant Description Entry '"
+                                    + activeEntry.plantDescription() + "'.");
+                            }
+                            return Future.done();
+                        });
+                });
+            });
+
+    }
+
+    /**
+     * Create an Orchestrator rule to be passed to the Orchestrator.
      *
      * @param entry           Plant Description Entry to which the rule will belong.
      * @param connectionIndex The index of the related connection within the entry's
@@ -96,8 +153,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Posts Orchestrator rules for the given Plant Description Entry.
      *
-     * For each connection in the given entry, a corresponding rule is posted to the
-     * orchestrator.
+     * For each connection in the given entry, a corresponding rule is posted to
+     * the Orchestrator.
      *
      * @param entry A Plant Description Entry.
      * @return A Future which will contain a list of the created rules.
@@ -133,9 +190,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Deletes a single orchestrator rule (StoreEntry).
+     * Deletes a single Orchestrator Store Entry.
      *
-     * @param id The ID of an orchestrator rule to delete.
+     * @param id The ID of an Orchestrator Store Entry to delete.
      * @return A Future that performs the deletion.
      */
     private Future<Void> deleteRule(int id) {
@@ -159,7 +216,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.done();
         }
 
-        List<Integer> rulesToRemove = rules.get(entry.id());
+        List<Integer> rulesToRemove = ruleMap.get(entry.id());
         var deletions = rulesToRemove.stream().map(ruleId -> deleteRule(ruleId)).collect(Collectors.toList());
 
         return Futures.serialize(deletions).flatMap(result -> {
@@ -167,6 +224,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 logger.info("Orchestrator rules belonging to Plant Description Entry '" + entry.plantDescription()
                         + "' deleted.");
             }
+            ruleMap.remove(entry.id());
             return Future.done();
         });
     }
@@ -202,26 +260,28 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Handles an update to a Plant Description Entry.
      *
+     * Deletes and/or creates rules in the Orchestrator as appropriate.
+     *
      * @param entry The updated entry.
      */
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
 
         boolean entryWasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
-        boolean shouldCreateRules = entry.active() && entry.connections().size() > 0;
+        boolean shouldPostRules = entry.active() && entry.connections().size() > 0;
         boolean shouldDeleteCurrentRules = entry.active() || entryWasDeactivated;
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteRules(activeEntry) : Future.done();
-        final Future<StoreEntryListDto> createRulesTask = shouldCreateRules
+        final Future<StoreEntryListDto> postRulesTask = shouldPostRules
             ? postRules(entry)
             : Future.success(emptyRuleList());
 
         deleteRulesTask.
-            flatMap(result -> createRulesTask)
+            flatMap(result -> postRulesTask)
             .ifSuccess(ruleList -> {
                 if (entry.active()) {
                     activeEntry = entry;
-                    rules.put(entry.id(), ruleList);
+                    ruleMap.put(entry.id(), ruleList);
                     logEntryActivated(entry, ruleList);
                 } else if (entryWasDeactivated) {
                     activeEntry = null;
