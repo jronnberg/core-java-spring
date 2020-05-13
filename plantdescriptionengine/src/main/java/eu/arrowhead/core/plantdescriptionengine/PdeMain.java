@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
@@ -166,7 +167,16 @@ public class PdeMain {
         Properties demoProps = new Properties();
 
         try {
-            appProps.load(ClassLoader.getSystemResourceAsStream("application.properties"));
+            if (args.length == 1) {
+                // If a command line argument is given, interpret it as the file
+                // path to an application properties file:
+                appProps.load(new FileInputStream(args[0]));
+            } else {
+                // Otherwise, load it from app resources:
+                appProps.load(ClassLoader.getSystemResourceAsStream("application.properties"));
+            }
+
+            // Read demo properties (TODO: Remove them)
             demoProps.load(ClassLoader.getSystemResourceAsStream("demo.properties"));
         } catch (IOException ex) {
             System.out.println("Failed to read application.properties.");
