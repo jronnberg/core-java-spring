@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto;
 
 import java.io.IOException;
 import java.io.OutputStream;

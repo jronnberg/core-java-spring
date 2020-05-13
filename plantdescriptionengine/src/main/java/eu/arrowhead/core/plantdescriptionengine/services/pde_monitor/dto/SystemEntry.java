@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.monitor.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
@@ -9,7 +9,7 @@ import java.util.Optional;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Port;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Port;
 
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)

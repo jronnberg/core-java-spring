@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.*;
-import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.*;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.*;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
@@ -49,8 +49,8 @@ public class PdeManagementService {
         return request
             .bodyAs(PlantDescriptionDto.class)
             .map(description -> {
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntry
-                    .from(description, entryMap.getUniqueId());
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
+
                 try {
                     entryMap.put(entry);
                 } catch (final BackingStoreException e) {

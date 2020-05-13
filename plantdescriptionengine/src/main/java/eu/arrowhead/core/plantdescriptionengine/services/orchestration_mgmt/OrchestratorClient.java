@@ -9,10 +9,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.SystemTracker;
-import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionUpdateListener;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.ProviderSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryList;
@@ -20,6 +19,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
@@ -61,17 +61,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * @return A Future that will contain a list of store entries.
-     */
-    private Future<StoreEntryListDto> getStoreEntries() {
-        return client
-                .send(orchestratorAddress,
-                        new HttpClientRequest().method(HttpMethod.GET).uri("/orchestrator/mgmt/store").header("accept",
-                                "application/json"))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
-    }
-
-    /**
      * Create an Orchestrator rule to be passed to the orchestrator.
      *
      * @param entry           Plant Description Entry to which the rule will belong.
@@ -91,16 +80,16 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemName() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
         return new StoreRuleBuilder()
+            .cloud(cloud)
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
-            .priority(1) // TODO: Remove hard-coded value
             .consumerSystemId(consumerSystem.id())
             .providerSystem(new ProviderSystemBuilder()
                 .systemName(providerSystem.systemName())
                 .address(providerSystem.address())
                 .port(providerSystem.port())
                 .build())
+            .priority(1) // TODO: Remove hard-coded value
             .serviceInterfaceName("HTTP-INSECURE-JSON") // TODO: Remove hard-coded value
-            .cloud(cloud)
             .build();
     }
 

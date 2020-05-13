@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;

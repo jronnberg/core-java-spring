@@ -11,10 +11,11 @@ import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.PdeManagementService;
-import eu.arrowhead.core.plantdescriptionengine.services.management.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore.FileStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.FileStore;
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
@@ -73,7 +74,9 @@ public class PdeMain {
 
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .localPort(pdePort);
+            .localPort(pdePort)
+            .plugins(HttpJsonCloudPlugin
+                .viaServiceRegistryAt(serviceRegistryAddress));
 
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
@@ -88,10 +91,7 @@ public class PdeMain {
 
             systemBuilder
                 .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
-                .trustStore(loadTrustStore(trustStorePath, trustStorePassword))
-                .plugins(HttpJsonCloudPlugin // TODO: This should be done in insecure mode as well.
-                    .viaServiceRegistryAt(serviceRegistryAddress));
-
+                .trustStore(loadTrustStore(trustStorePath, trustStorePassword));
         }
 
         return systemBuilder.build();

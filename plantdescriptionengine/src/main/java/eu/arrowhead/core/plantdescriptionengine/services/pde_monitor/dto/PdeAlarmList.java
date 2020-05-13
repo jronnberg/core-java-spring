@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,20 +9,20 @@ import se.arkalix.dto.DtoWritableAs;
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 /**
- * Data Transfer Object (DTO) interface for lists of plant descriptions.
+ * Data Transfer Object (DTO) interface for lists of PDE alarms.
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
-public interface PlantDescriptionEntryList {
+public interface PdeAlarmList {
 
-    List<PlantDescriptionEntry> data();
+    List<PdeAlarm> data();
     int count();
 
     default String asString() {
-        String result = "PlantDescriptionEntryList[count=" + count() + ",data=[";
+        String result = "PdeAlarmList[count=" + count() + ",data=[";
         List<String> strings = new ArrayList<>();
-        for (var entry : data()) {
-            strings.add(String.valueOf(entry.id()));
+        for (var alarm : data()) {
+            strings.add(String.valueOf(alarm.id()));
         }
         result += String.join(",", strings);
         result += "]]";
