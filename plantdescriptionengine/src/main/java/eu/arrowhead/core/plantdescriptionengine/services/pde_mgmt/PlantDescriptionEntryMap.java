@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListDto;
@@ -41,14 +42,15 @@ public class PlantDescriptionEntryMap {
     /**
      * Class constructor.
      *
-     * @param BackingStore Non-volatile storage for entries.
+     * @param backingStore Non-volatile storage for entries.
      * @throws BackingStoreException If backing store operations fail.
      */
     public PlantDescriptionEntryMap(BackingStore backingStore) throws BackingStoreException {
         Objects.requireNonNull(backingStore, "Expected backing store");
         this.backingStore = backingStore;
 
-        // Calculate the next free Plant Description Entry ID:
+        // Read entries from non-volatile storage and
+        // calculate the next free Plant Description Entry ID:
         int maxId = -1;
         for (var entry : backingStore.readEntries()) {
             maxId = Math.max(maxId, entry.id());
@@ -143,6 +145,18 @@ public class PlantDescriptionEntryMap {
      */
     public void addListener(PlantDescriptionUpdateListener listener) {
         listeners.add(listener);
+    }
+
+    /**
+     * @return The currently active entry, if any. Null there is none.
+     */
+    public PlantDescriptionEntry activeEntry() {
+        for (var entry : entries.values()) {
+            if (entry.active()) {
+                return entry;
+            }
+        }
+        return null;
     }
 
 }

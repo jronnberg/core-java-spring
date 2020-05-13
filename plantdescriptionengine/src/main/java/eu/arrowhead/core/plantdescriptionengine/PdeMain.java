@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.FileStore;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
@@ -186,31 +185,27 @@ public class PdeMain {
         final String serviceRegistryIp = appProps.getProperty("service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
-
-        final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
         final HttpClient httpClient = createHttpClient(appProps);
 
         SystemTracker.initialize(httpClient, serviceRegistryAddress).flatMap(result -> {
-
-            final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
-            final BackingStore entryStore = new FileStore(plantDescriptionsDirectory);
-            final var entryMap = new PlantDescriptionEntryMap(entryStore);
             final CloudDto cloud = new CloudBuilder()
                 .name(demoProps.getProperty("cloud.name"))
                 .operator(demoProps.getProperty("cloud.operator"))
                 .build();
+
             final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
+            final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
-            // Register the Orchestrator client to Plant Description events.
-            // This will cause it to interact with the Orchestrator whenever a
-            // Plant Description Entry is added, updated or removed.
-            entryMap.addListener(orchestratorClient);
+            final var entryMap = new PlantDescriptionEntryMap(new FileStore(plantDescriptionsDirectory));
 
-            final var pdeManager = new PdeManagementService(entryMap);
-            final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
-
-            logger.info("Providing services...");
-            return arSystem.provide(pdeManager.getService(secureMode));
+            return orchestratorClient.initialize(entryMap)
+                .flatMap(orchstratorInitializationResult -> {
+                    final var pdeManager = new PdeManagementService(entryMap);
+                    final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
+                    final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
+                    logger.info("Providing services...");
+                    return arSystem.provide(pdeManager.getService(secureMode));
+                });
         })
         .onFailure(throwable -> {
             logger.error("Failed to launch Plant Description Engine", throwable);

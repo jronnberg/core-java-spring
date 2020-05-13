@@ -9,6 +9,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 
 public class RuleMap {
 
+
     // Internal Map for storing rules as follows:
     // <PlantDescriptionEntryID, List<RuleId>>
     private Map<Integer, List<Integer>> ruleLists = new ConcurrentHashMap<>();
@@ -26,14 +27,27 @@ public class RuleMap {
      * Stores IDs of orchestrator rules relating to a Plant Description Entry.
      *
      * @param plantDescriptionEntryId A Plant Description Entry ID.
-     * @param rules A StoreEntryList object describing the Plant Description
-     *              entry's orchestrator rules.
+     * @param rules                   A StoreEntryList object describing the
+     *                                Plant Description entry's orchestrator
+     *                                rules.
      */
-	public void put(int plantDescriptionEntryId, StoreEntryList rules) {
+    public void put(int plantDescriptionEntryId, StoreEntryList rules) {
         List<Integer> entryRules = new ArrayList<>();
         for (var storeEntry : rules.data()) {
             entryRules.add(storeEntry.id());
         }
+        for (var storeEntry : rules.data()) {
+            entryRules.add(storeEntry.id());
+        }
         ruleLists.put(plantDescriptionEntryId, entryRules);
+	}
+
+    /**
+     * Removes all rules for a given Plant Description Entry.
+     *
+     * @param plantDescriptionEntryId ID of the Plant description Entry.
+     */
+    public void remove(int plantDescriptionEntryId) {
+        ruleLists.remove(plantDescriptionEntryId);
 	}
 }
