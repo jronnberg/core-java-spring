@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.DtoWriter;
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.DtoWriter;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.DtoWriteException;
 import se.arkalix.dto.binary.ByteArrayReader;

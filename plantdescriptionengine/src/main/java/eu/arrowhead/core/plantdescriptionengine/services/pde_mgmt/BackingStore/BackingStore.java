@@ -1,8 +1,8 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management.BackingStore;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore;
 
 import java.util.List;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 
 /**
  * Interface for objects that read and write Plant Description Entries to

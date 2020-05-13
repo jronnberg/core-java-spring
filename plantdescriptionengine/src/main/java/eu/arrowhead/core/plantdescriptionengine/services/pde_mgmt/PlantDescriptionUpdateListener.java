@@ -1,6 +1,6 @@
-package eu.arrowhead.core.plantdescriptionengine.services.management;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
 
-import eu.arrowhead.core.plantdescriptionengine.services.management.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 
 public interface PlantDescriptionUpdateListener {
     void onPlantDescriptionAdded(PlantDescriptionEntry entry);

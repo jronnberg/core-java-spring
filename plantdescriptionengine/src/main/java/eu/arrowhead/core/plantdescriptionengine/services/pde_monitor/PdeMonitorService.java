@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.monitor;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.HttpStatus;

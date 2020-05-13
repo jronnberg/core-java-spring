@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine;
+package eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt;
 
 import java.net.InetSocketAddress;
 import java.util.Map;

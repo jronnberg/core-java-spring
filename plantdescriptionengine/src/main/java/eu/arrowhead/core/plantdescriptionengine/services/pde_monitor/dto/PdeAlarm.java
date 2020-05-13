@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.monitor.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 
 import java.time.Instant;
 import java.util.Optional;
