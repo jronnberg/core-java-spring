@@ -65,8 +65,7 @@ public class RuleMapTest {
     }
 
     @Test
-    public void shouldStoreRuleIds()
-    {
+    public void shouldStoreRuleIds() {
         final RuleMap map = new RuleMap();
         StoreEntryListDto ruleList = createRuleList();
         int plantDescriptionEntryID = 99;
@@ -82,8 +81,7 @@ public class RuleMapTest {
     }
 
     @Test
-    public void shouldRemoveRuleIds()
-    {
+    public void shouldRemoveRuleIds() {
         final RuleMap map = new RuleMap();
         StoreEntryListDto ruleList = createRuleList();
         int plantDescriptionEntryID = 36;

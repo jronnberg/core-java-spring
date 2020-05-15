@@ -81,15 +81,14 @@ public class FileStore implements BackingStore {
         try {
             Files.createDirectories(path.getParent());
             File file = path.toFile();
+
             if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    throw new BackingStoreException(e);
-                }
+                file.createNewFile();
             }
-            FileOutputStream out = new FileOutputStream(file);
+
+            final FileOutputStream out = new FileOutputStream(file);
             final var writer = new DtoWriter(out);
+
             entry.writeJson(writer);
             out.close();
         } catch (IOException | DtoWriteException e) {
