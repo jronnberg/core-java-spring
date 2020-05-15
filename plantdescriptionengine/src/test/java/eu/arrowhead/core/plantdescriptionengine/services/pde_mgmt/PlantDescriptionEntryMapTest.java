@@ -27,27 +27,13 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
  */
 public class PlantDescriptionEntryMapTest {
 
-    private PlantDescriptionEntryDto createEntry(int id) {
-        final Instant now = Instant.now();
-        return new PlantDescriptionEntryBuilder()
-            .id(id)
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .include(new ArrayList<>())
-            .systems(new ArrayList<>())
-            .connections(new ArrayList<>())
-            .createdAt(now)
-            .updatedAt(now)
-            .build();
-    }
-
     @Test
     public void shouldReadEntriesFromBackingStore() throws BackingStoreException {
         final BackingStore store = new InMemoryBackingStore();
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
-            store.write(createEntry(id));
+            store.write(Utils.createEntry(id));
         }
 
         final var entryMap = new PlantDescriptionEntryMap(store);
@@ -70,7 +56,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReturnEntryById() throws BackingStoreException {
         int entryId = 16;
-        final PlantDescriptionEntryDto entry = createEntry(entryId);
+        final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         entryMap.put(entry);
 
@@ -87,7 +73,7 @@ public class PlantDescriptionEntryMapTest {
         final List<Integer> entryIds = List.of(16, 39, 244);
 
         for (int id : entryIds) {
-            entryMap.put(createEntry(id));
+            entryMap.put(Utils.createEntry(id));
         }
 
         final var storedEntries = entryMap.getEntries();
@@ -105,7 +91,7 @@ public class PlantDescriptionEntryMapTest {
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
         for (int id : entryIds) {
-            entryMap.put(createEntry(id));
+            entryMap.put(Utils.createEntry(id));
         }
 
         final var storedEntries = entryMap.getListDto();
@@ -120,7 +106,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldRemoveEntries() throws BackingStoreException {
         int entryId = 24;
-        final PlantDescriptionEntryDto entry = createEntry(entryId);
+        final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         entryMap.put(entry);
         entryMap.remove(entryId);
@@ -166,9 +152,9 @@ public class PlantDescriptionEntryMapTest {
 
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         final List<PlantDescriptionEntryDto> entries = List.of(
-            createEntry(entryMap.getUniqueId()),
-            createEntry(entryMap.getUniqueId()),
-            createEntry(entryMap.getUniqueId())
+            Utils.createEntry(entryMap.getUniqueId()),
+            Utils.createEntry(entryMap.getUniqueId()),
+            Utils.createEntry(entryMap.getUniqueId())
         );
 
         for (final var entry : entries) {
@@ -214,11 +200,11 @@ public class PlantDescriptionEntryMapTest {
         final int idB = 32;
 
         entryMap.addListener(listener);
-        entryMap.put(createEntry(idA));
-        entryMap.put(createEntry(idA));
+        entryMap.put(Utils.createEntry(idA));
+        entryMap.put(Utils.createEntry(idA));
 
         // "Update" this entry by putting a new one with the same ID in the map:
-        entryMap.put(createEntry(idB));
+        entryMap.put(Utils.createEntry(idB));
         entryMap.remove(idA);
 
         assertEquals(idB, listener.lastAdded);
