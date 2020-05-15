@@ -11,14 +11,13 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 public interface BackingStore {
 
     /**
-     * @return Future containing all entries currently in the backing store.
+     * @return A list of all entries currently in the backing store.
      */
     List<PlantDescriptionEntryDto> readEntries() throws BackingStoreException;
 
     /**
      * Writes a single entry to backing store.
      * @param entry An entry to store.
-     * @return Future that finishes when the request has been completed.
      */
     void write(final PlantDescriptionEntryDto entry) throws BackingStoreException;
 
