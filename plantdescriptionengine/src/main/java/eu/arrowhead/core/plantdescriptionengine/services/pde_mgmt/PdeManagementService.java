@@ -186,41 +186,6 @@ public class PdeManagementService {
     }
 
     /**
-     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by
-     * the id path parameter.
-     * @param request HTTP request object.
-     * @param response HTTP response containing the current
-     *                 PlantDescriptionEntryList.
-     */
-    private Future<?> onDescriptionGet(
-        final HttpServiceRequest request, final HttpServiceResponse response
-    ) {
-
-        String idString = request.pathParameter(0);
-        int id;
-
-        try {
-            id = Integer.parseInt(idString);
-        } catch (NumberFormatException e) {
-            response.status(HttpStatus.BAD_REQUEST);
-            response.body(idString + " is not a valid plant description entry ID.");
-            response.status(HttpStatus.BAD_REQUEST);
-            return Future.done();
-        }
-
-        final PlantDescriptionEntryDto entry = entryMap.get(id);
-
-        if (entry == null) {
-            response.body("Plant Description with ID " + id + " not found.");
-            response.status(HttpStatus.NOT_FOUND);
-            return Future.done();
-        }
-
-        response.status(HttpStatus.OK).body(entry);
-        return Future.done();
-    }
-
-    /**
      * Handles an HTTP call to acquire a list of Plant Description Entries
      * present in the PDE.
      * @param request HTTP request object.
@@ -297,7 +262,7 @@ public class PdeManagementService {
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde")
-            .get("/mgmt/pd/#id", (request, response) -> onDescriptionGet(request, response))
+            .get("/mgmt/pd/#id", new OnDescriptionsGet(entryMap))
             .get("/mgmt/pd", (request, response) -> onDescriptionsGet(request, response))
             .post("/mgmt/pd", (request, response) -> onDescriptionPost(request, response))
             .delete("/mgmt/pd/#id", (request, response) -> onDescriptionDelete(request, response))

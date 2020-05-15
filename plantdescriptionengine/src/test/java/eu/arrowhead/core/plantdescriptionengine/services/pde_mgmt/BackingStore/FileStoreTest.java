@@ -5,15 +5,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 
 /**
  * Unit test for the
@@ -23,20 +20,6 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 public class FileStoreTest {
 
     private String entryDirectory = "test-temp-data";
-
-    private PlantDescriptionEntryDto createEntry(int id) {
-        final Instant now = Instant.now();
-        return new PlantDescriptionEntryBuilder()
-            .id(id)
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .include(new ArrayList<>())
-            .systems(new ArrayList<>())
-            .connections(new ArrayList<>())
-            .createdAt(now)
-            .updatedAt(now)
-            .build();
-    }
 
     private void deleteDirectory(File dir) {
         File[] allContents = dir.listFiles();
@@ -60,7 +43,7 @@ public class FileStoreTest {
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
-            store.write(createEntry(id));
+            store.write(Utils.createEntry(id));
         }
 
         var storedEntries =  store.readEntries();
@@ -77,7 +60,7 @@ public class FileStoreTest {
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
-            store.write(createEntry(id));
+            store.write(Utils.createEntry(id));
         }
 
         int id0 = entryIds.get(0);
