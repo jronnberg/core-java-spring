@@ -20,7 +20,11 @@ public class RuleMap {
      *         entry's list of connections.
      */
     public List<Integer> get(int entryId) {
-        return new ArrayList<Integer>(ruleLists.get(entryId));
+        var rules = ruleLists.get(entryId);
+        if (rules == null) {
+            return null;
+        }
+        return new ArrayList<Integer>(rules);
     }
 
     /**
