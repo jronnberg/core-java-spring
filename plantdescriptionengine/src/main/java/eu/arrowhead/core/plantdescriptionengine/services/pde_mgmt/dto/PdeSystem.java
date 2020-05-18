@@ -16,11 +16,12 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface PdeSystem {
 
-    String systemName();
+    Integer systemId();
+    Optional<String> systemName();
     Optional<Map<String, String>> metadata();
     List<Port> ports();
 
     default String asString() {
-        return "PdeSystem[systemName=" + systemName() + "]";
+        return "PdeSystem[systemId=" + systemId() + "]";
     }
 }

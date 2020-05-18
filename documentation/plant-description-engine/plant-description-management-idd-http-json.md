@@ -593,13 +593,15 @@ JSON object with the following fields:
 | `portName` | String | Identity of the port | `true` | |
 | `serviceDefinition` | String | Service definition identity | `true` | |
 | `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
+| `metadata` | Object | Metadata - key-value pairs | `false` | null |
 
 ### System
 JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | |
+| `systemId` | Number | Identity of the system | `true` | |
+| `systemName` | String | Name of the system | `false` | null |
 | `metadata` | Object | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
 
@@ -608,7 +610,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | |
+| `systemId` | Number | Identity of the system | `true` | |
 | `portName` | String | Identity of the port | `true` | |
 
 

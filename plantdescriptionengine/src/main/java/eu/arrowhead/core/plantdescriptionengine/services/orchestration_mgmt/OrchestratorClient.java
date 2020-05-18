@@ -130,11 +130,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = SystemTracker.INSTANCE.getSystem(connection.consumer().systemName());
-        SrSystem providerSystem = SystemTracker.INSTANCE.getSystem(connection.producer().systemName());
+        SrSystem consumerSystem = SystemTracker.INSTANCE.getSystem(connection.consumer().systemId());
+        SrSystem providerSystem = SystemTracker.INSTANCE.getSystem(connection.producer().systemId());
 
-        Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemName() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
-        Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemName() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
         return new StoreRuleBuilder()
             .cloud(cloud)
