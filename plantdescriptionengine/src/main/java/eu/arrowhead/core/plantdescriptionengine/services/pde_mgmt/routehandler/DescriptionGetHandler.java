@@ -1,7 +1,8 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler;
 
 import java.util.Objects;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -9,15 +10,19 @@ import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 import se.arkalix.util.concurrent.Future;
 
-public class OnDescriptionsGet implements HttpRouteHandler {
+/**
+ * Handles HTTP requests to retrieve a specific Plant Description Entries.
+ */
+public class DescriptionGetHandler implements HttpRouteHandler {
 
     private final PlantDescriptionEntryMap entryMap;
 
     /**
      * Class constructor
-     * @param entryMap
+     *
+     * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public OnDescriptionsGet(PlantDescriptionEntryMap entryMap) {
+    public DescriptionGetHandler(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }

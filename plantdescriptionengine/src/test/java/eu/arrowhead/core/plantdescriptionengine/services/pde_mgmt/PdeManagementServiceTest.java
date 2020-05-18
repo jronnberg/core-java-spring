@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.NullBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionGetHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -21,7 +22,7 @@ public class PdeManagementServiceTest {
     public void shouldRespondWithNotFound() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
-        OnDescriptionsGet handler = new OnDescriptionsGet(entryMap);
+        final var handler = new DescriptionGetHandler(entryMap);
 
         HttpServiceRequest request = new MockRequest();
         HttpServiceResponse response = new MockResponse();
@@ -44,7 +45,7 @@ public class PdeManagementServiceTest {
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
-        OnDescriptionsGet handler = new OnDescriptionsGet(entryMap);
+        DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
@@ -77,7 +78,7 @@ public class PdeManagementServiceTest {
         final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
-        OnDescriptionsGet handler = new OnDescriptionsGet(entryMap);
+        DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(invalidId))
