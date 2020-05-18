@@ -18,7 +18,6 @@ class MockResponse implements HttpServiceResponse {
 
     @Override
     public Optional<Object> body() {
-        System.out.println("Getting body");
         return Optional.of(_body);
     }
 

@@ -217,6 +217,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         List<Integer> rulesToRemove = ruleMap.get(entry.id());
+
+        if (rulesToRemove == null) {
+            return Future.done();
+        }
+
         var deletions = rulesToRemove.stream().map(ruleId -> deleteRule(ruleId)).collect(Collectors.toList());
 
         return Futures.serialize(deletions).flatMap(result -> {

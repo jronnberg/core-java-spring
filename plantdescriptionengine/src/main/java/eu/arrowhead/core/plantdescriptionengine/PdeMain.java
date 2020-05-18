@@ -177,8 +177,8 @@ public class PdeMain {
 
             // Read demo properties (TODO: Remove them)
             demoProps.load(ClassLoader.getSystemResourceAsStream("demo.properties"));
-        } catch (IOException ex) {
-            System.out.println("Failed to read application.properties.");
+        } catch (IOException e) {
+            logger.error("Failed to read application.properties.", e);
             System.exit(74);
         }
 

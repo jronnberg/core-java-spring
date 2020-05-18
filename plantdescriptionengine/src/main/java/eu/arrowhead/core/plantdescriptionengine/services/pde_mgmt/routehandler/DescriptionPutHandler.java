@@ -1,0 +1,74 @@
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler;
+
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpRouteHandler;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
+import se.arkalix.util.concurrent.Future;
+
+/**
+ * Handles HTTP requests to update or create Plant Description Entries.
+ */
+public class DescriptionPutHandler implements HttpRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(DescriptionPutHandler.class);
+
+    private final PlantDescriptionEntryMap entryMap;
+
+    /**
+     * Class constructor
+     *
+     * @param entryMap Object that keeps track of Plant Description Enties.
+     */
+    public DescriptionPutHandler(PlantDescriptionEntryMap entryMap) {
+        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
+        this.entryMap = entryMap;
+    }
+
+    /**
+     * Handles an HTTP request to update or create the Plant Description Entry.
+     *
+     * @param request HTTP request containing the ID of the entry to
+     *                create/update, and a {@link PlantDescriptionUpdate}
+     *                describing its new state.
+     * @param response HTTP response containing the current
+     *                 PlantDescriptionEntryList. // TODO: Return the patched entry only?
+     */
+    @Override
+    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+        return request
+            .bodyAs(PlantDescriptionDto.class)
+            .map(description -> {
+                int id;
+
+                try {
+                    id = Integer.parseInt(request.pathParameter(0));
+                } catch (NumberFormatException e) {
+                    response.status(HttpStatus.BAD_REQUEST);
+                    response.body(request.pathParameter(0) + " is not a valid plant description entry ID.");
+                    return response.status(HttpStatus.BAD_REQUEST);
+                }
+
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
+
+                try {
+                    entryMap.put(entry);
+                } catch (final BackingStoreException e) {
+                    logger.error("Failed to write Plant Description Entry update to backing store.", e);
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                return response
+                    .status(HttpStatus.CREATED)
+                    .body(entry);
+            });
+    }
+}
