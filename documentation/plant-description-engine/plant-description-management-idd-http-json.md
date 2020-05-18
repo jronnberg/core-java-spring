@@ -20,7 +20,7 @@ interface is expected to respond with HTTP status code 200 OK for all successful
 ### POST /{baseURI}/mgmt/pd
  - __Interface: AddPlantDescription__
  - __Input: [PlantDescription](#plantdescription)__
- - __Output: [PlantDescriptionEntryList](#plantdescriptionentrylist)__
+ - __Output: [PlantDescriptionEntry](#plantdescriptionentry)__
 
 Called to add a Plant Description to the PDE.
 
@@ -82,61 +82,56 @@ Example of valid response:
 
 ```json
 HTTP/1.1 200 OK
-Content-Length: 2553
+Content-Length: 2394
 Content-Type: application/json
 
 {
-  "count": 1,
-  "data": [
-	{
-		"id": 1,
-		"plantDescription": "ArrowHead core",
-		"active": false,
-		"systems": [
-			{
-				"systemName": "Service Registry",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
-				]
-			},
-			{
-				"systemName": "Authorization",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
-				]
-			},
-			{
-				"systemName": "Orchestration",
-				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
-				]
-			}
-		],
-		"connections": [
-			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
-		],
-      "createdAt": "2020-03-13T16:54:00.511Z",
-      "updatedAt": "2020-03-13T16:54:00.511Z"
-	}
-  ]
+	"id": 1,
+	"plantDescription": "ArrowHead core",
+	"active": false,
+	"systems": [
+		{
+			"systemName": "Service Registry",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+			]
+		},
+		{
+			"systemName": "Authorization",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+			]
+		},
+		{
+			"systemName": "Orchestration",
+			"ports": [
+				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+			]
+		}
+	],
+	"connections": [
+		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
+			"producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
+			"producer": { "systemName": "Service Registry", "portName": "service_registry" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
+			"producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
+			"producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+	],
+	"createdAt": "2020-03-13T16:54:00.511Z",
+	"updatedAt": "2020-03-13T16:54:00.511Z"
 }
 ```
 

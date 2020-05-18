@@ -177,6 +177,14 @@ public interface PlantDescriptionEntry {
         return serviceDefinitionName;
     }
 
+    default boolean matchesDescription(PlantDescription description) {
+        return (
+            description.plantDescription().equals(plantDescription()) &&
+            (description.active().orElse(false) == active())
+            // TODO: Check 'include', 'systems' and 'connections' as well.
+        );
+    }
+
     default String asString() {
         return "PlantDescriptionEntry[id=" + id() + ",plantDescription=" + plantDescription() + "]";
     }
