@@ -11,6 +11,9 @@ import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
+/**
+ * Mock HttpServiceResponse implementation used for testing.
+ */
 class MockResponse implements HttpServiceResponse {
 
     private Object _body = null;

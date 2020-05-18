@@ -39,7 +39,7 @@ public class PlantDescriptionEntryMapTest {
         final var entryMap = new PlantDescriptionEntryMap(store);
         var storedEntries = entryMap.getEntries();
 
-        assertEquals(storedEntries.size(), entryIds.size());
+        assertEquals(entryIds.size(), storedEntries.size());
         for (final var entry : storedEntries) {
             assertTrue(entryIds.contains(entry.id()));
         }
@@ -50,7 +50,7 @@ public class PlantDescriptionEntryMapTest {
         final var newEntryMap = new PlantDescriptionEntryMap(store);
         storedEntries = newEntryMap.getEntries();
 
-        assertEquals(storedEntries.size(), entryIds.size() - 1);
+        assertEquals(entryIds.size() - 1, storedEntries.size());
     }
 
     @Test
