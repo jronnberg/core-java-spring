@@ -13,10 +13,10 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 public interface SystemPort {
 
-    String systemName();
+    Integer systemId();
     String portName();
 
     default String asString() {
-        return "SystemPortEndpoint[systemName=" + systemName() + ",portName=" + portName() + "]";
+        return "SystemPortEndpoint[systemId=" + systemId() + ",portName=" + portName() + "]";
     }
 }

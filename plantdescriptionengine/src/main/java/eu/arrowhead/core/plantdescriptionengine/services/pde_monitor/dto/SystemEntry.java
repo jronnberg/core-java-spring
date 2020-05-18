@@ -9,15 +9,14 @@ import java.util.Optional;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Port;
-
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface SystemEntry {
 
-    String systemName();
+    Integer systemId();
+    Optional<String> systemName();
     Optional<Map<String, String>> metadata();
-    List<Port> ports();
+    List<PortEntry> ports();
     Optional<Map<String, String>> systemData();
     Optional<String> inventoryId();
     Optional<Map<String, String>> inventoryData();

@@ -27,7 +27,8 @@ public enum SystemTracker {
     private InetSocketAddress serviceRegistryAddress = null;
     private static boolean initialized;
 
-    private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    private Map<Integer, SrSystem> systemsById = new ConcurrentHashMap<>();
+    private Map<String, SrSystem> systemsByName = new ConcurrentHashMap<>();
 
     /**
      * @return A Future which will complete with a list of registered systems.
@@ -46,7 +47,8 @@ public enum SystemTracker {
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
                 for (var system : systemList.data()) {
-                    systems.put(system.systemName(), system);
+                    systemsById.put(system.id(), system);
+                    systemsByName.put(system.systemName(), system);
                 }
                 return Future.done();
             });
@@ -83,14 +85,30 @@ public enum SystemTracker {
      * changed state since the last call to {@link #refreshSystems()}.
      *
      *
-     * @param systemName Name of a system to be retrieved.
+     * @param systemId ID of a system to be retrieved.
      * @return The desired system, if it is present in the local cache.
      */
-    public SrSystem getSystem(String systemName) {
+    public SrSystem getSystem(int systemId) {
         if (!initialized) {
             throw new IllegalStateException("SystemTracker has not been initialized.");
         }
-        return systems.get(systemName);
+        return systemsById.get(systemId);
+    }
+
+    /**
+     * Retrieves the specified system.
+     * Note that the returned data will be stale if the system in question has
+     * changed state since the last call to {@link #refreshSystems()}.
+     *
+     *
+     * @param systemName Name of a system to be retrieved.
+     * @return The desired system, if it is present in the local cache.
+     */
+    public SrSystem getSystem(String name) {
+        if (!initialized) {
+            throw new IllegalStateException("SystemTracker has not been initialized.");
+        }
+        return systemsByName.get(name);
     }
 
 }

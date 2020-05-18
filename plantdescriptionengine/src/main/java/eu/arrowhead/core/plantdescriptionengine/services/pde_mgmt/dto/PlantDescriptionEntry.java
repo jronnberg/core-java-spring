@@ -162,7 +162,7 @@ public interface PlantDescriptionEntry {
         String serviceDefinitionName = null;
 
         for (PdeSystem system : systems()) {
-            if (!system.systemName().equals(producerPort.systemName())) {
+            if (!system.systemId().equals(producerPort.systemId())) {
                 continue;
             }
             for (Port port : system.ports()) {
