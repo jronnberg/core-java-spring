@@ -380,6 +380,16 @@ JSON object with the following fields:
 | `count` | Number | Number of records found | `true` ||
 | `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
+### PortEntry
+JSON object with the following fields:
+
+| Field | Type | Description | Mandatory | Default value |
+| ----- | ---- | ----------- | --------- | ------------- |
+| `portName` | String | Identity of the port | `true` | |
+| `serviceDefinition` | String | Service definition identity | `true` | |
+| `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
+| `metadata` | Object | Metadata - key-value pairs | `false` | null |
+
 ### SystemEntry
 JSON object with the following fields:
 
@@ -387,7 +397,7 @@ JSON object with the following fields:
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemName` | String | Identity of the system | `true` | |
 | `metadata` | Object | Metadata - key-value pairs | `false` | Only present if specified |
-| `ports` | Array\<[Port]> | Array with service ports exposed by the system | `true` ||
+| `ports` | Array\<[PortEntry](#PortEntry)> | Array with service ports exposed by the system | `true` ||
 | `systemData` | Object | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
 | `inventoryId` | String | The systems Id in an Inventory system | `false` | Only present if provided by Monitorable |
 | `inventoryData` | Object | Inventory specific data - key-value pairs | `false` | Only present if provided by Inventory  |
@@ -436,6 +446,5 @@ Other forms or variants, including the use of other time zones, is adviced again
 [Plant Description Management HTTP(S)/JSON - Interface Design Description]:plant-description-management-idd-http-json.md
 [PDMon]:plant-description-monitor-sd.md
 [Plant Description Engine]:plant-description-engine-sysd.md
-[Port]:plant-description-management-idd-http-json.md#port
 [RFC 3339]:https://doi.org/10.17487/RFC3339
 [TLS]:https://doi.org/10.17487/RFC8446
