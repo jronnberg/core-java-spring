@@ -37,9 +37,9 @@ public class DescriptionPostHandler implements HttpRouteHandler {
     /**
      * Handles an HTTP request to add a new Plant Description to the PDE.
      *
-     * @param request  HTTP request object.
-     * @param response HTTP response containing a list of Plant Description
-     *                 Entries. // TODO: Respond with the created entry instead?
+     * @param request  HTTP request object containing a Plant Description.
+     * @param response HTTP response containing the newly created Plant
+     *                 Description entry.
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
@@ -56,7 +56,7 @@ public class DescriptionPostHandler implements HttpRouteHandler {
                 }
                 return response
                     .status(HttpStatus.CREATED)
-                    .body(entryMap.getListDto()); // TODO: Respond with the created entry instead?
+                    .body(entry);
             });
     }
 }
