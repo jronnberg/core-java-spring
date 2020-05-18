@@ -13,9 +13,11 @@ import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.FutureProgress;
 
+/**
+ * Mock HttpServiceRequest implementation used for testing.
+ */
 class MockRequest implements HttpServiceRequest {
 
 
@@ -32,12 +34,18 @@ class MockRequest implements HttpServiceRequest {
         }
     }
 
-    private List<String> _pathParameters = List.of("0", "1", "2"); // TODO: Set in constructor
+    private List<String> _pathParameters = new ArrayList<>();
+
+    private Object _body = null;
 
     public MockRequest() {}
 
     public MockRequest(Builder builder) {
         _pathParameters = builder.pathParameters;
+    }
+
+    public void body(Object body) {
+        _body = body;
     }
 
     @Override
@@ -72,7 +80,7 @@ class MockRequest implements HttpServiceRequest {
 
     @Override
     public <R extends DtoReadable> FutureProgress<R> bodyAs(Class<R> class_) {
-        throw new UnsupportedOperationException();
+        return new MockFutureProgress<R>((R)_body);
     }
 
     @Override
