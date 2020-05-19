@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,33 +21,22 @@ import se.arkalix.util.concurrent.FutureProgress;
  */
 class MockRequest implements HttpServiceRequest {
 
+    private final List<String> _pathParameters;
+    private final Object body;
+    private final Map<String, List<String>> _queryParameters;
 
-    public static class Builder {
-        List<String> pathParameters = new ArrayList<String>();
-
-        Builder pathParameters(List<String> pathParameters) {
-            this.pathParameters = pathParameters;
-            return this;
-        }
-
-        public MockRequest build() {
-            return new MockRequest(this);
-        }
+    public MockRequest() {
+        _pathParameters = new ArrayList<>();
+        body = null;
+        _queryParameters = new HashMap<>();
     }
-
-    private List<String> _pathParameters = new ArrayList<>();
-
-    private Object _body = null;
-
-    public MockRequest() {}
 
     public MockRequest(Builder builder) {
         _pathParameters = builder.pathParameters;
+        body = builder.body;
+        _queryParameters = builder.queryParameters;
     }
 
-    public void body(Object body) {
-        _body = body;
-    }
 
     @Override
     public <R extends DtoReadable> FutureProgress<R> bodyAs(DtoEncoding encoding, Class<R> class_) {
@@ -80,7 +70,7 @@ class MockRequest implements HttpServiceRequest {
 
     @Override
     public <R extends DtoReadable> FutureProgress<R> bodyAs(Class<R> class_) {
-        return new MockFutureProgress<R>((R)_body);
+        return new MockFutureProgress<R>((R)body);
     }
 
     @Override
@@ -110,7 +100,7 @@ class MockRequest implements HttpServiceRequest {
 
     @Override
     public Map<String, List<String>> queryParameters() {
-        throw new UnsupportedOperationException();
+        return _queryParameters;
     }
 
     @Override
@@ -121,6 +111,31 @@ class MockRequest implements HttpServiceRequest {
     @Override
     public HttpVersion version() {
         throw new UnsupportedOperationException();
+    }
+
+    public static class Builder {
+        private List<String> pathParameters = new ArrayList<String>();
+        private Object body;
+        private Map<String, List<String>> queryParameters;
+
+        Builder pathParameters(List<String> pathParameters) {
+            this.pathParameters = pathParameters;
+            return this;
+        }
+
+        Builder body(Object body) {
+            this.body = body;
+            return this;
+        }
+
+        Builder queryParameters(Map<String, List<String>> queryParameters) {
+            this.queryParameters = queryParameters;
+            return this;
+        }
+
+        public MockRequest build() {
+            return new MockRequest(this);
+        }
     }
 
 }

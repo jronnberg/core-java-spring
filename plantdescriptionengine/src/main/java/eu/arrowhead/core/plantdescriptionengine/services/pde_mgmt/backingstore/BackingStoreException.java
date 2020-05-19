@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore;
 
 /**
  * Signifies the failure for a BackingStore instance to communicate with its

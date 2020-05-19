@@ -12,10 +12,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.InMemoryBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.NullBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -57,7 +56,7 @@ public class PlantDescriptionEntryMapTest {
     public void shouldReturnEntryById() throws BackingStoreException {
         int entryId = 16;
         final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(entry);
 
         final var storedEntry = entryMap.get(entryId);
@@ -69,7 +68,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReturnAllEntries() throws BackingStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
 
         for (int id : entryIds) {
@@ -88,7 +87,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReturnListDto() throws BackingStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
         for (int id : entryIds) {
             entryMap.put(Utils.createEntry(id));
@@ -107,7 +106,7 @@ public class PlantDescriptionEntryMapTest {
     public void shouldRemoveEntries() throws BackingStoreException {
         int entryId = 24;
         final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(entry);
         entryMap.remove(entryId);
         final var storedEntry = entryMap.get(entryId);
@@ -134,7 +133,7 @@ public class PlantDescriptionEntryMapTest {
             .plantDescription("Plant Description B")
             .active(false)
             .build();
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
 
         entryMap.put(activeEntry);
         entryMap.put(inactiveEntry);
@@ -150,7 +149,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldGenerateUniqueIds() throws BackingStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final List<PlantDescriptionEntryDto> entries = List.of(
             Utils.createEntry(entryMap.getUniqueId()),
             Utils.createEntry(entryMap.getUniqueId()),
@@ -193,7 +192,7 @@ public class PlantDescriptionEntryMapTest {
             }
         }
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var listener = new Listener();
 
         final int idA = 16;
