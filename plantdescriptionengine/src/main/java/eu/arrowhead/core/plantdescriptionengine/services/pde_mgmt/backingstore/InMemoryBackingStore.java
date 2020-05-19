@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore;
 
 import java.util.ArrayList;
 import java.util.List;

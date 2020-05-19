@@ -2,12 +2,12 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
 
 import java.util.Objects;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionDeleteHandler;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionsGetHandler;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionPostHandler;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionPutHandler;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionGetHandler;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionPatchHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionDeleteHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionsGetHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPostHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPutHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionGetHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPatchHandler;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;

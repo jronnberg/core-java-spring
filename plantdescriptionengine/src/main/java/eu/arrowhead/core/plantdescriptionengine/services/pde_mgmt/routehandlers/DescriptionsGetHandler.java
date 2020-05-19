@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import java.util.Arrays;
 import java.util.List;

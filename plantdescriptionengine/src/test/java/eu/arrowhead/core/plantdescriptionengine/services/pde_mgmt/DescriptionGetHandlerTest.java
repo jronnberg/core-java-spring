@@ -8,10 +8,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.NullBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionGetHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionGetHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -21,7 +21,7 @@ public class DescriptionGetHandlerTest {
     @Test
     public void shouldRespondWithNotFound() throws BackingStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var handler = new DescriptionGetHandler(entryMap);
         final int nonExistentEntryId = 0;
 
@@ -48,7 +48,7 @@ public class DescriptionGetHandlerTest {
 
         int entryId = 39;
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
         DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
@@ -72,7 +72,7 @@ public class DescriptionGetHandlerTest {
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
@@ -82,7 +82,7 @@ public class DescriptionGetHandlerTest {
         int entryId = 24;
         String invalidId = "Invalid";
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
         DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
@@ -103,7 +103,7 @@ public class DescriptionGetHandlerTest {
                     assertNull(e);
                 });
         } catch (Exception e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 

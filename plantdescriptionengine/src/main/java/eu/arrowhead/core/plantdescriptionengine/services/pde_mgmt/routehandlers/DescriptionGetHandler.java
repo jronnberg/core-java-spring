@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import java.util.Objects;
 
@@ -45,7 +45,7 @@ public class DescriptionGetHandler implements HttpRouteHandler {
             id = Integer.parseInt(idString);
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(idString + " is not a valid plant description entry ID.");
+            response.body(idString + " is not a valid Plant Description Entry ID.");
             response.status(HttpStatus.BAD_REQUEST);
             return Future.done();
         }

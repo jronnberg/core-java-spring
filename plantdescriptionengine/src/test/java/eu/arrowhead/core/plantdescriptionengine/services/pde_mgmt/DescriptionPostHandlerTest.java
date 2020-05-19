@@ -7,26 +7,26 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.NullBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler.DescriptionPostHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPostHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
 public class DescriptionPostHandlerTest {
 
     @Test
-    public void shouldCreateNewEntry() throws BackingStoreException {
+    public void shouldCreateEntry() throws BackingStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new NullBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var handler = new DescriptionPostHandler(entryMap);
-
-        MockRequest request = new MockRequest();
-        HttpServiceResponse response = new MockResponse();
         final PlantDescription description = Utils.createDescription();
-        request.body(description);
+        final HttpServiceResponse response = new MockResponse();
+        final MockRequest request = new MockRequest.Builder()
+            .body(description)
+            .build();
 
         try {
             handler.handle(request, response)
@@ -43,12 +43,11 @@ public class DescriptionPostHandlerTest {
                     assertNotNull(entryInMap);
                     // TODO: Compare 'entryInMap' with 'entry'.
                 })
-                .onFailure(throwable -> {
-                    throwable.printStackTrace();
-                    assertNull(throwable);
+                .onFailure(e -> {
+                    assertNull(e);
                 });
         } catch (Exception e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 }

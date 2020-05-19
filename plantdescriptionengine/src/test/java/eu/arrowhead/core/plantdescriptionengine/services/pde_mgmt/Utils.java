@@ -15,7 +15,7 @@ public class Utils {
         return new PlantDescriptionEntryBuilder()
             .id(id)
             .plantDescription("Plant Description 1A")
-            .active(true)
+            .active(false)
             .include(new ArrayList<>())
             .systems(new ArrayList<>())
             .connections(new ArrayList<>())

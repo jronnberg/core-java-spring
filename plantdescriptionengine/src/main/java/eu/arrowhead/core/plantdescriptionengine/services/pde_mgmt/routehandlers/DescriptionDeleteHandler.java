@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandler;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import java.util.Objects;
 
@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -47,7 +47,7 @@ public class DescriptionDeleteHandler implements HttpRouteHandler {
             id = Integer.parseInt(request.pathParameter(0));
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(request.pathParameter(0) + " is not a valid plant description entry ID.");
+            response.body(request.pathParameter(0) + " is not a valid Plant Description Entry ID.");
             return Future.done();
         }
 
