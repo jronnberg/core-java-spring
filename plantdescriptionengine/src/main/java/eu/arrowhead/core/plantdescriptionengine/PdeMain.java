@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore.FileStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.FileStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.PdeMonitorService;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
@@ -187,24 +188,28 @@ public class PdeMain {
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
         final HttpClient httpClient = createHttpClient(appProps);
 
-        SystemTracker.initialize(httpClient, serviceRegistryAddress).flatMap(result -> {
+        final var systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
+
+        systemTracker.refreshSystems().flatMap(result -> {
             final CloudDto cloud = new CloudBuilder()
                 .name(demoProps.getProperty("cloud.name"))
                 .operator(demoProps.getProperty("cloud.operator"))
                 .build();
 
-            final var orchestratorClient = new OrchestratorClient(httpClient, cloud);
+            final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker);
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FileStore(plantDescriptionsDirectory));
+            final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
+            final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
 
             return orchestratorClient.initialize(entryMap)
-                .flatMap(orchstratorInitializationResult -> {
+                .ifSuccess(orchstratorInitializationResult -> {
                     final var pdeManager = new PdeManagementService(entryMap);
-                    final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
-                    final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
-                    logger.info("Providing services...");
-                    return arSystem.provide(pdeManager.getService(secureMode));
+                    final var pdeMonitor = new PdeMonitorService();
+
+                    arSystem.provide(pdeManager.getService(secureMode));
+                    arSystem.provide(pdeMonitor.getService(secureMode));
                 });
         })
         .onFailure(throwable -> {
