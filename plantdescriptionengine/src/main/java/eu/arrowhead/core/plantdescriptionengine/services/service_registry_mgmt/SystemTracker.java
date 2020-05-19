@@ -14,21 +14,32 @@ import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 
 /**
- * Singleton object used to keep track of registered Arrowhead systems.
- *
- * The Singleton pattern is implemented using an Enum, as described in Joshua
- * Bloch's Effective Java.
+ * Object used to keep track of registered Arrowhead systems.
  */
-public enum SystemTracker {
+public class SystemTracker {
 
-    INSTANCE; // Singleton instance
-
-    private HttpClient httpClient = null;
+    private final HttpClient httpClient;
     private InetSocketAddress serviceRegistryAddress = null;
-    private static boolean initialized;
+    private boolean initialized;
 
     private Map<Integer, SrSystem> systemsById = new ConcurrentHashMap<>();
     private Map<String, SrSystem> systemsByName = new ConcurrentHashMap<>();
+
+    /**
+     * Class constructor
+     *
+     * @param httpClient Object for communicating with the Service Registry.
+     * @param serviceRegistryAddress Address of the Service Registry.
+     *
+     */
+    public SystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
+
+        Objects.requireNonNull(serviceRegistryAddress, "Expected service registry address");
+        Objects.requireNonNull(httpClient, "Expected HTTP client");
+
+        this.httpClient = httpClient;
+        this.serviceRegistryAddress = serviceRegistryAddress;
+    }
 
     /**
      * @return A Future which will complete with a list of registered systems.
@@ -37,9 +48,6 @@ public enum SystemTracker {
      * {@link #getComponentAt(String) getSystem}.
      */
     public Future<Void> refreshSystems() {
-        if (!initialized) {
-            throw new IllegalStateException("SystemTracker has not been initialized.");
-        }
         return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/serviceregistry/mgmt/systems")
@@ -50,33 +58,9 @@ public enum SystemTracker {
                     systemsById.put(system.id(), system);
                     systemsByName.put(system.systemName(), system);
                 }
+                initialized = true;
                 return Future.done();
             });
-    }
-
-    /**
-     * Sets up the global singleton instance, retrieving systems from registry.
-     *
-     * {@link #refreshSystems()} can be called to keep the cached list of
-     * services up-to-date with the state of the Service Registry.
-     *
-     * @param httpClient Object for communicating with the Service Registry.
-     * @param serviceRegistryAddress Address of the Service Registry.
-     */
-    public static Future<Void> initialize(HttpClient httpClient, InetSocketAddress serviceRegistryAddress) {
-        if (initialized) {
-            throw new IllegalStateException("SystemTracker has already been initialized.");
-        }
-
-        Objects.requireNonNull(serviceRegistryAddress, "Expected service registry address");
-        Objects.requireNonNull(httpClient, "Expected HTTP client");
-
-        INSTANCE.serviceRegistryAddress = serviceRegistryAddress;
-        INSTANCE.httpClient = httpClient;
-
-        initialized = true;
-
-        return INSTANCE.refreshSystems();
     }
 
     /**

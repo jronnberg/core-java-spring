@@ -39,23 +39,27 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
     private PlantDescriptionEntry activeEntry = null;
     private final RuleMap ruleMap;
+    private final SystemTracker systemTracker;
 
     /**
      * Class constructor.
      *
      * @param client Object for sending HTTP messages to the Orchestrator.
      * @param cloud DTO describing a Arrowhead Cloud.
-     * @param RulebackingStore Non-volatile storage for Orchestrator Entries.
+     * @param SystemTracker Object used to keep track of registered Arrowhead
+     *                      systems.
      */
-    public OrchestratorClient(HttpClient client, CloudDto cloud) {
+    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker) {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
+        Objects.requireNonNull(systemTracker, "Expected System tracker");
 
         this.client = client;
         this.cloud = cloud;
+        this.systemTracker = systemTracker;
         ruleMap = new RuleMap();
 
-        SrSystem orchestrator = SystemTracker.INSTANCE.getSystem(ORCHESTRATOR_SYSTEM_NAME);
+        SrSystem orchestrator = systemTracker.getSystem(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
@@ -130,8 +134,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = SystemTracker.INSTANCE.getSystem(connection.consumer().systemId());
-        SrSystem providerSystem = SystemTracker.INSTANCE.getSystem(connection.producer().systemId());
+        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId());
+        SrSystem providerSystem = systemTracker.getSystem(connection.producer().systemId());
 
         Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
         Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
