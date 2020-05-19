@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -13,6 +14,7 @@ import java.util.Optional;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface Port {
 
     String portName();
@@ -23,9 +25,4 @@ public interface Port {
      * Indicates whether this port is used to consume or produce services.
      */
     Optional<Boolean> consumer();
-
-    default String asString() {
-        return "Port[portName=" + portName() + ",serviceDefinition=" + serviceDefinition() +
-            ",consumer=" + consumer() + "]";
-    }
 }

@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -15,6 +16,7 @@ import java.util.Optional;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface ServiceRegistryEntry {
 	Integer id();
 	ServiceDefinition serviceDefinition();
@@ -28,8 +30,4 @@ public interface ServiceRegistryEntry {
     String createdAt();
     String updatedAt();
 
-
-    default String asString() {
-        return "ServiceRegistryEntry[serviceDefinition=" + serviceDefinition() + ", provider=" + provider().systemName() + "]";
-    }
 }

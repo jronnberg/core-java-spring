@@ -21,8 +21,4 @@ public interface PlantDescriptionUpdate {
     Optional<List<Connection>> connections();
     Optional<List<Integer>> include();
 
-    default String asString() {
-        return "PlantDescriptionUpdate[plantDescription=" + plantDescription().orElse("N/A") + "]";
-    }
-
 }

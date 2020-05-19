@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -13,6 +14,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface PdeAlarm {
 
     int id();
@@ -24,9 +26,5 @@ public interface PdeAlarm {
     Instant updatedAt();
     Optional<Instant> clearedAt();
     Optional<Instant> acknowledgedAt();
-
-    default String asString() {
-        return "PdeAlarm[id=" + id() + ",description=" + description() + "]";
-    }
 
 }

@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -11,12 +12,9 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface Connection {
 
     SystemPort consumer();
     SystemPort producer();
-
-    default String asString() {
-        return "Connection[consumer=" + consumer().asString() + ",producer=" + producer().asString() + "]";
-    }
 }

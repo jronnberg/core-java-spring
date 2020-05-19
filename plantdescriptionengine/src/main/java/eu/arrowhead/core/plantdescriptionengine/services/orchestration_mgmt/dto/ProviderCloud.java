@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -10,6 +11,7 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface ProviderCloud {
 	Integer id();
 	String operator();
@@ -20,8 +22,4 @@ public interface ProviderCloud {
 	Boolean ownCloud();
     String createdAt();
     String updatedAt();
-
-    default String asString() {
-        return "ProviderCloud[operator=" + operator() + ", name="+ name() + "]";
-    }
 }

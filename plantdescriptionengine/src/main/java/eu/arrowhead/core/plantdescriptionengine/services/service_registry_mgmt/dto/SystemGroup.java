@@ -5,6 +5,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 import java.util.List;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -12,14 +13,13 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface SystemGroup {
+
 	Integer systemId();
 	String systemName();
 	String address();
 	Integer port();
 	List<ServiceDefinition> providerServices();
 
-    default String asString() {
-        return "SystemGroup[systemName=" + systemName() + "]";
-    }
 }

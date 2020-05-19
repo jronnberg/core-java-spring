@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -10,14 +11,12 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface ServiceInterface {
+
 	Integer id();
 	String interfaceName();
 	String createdAt();
 	String updatedAt();
-
-    default String asString() {
-        return "ServiceInterface[interfaceName=" + interfaceName() + "]";
-    }
 
 }

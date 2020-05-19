@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -12,7 +13,9 @@ import java.util.Optional;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface SrSystem {
+
 	Integer id(); // TODO: Should this be Optional?
     String systemName();
     String address();
@@ -21,8 +24,4 @@ public interface SrSystem {
     Optional<String> createdAt();
     Optional<String> updatedAt();
 
-
-    default String asString() {
-        return "SrSystem[systemName=" + systemName() + "]";
-    }
 }

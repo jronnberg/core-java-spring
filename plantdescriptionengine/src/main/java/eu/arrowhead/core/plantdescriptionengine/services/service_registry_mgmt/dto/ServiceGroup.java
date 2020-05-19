@@ -5,6 +5,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 import java.util.List;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -12,12 +13,11 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface ServiceGroup {
+
 	Integer serviceDefinitionId();
 	String serviceDefinition();
-	List<ServiceDefinition> providerServices();
+    List<ServiceDefinition> providerServices();
 
-    default String asString() {
-        return "ServiceGroup[serviceDefinition=" + serviceDefinition() + "]";
-    }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -17,6 +18,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface PlantDescriptionEntry {
 
     final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
@@ -183,10 +185,6 @@ public interface PlantDescriptionEntry {
             (description.active().orElse(false) == active())
             // TODO: Check 'include', 'systems' and 'connections' as well.
         );
-    }
-
-    default String asString() {
-        return "PlantDescriptionEntry[id=" + id() + ",plantDescription=" + plantDescription() + "]";
     }
 
 }

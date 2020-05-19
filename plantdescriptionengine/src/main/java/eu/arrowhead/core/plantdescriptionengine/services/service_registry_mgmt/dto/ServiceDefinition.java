@@ -5,6 +5,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -12,14 +13,11 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface ServiceDefinition {
 	Optional<Integer> id();
 	String serviceDefinition();
     Optional<String> createdAt();
     Optional<String> updatedAt();
-
-    default String asString() {
-        return "ServiceDefinition[serviceDefinition=" + serviceDefinition() + "]";
-    }
 
 }

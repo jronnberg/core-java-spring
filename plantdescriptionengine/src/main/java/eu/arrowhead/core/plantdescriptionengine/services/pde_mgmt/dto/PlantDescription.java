@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -13,14 +14,11 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface PlantDescription {
     String plantDescription();
     Optional<Boolean> active();
     Optional<List<Integer>> include();
     List<PdeSystem> systems();
     List<Connection> connections();
-
-    default String asString() {
-        return "PlantDescription[plantDescription=" + plantDescription() + "]";
-    }
 }

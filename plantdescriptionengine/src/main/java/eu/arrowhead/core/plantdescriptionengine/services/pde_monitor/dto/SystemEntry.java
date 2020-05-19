@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface SystemEntry {
 
     Integer systemId();
@@ -20,9 +22,5 @@ public interface SystemEntry {
     Optional<Map<String, String>> systemData();
     Optional<String> inventoryId();
     Optional<Map<String, String>> inventoryData();
-
-    default String asString() {
-        return "SystemEntry[systemName=" + systemName() + "]";
-    }
 
 }

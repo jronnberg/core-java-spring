@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -14,14 +15,11 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface PdeSystem {
 
     Integer systemId();
     Optional<String> systemName();
     Optional<Map<String, String>> metadata();
     List<Port> ports();
-
-    default String asString() {
-        return "PdeSystem[systemId=" + systemId() + "]";
-    }
 }

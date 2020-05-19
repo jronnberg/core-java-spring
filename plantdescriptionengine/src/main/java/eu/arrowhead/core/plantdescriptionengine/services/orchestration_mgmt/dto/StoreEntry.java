@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -17,6 +18,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.d
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface StoreEntry {
 	Integer id();
 	ServiceDefinition serviceDefinition();
@@ -31,9 +33,4 @@ public interface StoreEntry {
     Optional<Map<String, String>> attribute();
     String createdAt();
     String updatedAt();
-
-
-    default String asString() {
-        return "StoreEntry[serviceDefinition=" + serviceDefinition() + "]";
-    }
 }
