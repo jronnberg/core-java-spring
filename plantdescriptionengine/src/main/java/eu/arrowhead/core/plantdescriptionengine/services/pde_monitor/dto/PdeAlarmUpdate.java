@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 import java.util.Optional;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -12,12 +13,9 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface PdeAlarmUpdate {
 
     Optional<Boolean> acknowledged();
-
-    default String asString() {
-        return "PdeAlarmUpdate[acknowledged=" + acknowledged() + "]";
-    }
 
 }

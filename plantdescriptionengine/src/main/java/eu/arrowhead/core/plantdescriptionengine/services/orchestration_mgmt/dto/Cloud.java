@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 /**
@@ -10,11 +11,8 @@ import se.arkalix.dto.DtoWritableAs;
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
+@DtoToString
 public interface Cloud {
 	String operator();
 	String name();
-
-    default String asString() {
-        return "Cloud[operator=" + operator() + ", name="+ name() + "]";
-    }
 }
