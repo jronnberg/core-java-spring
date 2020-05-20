@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import org.junit.Test;
 
@@ -7,21 +7,24 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPostHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-public class DescriptionPostHandlerTest {
+public class AddPlantDescriptionTest {
 
     @Test
     public void shouldCreateEntry() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPostHandler(entryMap);
+        final var handler = new AddPlantDescription(entryMap);
         final PlantDescription description = Utils.createDescription();
         final HttpServiceResponse response = new MockResponse();
         final MockRequest request = new MockRequest.Builder()

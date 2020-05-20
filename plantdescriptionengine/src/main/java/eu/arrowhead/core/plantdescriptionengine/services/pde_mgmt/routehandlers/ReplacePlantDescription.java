@@ -19,8 +19,8 @@ import se.arkalix.util.concurrent.Future;
 /**
  * Handles HTTP requests to update or create Plant Description Entries.
  */
-public class DescriptionPutHandler implements HttpRouteHandler {
-    private static final Logger logger = LoggerFactory.getLogger(DescriptionPutHandler.class);
+public class ReplacePlantDescription implements HttpRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ReplacePlantDescription.class);
 
     private final PlantDescriptionEntryMap entryMap;
 
@@ -29,7 +29,7 @@ public class DescriptionPutHandler implements HttpRouteHandler {
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public DescriptionPutHandler(PlantDescriptionEntryMap entryMap) {
+    public ReplacePlantDescription(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }

@@ -26,8 +26,8 @@ import se.arkalix.util.concurrent.Future;
 /**
  * Handles HTTP requests to retrieve all current Plant Description Entries.
  */
-public class DescriptionsGetHandler implements HttpRouteHandler {
-    private static final Logger logger = LoggerFactory.getLogger(DescriptionPostHandler.class);
+public class GetAllPlantDescriptions implements HttpRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
     private final PlantDescriptionEntryMap entryMap;
 
@@ -36,7 +36,7 @@ public class DescriptionsGetHandler implements HttpRouteHandler {
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public DescriptionsGetHandler(PlantDescriptionEntryMap entryMap) {
+    public GetAllPlantDescriptions(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }
@@ -46,8 +46,8 @@ public class DescriptionsGetHandler implements HttpRouteHandler {
      * present in the PDE.
      *
      * @param request HTTP request object.
-     * @param response HTTP response containing the current
-     *                 PlantDescriptionEntryList.
+     * @param response HTTP response whose body contains a list of Plant
+     *                 Description entries.
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {

@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import org.junit.Test;
 
@@ -7,53 +7,47 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionUpdate;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionUpdateBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPatchHandler;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-public class DescriptionPatchHandlerTest {
+public class DeletePlantDescriptionTest {
 
     @Test
-    public void shouldReplaceExistingEntries() throws BackingStoreException {
+    public void shouldDeleteEntries() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPatchHandler(entryMap);
-        final int entryId = 87;
+        final var handler = new DeletePlantDescription(entryMap);
+        final int entryId = 14;
+        entryMap.put(Utils.createEntry(entryId));
 
-        final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
-        final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
-            .plantDescription(newName)
-            .build();
-        final HttpServiceResponse response = new MockResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
+        HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
-            .body(update)
             .build();
 
-        entryMap.put(entry);
+        HttpServiceResponse response = new MockResponse();
 
-        final int sizeBeforePut = entryMap.getEntries().size();
+        // Make sure that the entry is there before we delete it.
+        assertNotNull(entryMap.get(entryId));
 
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.OK, response.status().get());
-                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
-                    assertEquals(returnedEntry.plantDescription(), newName);
-                    assertEquals(sizeBeforePut, entryMap.getEntries().size());
+                    assertNull(entryMap.get(entryId));
                 })
-                .onFailure(throwable -> {
-                    assertNull(throwable);
+                .onFailure(e -> {
+                    assertNull(e);
                 });
         } catch (Exception e) {
             assertNull(e);
@@ -63,7 +57,7 @@ public class DescriptionPatchHandlerTest {
     @Test
     public void shouldRejectInvalidId() throws BackingStoreException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPatchHandler(entryMap);
+        final var handler = new DeletePlantDescription(entryMap);
         final String invalidEntryId = "InvalidId";
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -93,8 +87,8 @@ public class DescriptionPatchHandlerTest {
     @Test
     public void shouldRejectNonexistentIds() throws BackingStoreException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPatchHandler(entryMap);
-        final int nonExistentId = 9;
+        final var handler = new DeletePlantDescription(entryMap);
+        final int nonExistentId = 392;
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(nonExistentId)))

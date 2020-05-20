@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import org.junit.Test;
 
@@ -11,24 +11,27 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionPutHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-public class DescriptionPutHandlerTest {
+public class ReplacePlantDescriptionTest {
 
     @Test
     public void shouldCreateEntry() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPutHandler(entryMap);
+        final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
         final PlantDescription description = Utils.createDescription();
         final HttpServiceResponse response = new MockResponse();
@@ -64,7 +67,7 @@ public class DescriptionPutHandlerTest {
     public void shouldReplaceExistingEntries() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPutHandler(entryMap);
+        final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
 
         final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
@@ -108,7 +111,7 @@ public class DescriptionPutHandlerTest {
     @Test
     public void shouldRejectInvalidId() throws BackingStoreException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionPutHandler(entryMap);
+        final var handler = new ReplacePlantDescription(entryMap);
         final String invalidEntryId = "InvalidId";
 
         HttpServiceRequest request = new MockRequest.Builder()

@@ -16,9 +16,9 @@ import se.arkalix.util.concurrent.Future;
 /**
  * Handles HTTP requests to delete Plant Description Entries.
  */
-public class DescriptionDeleteHandler implements HttpRouteHandler {
+public class DeletePlantDescription implements HttpRouteHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DescriptionDeleteHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeletePlantDescription.class);
 
     private final PlantDescriptionEntryMap entryMap;
 
@@ -27,7 +27,7 @@ public class DescriptionDeleteHandler implements HttpRouteHandler {
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public DescriptionDeleteHandler(PlantDescriptionEntryMap entryMap) {
+    public DeletePlantDescription(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }

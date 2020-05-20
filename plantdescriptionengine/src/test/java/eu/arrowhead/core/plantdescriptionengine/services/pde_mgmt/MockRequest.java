@@ -19,7 +19,7 @@ import se.arkalix.util.concurrent.FutureProgress;
 /**
  * Mock HttpServiceRequest implementation used for testing.
  */
-class MockRequest implements HttpServiceRequest {
+public class MockRequest implements HttpServiceRequest {
 
     private final List<String> _pathParameters;
     private final Object body;
@@ -118,17 +118,17 @@ class MockRequest implements HttpServiceRequest {
         private Object body;
         private Map<String, List<String>> queryParameters;
 
-        Builder pathParameters(List<String> pathParameters) {
+        public Builder pathParameters(List<String> pathParameters) {
             this.pathParameters = pathParameters;
             return this;
         }
 
-        Builder body(Object body) {
+        public Builder body(Object body) {
             this.body = body;
             return this;
         }
 
-        Builder queryParameters(Map<String, List<String>> queryParameters) {
+        public Builder queryParameters(Map<String, List<String>> queryParameters) {
             this.queryParameters = queryParameters;
             return this;
         }

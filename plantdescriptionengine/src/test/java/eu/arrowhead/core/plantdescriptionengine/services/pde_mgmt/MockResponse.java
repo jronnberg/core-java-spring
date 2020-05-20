@@ -14,7 +14,7 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 /**
  * Mock HttpServiceResponse implementation used for testing.
  */
-class MockResponse implements HttpServiceResponse {
+public class MockResponse implements HttpServiceResponse {
 
     private Object _body = null;
     private HttpStatus _status = HttpStatus.IM_A_TEAPOT;
