@@ -8,7 +8,7 @@ This document describes an abstract Arrowhead Framework service meant to enable 
 
 The PDE gathers information about the presence of all specified systems in the active plant description. If a system is not present it raises an alarm. If it detects that an unknown system has registered a service in the service registry it also raises an alarm.
 
-The PDE can, tentatively, also gather system data and inventory data about the systems in the plant. If that is gathered it can be retrieved using this services.
+The PDE can, tentatively, also gather system data and inventory data about the systems in the plant. If that is gathered it can be retrieved using this service.
 
 This service is produced by the PDE and can be consumed by, for example, a dash-board to manage the alarms that the PDE raises.
 

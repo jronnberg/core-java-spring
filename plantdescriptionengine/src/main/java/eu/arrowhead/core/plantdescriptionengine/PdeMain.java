@@ -204,12 +204,13 @@ public class PdeMain {
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
 
             return orchestratorClient.initialize(entryMap)
-                .ifSuccess(orchstratorInitializationResult -> {
+                .flatMap(orchstratorInitializationResult -> {
                     final var pdeManager = new PdeManagementService(entryMap);
+                    return arSystem.provide(pdeManager.getService(secureMode));
+                })
+                .flatMap(mgmtServiceResult -> {
                     final var pdeMonitor = new PdeMonitorService();
-
-                    arSystem.provide(pdeManager.getService(secureMode));
-                    arSystem.provide(pdeMonitor.getService(secureMode));
+                    return arSystem.provide(pdeMonitor.getService(secureMode));
                 });
         })
         .onFailure(throwable -> {
