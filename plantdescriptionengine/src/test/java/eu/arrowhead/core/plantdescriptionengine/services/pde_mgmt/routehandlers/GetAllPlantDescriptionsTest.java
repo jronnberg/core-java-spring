@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import org.junit.Test;
 
@@ -11,16 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryList;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionsGetHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-public class DescriptionsGetHandlerTest {
+public class GetAllPlantDescriptionsTest {
 
     @Test
     public void shouldRespondWithStoredEntries() throws BackingStoreException {
@@ -32,7 +35,7 @@ public class DescriptionsGetHandlerTest {
             entryMap.put(Utils.createEntry(id));
         }
 
-        DescriptionsGetHandler handler = new DescriptionsGetHandler(entryMap);
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
         HttpServiceRequest request = new MockRequest();
         HttpServiceResponse response = new MockResponse();
 
@@ -62,7 +65,7 @@ public class DescriptionsGetHandlerTest {
             entryMap.put(Utils.createEntry(id));
         }
 
-        DescriptionsGetHandler handler = new DescriptionsGetHandler(entryMap);
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "sort_field", List.of("id"),
@@ -100,7 +103,7 @@ public class DescriptionsGetHandlerTest {
     @Test
     public void shouldRejectInvalidParameters() throws BackingStoreException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        DescriptionsGetHandler handler = new DescriptionsGetHandler(entryMap);
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active")
@@ -150,7 +153,7 @@ public class DescriptionsGetHandlerTest {
             .updatedAt(now)
             .build());
 
-        DescriptionsGetHandler handler = new DescriptionsGetHandler(entryMap);
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active"),

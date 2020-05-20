@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
 import org.junit.Test;
 
@@ -8,21 +8,24 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DescriptionGetHandler;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-public class DescriptionGetHandlerTest {
+public class GetPlantDescriptionTest {
 
     @Test
     public void shouldRespondWithNotFound() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var handler = new DescriptionGetHandler(entryMap);
+        final var handler = new GetPlantDescription(entryMap);
         final int nonExistentEntryId = 0;
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -51,7 +54,7 @@ public class DescriptionGetHandlerTest {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
-        DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
+        GetPlantDescription handler = new GetPlantDescription(entryMap);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
@@ -85,7 +88,7 @@ public class DescriptionGetHandlerTest {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(Utils.createEntry(entryId));
 
-        DescriptionGetHandler handler = new DescriptionGetHandler(entryMap);
+        GetPlantDescription handler = new GetPlantDescription(entryMap);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(invalidId))

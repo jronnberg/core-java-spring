@@ -13,7 +13,7 @@ import se.arkalix.util.concurrent.Future;
 /**
  * Handles HTTP requests to retrieve a specific Plant Description Entries.
  */
-public class DescriptionGetHandler implements HttpRouteHandler {
+public class GetPlantDescription implements HttpRouteHandler {
 
     private final PlantDescriptionEntryMap entryMap;
 
@@ -22,7 +22,7 @@ public class DescriptionGetHandler implements HttpRouteHandler {
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public DescriptionGetHandler(PlantDescriptionEntryMap entryMap) {
+    public GetPlantDescription(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }
