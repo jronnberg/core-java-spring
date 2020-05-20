@@ -9,10 +9,10 @@ import java.util.List;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;

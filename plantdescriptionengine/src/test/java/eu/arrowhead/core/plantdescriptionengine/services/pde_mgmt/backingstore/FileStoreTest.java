@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
 
 /**
  * Unit test for the
