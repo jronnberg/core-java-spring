@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import java.time.Instant;
 import java.util.ArrayList;

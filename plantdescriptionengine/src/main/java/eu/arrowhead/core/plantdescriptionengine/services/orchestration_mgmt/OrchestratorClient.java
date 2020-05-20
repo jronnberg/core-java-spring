@@ -261,6 +261,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
         } else {
             if (logger.isWarnEnabled()) {
+                // TODO: This isn't strictly true: the count is zero if the rules already exist.
                 logger.warn("The active Plant Description (" + entryName + ") does not have any connections.");
             }
         }
