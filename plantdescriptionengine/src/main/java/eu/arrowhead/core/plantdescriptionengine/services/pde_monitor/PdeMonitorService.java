@@ -34,8 +34,8 @@ public class PdeMonitorService {
         var service = new HttpService()
             .name("plant-description-monitor-service")
             .encodings(EncodingDescriptor.JSON)
-            .basePath("/pde")
-            .get("/monitor/alarm", (request, response) -> onAlarmsGet(request, response));
+            .basePath("/pde/monitor")
+            .get("/alarm", (request, response) -> onAlarmsGet(request, response));
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

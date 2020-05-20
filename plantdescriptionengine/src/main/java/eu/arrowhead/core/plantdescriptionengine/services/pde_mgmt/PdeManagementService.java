@@ -38,13 +38,13 @@ public class PdeManagementService {
         HttpService service = new HttpService()
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
-            .basePath("/pde")
-            .get("/mgmt/pd/#id", new DescriptionGetHandler(entryMap))
-            .get("/mgmt/pd", new DescriptionsGetHandler(entryMap))
-            .post("/mgmt/pd", new DescriptionPostHandler(entryMap))
-            .delete("/mgmt/pd/#id", new DescriptionDeleteHandler(entryMap))
-            .put("/mgmt/pd/#id", new DescriptionPutHandler(entryMap))
-            .patch("/mgmt/pd/#id", new DescriptionPatchHandler(entryMap));
+            .basePath("/pde/mgmt")
+            .get("/pd/#id", new DescriptionGetHandler(entryMap))
+            .get("/pd", new DescriptionsGetHandler(entryMap))
+            .post("/pd", new DescriptionPostHandler(entryMap))
+            .delete("/pd/#id", new DescriptionDeleteHandler(entryMap))
+            .put("/pd/#id", new DescriptionPutHandler(entryMap))
+            .patch("/pd/#id", new DescriptionPatchHandler(entryMap));
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());
