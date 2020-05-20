@@ -38,30 +38,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"},
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"},
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true },
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true },
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
@@ -93,30 +93,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
@@ -211,30 +211,30 @@ Content-Type: application/json
 			{
 				"systemName": "Service Registry",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+					{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
+					{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 				]
 			},
 			{
 				"systemName": "Authorization",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+					{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+					{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+					{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"}
+					{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 				]
 			},
 			{
 				"systemName": "Orchestration",
 				"ports": [
-					{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-					{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-					{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-					{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-					{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-					{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-					{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+					{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+					{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+					{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+					{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+					{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+					{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+					{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true }
+					{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 				]
 			},
 		],
@@ -283,30 +283,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
@@ -347,30 +347,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"},
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"},
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
@@ -402,30 +402,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true },
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true },
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
@@ -479,30 +479,30 @@ Content-Type: application/json
 		{
 			"systemName": "Service Registry",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery"},
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Authorization",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra"}
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
 			"ports": [
-				{ "portName": "service_registry", "serviceDefinition": "Service Discovery", "consumer": true },
-				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
-				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},
-				{ "portName": "orchestrationPush", "serviceDefinition": "OrchestrationPush", "consumer": true },
-				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "OrchestrationCapabilities", "consumer": true }
-				{ "portName": "monitorable", "serviceDefinition": "eu.arrowehead.services.monitorable"}
+				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
+				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
+				{ "portName": "authorizationControl", "serviceDefinition": "authorization-control-intra", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "orchestration-service"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "orchestration-store-management"},
+				{ "portName": "orchestrationPush", "serviceDefinition": "orchestration-push", "consumer": true },
+				{ "portName": "OrchestrationCapabilities", "serviceDefinition": "orchestration-capabilities", "consumer": true }
+				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
 			]
 		}
 	],
