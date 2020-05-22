@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
@@ -185,6 +186,59 @@ public interface PlantDescriptionEntry {
             (description.active().orElse(false) == active())
             // TODO: Check 'include', 'systems' and 'connections' as well.
         );
+    }
+
+    /**
+     * Returns a copy of a Plant Description Entry supplemented with monitor
+     * info.
+     *
+     * The resulting copy will contain inventory ID and system data, if
+     * available.
+     */
+    // TODO: Remove this function
+    static PlantDescriptionEntryDto extend(PlantDescriptionEntry entry, MonitorInfo monitorInfo) {
+        List<PdeSystemDto> systems = new ArrayList<>();
+        List<ConnectionDto> connections = new ArrayList<>();
+
+        for (PdeSystem system : entry.systems()) {
+
+            List<PortDto> ports = new ArrayList<>();
+            for (Port port : system.ports()) {
+                ports.add((PortDto)port);
+            }
+
+            var systemBuilder = new PdeSystemBuilder()
+                .systemId(system.systemId())
+                .ports(ports);
+
+            if (system.systemName().isPresent()) {
+                String systemName = system.systemName().get();
+                systemBuilder.systemName(systemName);
+                systemBuilder.inventoryId(monitorInfo.getInventoryId(systemName));
+                systemBuilder.systemData(monitorInfo.getSystemData(systemName));
+            }
+
+            if (system.metadata().isPresent()) {
+                systemBuilder.metadata(system.metadata().get());
+            }
+
+            systems.add(systemBuilder.build());
+        }
+
+        for (Connection connection : entry.connections()) {
+            connections.add((ConnectionDto)connection);
+        }
+
+        return new PlantDescriptionEntryBuilder()
+            .id(entry.id())
+            .plantDescription(entry.plantDescription())
+            .active(entry.active())
+            .include(entry.include())
+            .systems(systems)
+            .connections(connections)
+            .createdAt(entry.createdAt())
+            .updatedAt(entry.updatedAt())
+            .build();
     }
 
 }

@@ -26,5 +26,5 @@ public interface PdeSystem {
     // TODO: Remove the three fields below, use separate DTO for the Monitor service
     Optional<Map<String, String>> systemData();
     Optional<String> inventoryId();
-    Optional<Map<String, String>> inventoryData();
+    // Optional<Map<String, String>> inventoryData();
 }
