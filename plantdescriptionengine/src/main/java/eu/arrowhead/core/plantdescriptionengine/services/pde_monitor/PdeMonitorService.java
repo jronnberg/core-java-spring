@@ -1,16 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
-import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPlantDescriptions;
@@ -26,7 +23,6 @@ import se.arkalix.net.http.service.HttpService;
 import se.arkalix.query.ServiceQuery;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
-import se.arkalix.util.concurrent.Futures;
 
 public class PdeMonitorService {
 
@@ -37,8 +33,9 @@ public class PdeMonitorService {
     private final HttpClient httpClient; // TODO: Remove this?
     private final boolean secure;
     private final ServiceQuery monitorableQuery;
+    private final MonitorInfo monitorInfo = new MonitorInfo();
 
-    private final static int pollInterval = 5000; // Milliseconds
+    private final static int pollInterval = 3000; // Milliseconds
 
     /**
      * Class constructor.
@@ -80,7 +77,7 @@ public class PdeMonitorService {
             .name("plant-description-monitor-service")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
-            .get("/pd", new GetAllPlantDescriptions(monitorableQuery, httpClient, entryMap))
+            .get("/pd", new GetAllPlantDescriptions(monitorInfo, entryMap))
             .get("/alarm", new GetAllPdeAlarms());
 
         if (secure) {
@@ -99,66 +96,42 @@ public class PdeMonitorService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                pollMonitorableSystems()
-                    .onFailure(e -> {
-                        e.printStackTrace();
-                        logger.error("Polling of monitorable systems failed.", e);
-                    });
+                pollMonitorableSystems();
             }
         }, 0, pollInterval);
     }
 
-    private Future<?> pollMonitorableSystems() { // TODO: Change return type
-        return monitorableQuery.resolveAll()
-            .flatMap(services -> {
-
-                var idRequests = services.stream()
-                    .map(service -> retrieveId(service))
-                    .collect(Collectors.toList());
-
-                var dataRequests = services.stream()
-                    .map(service -> retrieveSystemData(service))
-                    .collect(Collectors.toList());
-
-                var serialIdRequest = Futures.serialize(idRequests)
-                .flatMap(inventoryIds -> {
-                    for (var id : inventoryIds) {
-                        System.out.println(id.id());
-                    }
-                    return Future.done();
-                });
-
-                var serialDataRequest = Futures.serialize(dataRequests)
-                .flatMap(systemDataList -> {
-                    for (var systemData : systemDataList) {
-                        System.out.println(systemData.data());
-                    }
-                    return Future.done();
-                });
-
-                return Futures.serialize(List.of(serialIdRequest, serialDataRequest));
-
-        });
+    private void pollMonitorableSystems() {
+        monitorableQuery.resolveAll()
+            .ifSuccess(services -> {
+                for (var service : services) {
+                    retrieveId(service);
+                }
+            })
+            .onFailure(e -> {
+                logger.error("Failed to poll monitorable systems.", e);
+            });
     }
 
-    private Future<InventoryIdDto> retrieveId(ServiceDescription service) {
-        var address = service.provider().socketAddress();
-        return httpClient.send(address, new HttpClientRequest()
+    private void retrieveId(ServiceDescription service) {
+        final String providerName = service.provider().name();
+        final var address = service.provider().socketAddress();
+
+        httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/monitorable/inventoryid")
             .header("accept", "application/json"))
             .flatMap(result -> result
-                .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class));
-    }
-
-    private Future<SystemDataDto> retrieveSystemData(ServiceDescription service) {
-        var address = service.provider().socketAddress();
-        return httpClient.send(address, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri("/monitorable/systemdata")
-            .header("accept", "application/json"))
-            .flatMap(result -> result
-                .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class));
+                .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+            .ifSuccess(inventoryId -> {
+                monitorInfo.putInventoryId(providerName, inventoryId.id());
+                System.out.println(inventoryId.id());
+            })
+            .onFailure(e -> {
+                monitorInfo.removeInventoryId(providerName);
+                System.out.println("Failed to retrieve data");
+                // TODO: Error handling, raise an alarm?
+            });
     }
 
 }
