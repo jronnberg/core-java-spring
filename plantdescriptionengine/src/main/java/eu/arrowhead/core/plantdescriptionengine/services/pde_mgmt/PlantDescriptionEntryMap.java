@@ -23,6 +23,9 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
  * {@link eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore},
  * which is used to store Plant Description Entries in some permanent storage
  * (e.g. to file a database).
+ *
+ * TODO: This class is used by the monitor service as well, so it should be
+ *       moved out of the management package.
  */
 public class PlantDescriptionEntryMap {
     private static final Logger logger = LoggerFactory.getLogger(PlantDescriptionEntryMap.class);

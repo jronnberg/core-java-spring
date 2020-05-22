@@ -20,7 +20,7 @@ public class PdeManagementService {
      * Constructor of a PdeManagementService.
      *
      * @param entryMap An object that maps ID:s to Plant Description
-     *                            Entries.
+     *                 Entries.
      */
     public PdeManagementService(PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected plant description map");
