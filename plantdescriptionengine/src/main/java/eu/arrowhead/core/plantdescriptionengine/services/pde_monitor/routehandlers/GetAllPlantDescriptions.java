@@ -2,10 +2,8 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandl
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryList;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -17,8 +15,6 @@ import se.arkalix.util.concurrent.Future;
  * Handles HTTP requests to retrieve all current Plant Description Entries.
  */
 public class GetAllPlantDescriptions implements HttpRouteHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
     private final PlantDescriptionEntryMap entryMap;
     private final MonitorInfo monitorInfo;
@@ -50,15 +46,8 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
-        var entries = entryMap.getListDto().data();
-        for (var entry : entries) {
-            for (var system : entry.systems()) {
-                final String systemName = system.systemName().orElse("");
-                System.out.println(".....=> " + monitorInfo.getInventoryId(systemName));
-                System.out.println(system.systemName());
-            }
-        }
-        response.status(HttpStatus.OK).body(entryMap.getListDto());
+        var body = PlantDescriptionEntryList.extend(entryMap.getListDto(), monitorInfo);
+        response.status(HttpStatus.OK).body(body);
         return Future.done();
     }
 

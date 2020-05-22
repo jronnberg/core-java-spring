@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
+import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPlantDescriptions;
@@ -106,6 +107,7 @@ public class PdeMonitorService {
             .ifSuccess(services -> {
                 for (var service : services) {
                     retrieveId(service);
+                    retrieveSystemData(service);
                 }
             })
             .onFailure(e -> {
@@ -125,11 +127,28 @@ public class PdeMonitorService {
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(inventoryId -> {
                 monitorInfo.putInventoryId(providerName, inventoryId.id());
-                System.out.println(inventoryId.id());
             })
             .onFailure(e -> {
                 monitorInfo.removeInventoryId(providerName);
-                System.out.println("Failed to retrieve data");
+                // TODO: Error handling, raise an alarm?
+            });
+    }
+
+    private void retrieveSystemData(ServiceDescription service) {
+        final String providerName = service.provider().name();
+        final var address = service.provider().socketAddress();
+
+        httpClient.send(address, new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri("/monitorable/systemdata")
+            .header("accept", "application/json"))
+            .flatMap(result -> result
+                .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
+            .ifSuccess(systemData -> {
+                monitorInfo.putSystemData(providerName, systemData.data());
+            })
+            .onFailure(e -> {
+                monitorInfo.removeSystemData(providerName);
                 // TODO: Error handling, raise an alarm?
             });
     }
