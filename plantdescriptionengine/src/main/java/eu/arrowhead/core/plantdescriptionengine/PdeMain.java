@@ -209,8 +209,8 @@ public class PdeMain {
                     return arSystem.provide(pdeManager.getService(secureMode));
                 })
                 .flatMap(mgmtServiceResult -> {
-                    final var pdeMonitor = new PdeMonitorService();
-                    return arSystem.provide(pdeMonitor.getService(secureMode));
+                    final var monitorService = new PdeMonitorService(arSystem, entryMap, httpClient, secureMode);
+                    return monitorService.provide();
                 });
         })
         .onFailure(throwable -> {

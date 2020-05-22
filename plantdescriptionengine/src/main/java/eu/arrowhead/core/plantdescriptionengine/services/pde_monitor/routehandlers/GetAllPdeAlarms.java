@@ -10,13 +10,13 @@ import se.arkalix.util.concurrent.Future;
 /**
  * Handles HTTP requests to retrieve PDE alarms.
  */
-public class AlarmsGetHandler implements HttpRouteHandler {
+public class GetAllPdeAlarms implements HttpRouteHandler {
 
     /**
-     * Handles an HTTP call to acquire a list of alarms raised by the PDE.
+     * Handles an HTTP call to acquire a list of PDE alarms raised by the PDE.
      *
-     * @param request  HTTP request object.
-     * @param response HTTP response object.
+     * @param request HTTP request object.
+     * @param response HTTP response containing an alarm list.
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
