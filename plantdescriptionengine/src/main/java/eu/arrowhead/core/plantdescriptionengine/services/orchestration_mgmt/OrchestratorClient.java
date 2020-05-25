@@ -173,17 +173,20 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         List<DtoWritable> rules = new ArrayList<>();
 
-        for (int i = 0; i < numConnections; i++) {
-            rules.add(createRule(entry, i));
-        }
+        return systemTracker.refreshSystems() // TODO: Make the system tracker refresh itself automatically instead.
+            .flatMap(result -> {
+                for (int i = 0; i < numConnections; i++) {
+                    rules.add(createRule(entry, i));
+                }
 
-        return client
-            .send(orchestratorAddress, new HttpClientRequest()
-                .method(HttpMethod.POST)
-                .uri("/orchestrator/mgmt/store")
-                .body(DtoEncoding.JSON, rules)
-                .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+                return client
+                    .send(orchestratorAddress, new HttpClientRequest()
+                        .method(HttpMethod.POST)
+                        .uri("/orchestrator/mgmt/store")
+                        .body(DtoEncoding.JSON, rules)
+                        .header("accept", "application/json"))
+                    .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+            });
     }
 
     /**

@@ -36,7 +36,7 @@ public class PdeMonitorService {
     private final ServiceQuery monitorableQuery;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
-    private final static int pollInterval = 3000; // Milliseconds
+    private final static int pollInterval = 5000; // Milliseconds
 
     /**
      * Class constructor.
