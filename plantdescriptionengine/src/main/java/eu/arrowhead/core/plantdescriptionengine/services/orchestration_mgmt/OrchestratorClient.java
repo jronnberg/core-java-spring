@@ -140,7 +140,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
         Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
-        return new StoreRuleBuilder()
+        var builder = new StoreRuleBuilder()
             .cloud(cloud)
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
             .consumerSystemId(consumerSystem.id())
@@ -149,9 +149,15 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 .address(providerSystem.address())
                 .port(providerSystem.port())
                 .build())
-            .priority(1) // TODO: Remove hard-coded value
-            .serviceInterfaceName("HTTP-INSECURE-JSON") // TODO: Remove hard-coded value
-            .build();
+            .priority(1); // TODO: Remove hard-coded value
+
+        if (client.isSecure()) {
+            builder.serviceInterfaceName("HTTP-SECURE-JSON");
+        } else {
+            builder.serviceInterfaceName("HTTP-INSECURE-JSON");
+        }
+
+        return builder.build();
     }
 
     /**
@@ -289,8 +295,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             ? postRules(entry)
             : Future.success(emptyRuleList());
 
-        deleteRulesTask.
-            flatMap(result -> postRulesTask)
+        deleteRulesTask
+            .flatMap(result -> postRulesTask)
             .ifSuccess(ruleList -> {
                 if (entry.active()) {
                     activeEntry = entry;
