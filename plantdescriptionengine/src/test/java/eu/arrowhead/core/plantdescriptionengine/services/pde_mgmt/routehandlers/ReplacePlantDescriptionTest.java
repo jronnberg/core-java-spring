@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
@@ -33,7 +33,7 @@ public class ReplacePlantDescriptionTest {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
-        final PlantDescription description = Utils.createDescription();
+        final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
@@ -70,7 +70,7 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
 
-        final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
+        final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
         final PlantDescription description = new PlantDescriptionBuilder()
             .plantDescription(newName)

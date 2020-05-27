@@ -29,11 +29,10 @@ public class PdeMonitorService {
 
     private static final Logger logger = LoggerFactory.getLogger(PdeMonitorService.class);
 
-    private final ArSystem arSystem;
     private final PlantDescriptionEntryMap entryMap;
     private final HttpClient httpClient; // TODO: Remove this?
     private final boolean secure;
-    private final ServiceQuery monitorableQuery;
+    private ServiceQuery monitorableQuery;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
     private final static int pollInterval = 5000; // Milliseconds
@@ -41,38 +40,36 @@ public class PdeMonitorService {
     /**
      * Class constructor.
      *
-     * @param arSystem An Arrowhead Framework system used to provide this
-     *                 service.
      * @param entryMap An object that maps ID:s to Plant Description
      *                 Entries.
      * @param insecure Indicates whether the service should run in secure mode.
      */
-    public PdeMonitorService(
-        ArSystem arSystem, PlantDescriptionEntryMap entryMap, HttpClient httpClient, boolean secure
-    ) {
-        Objects.requireNonNull(arSystem, "Expected AR System");
+    public PdeMonitorService(PlantDescriptionEntryMap entryMap, HttpClient httpClient, boolean secure) {
         Objects.requireNonNull(entryMap, "Expected plant description map");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
 
-        this.arSystem = arSystem;
         this.entryMap = entryMap;
         this.httpClient = httpClient;
         this.secure = secure;
-
-        monitorableQuery = arSystem.consume()
-            .name("monitorable")
-            .encodings(EncodingDescriptor.JSON);
     }
 
     /**
      * Registers this service with an Arrowhead system, eventually making it
      * accessible to remote Arrowhead systems.
      *
+     * @param arSystem An Arrowhead Framework system used to provide this
+     *                 service.
      * @return A HTTP Service used to monitor alarms raised by the Plant
      *         Description Engine core system.
      *
      */
-    public Future<ArServiceHandle> provide() {
+    public Future<ArServiceHandle> provide(ArSystem arSystem) {
+
+        Objects.requireNonNull(arSystem, "Expected AR System");
+
+        monitorableQuery = arSystem.consume()
+            .name("monitorable")
+            .encodings(EncodingDescriptor.JSON);
 
         var service = new HttpService()
             .name("plant-description-monitor")
@@ -151,6 +148,13 @@ public class PdeMonitorService {
                 monitorInfo.removeSystemData(providerName);
                 // TODO: Error handling, raise an alarm?
             });
+    }
+
+    /**
+     * Determines whether or not this service is running in secure mode.
+     */
+    boolean isSecure() {
+        return secure;
     }
 
 }

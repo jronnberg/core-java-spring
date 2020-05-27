@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -32,7 +32,7 @@ public class UpdatePlantDescriptionTest {
         final var handler = new UpdatePlantDescription(entryMap);
         final int entryId = 87;
 
-        final PlantDescriptionEntryDto entry = Utils.createEntry(entryId);
+        final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
         final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
             .plantDescription(newName)

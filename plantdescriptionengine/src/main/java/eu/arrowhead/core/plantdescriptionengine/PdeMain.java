@@ -207,10 +207,10 @@ public class PdeMain {
 
             return orchestratorClient.initialize(entryMap)
                 .flatMap(orchstratorInitializationResult -> {
-                    return new PdeManagementService(arSystem, entryMap, secureMode).provide();
+                    return new PdeManagementService(entryMap, secureMode).provide(arSystem);
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, entryMap, httpClient, secureMode).provide();
+                    return new PdeMonitorService(entryMap, httpClient, secureMode).provide(arSystem);
                 });
         })
         .onFailure(throwable -> {

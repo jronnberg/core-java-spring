@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
 import org.junit.Test;
 
@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +18,12 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescripti
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryList;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -35,7 +40,9 @@ public class GetAllPlantDescriptionsTest {
             entryMap.put(TestUtils.createEntry(id));
         }
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
+        final var monitorInfo = new MonitorInfo();
+
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
         HttpServiceRequest request = new MockRequest();
         HttpServiceResponse response = new MockResponse();
 
@@ -57,6 +64,61 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
+    public void shouldExtendWithMonitorData() throws BackingStoreException {
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var monitorInfo = new MonitorInfo();
+        final String systemName = "System A";
+        final String inventoryId = "system_a_inventory_id";
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .systemId(1)
+            .build();
+        final Instant now = Instant.now();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        entryMap.put(entry);
+        final Map<String, String> systemData = new HashMap<>();
+        systemData.put("a", "1");
+        systemData.put("b", "2");
+        monitorInfo.putInventoryId(systemName, inventoryId);
+        monitorInfo.putSystemData(systemName, systemData);
+
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        HttpServiceRequest request = new MockRequest();
+        HttpServiceResponse response = new MockResponse();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.body().isPresent());
+                var returnedEntries = (PlantDescriptionEntryList)response.body().get();
+                var returnedEntry = returnedEntries.data().get(0);
+                var returnedSystem = returnedEntry.systems().get(0);
+                assertTrue(returnedSystem.inventoryId().isPresent());
+                assertTrue(returnedSystem.systemData().isPresent());
+                assertEquals(returnedSystem.inventoryId().get(), inventoryId);
+                assertEquals(returnedSystem.systemData().get(), systemData);
+            }).onFailure(e -> {
+                e.printStackTrace();
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
     public void shouldSortEntries() throws BackingStoreException {
         final List<Integer> entryIds = List.of(0, 1, 2, 3);
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
@@ -65,7 +127,9 @@ public class GetAllPlantDescriptionsTest {
             entryMap.put(TestUtils.createEntry(id));
         }
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
+        final var monitorInfo = new MonitorInfo();
+
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "sort_field", List.of("id"),
@@ -103,7 +167,9 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldRejectInvalidParameters() throws BackingStoreException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
+        final var monitorInfo = new MonitorInfo();
+
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active")
@@ -141,6 +207,7 @@ public class GetAllPlantDescriptionsTest {
             entryMap.put(TestUtils.createEntry(id));
         }
 
+        final var monitorInfo = new MonitorInfo();
         final Instant now = Instant.now();
         entryMap.put(new PlantDescriptionEntryBuilder()
             .id(activeEntryId)
@@ -153,7 +220,7 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build());
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active"),

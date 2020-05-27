@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
@@ -28,7 +28,7 @@ public class DeletePlantDescriptionTest {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var handler = new DeletePlantDescription(entryMap);
         final int entryId = 14;
-        entryMap.put(Utils.createEntry(entryId));
+        entryMap.put(TestUtils.createEntry(entryId));
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))

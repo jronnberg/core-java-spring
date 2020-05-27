@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import se.arkalix.dto.DtoReadableAs;

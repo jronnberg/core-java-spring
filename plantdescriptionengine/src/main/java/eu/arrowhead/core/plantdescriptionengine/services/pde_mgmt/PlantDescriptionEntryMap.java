@@ -7,9 +7,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -28,7 +25,6 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
  *       moved out of the management package.
  */
 public class PlantDescriptionEntryMap {
-    private static final Logger logger = LoggerFactory.getLogger(PlantDescriptionEntryMap.class);
 
     // List of instances that need to be informed of any changes to Plant
     // Description Entries.
@@ -60,9 +56,6 @@ public class PlantDescriptionEntryMap {
             entries.put(entry.id(), entry);
         }
         nextId.set(maxId + 1);
-        if (logger.isInfoEnabled()) {
-            logger.info("Using nextId = " + nextId.get());
-        }
     }
 
     /**

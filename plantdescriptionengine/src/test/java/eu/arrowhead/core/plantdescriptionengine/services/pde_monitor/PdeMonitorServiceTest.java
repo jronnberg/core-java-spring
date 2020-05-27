@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import org.junit.Test;
 
@@ -10,31 +10,35 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import se.arkalix.ArSystem;
+import se.arkalix.net.http.client.HttpClient;
 
-public class PdeManagementServiceTest {
+public class PdeMonitorServiceTest {
 
     @Test
-    public void shouldCreateSecureService() throws BackingStoreException {
-
+    public void shouldCreateSecureService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var service = new PdeManagementService(entryMap, true);
+        final HttpClient client = new HttpClient.Builder().build();
+        final var service = new PdeMonitorService(entryMap, client, true);
         assertTrue(service.isSecure());
     }
 
     @Test
-    public void shouldCreateInsecureService() throws BackingStoreException {
+    public void shouldCreateInsecureService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var service = new PdeManagementService(entryMap, false);
+        final HttpClient client = new HttpClient.Builder().build();
+        final var service = new PdeMonitorService(entryMap, client, false);
         assertFalse(service.isSecure());
     }
 
     @Test
     public void shouldProvideService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final var service = new PdeManagementService(entryMap, false);
+        final HttpClient client = new HttpClient.Builder().build();
+        final var service = new PdeMonitorService(entryMap, client, false);
 
         final ArSystem arSystem = new ArSystem.Builder()
             .name("Test System")

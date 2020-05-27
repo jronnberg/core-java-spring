@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import se.arkalix.dto.DtoReadableAs;
