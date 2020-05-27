@@ -99,7 +99,8 @@ Currently only the following values can be updated. If a field is not present th
 ### struct SystemEntry
 | Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | |
+| `systemId` | String | Identity of the system within the PDE | `true` | |
+| `systemName` | String | Name of the system | `false` | null |
 | `metadata` | Custom | Metadata - key-value pairs | `false` | Only present if specified |
 | `ports` | Array\<[Port]> | Array with service ports exposed by the system | `true` ||
 | `systemData` | Custom | System specific data - key-value pairs | `false` | Only present if provided by [Monitorable] service of the system |

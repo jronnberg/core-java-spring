@@ -37,6 +37,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -44,6 +45,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Authorization",
+			"systemId": "authorization",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -53,6 +55,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -66,14 +69,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	]
 }
 ```
@@ -92,6 +95,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -108,6 +112,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -121,14 +126,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-			"producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-			"producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-			"producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-			"producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+			"producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+			"producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+			"producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+			"producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	],
 	"createdAt": "2020-03-13T16:54:00.511Z",
 	"updatedAt": "2020-03-13T16:54:00.511Z"
@@ -210,6 +215,7 @@ Content-Type: application/json
 		"systems": [
 			{
 				"systemName": "Service Registry",
+				"systemId": "service_registry",
 				"ports": [
 					{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
 					{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -217,6 +223,7 @@ Content-Type: application/json
 			},
 			{
 				"systemName": "Authorization",
+				"systemId": "authorization",
 				"ports": [
 					{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -226,6 +233,7 @@ Content-Type: application/json
 			},
 			{
 				"systemName": "Orchestration",
+				"systemId": "orchestration",
 				"ports": [
 					{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 					{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -239,14 +247,14 @@ Content-Type: application/json
 			},
 		],
 		"connections": [
-			{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-			  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-			  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-			{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-			  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+			{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+			  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+			{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+			  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+			{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+			  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+			{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+			  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 		],
       "createdAt": "2020-03-13T16:54:00.511Z",
       "updatedAt": "2020-03-13T16:54:00.511Z"
@@ -282,6 +290,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -289,6 +298,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Authorization",
+			"systemNId": "authorization",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -298,6 +308,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -311,14 +322,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	],
   "createdAt": "2020-03-13T16:54:00.511Z",
   "updatedAt": "2020-03-13T16:54:00.511Z"
@@ -346,6 +357,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -353,6 +365,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Authorization",
+			"systemId": "authorization",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -362,6 +375,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -375,14 +389,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	]
 }
 ```
@@ -401,6 +415,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"}
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -408,6 +423,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Authorization",
+			"systemId": "authorization",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -417,6 +433,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -430,14 +447,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	],
   "createdAt": "2020-03-13T16:54:00.511Z",
   "updatedAt": "2020-03-13T17:44:00.511Z"
@@ -478,6 +495,7 @@ Content-Type: application/json
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery"},
 				{ "portName": "monitorable", "serviceDefinition": "monitorable"}
@@ -485,6 +503,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Authorization",
+			"systemId": "authorization",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation"},
@@ -494,6 +513,7 @@ Content-Type: application/json
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
 				{ "portName": "service_registry", "serviceDefinition": "service-discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "token-generation", "consumer": true },
@@ -507,14 +527,14 @@ Content-Type: application/json
 		}
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_registry" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_registry" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }}
+		{ "consumer": { "systemId": "authorization", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_registry" },
+		  "producer": { "systemId": "service_registry", "portName": "service_registry" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }}
 	],
   "createdAt": "2020-03-13T16:54:00.511Z",
   "updatedAt": "2020-03-13T18:23:00.511Z"
@@ -595,7 +615,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemId` | Number | Identity of the system | `true` | |
+| `systemId` | String | Identity of the system within the PDE | `true` | |
 | `systemName` | String | Name of the system | `false` | null |
 | `metadata` | Object | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#port)> | Array with service ports exposed by the system | `true` ||
@@ -605,7 +625,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemId` | Number | Identity of the system | `true` | |
+| `systemId` | Number | Identity of the system within the PDE | `true` | |
 | `portName` | String | Identity of the port | `true` | |
 
 
