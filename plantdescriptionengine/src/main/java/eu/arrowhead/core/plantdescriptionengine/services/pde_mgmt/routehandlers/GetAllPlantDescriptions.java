@@ -27,6 +27,7 @@ import se.arkalix.util.concurrent.Future;
  * Handles HTTP requests to retrieve all current Plant Description Entries.
  */
 public class GetAllPlantDescriptions implements HttpRouteHandler {
+
     private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
     private final PlantDescriptionEntryMap entryMap;
@@ -100,9 +101,9 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         response
             .status(HttpStatus.OK)
             .body(new PlantDescriptionEntryListBuilder()
-            .data(entries)
-            .count(entries.size())
-            .build());
+                .data(entries)
+                .count(entries.size())
+                .build());
         return Future.done();
     }
 }

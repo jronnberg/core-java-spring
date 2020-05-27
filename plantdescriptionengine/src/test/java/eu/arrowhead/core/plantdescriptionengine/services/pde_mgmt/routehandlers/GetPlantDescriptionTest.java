@@ -11,7 +11,7 @@ import java.util.List;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -52,7 +52,7 @@ public class GetPlantDescriptionTest {
         int entryId = 39;
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        entryMap.put(Utils.createEntry(entryId));
+        entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);
 
@@ -86,7 +86,7 @@ public class GetPlantDescriptionTest {
         String invalidId = "Invalid";
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        entryMap.put(Utils.createEntry(entryId));
+        entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);
 

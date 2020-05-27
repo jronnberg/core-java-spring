@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
 /**
  * Unit test for the
@@ -43,7 +43,7 @@ public class FileStoreTest {
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
-            store.write(Utils.createEntry(id));
+            store.write(TestUtils.createEntry(id));
         }
 
         var storedEntries =  store.readEntries();
@@ -60,7 +60,7 @@ public class FileStoreTest {
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
-            store.write(Utils.createEntry(id));
+            store.write(TestUtils.createEntry(id));
         }
 
         int id0 = entryIds.get(0);

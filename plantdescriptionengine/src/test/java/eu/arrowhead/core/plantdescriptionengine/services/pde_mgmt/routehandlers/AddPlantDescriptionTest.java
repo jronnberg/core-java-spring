@@ -14,7 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
-import eu.arrowhead.core.plantdescriptionengine.utils.Utils;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
@@ -25,7 +25,7 @@ public class AddPlantDescriptionTest {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var handler = new AddPlantDescription(entryMap);
-        final PlantDescription description = Utils.createDescription();
+        final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)

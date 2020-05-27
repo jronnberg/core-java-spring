@@ -17,25 +17,20 @@ import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
 
-    private final ArSystem arSystem;
     private final PlantDescriptionEntryMap entryMap;
     private final boolean secure;
 
     /**
-     * Constructor of a PdeManagementService.
+     * Class constructor.
      *
-     * @param arSystem An Arrowhead Framework system used to provide this
-     *                 service.
      * @param entryMap An object that maps ID:s to Plant Description
      *                 Entries.
      * @param secure   Indicates whether the service should run in secure mode.
      */
-    public PdeManagementService(ArSystem arSystem, PlantDescriptionEntryMap entryMap, boolean secure) {
+    public PdeManagementService(PlantDescriptionEntryMap entryMap, boolean secure) {
 
-        Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(entryMap, "Expected plant description map");
 
-        this.arSystem = arSystem;
         this.entryMap = entryMap;
         this.secure = secure;
     }
@@ -44,9 +39,13 @@ public class PdeManagementService {
      * Registers this service with an Arrowhead system, eventually making it
      * accessible to remote Arrowhead systems.
      *
+     * @param arSystem An Arrowhead Framework system used to provide this
+     *                 service.
      * @return A HTTP Service used to manage Plant Descriptions.
      */
-    public Future<ArServiceHandle> provide() {
+    public Future<ArServiceHandle> provide(ArSystem arSystem) {
+        Objects.requireNonNull(arSystem, "Expected AR System");
+
         var service = new HttpService()
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
@@ -65,6 +64,13 @@ public class PdeManagementService {
         }
 
         return arSystem.provide(service);
+    }
+
+    /**
+     * Determines whether or not this service is running in secure mode.
+     */
+    boolean isSecure() {
+        return secure;
     }
 
 }
