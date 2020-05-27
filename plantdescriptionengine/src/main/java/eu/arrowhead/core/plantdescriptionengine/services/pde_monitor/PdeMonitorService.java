@@ -75,7 +75,7 @@ public class PdeMonitorService {
     public Future<ArServiceHandle> provide() {
 
         var service = new HttpService()
-            .name("plant-description-monitor-service")
+            .name("plant-description-monitor")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
             .get("/pd", new GetAllPlantDescriptions(monitorInfo, entryMap))

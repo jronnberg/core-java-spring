@@ -107,9 +107,10 @@ public class PdeMain {
      *
      * @param keyStorePath Sets path to file containing JVM-compatible key
      *                     store.
-     * @param keyPassword Password of private key associated with
-     *                    designated certificate in key store.
+     * @param keyPassword  Password of private key associated with
+     *                     designated certificate in key store.
      * @param keyStorePassword Password of provided key store.
+     *
      * @return An object holding the Arrowhead certificate chain and private key
      *         required to manage an owned system or operator identity.
      */
@@ -139,6 +140,7 @@ public class PdeMain {
      *
      * @param path Filesystem path to key store to load.
      * @param password Key store password.
+     *
      * @return Object holding certificates associated with trusted Arrowhead
      *         systems, operators, clouds, companies and other authorities.
      */
@@ -205,12 +207,10 @@ public class PdeMain {
 
             return orchestratorClient.initialize(entryMap)
                 .flatMap(orchstratorInitializationResult -> {
-                    final var pdeManager = new PdeManagementService(entryMap);
-                    return arSystem.provide(pdeManager.getService(secureMode));
+                    return new PdeManagementService(arSystem, entryMap, secureMode).provide();
                 })
                 .flatMap(mgmtServiceResult -> {
-                    final var monitorService = new PdeMonitorService(arSystem, entryMap, httpClient, secureMode);
-                    return monitorService.provide();
+                    return new PdeMonitorService(arSystem, entryMap, httpClient, secureMode).provide();
                 });
         })
         .onFailure(throwable -> {

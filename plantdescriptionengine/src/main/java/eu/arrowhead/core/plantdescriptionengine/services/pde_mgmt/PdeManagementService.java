@@ -8,34 +8,46 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.UpdatePlantDescription;
+import se.arkalix.ArServiceHandle;
+import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
+import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
 
+    private final ArSystem arSystem;
     private final PlantDescriptionEntryMap entryMap;
+    private final boolean secure;
 
     /**
      * Constructor of a PdeManagementService.
      *
+     * @param arSystem An Arrowhead Framework system used to provide this
+     *                 service.
      * @param entryMap An object that maps ID:s to Plant Description
      *                 Entries.
+     * @param secure   Indicates whether the service should run in secure mode.
      */
-    public PdeManagementService(PlantDescriptionEntryMap entryMap) {
+    public PdeManagementService(ArSystem arSystem, PlantDescriptionEntryMap entryMap, boolean secure) {
+
+        Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(entryMap, "Expected plant description map");
+
+        this.arSystem = arSystem;
         this.entryMap = entryMap;
+        this.secure = secure;
     }
 
     /**
-     * @return A HTTP Service that handles requests for retrieving and updating
-     *         Plant Description data.
+     * Registers this service with an Arrowhead system, eventually making it
+     * accessible to remote Arrowhead systems.
      *
-     * @param secure Indicates whether the returned service should run in secure
-     *               mode.
+     * @return A HTTP Service used to manage Plant Descriptions.
      */
-    public HttpService getService(boolean secure) {
-        HttpService service = new HttpService()
+    public Future<ArServiceHandle> provide() {
+        var service = new HttpService()
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/mgmt")
@@ -52,15 +64,7 @@ public class PdeManagementService {
             service.accessPolicy(AccessPolicy.unrestricted());
         }
 
-        return service;
-    }
-
-    /**
-     * @return A HTTP Service that handles requests for retrieving and updating
-     *         Plant Description data, running in secure mode.
-     */
-    public HttpService getService() {
-        return getService(true);
+        return arSystem.provide(service);
     }
 
 }
