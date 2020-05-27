@@ -48,15 +48,15 @@ in this section, there is also a list of implicit [primitive](#primitives) types
 which are used to represent things like dates.
 
 ### struct Connection
-| Field | Type | Description | Mandatory | 
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
-| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | `true` | 
-| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | `true` | 
+| `consumer` | [SystemPort](#struct-systemport) | The consumer end SystemPort of the connection | `true` |
+| `producer` | [SystemPort](#struct-systemport) | The producer end SystemPort of the connection | `true` |
 
 
 ### struct PlantDescription
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `plantDescription` | String | Plant description name | `true` | |
 | `active` | Boolean | Is this the active plant description | `false` | `false` |
@@ -66,10 +66,10 @@ which are used to represent things like dates.
 
 ### struct PlantDescriptionEntry
 
-| Field | Type | Description | Mandatory | Note | 
+| Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Number | Id of the entry | `true` | |
-| `plantDescription` | String | Plant description name| `true` | | 
+| `plantDescription` | String | Plant description name| `true` | |
 | `active` | Boolean | Is this the active plant description | `true` | |
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `true` | |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `true` ||
@@ -79,7 +79,7 @@ which are used to represent things like dates.
 
 ### struct PlantDescriptionEntryList
 
-| Field | Type | Description | 
+| Field | Type | Description |
 | ----- | ---- | ----------- |
 | `count` | Number | Number of records found |
 | `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
@@ -88,32 +88,34 @@ which are used to represent things like dates.
 
 Currently only the following values can be updated. If a field is not present the current value will remain unchanged.
 
-| Field | Type | Description | Mandatory | 
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
-| `plantDescription` | String | Plant description name | `false` | 
+| `plantDescription` | String | Plant description name | `false` |
 | `active` | Boolean | Is this the active plant description | `false` |
 | `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `false` |
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `false` |
 
 ### struct Port
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `portName` | String | Identity of the port | `true` | |
 | `serviceDefinition` | String | Service definition identity | `true` | |
 | `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
 
 ### struct System
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemId` | String | Identity of the system within the PDE | `true` | |
+| `systemName` | String | Name of the system | `false` | null |
 | `metadata` | Custom | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | `true` ||
 
 ### struct SystemPort
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemName` | String | Identity of the system | `true` | | 
+| `systemId` | String | Identity of the system within the PDE | `true` | |
+| `systemName` | String | Name of the system | `false` | null |
 | `portName` | String | Identity of the port | `true` | |
 
 
@@ -122,7 +124,7 @@ Types and structures mentioned throughout this document that are assumed to be a
 of this service. The concrete interpretations of each of these types and structures must be provided by any IDD
 document claiming to implement this service.
 
-| Type | Description | 
+| Type | Description |
 | ---- | ----------- |
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Boolean | One out of `true` or `false`. |

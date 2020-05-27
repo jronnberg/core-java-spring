@@ -21,10 +21,10 @@ We will as an example consider a plant that has the four core systems and six cu
  - B that produces service Y
  - C that produces service Z
  - D that consumes services X, Y and Z.
-   This system should always be connected to a system producing X. 
+   This system should always be connected to a system producing X.
    It should also be connected to either a system that provides Y or a system the provides Z but not both.
  - Invent system that produces the [Inventory] service.
-   
+
 The four custom systems A-D also provides the [Monitorable] service.
 
 
@@ -43,59 +43,62 @@ This corresponds to a Plant Description with the core systems:
 	"systems": [
 		{
 			"systemName": "Service Registry",
+			"systemId": "service_registry",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery"}	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery"}
 			]
 		},
 		{
 			"systemName": "Authorization",
+			"systemId": "authorization",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation"},
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control"}
 			]
 		},
 		{
 			"systemName": "Orchestration",
+			"systemId": "orchestration",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "tokenGeneration", "serviceDefinition": "Token Generation", "consumer": true },
-				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},	
-				{ "portName": "orchestraDtionStoreManagement", "serviceDefinition": "OrchestrationStoreManagement"},	
-true }	
+				{ "portName": "authorizationControl", "serviceDefinition": "Authorization Control", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService"},
+				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement", "consumer": true }
 			]
 		},
 		{
-			"systemName": "Plant Description Engine",
+			"systemId": "plant_description_engine",
+			"systemId": "plant_description_engine",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },
 				{ "portName": "orchestrationStoreManagement", "serviceDefinition": "OrchestrationStoreManagement", "consumer": true },
-				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }	
+				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor"},
 				{ "portName": "management", "serviceDefinition": "Plant Description Management"},
 			]
 		},
-		
+
 	],
 	"connections": [
-		{ "consumer": { "systemName": "Authorization", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "authorization", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
 
-		{ "consumer": { "systemName": "Orchestration", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "tokenGeneration" },
-		  "producer": { "systemName": "Authorization", "portName": "tokenGeneration" }},
-		{ "consumer": { "systemName": "Orchestration", "portName": "authorizationControl" },
-		  "producer": { "systemName": "Authorization", "portName": "authorizationControl" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "tokenGeneration" },
+		  "producer": { "systemId": "authorization", "portName": "tokenGeneration" }},
+		{ "consumer": { "systemId": "orchestration", "portName": "authorizationControl" },
+		  "producer": { "systemId": "authorization", "portName": "authorizationControl" }},
 
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "orchestrationService" },
-		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "orchestrationStoreManagement" },
-		  "producer": { "systemName": "Orchestration", "portName": "orchestrationStoreManagement" }}
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "orchestrationService" },
+		  "producer": { "systemId": "orchestration", "portName": "orchestrationService" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "orchestrationStoreManagement" },
+		  "producer": { "systemId": "orchestration", "portName": "orchestrationStoreManagement" }}
 	]
 }
 ```
@@ -104,91 +107,96 @@ All custom systems are assumed to be connected to the core systems and register 
 
 IMAGE
 
-This corresponds to a bare plant description that include the core and contains the custom systems and how they are connected to the core systems: 
+This corresponds to a bare plant description that include the core and contains the custom systems and how they are connected to the core systems:
 
 ```json
 {
 	"id": 2,
-	"plantDescription": "Example plant - bare",, "consumer": true 
+	"plantDescription": "Example plant - bare",
 	"include": [ 1 ],
 	"systems": [
 		{
 			"systemName": "Operations Center",
+			"systemId": "operations_center",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "orchestrationService", "serviceDefinition": "OrchestrationService", "consumer": true },
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor", "consumer": true },
 				{ "portName": "management", "serviceDefinition": "Plant Description Management", "consumer": true }
 			]
 		},
 		{
 			"systemName": "A",
+			"systemId": "a",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "x", "serviceDefinition": "X"},	
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "x", "serviceDefinition": "X"},
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "B",
+			"systemId": "b",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "y", "serviceDefinition": "Y"},	
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "y", "serviceDefinition": "Y"},
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "C",
+			"systemId": "c",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
 				{ "portName": "z", "serviceDefinition": "Z"},
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "D",
+			"systemId": "d",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
-				{ "portName": "x", "serviceDefinition": "X", "consumer": true }	
-				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }	
-				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
+				{ "portName": "x", "serviceDefinition": "X", "consumer": true }
+				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }
+				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }
 			]
 		},
 		{
 			"systemName": "Invent",
 			"ports": [
-				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },	
-				{ "portName": "inventory", "serviceDefinition": "Inventory"}	
+				{ "portName": "service_discovery", "serviceDefinition": "Service Discovery", "consumer": true },
+				{ "portName": "inventory", "serviceDefinition": "Inventory"}
 			]
 		}
-		
+
 	],
 	"connections": [
-		{ "consumer": { "systemName": "A", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "a", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
 
-		{ "consumer": { "systemName": "B", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "b", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
 
-		{ "consumer": { "systemName": "C", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "c", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
 
 
-		{ "consumer": { "systemName": "D", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
-		{ "consumer": { "systemName": "D", "portName": "orchestrationService" },
-		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
+		{ "consumer": { "systemId": "d", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "d", "portName": "orchestrationService" },
+		  "producer": { "systemId": "orchestration", "portName": "orchestrationService" }},
 
-		{ "consumer": { "systemName": "Operations Center", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
-		{ "consumer": { "systemName": "Operations Center", "portName": "orchestrationService" },
-		  "producer": { "systemName": "Orchestration", "portName": "orchestrationService" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "orchestrationService" },
+		  "producer": { "systemId": "orchestration", "portName": "orchestrationService" }},
 
-		{ "consumer": { "systemName": "Invent", "portName": "service_discovery" },
-		  "producer": { "systemName": "Service Registry", "portName": "service_discovery" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "inventory" },
-		  "producer": { "systemName": "Invent", "portName": "inventory" }},
+		{ "consumer": { "systemId": "invent", "portName": "service_discovery" },
+		  "producer": { "systemId": "service_registry", "portName": "service_discovery" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "inventory" },
+		  "producer": { "systemId": "invent", "portName": "inventory" }},
 	]
 }
 ```
@@ -202,29 +210,29 @@ The bare plant is extended with the connections that should always be there
 	"include": [ 2 ],
 	"systems": [],
 	"connections": [
-		{ "consumer": { "systemName": "D", "portName": "x" },
-		  "producer": { "systemName": "A", "portName": "x" }},
+		{ "consumer": { "systemId": "d", "portName": "x" },
+		  "producer": { "systemId": "a", "portName": "x" }},
 
-		{ "consumer": { "systemName": "Operations Center", "portName": "management" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "management" }},
-		{ "consumer": { "systemName": "Operations Center", "portName": "monitor" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "monitor" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "management" },
+		  "producer": { "systemId": "plant_description_engine", "portName": "management" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "monitor" },
+		  "producer": { "systemId": "plant_description_engine", "portName": "monitor" }},
 
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "A", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "B", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "C", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "D", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "a", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "b", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "c", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "d", "portName": "monitorable" }},
 
 	]
 }
 ```
 
 
-We now end up with two different variants that include the base variant, one that connects D to service Y in B 
+We now end up with two different variants that include the base variant, one that connects D to service Y in B
 
 ```json
 {
@@ -234,8 +242,8 @@ We now end up with two different variants that include the base variant, one tha
 	"include": [ 3 ],
 	"systems": [],
 	"connections": [
-		{ "consumer": { "systemName": "D", "portName": "y" },
-		  "producer": { "systemName": "B", "portName": "y" }}
+		{ "consumer": { "systemId": "d", "portName": "y" },
+		  "producer": { "systemId": "b", "portName": "y" }}
 	]
 }
 ```
@@ -249,15 +257,15 @@ and one that connects D to service Z in C
 	"include": [ 3 ],
 	"systems": [],
 	"connections": [
-		{ "consumer": { "systemName": "D", "portName": "z" },
-		  "producer": { "systemName": "C", "portName": "z" }}
+		{ "consumer": { "systemId": "d", "portName": "z" },
+		  "producer": { "systemId": "c", "portName": "z" }}
 	]
 }
 ```
 
 
 ### Bootstrapping problem
-In the plant description above we have two bootstrapping problems. First in order for the Operations Center to be allowed to use the Plant Description Management service from the PDE a rule allowing it to do so must be added to the Orchestrator. Otherwise it will not be able to add the first plant description allowing it to use the service.   
+In the plant description above we have two bootstrapping problems. First in order for the Operations Center to be allowed to use the Plant Description Management service from the PDE a rule allowing it to do so must be added to the Orchestrator. Otherwise it will not be able to add the first plant description allowing it to use the service.
 
 Secondly, in order for the PDE to be allowed to use the OrchestrationStoreManagement service from the Orchestrator a rule allowing it to do so should be added to the Orchestrator. (This might not be needed if all core systems are allowed to use any service from other core systems)
 
@@ -275,15 +283,17 @@ A merged and cleaned plant description would look like this
 	"systems": [
 		{
 			"systemName": "Plant Description Engine",
+			"systemId": "plant_description_engine",
 			"ports": [
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor"},
 				{ "portName": "management", "serviceDefinition": "Plant Description Management"},
 				{ "portName": "monitorable", "serviceDefinition": "Monitorable", "consumer": true }
-				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }	
+				{ "portName": "inventory", "serviceDefinition": "Inventory", "consumer": true }
 			]
 		},
 		{
 			"systemName": "Operations Center",
+			"systemId": "operations_center",
 			"ports": [
 				{ "portName": "monitor", "serviceDefinition": "Plant Description Monitor", "consumer": true },
 				{ "portName": "management", "serviceDefinition": "Plant Description Management", "consumer": true }
@@ -291,62 +301,66 @@ A merged and cleaned plant description would look like this
 		},
 		{
 			"systemName": "A",
+			"systemId": "a",
 			"ports": [
-				{ "portName": "x", "serviceDefinition": "X"},	
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "x", "serviceDefinition": "X"},
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "B",
+			"systemId": "b",
 			"ports": [
-				{ "portName": "y", "serviceDefinition": "Y"},	
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "y", "serviceDefinition": "Y"},
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "C",
 			"ports": [
 				{ "portName": "z", "serviceDefinition": "Z"},
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
 			]
 		},
 		{
 			"systemName": "D",
+			"systemId": "d",
 			"ports": [
-				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}	
-				{ "portName": "x", "serviceDefinition": "X", "consumer": true }	
-				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }	
-				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }	
+				{ "portName": "monitorable", "serviceDefinition": "Monitorable"}
+				{ "portName": "x", "serviceDefinition": "X", "consumer": true }
+				{ "portName": "y", "serviceDefinition": "Y", "consumer": true }
+				{ "portName": "z", "serviceDefinition": "Z", "consumer": true }
 			]
 		},
 		{
 			"systemName": "Invent",
+			"systemId": "invent",
 			"ports": [
-				{ "portName": "inventory", "serviceDefinition": "Inventory"}	
+				{ "portName": "inventory", "serviceDefinition": "Inventory"}
 			]
 		}
-		
+
 	],
 	"connections": [
-		{ "consumer": { "systemName": "D", "portName": "x" },
-		  "producer": { "systemName": "A", "portName": "x" }},
+		{ "consumer": { "systemId": "d", "portName": "x" },
+		  "producer": { "systemId": "a", "portName": "x" }},
 
-		{ "consumer": { "systemName": "Operations Center", "portName": "management" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "management" }},
-		{ "consumer": { "systemName": "Operations Center", "portName": "monitor" },
-		  "producer": { "systemName": "Plant Description Engine", "portName": "monitor" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "management" },
+		  "producer": { "systemId": "plant_description_engine", "portName": "management" }},
+		{ "consumer": { "systemId": "operations_center", "portName": "monitor" },
+		  "producer": { "systemId": "plant_description_engine", "portName": "monitor" }},
 
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "A", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "B", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "C", "portName": "monitorable" }},
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "monitorable" },
-		  "producer": { "systemName": "D", "portName": "monitorable" }},
-		  
-		{ "consumer": { "systemName": "Plant Description Engine", "portName": "inventory" },
-		  "producer": { "systemName": "Invent", "portName": "inventory" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "a", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "b", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "c", "portName": "monitorable" }},
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "monitorable" },
+		  "producer": { "systemId": "d", "portName": "monitorable" }},
+
+		{ "consumer": { "systemId": "plant_description_engine", "portName": "inventory" },
+		  "producer": { "systemId": "invent", "portName": "inventory" }},
 
 	]
 }
@@ -376,14 +390,14 @@ The PDE should contain at least one Plant Description (PD) of the plant. The ope
 When the operator has activated a PD using {[Add](plant-description-management-sd.md#interface-addplantdescriptionplantdescription-plantdescriptionentrylist)/[Replace](plant-description-management-sd.md#interface-replaceplantdescriptionid-plantdescription-plantdescriptionentry)/[Update](plant-description-management-sd.md#interface-updateplantdescriptionid-plantdescriptionupdate-plantdescriptionentry)}PlantDescription end point, the PDE connects to the [Orchestration Store Management] service.
 
 The PDE then start with removing any store rules, using the [Delete Store Entries by ID](../../README.md#orchestrator_endpoints_delete_store_id) end point, that it has previously stored which should no longer be present. These removed store rules was added for another active PD. It then adds new store rules, using the  [Add Store Entries](../../README.md#orchestrator_endpoints_post_store) end point, for all the connections present in the newly activated PD.
- 
+
 Whenever the Orchestrator is updated it uses the [Orchestration Push] service, of all the systems that has registered as a producer of that service, to inform them about any updates that concerns them. If a consumer system has not registered the [Orchestration Push] service it must poll the Orchestrator regularly to keep updated.
 
-At the moment the [Orchestration Store Management] service requires `consumerSystemId` as part of the `StoreRule`. This means that in order to be able to add a store rule for a consumer system, it must be registered in the systems registry.  Hence either the PDE must know instance information (ip address and port) for all systems and register them, or the systems must register before the PDE can add store rules. In the next version of the Orchestrator this will be changed and instead the consumer system will be identified using `systemName`. Furthermore, both consumer and provider systems will be possible to identify using `MeteData` instead of `systemName`.
- 
+At the moment the [Orchestration Store Management] service requires `consumerSystemId` as part of the `StoreRule`. This means that in order to be able to add a store rule for a consumer system, it must be registered in the systems registry.  Hence either the PDE must know instance information (ip address and port) for all systems and register them, or the systems must register before the PDE can add store rules. In the next version of the Orchestrator this will be changed and instead the consumer system will be identified using `systemName`. Furthermore, both consumer and provider systems will be possible to identify using `MetaData` instead of `systemName`.
+
 ### Monitoring the plant
- 
-The PDE queries the Orchestrator about any systems that it should monitor using the [Monitorable] service. The PDE regularly [Ping](monitorable-sd.md#interface-ping-ok) the monitored systems and raises an alarm if the system does not respond. 
+
+The PDE queries the Orchestrator about any systems that it should monitor using the [Monitorable] service. The PDE regularly [Ping](monitorable-sd.md#interface-ping-ok) the monitored systems and raises an alarm if the system does not respond.
 
 If the monitored system provides any [SystemData](monitorable-sd.md#interface-getsystemdata-systemdata) this data is stored by the PDE and returned as part of the Plant Description Entries provided by the [Plant Description Monitor] service.
 
@@ -391,8 +405,8 @@ If there is an Inventory system present in the plant that produces the [Inventor
 
 
 
-   
-  
+
+
 [Authorization]:../../README.md#authorization
 [AuthorizationControl]:../../README.md#authorization
 [DNS]:https://en.wikipedia.org/wiki/Domain_Name_System
@@ -408,4 +422,3 @@ If there is an Inventory system present in the plant that produces the [Inventor
 [Plant Description Management]:plant-description-management-sd.md
 [Service Discovery]:../../README.md#serviceregistry_usecases
 [Service Registry]:../../README.md#serviceregistry
-  
