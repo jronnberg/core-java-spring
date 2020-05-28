@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,10 @@ import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -38,9 +39,8 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
     /**
      * Class constructor
      *
-     * @param httpClient Object for communicating with monitorable services.
-     * @param monitorInfo Object that keeps track information on monitorable
-     *                    systems.
+     * @param httpClient  Object for communicating with monitorable services.
+     * @param monitorInfo Object that stores information on monitorable systems.
      *
      */
     public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionEntryMap entryMap
@@ -86,7 +86,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             return Future.done();
         }
 
-        List<PlantDescriptionEntryDto> entries = entryMap.getEntries();
+        var entries = entryMap.getEntries();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
@@ -108,9 +108,12 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             PlantDescriptionEntry.filterOnActive(entries, filterValue);
         }
 
-        List<PlantDescriptionEntryDto> extendedEntries = entries.stream()
-            .map(entry -> PlantDescriptionEntry.extend(entry, monitorInfo))
-            .collect(Collectors.toList());
+        // Extend each Plant Description Entry with monitor data retrieved from
+        // monitorable services:
+        List<PlantDescriptionEntryDto> extendedEntries = new ArrayList<>();
+        for (var entry : entries) {
+            extendedEntries.add(DtoUtils.extend(entry, monitorInfo));
+        }
 
         response
             .status(HttpStatus.OK)
