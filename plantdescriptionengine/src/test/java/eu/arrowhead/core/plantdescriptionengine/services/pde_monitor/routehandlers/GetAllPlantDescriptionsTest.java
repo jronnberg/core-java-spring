@@ -36,15 +36,15 @@ public class GetAllPlantDescriptionsTest {
         final List<Integer> entryIds = List.of(0, 1, 2, 3);
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
 
-        for (int id : entryIds) {
+        for (final int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
         }
 
         final var monitorInfo = new MonitorInfo();
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
-        HttpServiceRequest request = new MockRequest();
-        HttpServiceResponse response = new MockResponse();
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest();
+        final HttpServiceResponse response = new MockResponse();
 
         try {
             handler.handle(request, response)
@@ -53,12 +53,12 @@ public class GetAllPlantDescriptionsTest {
                 assertEquals(HttpStatus.OK, response.status().get());
 
                 assertTrue(response.body().isPresent());
-                var entries = (PlantDescriptionEntryList)response.body().get();
+                final var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(entryIds.size(), entries.count());
             }).onFailure(e -> {
                 assertNull(e);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             assertNull(e);
         }
     }
@@ -93,17 +93,17 @@ public class GetAllPlantDescriptionsTest {
         monitorInfo.putInventoryId(systemName, inventoryId);
         monitorInfo.putSystemData(systemName, systemData);
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
-        HttpServiceRequest request = new MockRequest();
-        HttpServiceResponse response = new MockResponse();
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest();
+        final HttpServiceResponse response = new MockResponse();
 
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
                 assertTrue(response.body().isPresent());
-                var returnedEntries = (PlantDescriptionEntryList)response.body().get();
-                var returnedEntry = returnedEntries.data().get(0);
-                var returnedSystem = returnedEntry.systems().get(0);
+                final var returnedEntries = (PlantDescriptionEntryList)response.body().get();
+                final var returnedEntry = returnedEntries.data().get(0);
+                final var returnedSystem = returnedEntry.systems().get(0);
                 assertTrue(returnedSystem.inventoryId().isPresent());
                 assertTrue(returnedSystem.systemData().isPresent());
                 assertEquals(returnedSystem.inventoryId().get(), inventoryId);
@@ -112,7 +112,7 @@ public class GetAllPlantDescriptionsTest {
                 e.printStackTrace();
                 assertNull(e);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             assertNull(e);
         }
@@ -120,45 +120,133 @@ public class GetAllPlantDescriptionsTest {
 
     @Test
     public void shouldSortEntries() throws BackingStoreException {
-        final List<Integer> entryIds = List.of(0, 1, 2, 3);
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
 
-        for (int id : entryIds) {
-            entryMap.put(TestUtils.createEntry(id));
-        }
+        final Instant createdAt1 = Instant.parse("2020-05-27T14:48:00.00Z");
+        final Instant createdAt2 = Instant.parse("2020-06-27T14:48:00.00Z");
+        final Instant createdAt3 = Instant.parse("2020-07-27T14:48:00.00Z");
+
+        final Instant updatedAt1 = Instant.parse("2020-08-01T14:48:00.00Z");
+        final Instant updatedAt2 = Instant.parse("2020-08-03T14:48:00.00Z");
+        final Instant updatedAt3 = Instant.parse("2020-08-02T14:48:00.00Z");
+
+        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder()
+            .id(32)
+            .plantDescription("Plant Description 1")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt1)
+            .updatedAt(updatedAt1)
+            .build();
+        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder()
+            .id(2)
+            .plantDescription("Plant Description 2")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt2)
+            .updatedAt(updatedAt2)
+            .build();
+        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder()
+            .id(8)
+            .plantDescription("Plant Description 3")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt3)
+            .updatedAt(updatedAt3)
+            .build();
+
+        entryMap.put(entry1);
+        entryMap.put(entry2);
+        entryMap.put(entry3);
+
+        final int numEntries = entryMap.getListDto().count();
 
         final var monitorInfo = new MonitorInfo();
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
-        HttpServiceRequest request = new MockRequest.Builder()
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest idDescendingRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "sort_field", List.of("id"),
                 "direction", List.of("DESC")
             ))
             .build();
-        HttpServiceResponse response = new MockResponse();
+        final HttpServiceRequest creationAscendingRequest = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("createdAt"),
+                "direction", List.of("ASC")
+            ))
+            .build();
+        final HttpServiceRequest updatesDescendingRequest = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("updatedAt"),
+                "direction", List.of("DESC")
+            ))
+            .build();
+        final HttpServiceResponse response1 = new MockResponse();
+        final HttpServiceResponse response2 = new MockResponse();
+        final HttpServiceResponse response3 = new MockResponse();
 
         try {
-            handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
-                assertEquals(HttpStatus.OK, response.status().get());
+            handler.handle(idDescendingRequest, response1)
+            .flatMap(result -> {
+                assertTrue(response1.status().isPresent());
+                assertEquals(HttpStatus.OK, response1.status().get());
 
-                assertTrue(response.body().isPresent());
-                var entries = (PlantDescriptionEntryList)response.body().get();
-                assertEquals(entryIds.size(), entries.count());
+                assertTrue(response1.body().isPresent());
+                final var entries = (PlantDescriptionEntryList)response1.body().get();
+                assertEquals(numEntries, entries.count());
 
                 int previousId = entries.data().get(0).id();
                 for (int i = 1; i < entries.count(); i++) {
-                    var entry = entries.data().get(i);
+                    final var entry = entries.data().get(i);
                     assertTrue(entry.id() <= previousId);
                     previousId = entry.id();
+                }
+
+                return handler.handle(creationAscendingRequest, response2);
+            })
+            .flatMap(result -> {
+                assertTrue(response2.status().isPresent());
+                assertEquals(HttpStatus.OK, response2.status().get());
+
+                assertTrue(response2.body().isPresent());
+                final var entries = (PlantDescriptionEntryList)response2.body().get();
+                assertEquals(numEntries, entries.count());
+
+                Instant previousTimestamp = entries.data().get(0).createdAt();
+                for (int i = 1; i < entries.count(); i++) {
+                    final var entry = entries.data().get(i);
+                    assertTrue(entry.createdAt().compareTo(previousTimestamp) >= 0);
+                    previousTimestamp = entry.createdAt();
+                }
+
+                return handler.handle(updatesDescendingRequest, response3);
+            })
+            .ifSuccess(result -> {
+                assertTrue(response3.status().isPresent());
+                assertEquals(HttpStatus.OK, response3.status().get());
+
+                assertTrue(response3.body().isPresent());
+                final var entries = (PlantDescriptionEntryList)response3.body().get();
+                assertEquals(numEntries, entries.count());
+
+                Instant previousTimestamp = entries.data().get(0).updatedAt();
+                for (int i = 1; i < entries.count(); i++) {
+                    final var entry = entries.data().get(i);
+                    assertTrue(entry.updatedAt().compareTo(previousTimestamp) < 0);
+                    previousTimestamp = entry.updatedAt();
                 }
             }).onFailure(e -> {
                 e.printStackTrace();
                 assertNull(e);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             assertNull(e);
         }
@@ -169,14 +257,14 @@ public class GetAllPlantDescriptionsTest {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final var monitorInfo = new MonitorInfo();
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
-        HttpServiceRequest request = new MockRequest.Builder()
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active")
                 // Missing filter_value, invalid request!
             ))
             .build();
-        HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockResponse();
 
         try {
             handler.handle(request, response)
@@ -190,7 +278,7 @@ public class GetAllPlantDescriptionsTest {
                 e.printStackTrace();
                 assertNull(e);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             assertNull(e);
         }
@@ -203,7 +291,7 @@ public class GetAllPlantDescriptionsTest {
         final int activeEntryId = 3;
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
 
-        for (int id : entryIds) {
+        for (final int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
         }
 
@@ -220,14 +308,14 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build());
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
-        HttpServiceRequest request = new MockRequest.Builder()
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active"),
                 "filter_value", List.of("true")
             ))
             .build();
-        HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockResponse();
 
         try {
             handler.handle(request, response)
@@ -236,14 +324,14 @@ public class GetAllPlantDescriptionsTest {
                 assertEquals(HttpStatus.OK, response.status().get());
 
                 assertTrue(response.body().isPresent());
-                var entries = (PlantDescriptionEntryList)response.body().get();
+                final var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(1, entries.count());
                 assertEquals(entries.data().get(0).id(), activeEntryId);
             }).onFailure(e -> {
                 e.printStackTrace();
                 assertNull(e);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             assertNull(e);
         }
