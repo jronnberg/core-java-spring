@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto;
+package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 
 import java.util.List;
 
