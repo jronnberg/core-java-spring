@@ -3,6 +3,8 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import se.arkalix.description.ServiceDescription;
+
 /**
  * Object used for keeping track of inventory data of monitorable systems.
  */
@@ -20,8 +22,8 @@ public class MonitorInfo {
         return inventoryIds.get(systemName);
     }
 
-    public void putInventoryId(String systemName, String id) {
-        inventoryIds.put(systemName, id);
+    public void putInventoryId(ServiceDescription service, String inventoryId) {
+        inventoryIds.put(service.provider().name(), inventoryId);
     }
 
     public void removeInventoryId(String systemName) {
@@ -32,8 +34,8 @@ public class MonitorInfo {
         return systemData.get(systemName);
     }
 
-    public void putSystemData(String systemName, Map<String, String> data) {
-        systemData.put(systemName, data);
+    public void putSystemData(ServiceDescription service, Map<String, String> data) {
+        systemData.put(service.provider().name(), data);
     }
 
     public void removeSystemData(String systemName) {

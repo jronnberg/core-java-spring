@@ -134,7 +134,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId());
+        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId()); // TODO: Use system name here.
         SrSystem providerSystem = systemTracker.getSystem(connection.producer().systemId());
 
         Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?

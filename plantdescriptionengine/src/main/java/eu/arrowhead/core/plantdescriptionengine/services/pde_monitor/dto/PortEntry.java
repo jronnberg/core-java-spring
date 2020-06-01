@@ -21,11 +21,9 @@ public interface PortEntry {
     String serviceDefinition();
     Optional<Map<String, String>> metadata();
 
-    /*
     Optional<Map<String, String>> systemData();
     Optional<String> inventoryId();
     Optional<Map<String, String>> inventoryData();
-    */
 
     /**
      * Indicates whether this port is used to consume or produce services.
