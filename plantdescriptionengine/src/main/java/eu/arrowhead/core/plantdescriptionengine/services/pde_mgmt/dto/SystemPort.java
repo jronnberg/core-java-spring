@@ -15,7 +15,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface SystemPort {
 
-    Integer systemId();
+    String systemId();
     String portName();
 
 }

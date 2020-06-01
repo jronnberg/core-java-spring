@@ -15,7 +15,7 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoToString
 public interface SystemEntry {
 
-    Integer systemId();
+    String systemId();
     Optional<String> systemName();
     Optional<Map<String, String>> metadata();
     List<PortEntry> ports();

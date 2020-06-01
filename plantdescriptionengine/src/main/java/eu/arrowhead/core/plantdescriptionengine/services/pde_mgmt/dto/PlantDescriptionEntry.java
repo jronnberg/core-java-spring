@@ -179,6 +179,20 @@ public interface PlantDescriptionEntry {
         return serviceDefinitionName;
     }
 
+    default String getSystemName(String systemId) { // TODO: Remove this method when it is now longer used.
+        for (var system : systems()) {
+            if (system.systemId().equals(systemId)) {
+                return system.systemName().orElse(null);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param description A Plant Description.
+     * @return True if the fields of the given description match those of this
+     *         instance.
+     */
     default boolean matchesDescription(PlantDescription description) {
         return (
             description.plantDescription().equals(plantDescription()) &&

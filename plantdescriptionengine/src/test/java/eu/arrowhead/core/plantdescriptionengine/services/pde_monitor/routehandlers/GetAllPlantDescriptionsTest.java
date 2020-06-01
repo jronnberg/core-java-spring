@@ -72,7 +72,7 @@ public class GetAllPlantDescriptionsTest {
         final String inventoryId = "system_a_inventory_id";
         final PdeSystemDto system = new PdeSystemBuilder()
             .systemName(systemName)
-            .systemId(1)
+            .systemId("system_a")
             .build();
         final Instant now = Instant.now();
         final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
