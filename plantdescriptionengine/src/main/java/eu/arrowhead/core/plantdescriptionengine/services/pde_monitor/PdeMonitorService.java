@@ -113,7 +113,6 @@ public class PdeMonitorService {
     }
 
     private void retrieveId(ServiceDescription service) {
-        final String providerName = service.provider().name();
         final var address = service.provider().socketAddress();
 
         httpClient.send(address, new HttpClientRequest()
@@ -123,16 +122,14 @@ public class PdeMonitorService {
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(inventoryId -> {
-                monitorInfo.putInventoryId(providerName, inventoryId.id());
+                monitorInfo.putInventoryId(service, inventoryId.id());
             })
             .onFailure(e -> {
-                monitorInfo.removeInventoryId(providerName);
                 // TODO: Error handling, raise an alarm?
             });
     }
 
     private void retrieveSystemData(ServiceDescription service) {
-        final String providerName = service.provider().name();
         final var address = service.provider().socketAddress();
 
         httpClient.send(address, new HttpClientRequest()
@@ -142,10 +139,9 @@ public class PdeMonitorService {
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
             .ifSuccess(systemData -> {
-                monitorInfo.putSystemData(providerName, systemData.data());
+                monitorInfo.putSystemData(service, systemData.data());
             })
             .onFailure(e -> {
-                monitorInfo.removeSystemData(providerName);
                 // TODO: Error handling, raise an alarm?
             });
     }
