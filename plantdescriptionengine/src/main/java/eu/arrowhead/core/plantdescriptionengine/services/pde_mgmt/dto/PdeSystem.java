@@ -18,13 +18,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface PdeSystem {
 
-    Integer systemId();
+    String systemId();
     Optional<String> systemName();
     Optional<Map<String, String>> metadata();
     List<Port> ports();
-
-    // TODO: Remove the three fields below, use separate DTO for the Monitor service
-    Optional<Map<String, String>> systemData();
-    Optional<String> inventoryId();
-    // Optional<Map<String, String>> inventoryData();
 }

@@ -134,11 +134,16 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId()); // TODO: Use system name here.
+        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId()); // TODO: Use system name here?
         SrSystem providerSystem = systemTracker.getSystem(connection.producer().systemId());
 
-        Objects.requireNonNull(consumerSystem, "Consumer system '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
-        Objects.requireNonNull(providerSystem, "Producer system '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        // TODO: The system names will no longer be required once the
+        // orchestrator is updated to create rules based on metadata.
+        String consumerName = entry.getSystemName(connection.consumer().systemId());
+        String providerName = entry.getSystemName(connection.producer().systemId());
+
+        Objects.requireNonNull(consumerSystem, "Consumer system '" + consumerName + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        Objects.requireNonNull(providerSystem, "Producer system '" + providerName + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)
