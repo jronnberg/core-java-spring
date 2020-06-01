@@ -10,35 +10,18 @@ import se.arkalix.description.ServiceDescription;
  */
 public class MonitorInfo {
 
-    // Map relating system names to inventory IDs:
+    // Map relating the tuple (systemName, serviceUri) to inventory IDs:
     private final Map<String, String> inventoryIds = new ConcurrentHashMap<>();
 
-    // Map relating system names to data:
+    // Map relating the tuple (systemName, serviceUri) to system data:
     private final Map<String, Map<String, String>> systemData = new ConcurrentHashMap<>();
 
-    // TODO: Use IDs as keys instead of names
-
-    public String getInventoryId(String systemName) {
-        return inventoryIds.get(systemName);
-    }
-
     public void putInventoryId(ServiceDescription service, String inventoryId) {
-        inventoryIds.put(service.provider().name(), inventoryId);
-    }
-
-    public void removeInventoryId(String systemName) {
-        inventoryIds.remove(systemName);
-    }
-
-    public Map<String, String> getSystemData(String systemName) {
-        return systemData.get(systemName);
+        inventoryIds.put(service.provider().name() + service.uri(), inventoryId);
     }
 
     public void putSystemData(ServiceDescription service, Map<String, String> data) {
-        systemData.put(service.provider().name(), data);
+        systemData.put(service.provider().name() + service.uri(), data);
     }
 
-    public void removeSystemData(String systemName) {
-        systemData.remove(systemName);
-    }
 }
