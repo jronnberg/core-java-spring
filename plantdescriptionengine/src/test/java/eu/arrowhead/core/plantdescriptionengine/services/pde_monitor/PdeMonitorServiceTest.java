@@ -22,7 +22,11 @@ public class PdeMonitorServiceTest {
     public void shouldCreateSecureService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final HttpClient client = new HttpClient.Builder().build();
-        final var service = new PdeMonitorService(entryMap, client, true);
+        final ArSystem arSystem = new ArSystem.Builder()
+            .name("Test System")
+            .insecure()
+            .build();
+        final var service = new PdeMonitorService(arSystem, entryMap, client, true);
         assertTrue(service.isSecure());
     }
 
@@ -30,7 +34,11 @@ public class PdeMonitorServiceTest {
     public void shouldCreateInsecureService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final HttpClient client = new HttpClient.Builder().build();
-        final var service = new PdeMonitorService(entryMap, client, false);
+        final ArSystem arSystem = new ArSystem.Builder()
+            .name("Test System")
+            .insecure()
+            .build();
+        final var service = new PdeMonitorService(arSystem, entryMap, client, false);
         assertFalse(service.isSecure());
     }
 
@@ -38,13 +46,14 @@ public class PdeMonitorServiceTest {
     public void shouldProvideService() throws BackingStoreException, SSLException {
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         final HttpClient client = new HttpClient.Builder().build();
-        final var service = new PdeMonitorService(entryMap, client, false);
 
         final ArSystem arSystem = new ArSystem.Builder()
             .name("Test System")
             .insecure()
             .build();
-        service.provide(arSystem)
+        final var service = new PdeMonitorService(arSystem, entryMap, client, false);
+
+        service.provide()
             .ifSuccess(result -> {
                 assertNotNull(result);
             })

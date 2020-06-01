@@ -94,11 +94,13 @@ public final class DtoUtils {
                     .metadata(system.metadata().orElse(null)).ports(ports);
 
             if (system.systemName().isPresent()) {
+                /*
                 String systemName = system.systemName().get();
                 systemBuilder
                     .systemName(systemName)
                     .inventoryId(monitorInfo.getInventoryId(systemName))
                     .systemData(monitorInfo.getSystemData(systemName));
+                    */
             }
 
             if (system.metadata().isPresent()) {

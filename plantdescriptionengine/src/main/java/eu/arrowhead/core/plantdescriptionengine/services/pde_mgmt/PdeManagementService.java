@@ -8,12 +8,9 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.UpdatePlantDescription;
-import se.arkalix.ArServiceHandle;
-import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
-import se.arkalix.util.concurrent.Future;
 
 public class PdeManagementService {
 
@@ -29,6 +26,7 @@ public class PdeManagementService {
      */
     public PdeManagementService(PlantDescriptionEntryMap entryMap, boolean secure) {
 
+        Objects.requireNonNull(entryMap, "Expected AR System");
         Objects.requireNonNull(entryMap, "Expected plant description map");
 
         this.entryMap = entryMap;
@@ -43,9 +41,7 @@ public class PdeManagementService {
      *                 service.
      * @return A HTTP Service used to manage Plant Descriptions.
      */
-    public Future<ArServiceHandle> provide(ArSystem arSystem) {
-        Objects.requireNonNull(arSystem, "Expected AR System");
-
+    public HttpService getService() {
         var service = new HttpService()
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
@@ -62,15 +58,7 @@ public class PdeManagementService {
         } else {
             service.accessPolicy(AccessPolicy.unrestricted());
         }
-
-        return arSystem.provide(service);
-    }
-
-    /**
-     * Determines whether or not this service is running in secure mode.
-     */
-    boolean isSecure() {
-        return secure;
+        return service;
     }
 
 }
