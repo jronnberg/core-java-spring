@@ -2,10 +2,10 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
 
 import javax.net.ssl.SSLException;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;

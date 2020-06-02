@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.dto.json.value.JsonObject;
 
 /**
  * Object used for keeping track of inventory data of monitorable systems.
@@ -15,13 +16,13 @@ import se.arkalix.description.ServiceDescription;
 public class MonitorInfo {
 
     public static class Bundle {
-        public final Map<String, String> systemData;
+        public final JsonObject systemData;
         public final Map<String, String> metadata;
         public final String inventoryId;
         public final String systemName;
 
-        private Bundle(
-            String systemName, Map<String, String> metadata, Map<String, String> systemData, String inventoryId
+        Bundle(
+            String systemName, Map<String, String> metadata, JsonObject systemData, String inventoryId
         ) {
             this.systemData = systemData;
             this.inventoryId = inventoryId;
@@ -30,18 +31,26 @@ public class MonitorInfo {
         }
 
         /**
-         * Returns true if the parameters matches this instances metadata.
+         * Returns true if the given parameters matches this instances metadata.
          *
-         * More specifically, returns true if the union of
-         * {@code systemMetadata} and {@code serviceMetadata} is a subset of
-         * this instance's metadata.
+         * More specifically, returns true if {@code serviceMetadata} is
+         * present, and the union of {@code systemMetadata} and
+         * {@code serviceMetadata} is a subset of this instance's metadata.
+         *
+         * @param systemMetadata Metadata relating to a particular system
+         *                       (read from a system in a Plant Description
+         *                       Entry).
+         * @param serviceMetadata Metadata relating to a particular service
+         *                        (read from one of the ports of a system in a
+         *                        Plant Description Entry).
          */
-		public boolean matchesService(
+		public boolean matchesPort(
             Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> serviceMetadata
         ) {
-            var unionMetadata = union(
-                systemMetadata.orElse(new HashMap<>()), serviceMetadata.orElse(new HashMap<>())
-            );
+            if (!serviceMetadata.isPresent() || serviceMetadata.get().size() == 0) {
+                return false;
+            }
+            var unionMetadata = union(systemMetadata.orElse(new HashMap<>()), serviceMetadata.get());
             return isSubset(unionMetadata, metadata);
 		}
     }
@@ -101,7 +110,7 @@ public class MonitorInfo {
         infoBundles.put(key, newBundle);
     }
 
-    public void putSystemData(ServiceDescription service, Map<String, String> data) {
+    public void putSystemData(ServiceDescription service, JsonObject data) {
         String key = getKey(service);
         String systemName = service.provider().name();
         Map<String, String> metadata = service.metadata();
