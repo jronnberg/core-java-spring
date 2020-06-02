@@ -1,6 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.arkalix.description.ServiceDescription;
@@ -10,18 +14,117 @@ import se.arkalix.description.ServiceDescription;
  */
 public class MonitorInfo {
 
-    // Map relating the tuple (systemName, serviceUri) to inventory IDs:
-    private final Map<String, String> inventoryIds = new ConcurrentHashMap<>();
+    public static class Bundle {
+        public final Map<String, String> systemData;
+        public final Map<String, String> metadata;
+        public final String inventoryId;
+        public final String systemName;
 
-    // Map relating the tuple (systemName, serviceUri) to system data:
-    private final Map<String, Map<String, String>> systemData = new ConcurrentHashMap<>();
+        private Bundle(
+            String systemName, Map<String, String> metadata, Map<String, String> systemData, String inventoryId
+        ) {
+            this.systemData = systemData;
+            this.inventoryId = inventoryId;
+            this.systemName = systemName;
+            this.metadata = metadata;
+        }
+
+        /**
+         * Returns true if the parameters matches this instances metadata.
+         *
+         * More specifically, returns true if the union of
+         * {@code systemMetadata} and {@code serviceMetadata} is a subset of
+         * this instance's metadata.
+         */
+		public boolean matchesService(
+            Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> serviceMetadata
+        ) {
+            var unionMetadata = union(
+                systemMetadata.orElse(new HashMap<>()), serviceMetadata.orElse(new HashMap<>())
+            );
+            return isSubset(unionMetadata, metadata);
+		}
+    }
+
+    private final Map<String, Bundle> infoBundles = new ConcurrentHashMap<>();
+
+    private String getKey(ServiceDescription service) {
+        return service.provider().name() + service.uri();
+    }
+
+    /**
+     * Returns
+     * @param a A metadata object (mapping Strings to Strings).
+     * @param b A metadata object (mapping Strings to Strings).
+     *
+     * @return True if a is a subset of b.
+     */
+    private static boolean isSubset(Map<String, String> a, Map<String, String> b) {
+        for (String key : a.keySet()) {
+            if (!b.containsKey(key) || !b.get(key).equals(a.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param a A String to String map.
+     * @param b A String to String map.
+     *
+     * @return The union of maps a and b, where the values in b override the
+     *         values of a in case of collisions.
+     */
+    private static Map<String, String> union(Map<String, String> a, Map<String, String> b) {
+        Map<String, String> result = new HashMap<>();
+        for (var key : a.keySet()) {
+            result.put(key, a.get(key));
+        }
+        for (var key : b.keySet()) {
+            result.put(key, b.get(key));
+        }
+        return result;
+    }
+
 
     public void putInventoryId(ServiceDescription service, String inventoryId) {
-        inventoryIds.put(service.provider().name() + service.uri(), inventoryId);
+        String systemName = service.provider().name();
+        Map<String, String> metadata = service.metadata();
+        String key = getKey(service);
+        Bundle oldBundle = infoBundles.get(key);
+        Bundle newBundle;
+        if (oldBundle == null) {
+            newBundle = new Bundle(systemName, metadata, null, inventoryId);
+        } else {
+            newBundle = new Bundle(systemName, metadata, oldBundle.systemData, inventoryId);
+        }
+        infoBundles.put(key, newBundle);
     }
 
     public void putSystemData(ServiceDescription service, Map<String, String> data) {
-        systemData.put(service.provider().name() + service.uri(), data);
+        String key = getKey(service);
+        String systemName = service.provider().name();
+        Map<String, String> metadata = service.metadata();
+        Bundle oldBundle = infoBundles.get(key);
+        Bundle newBundle;
+        if (oldBundle == null) {
+            newBundle = new Bundle(systemName, metadata, data, null);
+        } else {
+            newBundle = new Bundle(systemName, metadata, data, oldBundle.inventoryId);
+        }
+        infoBundles.put(key, newBundle);
+    }
+
+    public List<Bundle> getSystemInfo(String systemName, Map<String, String> metadata) {
+        List<Bundle> result = new ArrayList<>();
+        for (var bundle : infoBundles.values()) {
+            if (systemName != null && systemName.equals(bundle.systemName)) {
+                result.add(bundle);
+            } else if (metadata != null && isSubset(metadata, bundle.metadata)) {
+                result.add(bundle);
+            }
+        }
+        return result;
     }
 
 }
