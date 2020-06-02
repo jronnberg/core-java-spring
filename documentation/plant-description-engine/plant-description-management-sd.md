@@ -108,7 +108,7 @@ Currently only the following values can be updated. If a field is not present th
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemId` | String | Identity of the system within the PDE | `true` | |
 | `systemName` | String | Name of the system | `false` | null |
-| `metadata` | Custom | Metadata - key-value pairs | `false` | null |
+| `metadata` | Object\<String> | Metadata - key-value pairs | `false` | null |
 | `ports` | Array\<[Port](#struct-port)> | Array with service ports exposed by the system | `true` ||
 
 ### struct SystemPort
@@ -126,9 +126,9 @@ document claiming to implement this service.
 
 | Type | Description |
 | ---- | ----------- |
+| Object \<A> | An unordered collection of [String: Value] pairs, where each Value conforms to type A. |
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Boolean | One out of `true` or `false`. |
-| Custom | Any suitable type chosen by the implementor of the service.|
 | DateTime | Pinpoints a specific moment in time. |
 | Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
 | String | An arbitrary UTF-8 string. |
