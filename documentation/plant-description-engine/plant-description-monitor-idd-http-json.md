@@ -394,7 +394,7 @@ JSON object with the following fields:
 | `portName` | String | Identity of the port | `true` | |
 | `serviceDefinition` | String | Service definition identity | `true` | |
 | `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
-| `metadata` | Object | Metadata - key-value pairs | `false` | null |
+| `metadata` | Object\<String> | Metadata - key-value pairs | `false` | null |
 
 ### SystemEntry
 JSON object with the following fields:
@@ -403,7 +403,7 @@ JSON object with the following fields:
 | ----- | ---- | ----------- | --------- | ------------- |
 | `systemId` | String | Identity of the system within the PDE | `true` | |
 | `systemName` | String | Name of the system | `false` | null |
-| `metadata` | Object | Metadata - key-value pairs | `false` | Only present if specified |
+| `metadata` | Object\<String> | Metadata - key-value pairs | `false` | Only present if specified |
 | `ports` | Array\<[PortEntry](#PortEntry)> | Array with service ports exposed by the system | `true` ||
 | `systemData` | Object | System specific data - key-value pairs | `false` | Only present if provided by Monitorable |
 | `inventoryId` | String | The systems Id in an Inventory system | `false` | Only present if provided by Monitorable |

@@ -15,12 +15,12 @@ The rest of this document describes how to realize the [Inventory] service using
 This section describes the interfaces that must be exposed by [Inventory] services. In particular, the below
 subsection first names the HTTP method and path used to call the interface, after which it names an abstract
 interface from the [Inventory] service description document, output type, as well as errors that can be thrown. The
-interface is expected to respond with HTTP status code 200 OK for all successful calls. 
+interface is expected to respond with HTTP status code 200 OK for all successful calls.
 
 ### GET {baseURL}/data/{id}
  - __Interface:	GetInventoryData__
  - __Output: [InventoryData](#inventorydata)__
-	 
+
 Called to acquire the application system's inventory data.
 
 Example of valid invocation:
@@ -40,16 +40,16 @@ Content-Type: application/json
 		"key1": "value1",
 		"key2": 2,
 		"key3": {
-			"key3_key1": 1	
+			"key3_key1": 1
 		}
-	}		
+	}
 }
 ```
 
 ### GET {baseURL}/system
  - __Interface: GetInventorySystems__
  - __Output: [Systemlist](#systemlist)__
-	 
+
 Called to acquire for systems present in the Inventory system.
 
 Query params:
@@ -62,7 +62,7 @@ Query params:
 | `filter_value` | value to filter by | no |
 
 
-> **Note:**  Possible values for `filter_field` are: 
+> **Note:**  Possible values for `filter_field` are:
 > * `systemName`
 > * `metaData`
 
@@ -87,7 +87,7 @@ Content-Type: application/json
 			"key1": 1,
 			"key2": "value 2"
 		}
-	}]		
+	}]
 }
 ```
 
@@ -105,15 +105,15 @@ JSON object with the following fields:
 
 ### System
 
-| Field | Type | Description | Mandatory |  
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
 | `inventoryId` | String | The systems Id in this Inventory system | `true` |
 | `systemName` | String | Identity of the system | `false` |
-| `metadata` | Object | Metadata - key-value pairs | `false` |
+| `metadata` | Object\<String> | Metadata - key-value pairs | `false` |
 
 ### SystemList
 
-| Field | Type | Description | Mandatory | 
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
 | `count` | Number | Number of records found | `true` |
 | `data` | Array\<[System](#system)> | Array of [Systems](#system) that the Inventory contains | `true` |
