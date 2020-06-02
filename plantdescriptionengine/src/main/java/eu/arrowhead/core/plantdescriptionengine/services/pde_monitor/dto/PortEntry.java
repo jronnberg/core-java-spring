@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
+import se.arkalix.dto.json.value.JsonObject;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
@@ -21,7 +22,7 @@ public interface PortEntry {
     String serviceDefinition();
     Optional<Map<String, String>> metadata();
 
-    Optional<Map<String, String>> systemData();
+    Optional<JsonObject> systemData();
     Optional<String> inventoryId();
     Optional<Map<String, String>> inventoryData();
 

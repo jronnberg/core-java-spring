@@ -9,6 +9,7 @@ import java.util.Optional;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
+import se.arkalix.dto.json.value.JsonObject;
 
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
@@ -19,8 +20,8 @@ public interface SystemEntry {
     Optional<String> systemName();
     Optional<Map<String, String>> metadata();
     List<PortEntry> ports();
-    Optional<Map<String, String>> systemData();
+    Optional<JsonObject> systemData();
     Optional<String> inventoryId();
-    Optional<Map<String, String>> inventoryData();
+    Optional<JsonObject> inventoryData();
 
 }

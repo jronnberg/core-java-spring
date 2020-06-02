@@ -16,7 +16,6 @@ import se.arkalix.util.concurrent.Future;
 public class PdeMonitorService {
 
     private final ArSystem arSystem;
-    private final HttpClient httpClient;
     private final MonitorableClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
@@ -40,7 +39,6 @@ public class PdeMonitorService {
 
         this.arSystem = arSystem;
         this.entryMap = entryMap;
-        this.httpClient = httpClient;
         this.secure = secure;
 
         this.monitorableClient = new MonitorableClient(arSystem, httpClient, monitorInfo);
