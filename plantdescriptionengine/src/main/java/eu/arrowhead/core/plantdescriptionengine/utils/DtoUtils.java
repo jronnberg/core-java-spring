@@ -77,30 +77,50 @@ public final class DtoUtils {
 
         for (var system : entry.systems()) {
 
+            List<MonitorInfo.Bundle> systemMonitorInfo = monitorInfo.getSystemInfo(
+                system.systemName().orElse(null), system.metadata().orElse(null)
+            );
+
             List<PortEntryDto> ports = new ArrayList<>();
             for (var port : system.ports()) {
-                var portCopy = new PortEntryBuilder()
+
+                MonitorInfo.Bundle serviceMonitorInfo = null;
+
+                for (var infoBundle : systemMonitorInfo) {
+                    if (infoBundle.matchesService(system.metadata(), port.metadata())) {
+                        serviceMonitorInfo = infoBundle;
+                        systemMonitorInfo.remove(infoBundle);
+                        break;
+                    }
+                }
+
+                var portBuilder = new PortEntryBuilder()
                     // TODO: Hiding the implementation of 'consumer' default
                     // values in here feels a bit iffy:
                     .portName(port.portName())
                     .serviceDefinition(port.serviceDefinition())
                     .consumer(port.consumer().orElse(false))
-                    .metadata(port.metadata().orElse(null))
-                    .build();
-                ports.add(portCopy);
+                    .metadata(port.metadata().orElse(null));
+
+                if (serviceMonitorInfo != null) {
+                    portBuilder.systemData(serviceMonitorInfo.systemData);
+                    portBuilder.inventoryId(serviceMonitorInfo.inventoryId);
+                }
+
+                ports.add(portBuilder.build());
             }
 
             var systemBuilder = new SystemEntryBuilder().systemId(system.systemId())
                     .metadata(system.metadata().orElse(null)).ports(ports);
 
-            if (system.systemName().isPresent()) {
-                /*
-                String systemName = system.systemName().get();
+            // If there any monitor info left, that means it has not been
+            // matched to a specific service, and should be presented on the
+            // system entry itself.
+            if (systemMonitorInfo.size() > 0) {
+                var infoBundle = systemMonitorInfo.get(0);
                 systemBuilder
-                    .systemName(systemName)
-                    .inventoryId(monitorInfo.getInventoryId(systemName))
-                    .systemData(monitorInfo.getSystemData(systemName));
-                    */
+                    .inventoryId(infoBundle.inventoryId)
+                    .systemData(infoBundle.systemData);
             }
 
             if (system.metadata().isPresent()) {
