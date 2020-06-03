@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.DtoWriter;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.utils.DtoWriter;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.DtoWriteException;
 import se.arkalix.dto.binary.ByteArrayReader;
@@ -30,7 +30,7 @@ public class FileStore implements BackingStore {
      *                             Description.
      * @throws BackingStoreException
      */
-    public FileStore(String descriptionDirectory) {
+    public FileStore(final String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
         this.descriptionDirectory = descriptionDirectory;
     }
@@ -39,7 +39,7 @@ public class FileStore implements BackingStore {
      * @return The file path to use for reading or writing a Plant Description
      *         Entry to disk.
      */
-    private Path getFilePath(int entryId) {
+    private Path getFilePath(final int entryId) {
         return Paths.get(descriptionDirectory, entryId + ".json");
     }
 
@@ -48,18 +48,18 @@ public class FileStore implements BackingStore {
      */
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws BackingStoreException {
-        File directory = new File(descriptionDirectory);
+        final File directory = new File(descriptionDirectory);
         directory.mkdir();
 
-        File[] directoryListing = directory.listFiles();
+        final File[] directoryListing = directory.listFiles();
 
         // Read all Plant Description entries into memory.
         if (directoryListing == null) {
             throw new BackingStoreException(new FileNotFoundException());
         }
 
-        var result = new ArrayList<PlantDescriptionEntryDto>();
-        for (File child : directoryListing) {
+        final var result = new ArrayList<PlantDescriptionEntryDto>();
+        for (final File child : directoryListing) {
             byte[] bytes = null;
             try {
                 bytes = Files.readAllBytes(child.toPath());
@@ -76,11 +76,11 @@ public class FileStore implements BackingStore {
      */
     @Override
     public void write(final PlantDescriptionEntryDto entry) throws BackingStoreException {
-        Path path = getFilePath(entry.id());
+        final Path path = getFilePath(entry.id());
         // Create the file and parent directories, if they do not already exist:
         try {
             Files.createDirectories(path.getParent());
-            File file = path.toFile();
+            final File file = path.toFile();
 
             if (!file.exists()) {
                 file.createNewFile();
@@ -100,11 +100,11 @@ public class FileStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void remove(int entryId) throws BackingStoreException {
+    public void remove(final int entryId) throws BackingStoreException {
         final Path filepath = getFilePath(entryId);
         try {
             Files.delete(filepath);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new BackingStoreException("Failed to delete Plant Description Entry file", e);
         }
     }
