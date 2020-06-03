@@ -45,7 +45,7 @@ public interface PlantDescriptionEntry {
     int id();
     String plantDescription();
     boolean active();
-    List<Integer> include();
+    List<Float> include();
     List<PdeSystem> systems();
     List<Connection> connections();
     Instant createdAt();
