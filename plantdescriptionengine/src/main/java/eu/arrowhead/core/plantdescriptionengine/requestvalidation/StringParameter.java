@@ -24,17 +24,29 @@ public class StringParameter extends QueryParameter {
         super(name);
     }
 
+    /**
+     * @param legalValues A list of legal values for this parameter.
+     * @return This instance.
+     */
     public StringParameter legalValues(List<String> legalValues) {
         this.legalValues = legalValues;
         return this;
     }
 
+    /**
+     * @param value Sets the only legal value for this parameter.
+     * @return This instance.
+     */
     public StringParameter legalValue(String value) {
         this.legalValues = new ArrayList<String>();
         this.legalValues.add(value);
         return this;
     }
 
+    /**
+     * @param s A default value to use for this parameter.
+     * @return This instance.
+     */
     public StringParameter setDefault(String s) {
         this.defaultValue = s;
         return this;
