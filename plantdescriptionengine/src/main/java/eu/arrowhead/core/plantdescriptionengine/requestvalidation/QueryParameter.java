@@ -15,6 +15,11 @@ public abstract class QueryParameter {
     protected String name;
     protected List<QueryParameter> requiredParameters = new ArrayList<>();
 
+    /**
+     *
+     * @param param A query parameter that must be present if this one is.
+     * @return This instance.
+     */
     public QueryParameter requires(QueryParameter param) {
         requiredParameters.add(param);
         return this;
@@ -35,6 +40,7 @@ public abstract class QueryParameter {
      * of the requirements imposed by this instance, it is stored in the given
      * parser object. Any requirement violations are reported using the parsers
      * {@code report} method.
+     *
      * @param request A HTTP service request.
      * @param parser A query parameter parser instance.
      * @param required If true, this method will report an error if the

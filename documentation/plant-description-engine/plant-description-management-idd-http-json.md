@@ -585,7 +585,7 @@ JSON object with the following fields:
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `count` | Number | Number of records found | `true` ||
-| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
+| `data` | Array\<[PlantDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### PlantDescriptionUpdate
 JSON object with the following fields:

@@ -22,6 +22,11 @@ public class BooleanParameter extends QueryParameter {
         super(name);
     }
 
+    /**
+     *
+     * @param value A default value for the parameter.
+     * @return This instance.
+     */
     public BooleanParameter setDefault(boolean value) {
         this.defaultValue = value;
         return this;
