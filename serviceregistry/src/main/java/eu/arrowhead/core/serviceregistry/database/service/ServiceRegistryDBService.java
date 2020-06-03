@@ -290,7 +290,7 @@ public class ServiceRegistryDBService {
 			if (find.isPresent()) {
 				return find.get();
 			} else {
-				throw new InvalidParameterException("Service definition with id of '" + id + "' not exists");
+				throw new InvalidParameterException("Service definition with id of '" + id + "' does not exist");
 			}
 		} catch (final InvalidParameterException ex) {
 			throw ex;
@@ -388,7 +388,7 @@ public class ServiceRegistryDBService {
 				serviceDefinitionEntry.setServiceDefinition(validatedServiceDefinition);
 				return serviceDefinitionRepository.saveAndFlush(serviceDefinitionEntry);
 			} else {
-				throw new InvalidParameterException("Service definition with id of '" + id + "' not exists");
+				throw new InvalidParameterException("Service definition with id of '" + id + "' does not exist");
 			}
 		} catch (final InvalidParameterException ex) {
 			throw ex;
@@ -415,7 +415,7 @@ public class ServiceRegistryDBService {
 
 		try {
 			if (!serviceDefinitionRepository.existsById(id)) {
-				throw new InvalidParameterException("Service Definition with id '" + id + "' not exists");
+				throw new InvalidParameterException("Service Definition with id '" + id + "' does not exist");
 			}
 			
 			serviceDefinitionRepository.deleteById(id);
@@ -437,7 +437,7 @@ public class ServiceRegistryDBService {
 			if (find.isPresent()) {
 				return find.get();
 			} else {
-				throw new InvalidParameterException("Service Registry with id of '" + id + "' not exists");
+				throw new InvalidParameterException("Service Registry with id of '" + id + "' does not exist");
 			}
 		} catch (final InvalidParameterException ex) {
 			throw ex;
@@ -589,7 +589,7 @@ public class ServiceRegistryDBService {
 			if (srEntryOptional.isPresent()) {
 				srEntry = srEntryOptional.get();
 			} else {
-				throw new InvalidParameterException("Service Registry entry with id '" + id + "' not exists");
+				throw new InvalidParameterException("Service Registry entry with id '" + id + "' does not exist");
 			}
 			
 			final String validatedServiceDefinition = request.getServiceDefinition().toLowerCase().trim();
@@ -630,7 +630,7 @@ public class ServiceRegistryDBService {
 			if (srEntryOptional.isPresent()) {
 				srEntry = srEntryOptional.get();
 			} else {
-				throw new InvalidParameterException("Service Registry entry with id '" + id + "' not exists");
+				throw new InvalidParameterException("Service Registry entry with id '" + id + "' does not exist");
 			}
 			
 			final String validatedServiceDefinition = !Utilities.isEmpty(request.getServiceDefinition()) ? request.getServiceDefinition().toLowerCase().trim() :
@@ -699,8 +699,9 @@ public class ServiceRegistryDBService {
 		logger.debug("createServiceRegistry started...");
 		Assert.notNull(serviceDefinition, "Service definition is not specified.");
 		Assert.notNull(provider, "Provider is not specified.");
+		Assert.notNull(serviceUri, "URI is not specified.");
 		
-		checkConstraintOfSystemRegistryTable(serviceDefinition, provider);
+		checkConstraintOfSystemRegistryTable(serviceDefinition, serviceUri);
 		checkSRSecurityValue(securityType, provider.getAuthenticationInfo());
 		checkSRServiceInterfacesList(interfaces);
 		
@@ -730,10 +731,10 @@ public class ServiceRegistryDBService {
 		logger.debug("updateServiceRegistry started...");
 		Assert.notNull(srEntry, "ServiceRegistry Entry is not specified.");	
 		Assert.notNull(serviceDefinition, "Service definition is not specified.");
-		Assert.notNull(provider, "Provider is not specified.");		
+		Assert.notNull(serviceUri, "serviceUri is not specified.");
 		
 		if (checkServiceRegistryIfUniqueValidationNeeded(srEntry, serviceDefinition, provider)) {
-			checkConstraintOfSystemRegistryTable(serviceDefinition, provider);			
+			checkConstraintOfSystemRegistryTable(serviceDefinition, serviceUri);
 		}
 		
 		checkSRSecurityValue(securityType, provider.getAuthenticationInfo());
@@ -767,13 +768,15 @@ public class ServiceRegistryDBService {
 													" exists.");
 			}
 			
-			final Optional<ServiceRegistry> optServiceRegistryEntry = serviceRegistryRepository.findByServiceDefinitionAndSystem(optServiceDefinition.get(), optProviderSystem.get());
+			final List<ServiceRegistry> optServiceRegistryEntry = serviceRegistryRepository.findByServiceDefinition(optServiceDefinition.get());
 			if (optServiceRegistryEntry.isEmpty()) {
 				throw new InvalidParameterException("No Service Registry entry with provider: (" + validatedSystemName + ", " + validatedSystemAddress + ":" + providerSystemPort +
 													") and service definition: " + validatedServiceDefinition + " exists.");
 			}
-			
-			removeServiceRegistryEntryById(optServiceRegistryEntry.get().getId()); 
+			for(int i=0; i<optServiceRegistryEntry.size();i++){
+				removeServiceRegistryEntryById(optServiceRegistryEntry.get(i).getId());
+			}
+
 		} catch (final InvalidParameterException ex) {
 			throw ex;
 		} catch (final Exception ex) {
@@ -858,7 +861,7 @@ public class ServiceRegistryDBService {
 		
 		try {
 			if (!serviceRegistryRepository.existsById(id)) {
-				throw new InvalidParameterException("Service Registry entry with id '" + id + "' not exists");
+				throw new InvalidParameterException("Service Registry entry with id '" + id + "' does not exist");
 			}
 			
 			serviceRegistryRepository.deleteById(id);
@@ -1123,15 +1126,20 @@ public class ServiceRegistryDBService {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private void checkConstraintOfSystemRegistryTable(final ServiceDefinition serviceDefinition, final System provider) {
+	private void checkConstraintOfSystemRegistryTable(final ServiceDefinition serviceDefinition, final String serviceUri) {
 		logger.debug("checkConstraintOfSystemRegistryTable started...");
-		
+
 		try {
-			final Optional<ServiceRegistry> find = serviceRegistryRepository.findByServiceDefinitionAndSystem(serviceDefinition, provider);
-			if (find.isPresent()) {
-				throw new InvalidParameterException("Service Registry entry with provider: (" + provider.getSystemName() + ", " + provider.getAddress() + ":" + provider.getPort() +
-													") and service definition: " + serviceDefinition.getServiceDefinition() + " already exists.");
+			final List<ServiceRegistry> find = serviceRegistryRepository.findByServiceDefinition(serviceDefinition);
+			int i=0;
+			while(i<find.size()){
+				if (find.get(i).getServiceUri().equalsIgnoreCase(serviceUri)) {
+					throw new InvalidParameterException("Service Registry entry with serviceUri "+serviceUri+" and service definition: " + serviceDefinition.getServiceDefinition() + " already exists.");
+				}
+				else
+					i++;
 			}
+
 		} catch (final InvalidParameterException ex) {
 			throw ex;
 		} catch (final Exception ex) {
@@ -1198,7 +1206,7 @@ public class ServiceRegistryDBService {
 	}
 	
 	//-------------------------------------------------------------------------------------------------	
-	private ServiceRegistry setModifiedValuesOfServiceRegistryEntryFields(final ServiceRegistry srEntry, final ServiceDefinition serviceDefinition, final System provider, 
+	private ServiceRegistry setModifiedValuesOfServiceRegistryEntryFields(final ServiceRegistry srEntry, final ServiceDefinition serviceDefinition, final System provider,
 																		  final String serviceUri, final ZonedDateTime endOfValidity, final ServiceSecurityType securityType,
 																		  final String metadataStr, final int version, final List<String> interfaces) {
 		logger.debug("setModifiedValuesOfServiceRegistryEntryFields started...");
