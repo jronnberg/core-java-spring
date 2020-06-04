@@ -13,6 +13,8 @@ import se.arkalix.net.http.service.HttpServiceRequest;
  */
 public class IntParameter extends QueryParameter {
 
+    private int minValue = Integer.MIN_VALUE;
+
     /**
      * @return True if the provided string is a base 10 integer.
      */
@@ -56,12 +58,29 @@ public class IntParameter extends QueryParameter {
         String value = possibleValue.get();
 
         if (!isInteger(value)) {
-            parser.report(new ParseError("Query parameter " + name +
-                " must be a valid string, got " + value + "."));
+            parser.report(new ParseError("Query parameter '" + name +
+                "' must be a valid string, got " + value + "."));
+        }
+
+        int intValue = Integer.parseInt(value);
+
+        if (intValue < minValue) {
+            parser.report(new ParseError("Query parameter '" + name +
+                "' must be greater than " + minValue + ", got " + intValue
+                + "."));
         }
 
         if (!parser.hasError()) {
-            parser.putInt(name, Integer.parseInt(value));
+            parser.putInt(name, intValue);
         }
     }
+
+    /**
+     * @param The minimum allowed value for this parameter.
+     * @return This instance.
+     */
+	public QueryParameter min(int i) {
+        minValue = i;
+		return this;
+	}
 }
