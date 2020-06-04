@@ -33,9 +33,10 @@ public class PdeMain {
     /**
      * @param appProps Configurations used for this instance of the Plant
      *                 Description Engine.
-     * @return HTTP client useful for sending messages to remote hosts.
+     * @return HTTP client useful for consuming Arrowhead services as a
+     *         privileged system.
      */
-    private static HttpClient createHttpClient(Properties appProps) {
+    private static HttpClient createSysopHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
         HttpClient client = null;
         try {
@@ -43,14 +44,14 @@ public class PdeMain {
                 client = new HttpClient.Builder().insecure().build();
             } else {
                 OwnedIdentity identity = loadIdentity(
-                    appProps.getProperty("server.ssl.consumer-key-store"),
-                    appProps.getProperty("server.ssl.consumer-key-password").toCharArray(),
-                    appProps.getProperty("server.ssl.consumer-key-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.sysop-key-store"),
+                    appProps.getProperty("server.ssl.sysop-key-password").toCharArray(),
+                    appProps.getProperty("server.ssl.sysop-key-store-password").toCharArray()
                 );
 
                 TrustStore trustStore = loadTrustStore(
-                    appProps.getProperty("server.ssl.consumer-trust-store"),
-                    appProps.getProperty("server.ssl.consumer-trust-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.sysop-trust-store"),
+                    appProps.getProperty("server.ssl.sysop-trust-store-password").toCharArray()
                 );
 
                 client = new HttpClient.Builder()
@@ -59,7 +60,43 @@ public class PdeMain {
                     .build();
             }
         } catch (SSLException e) {
-            logger.error("Failed to create HTTP Client", e);
+            logger.error("Failed to create Sysop HTTP Client", e);
+            System.exit(1);
+        }
+        return client;
+    }
+
+    /**
+     * @param appProps Configurations used for this instance of the Plant
+     *                 Description Engine.
+     * @return HTTP client useful for consuming Arrowhead services as a
+     *         non-privileged system.
+     */
+    private static HttpClient createPdeHttpClient(Properties appProps) {
+        final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
+        HttpClient client = null;
+        try {
+            if (!secureMode) {
+                client = new HttpClient.Builder().insecure().build();
+            } else {
+                OwnedIdentity identity = loadIdentity(
+                    appProps.getProperty("server.ssl.pde-key-store"),
+                    appProps.getProperty("server.ssl.pde-key-password").toCharArray(),
+                    appProps.getProperty("server.ssl.pde-key-store-password").toCharArray()
+                );
+
+                TrustStore trustStore = loadTrustStore(
+                    appProps.getProperty("server.ssl.pde-trust-store"),
+                    appProps.getProperty("server.ssl.pde-trust-store-password").toCharArray()
+                );
+
+                client = new HttpClient.Builder()
+                    .identity(identity)
+                    .trustStore(trustStore)
+                    .build();
+            }
+        } catch (SSLException e) {
+            logger.error("Failed to create PDE HTTP Client", e);
             System.exit(1);
         }
         return client;
@@ -84,11 +121,11 @@ public class PdeMain {
         if (!secureMode) {
             systemBuilder.name("pde").insecure(); // TODO: Use some other name?
         } else {
-            final String trustStorePath = appProps.getProperty("server.ssl.provider-trust-store");
-            final char[] trustStorePassword = appProps.getProperty("server.ssl.provider-trust-store-password").toCharArray();
-            final String keyStorePath = appProps.getProperty("server.ssl.provider-key-store");
-            final char[] keyPassword = appProps.getProperty("server.ssl.provider-key-password").toCharArray();
-            final char[] keyStorePassword = appProps.getProperty("server.ssl.provider-key-store-password").toCharArray();
+            final String trustStorePath = appProps.getProperty("server.ssl.pde-trust-store");
+            final char[] trustStorePassword = appProps.getProperty("server.ssl.pde-trust-store-password").toCharArray();
+            final String keyStorePath = appProps.getProperty("server.ssl.pde-key-store");
+            final char[] keyPassword = appProps.getProperty("server.ssl.pde-key-password").toCharArray();
+            final char[] keyStorePassword = appProps.getProperty("server.ssl.pde-key-store-password").toCharArray();
 
             systemBuilder
                 .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
@@ -185,12 +222,11 @@ public class PdeMain {
             System.exit(74);
         }
 
+        final HttpClient sysopClient = createSysopHttpClient(appProps);
         final String serviceRegistryIp = appProps.getProperty("service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
-        final HttpClient httpClient = createHttpClient(appProps);
-
-        final var systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
+        final var systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
 
         systemTracker.refreshSystems().flatMap(result -> {
             final CloudDto cloud = new CloudBuilder()
@@ -198,12 +234,14 @@ public class PdeMain {
                 .operator(demoProps.getProperty("cloud.operator"))
                 .build();
 
-            final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker);
+            final HttpClient pdeClient = createPdeHttpClient(appProps);
+            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker);
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FileStore(plantDescriptionsDirectory));
-            final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
+
+            final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
             return orchestratorClient.initialize(entryMap)
                 .flatMap(orchstratorInitializationResult -> {
@@ -211,7 +249,7 @@ public class PdeMain {
                     return arSystem.provide(pdeManagementService.getService());
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, entryMap, httpClient, secureMode).provide();
+                    return new PdeMonitorService(arSystem, entryMap, pdeClient, secureMode).provide();
                 });
         })
         .onFailure(throwable -> {
