@@ -6,7 +6,9 @@ import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
+import se.arkalix.dto.json.value.JsonBoolean;
 import se.arkalix.dto.json.value.JsonObject;
+import se.arkalix.dto.json.value.JsonPair;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -20,24 +22,37 @@ import java.util.Optional;
 
 public class MonitorInfoTest {
 
+    private ServiceDescription createServiceDescription(final Map<String, String> metadata) {
+        var provider = new ProviderDescription("Provider-system", new InetSocketAddress("0.0.0.0", 5000));
+        return new ServiceDescription.Builder()
+            .name("service-a")
+            .provider(provider)
+            .uri("/test")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            .metadata(metadata)
+            .build();
+    }
+
+    private ServiceDescription createServiceDescription() {
+        return createServiceDescription(new HashMap<>());
+    }
+
     @Test
     public void shouldMatch() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
+        Map<String, String> metadata = Map.of(
+            "a", "1",
+            "b", "2"
+        );
         JsonObject systemData = null;
         String inventoryId = null;
 
-        metadata.put("a", "1");
-        metadata.put("b", "2");
-
         var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
 
-        Map<String, String> systemMetadata = new HashMap<>();
-        Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "1");
-        serviceMetadata.put("b", "2");
+        Map<String, String> systemMetadata = Map.of("a", "1");
+        Map<String, String> serviceMetadata = Map.of("b", "2");
 
         assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
@@ -46,20 +61,14 @@ public class MonitorInfoTest {
     public void shouldNotMatch() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
-        JsonObject systemData = null;
-        String inventoryId = null;
+        Map<String, String> metadata = Map.of(
+            "a", "1",
+            "b", "2"
+        );
+        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
 
-        metadata.put("a", "1");
-        metadata.put("b", "2");
-
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
-
-        Map<String, String> systemMetadata = new HashMap<>();
-        Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "x");
-        serviceMetadata.put("b", "2");
+        Map<String, String> systemMetadata = Map.of("a", "x");
+        Map<String, String> serviceMetadata = Map.of("b", "2");
 
         assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
@@ -68,21 +77,16 @@ public class MonitorInfoTest {
     public void supersetShouldMatch() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
-        JsonObject systemData = null;
-        String inventoryId = null;
+        Map<String, String> metadata = Map.of(
+            "a", "1",
+            "b", "2",
+            "c", "3"
+        );
 
-        metadata.put("a", "1");
-        metadata.put("b", "2");
-        metadata.put("c", "3");
+        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
-
-        Map<String, String> systemMetadata = new HashMap<>();
-        Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "1");
-        serviceMetadata.put("b", "2");
+        Map<String, String> systemMetadata = Map.of("a", "1");
+        Map<String, String> serviceMetadata = Map.of("b", "2");
 
         assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
@@ -91,21 +95,18 @@ public class MonitorInfoTest {
     public void subsetsShouldNotMatch() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
-        JsonObject systemData = null;
-        String inventoryId = null;
+        Map<String, String> metadata = Map.of(
+            "a", "1",
+            "b", "2"
+        );
 
-        metadata.put("a", "1");
-        metadata.put("b", "2");
+        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
-
-        Map<String, String> systemMetadata = new HashMap<>();
-        Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "1");
-        serviceMetadata.put("b", "2");
-        serviceMetadata.put("c", "3");
+        Map<String, String> systemMetadata = Map.of("a", "1");
+        Map<String, String> serviceMetadata = Map.of(
+            "b", "2",
+            "c", "3"
+        );
 
         assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
@@ -114,18 +115,12 @@ public class MonitorInfoTest {
     public void shouldRequireServiceMetadata() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
-        JsonObject systemData = null;
-        String inventoryId = null;
+        Map<String, String> metadata = Map.of("a", "1");
 
-        metadata.put("a", "1");
+        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
-
-        Map<String, String> systemMetadata = new HashMap<>();
+        Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "1");
 
         assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
         assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.empty()));
@@ -135,57 +130,136 @@ public class MonitorInfoTest {
     public void serviceShouldOverrideSystem() {
 
         String systemName = "System A";
-        Map<String, String> metadata = new HashMap<>();
-        JsonObject systemData = null;
-        String inventoryId = null;
+        Map<String, String> metadata = Map.of("a", "1");
 
-        metadata.put("a", "1");
+        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
-
-        Map<String, String> systemMetadata = new HashMap<>();
-        Map<String, String> serviceMetadata = new HashMap<>();
-
-        systemMetadata.put("a", "2");
-        serviceMetadata.put("a", "1");
+        Map<String, String> systemMetadata = Map.of("a", "2");
+        Map<String, String> serviceMetadata = Map.of("a", "1");
 
         assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
 
-        systemMetadata.put("a", "1");
-        serviceMetadata.put("a", "2");
+        systemMetadata = Map.of("a", "1");
+        serviceMetadata = Map.of("a", "2");
 
         assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
 
     }
 
     @Test
-    public void shouldStoreInventoryIds() {
+    public void shouldStoreSystemData() {
 
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("x", "y");
+        Map<String, String> metadata = Map.of("name", "abc");
+        ServiceDescription  serviceDescription = createServiceDescription(metadata);
 
-        var provider = new ProviderDescription("Provider", new InetSocketAddress("0.0.0.0", 5000));
-        ServiceDescription  serviceDescription = new ServiceDescription.Builder()
+        JsonObject jsonObject = new JsonObject(List.of(
+            new JsonPair("a", JsonBoolean.TRUE)
+        ));
+        var monitorInfo = new MonitorInfo();
+        monitorInfo.putSystemData(serviceDescription, jsonObject);
+
+        Map<String, String> lookupMetadata = Map.of("name", "abc");
+        var systemInfoList = monitorInfo.getSystemInfo(null, lookupMetadata);
+        assertEquals(1, systemInfoList.size());
+        var systemInfo = systemInfoList.get(0);
+        assertEquals("{[a: true]}", systemInfo.systemData.toString());
+    }
+
+    @Test
+    public void shouldStoreInventoryId() {
+        Map<String, String> metadataA = Map.of("name", "a");
+        Map<String, String> metadataB = Map.of("name", "b");
+        String systemNameA = "System-a";
+        String systemNameB = "System-b";
+
+        var providerA = new ProviderDescription(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
+        var serviceA = new ServiceDescription.Builder()
             .name("service-a")
-            .provider(provider)
+            .provider(providerA)
             .uri("/test")
             .security(SecurityDescriptor.NOT_SECURE)
             .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
-            .metadata(metadata)
+            .metadata(metadataA)
             .build();
 
-        String inventoryId = "id-1234";
+        var providerB = new ProviderDescription(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
+        var serviceB = new ServiceDescription.Builder()
+            .name("service-b")
+            .provider(providerB)
+            .uri("/test")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            .metadata(metadataB)
+            .build();
+
+        String inventoryIdA = "id-A";
+        String inventoryIdB = "id-B";
+        
+        var monitorInfo = new MonitorInfo();
+        monitorInfo.putInventoryId(serviceA, inventoryIdA);
+        monitorInfo.putInventoryId(serviceB, inventoryIdB);
+
+        var systemInfoList = monitorInfo.getSystemInfo(serviceB.provider().name(), null);
+        assertEquals(1, systemInfoList.size());
+        var systemInfo = systemInfoList.get(0);
+        assertEquals(inventoryIdB, systemInfo.inventoryId);
+    }
+
+    @Test
+    public void shouldRetrieveBySystemName() {
+
+        Map<String, String> metadata = Map.of("x", "y");
+        ServiceDescription  serviceDescription = createServiceDescription(metadata);
+
+        String inventoryId = "id-4567";
         var monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(serviceDescription, inventoryId);
-
-        Map<String, String> lookupMetadata = new HashMap<>();
-        lookupMetadata.put("x", "y");
-
-        var systemInfoList = monitorInfo.getSystemInfo(null, lookupMetadata);
+        var systemInfoList = monitorInfo.getSystemInfo(serviceDescription.provider().name(), null);
         assertEquals(1, systemInfoList.size());
 
         var systemInfo = systemInfoList.get(0);
         assertEquals(inventoryId, systemInfo.inventoryId);
+    }
+
+    @Test
+    public void shouldOverwriteData() {
+
+        ServiceDescription  service = createServiceDescription();
+        var monitorInfo = new MonitorInfo();
+
+        String oldInventoryId = "id-1234";
+        monitorInfo.putInventoryId(service, oldInventoryId);
+
+        String newInventoryId = "id-5678";
+        monitorInfo.putInventoryId(service, newInventoryId);
+
+        var systemInfoList = monitorInfo.getSystemInfo(service.provider().name(), null);
+        assertEquals(1, systemInfoList.size());
+
+        var systemInfo = systemInfoList.get(0);
+        assertEquals(newInventoryId, systemInfo.inventoryId);
+    }
+    
+    @Test
+    public void shouldMergeData() {
+        ServiceDescription  service = createServiceDescription();
+        var monitorInfo = new MonitorInfo();
+
+        String inventoryId = "xyz";
+        monitorInfo.putInventoryId(service, inventoryId);
+
+        JsonObject systemData = new JsonObject(List.of(
+            new JsonPair("b", JsonBoolean.FALSE)
+        ));
+    
+        monitorInfo.putSystemData(service, systemData);
+        
+        var systemInfoList = monitorInfo.getSystemInfo(service.provider().name(), null);
+        assertEquals(1, systemInfoList.size());
+
+        var systemInfo = systemInfoList.get(0);
+        assertEquals(inventoryId, systemInfo.inventoryId);
+        assertEquals("{[b: false]}", systemInfo.systemData.toString());
     }
 }
 
