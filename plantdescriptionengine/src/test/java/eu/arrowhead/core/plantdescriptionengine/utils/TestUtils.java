@@ -10,7 +10,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 
 public class TestUtils {
 
-    public static PlantDescriptionEntryDto createEntry(int id) {
+    public static PlantDescriptionEntryDto createEntry(float id) {
         final Instant now = Instant.now();
         return new PlantDescriptionEntryBuilder()
             .id(id)

@@ -12,14 +12,14 @@ public class RuleMap {
 
     // Internal Map for storing rules as follows:
     // <PlantDescriptionEntryID, List<RuleId>>
-    private Map<Integer, List<Integer>> ruleLists = new ConcurrentHashMap<>();
+    private Map<Float, List<Integer>> ruleLists = new ConcurrentHashMap<>();
 
     /**
      * @param entryId The ID of a Plant Description Entry.
      * @return A list of ID:s for orchestrator rules corresponding to the
      *         entry's list of connections.
      */
-    public List<Integer> get(int entryId) {
+    public List<Integer> get(float entryId) {
         var rules = ruleLists.get(entryId);
         if (rules == null) {
             return null;
@@ -35,7 +35,7 @@ public class RuleMap {
      *                                Plant Description entry's orchestrator
      *                                rules.
      */
-    public void put(int plantDescriptionEntryId, StoreEntryList rules) {
+    public void put(final float plantDescriptionEntryId, final StoreEntryList rules) {
         List<Integer> entryRules = new ArrayList<>();
         for (var storeEntry : rules.data()) {
             entryRules.add(storeEntry.id());
@@ -48,7 +48,7 @@ public class RuleMap {
      *
      * @param plantDescriptionEntryId ID of the Plant description Entry.
      */
-    public void remove(int plantDescriptionEntryId) {
+    public void remove(final float plantDescriptionEntryId) {
         ruleLists.remove(plantDescriptionEntryId);
 	}
 }

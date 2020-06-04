@@ -14,7 +14,8 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
  */
 public class InMemoryBackingStore implements BackingStore {
 
-    private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
+    // ID-to-entry map:
+    private Map<Float, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -28,7 +29,7 @@ public class InMemoryBackingStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void write(PlantDescriptionEntryDto entry) throws BackingStoreException {
+    public void write(final PlantDescriptionEntryDto entry) throws BackingStoreException {
         entries.put(entry.id(), entry);
     }
 
@@ -36,7 +37,7 @@ public class InMemoryBackingStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void remove(int id) throws BackingStoreException {
+    public void remove(final float id) throws BackingStoreException {
         entries.remove(id);
     }
 

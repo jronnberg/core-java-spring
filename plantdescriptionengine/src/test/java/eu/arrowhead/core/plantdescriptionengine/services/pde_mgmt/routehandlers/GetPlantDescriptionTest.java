@@ -70,7 +70,7 @@ public class GetPlantDescriptionTest {
 
                 assertTrue(response.body().isPresent());
                 var returnedEntry = (PlantDescriptionEntry)response.body().get();
-                assertEquals(returnedEntry.id(), entryId); // TODO: Add 'equals' method to entries and do a proper comparison?
+                assertEquals(returnedEntry.id(), entryId, 0); // TODO: Add 'equals' method to entries and do a proper comparison?
             }).onFailure(e -> {
                 assertNull(e);
             });
