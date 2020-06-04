@@ -63,4 +63,24 @@ public class PdeMonitorServiceTest {
             });
         assertFalse(service.isSecure());
     }
+
+    @Test
+    public void shouldNotAllowSecureService() throws BackingStoreException, SSLException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final HttpClient client = new HttpClient.Builder().build();
+
+        final ArSystem arSystem = new ArSystem.Builder()
+            .name("Test System")
+            .insecure()
+            .build();
+        final var service = new PdeMonitorService(arSystem, entryMap, client, true);
+
+        service.provide()
+            .ifSuccess(result -> {
+                assertNull(result);
+            })
+            .onFailure(e -> {
+                assertNotNull(e);
+            });
+    }
 }
