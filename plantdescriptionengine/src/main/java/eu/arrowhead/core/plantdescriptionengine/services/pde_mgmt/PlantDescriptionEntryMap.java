@@ -30,7 +30,8 @@ public class PlantDescriptionEntryMap {
     // Description Entries.
     List<PlantDescriptionUpdateListener> listeners = new ArrayList<>();
 
-    private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
+    // ID-to-entry mapping
+    private Map<Float, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     // Non-volatile storage for entries:
     private final BackingStore backingStore;
@@ -50,12 +51,12 @@ public class PlantDescriptionEntryMap {
 
         // Read entries from non-volatile storage and
         // calculate the next free Plant Description Entry ID:
-        int maxId = -1;
+        float maxId = -1;
         for (var entry : backingStore.readEntries()) {
             maxId = Math.max(maxId, entry.id());
             entries.put(entry.id(), entry);
         }
-        nextId.set(maxId + 1);
+        nextId.set(Math.round(maxId + 1));
     }
 
     /**
@@ -91,7 +92,7 @@ public class PlantDescriptionEntryMap {
         }
     }
 
-    public PlantDescriptionEntryDto get(int id) {
+    public PlantDescriptionEntryDto get(float id) {
         return entries.get(id);
     }
 
@@ -105,7 +106,7 @@ public class PlantDescriptionEntryMap {
      *                               entry will not be stored in memory either,
      *                               and no listeners will be notified.
      */
-    public void remove(int id) throws BackingStoreException {
+    public void remove(float id) throws BackingStoreException {
         backingStore.remove(id);
         var entry = entries.remove(id);
 

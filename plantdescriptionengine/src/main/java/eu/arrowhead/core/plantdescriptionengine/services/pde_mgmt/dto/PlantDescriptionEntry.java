@@ -24,7 +24,7 @@ public interface PlantDescriptionEntry {
     final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return e1.id() - e2.id();
+            return (int)(e1.id() - e2.id());
         }
     };
 
@@ -42,7 +42,7 @@ public interface PlantDescriptionEntry {
         }
     };
 
-    int id();
+    float id();
     String plantDescription();
     boolean active();
     List<Float> include();
@@ -56,7 +56,7 @@ public interface PlantDescriptionEntry {
      * @param id Identifier to be used for the new entry.
      * @return A new plant entry based on the given description.
      */
-    static PlantDescriptionEntryDto from(PlantDescriptionDto description, int id) {
+    static PlantDescriptionEntryDto from(PlantDescriptionDto description, float id) {
         List<PdeSystemDto> systems = new ArrayList<>();
         List<ConnectionDto> connections = new ArrayList<>();
 

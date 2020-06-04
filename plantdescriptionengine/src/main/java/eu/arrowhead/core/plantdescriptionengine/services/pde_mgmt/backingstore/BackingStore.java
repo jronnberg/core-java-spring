@@ -25,6 +25,6 @@ public interface BackingStore {
      * Delete the specified entry from the backing store.
      * @param id ID of the entry to delete.
      */
-    void remove(int id) throws BackingStoreException;
+    void remove(float id) throws BackingStoreException;
 
 }

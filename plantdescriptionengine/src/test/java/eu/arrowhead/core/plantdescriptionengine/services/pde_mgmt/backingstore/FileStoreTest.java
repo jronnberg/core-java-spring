@@ -40,9 +40,9 @@ public class FileStoreTest {
     @Test
     public void ShouldWriteEntries() throws BackingStoreException {
         final BackingStore store = new FileStore(entryDirectory);
-        final List<Integer> entryIds = List.of(1, 2, 3);
+        final List<Float> entryIds = List.of(1f, 2f, 3f);
 
-        for (int id : entryIds) {
+        for (float id : entryIds) {
             store.write(TestUtils.createEntry(id));
         }
 
@@ -57,13 +57,13 @@ public class FileStoreTest {
     @Test
     public void ShouldRemoveEntries() throws BackingStoreException {
         final BackingStore store = new FileStore(entryDirectory);
-        final List<Integer> entryIds = List.of(1, 2, 3);
+        final List<Float> entryIds = List.of(1f, 2f, 3f);
 
-        for (int id : entryIds) {
+        for (float id : entryIds) {
             store.write(TestUtils.createEntry(id));
         }
 
-        int id0 = entryIds.get(0);
+        float id0 = entryIds.get(0);
         store.remove(id0);
 
         var storedEntries = store.readEntries();

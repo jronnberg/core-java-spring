@@ -17,7 +17,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface PdeAlarm {
 
-    int id();
+    float id();
     String systemName();
     boolean acknowledged();
     String severity();
