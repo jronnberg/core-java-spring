@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.json.value.JsonObject;
 
@@ -50,8 +51,8 @@ public class MonitorInfo {
             if (!serviceMetadata.isPresent() || serviceMetadata.get().size() == 0) {
                 return false;
             }
-            var unionMetadata = union(systemMetadata.orElse(new HashMap<>()), serviceMetadata.get());
-            return isSubset(unionMetadata, metadata);
+            var mergedMetadata = DtoUtils.mergeMetadata(systemMetadata.orElse(new HashMap<>()), serviceMetadata.get());
+            return isSubset(mergedMetadata, metadata);
 		}
     }
 
@@ -76,25 +77,6 @@ public class MonitorInfo {
         }
         return true;
     }
-
-    /**
-     * @param a A String to String map.
-     * @param b A String to String map.
-     *
-     * @return The union of maps a and b, where the values in b override the
-     *         values of a in case of collisions.
-     */
-    private static Map<String, String> union(Map<String, String> a, Map<String, String> b) {
-        Map<String, String> result = new HashMap<>();
-        for (var key : a.keySet()) {
-            result.put(key, a.get(key));
-        }
-        for (var key : b.keySet()) {
-            result.put(key, b.get(key));
-        }
-        return result;
-    }
-
 
     public void putInventoryId(ServiceDescription service, String inventoryId) {
         String systemName = service.provider().name();

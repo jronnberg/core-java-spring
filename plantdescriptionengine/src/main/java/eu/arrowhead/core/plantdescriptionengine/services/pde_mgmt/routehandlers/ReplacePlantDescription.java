@@ -40,8 +40,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
      * @param request HTTP request containing the ID of the entry to
      *                create/update, and a {@link PlantDescriptionUpdate}
      *                describing its new state.
-     * @param response HTTP response containing the current
-     *                 PlantDescriptionEntryList. // TODO: Return the patched entry only?
+     * @param response HTTP response containing the created/updated entry.
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
