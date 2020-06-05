@@ -21,6 +21,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.Orch
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import se.arkalix.ArSystem;
+import se.arkalix.core.plugin.ArOrchestrationStrategy;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
@@ -44,14 +45,14 @@ public class PdeMain {
                 client = new HttpClient.Builder().insecure().build();
             } else {
                 OwnedIdentity identity = loadIdentity(
-                    appProps.getProperty("server.ssl.sysop-key-store"),
-                    appProps.getProperty("server.ssl.sysop-key-password").toCharArray(),
-                    appProps.getProperty("server.ssl.sysop-key-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.sysop.key-store"),
+                    appProps.getProperty("server.ssl.sysop.key-password").toCharArray(),
+                    appProps.getProperty("server.ssl.sysop.key-store-password").toCharArray()
                 );
 
                 TrustStore trustStore = loadTrustStore(
-                    appProps.getProperty("server.ssl.sysop-trust-store"),
-                    appProps.getProperty("server.ssl.sysop-trust-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.sysop.trust-store"),
+                    appProps.getProperty("server.ssl.sysop.trust-store-password").toCharArray()
                 );
 
                 client = new HttpClient.Builder()
@@ -80,14 +81,14 @@ public class PdeMain {
                 client = new HttpClient.Builder().insecure().build();
             } else {
                 OwnedIdentity identity = loadIdentity(
-                    appProps.getProperty("server.ssl.pde-key-store"),
-                    appProps.getProperty("server.ssl.pde-key-password").toCharArray(),
-                    appProps.getProperty("server.ssl.pde-key-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.pde.key-store"),
+                    appProps.getProperty("server.ssl.pde.key-password").toCharArray(),
+                    appProps.getProperty("server.ssl.pde.key-store-password").toCharArray()
                 );
 
                 TrustStore trustStore = loadTrustStore(
-                    appProps.getProperty("server.ssl.pde-trust-store"),
-                    appProps.getProperty("server.ssl.pde-trust-store-password").toCharArray()
+                    appProps.getProperty("server.ssl.pde.trust-store"),
+                    appProps.getProperty("server.ssl.pde.trust-store-password").toCharArray()
                 );
 
                 client = new HttpClient.Builder()
@@ -113,19 +114,21 @@ public class PdeMain {
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
             .localPort(pdePort)
-            .plugins(HttpJsonCloudPlugin
-                .viaServiceRegistryAt(serviceRegistryAddress));
+            .plugins(new HttpJsonCloudPlugin.Builder()
+                .orchestrationStrategy(ArOrchestrationStrategy.STORED_ONLY)
+                .serviceRegistrySocketAddress(serviceRegistryAddress)
+                .build());
 
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
         if (!secureMode) {
             systemBuilder.name("pde").insecure(); // TODO: Use some other name?
         } else {
-            final String trustStorePath = appProps.getProperty("server.ssl.pde-trust-store");
-            final char[] trustStorePassword = appProps.getProperty("server.ssl.pde-trust-store-password").toCharArray();
-            final String keyStorePath = appProps.getProperty("server.ssl.pde-key-store");
-            final char[] keyPassword = appProps.getProperty("server.ssl.pde-key-password").toCharArray();
-            final char[] keyStorePassword = appProps.getProperty("server.ssl.pde-key-store-password").toCharArray();
+            final String trustStorePath = appProps.getProperty("server.ssl.pde.trust-store");
+            final char[] trustStorePassword = appProps.getProperty("server.ssl.pde.trust-store-password").toCharArray();
+            final String keyStorePath = appProps.getProperty("server.ssl.pde.key-store");
+            final char[] keyPassword = appProps.getProperty("server.ssl.pde.key-password").toCharArray();
+            final char[] keyStorePassword = appProps.getProperty("server.ssl.pde.key-store-password").toCharArray();
 
             systemBuilder
                 .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
