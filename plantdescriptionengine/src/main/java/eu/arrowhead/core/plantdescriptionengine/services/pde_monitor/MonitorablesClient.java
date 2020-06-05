@@ -21,8 +21,8 @@ import se.arkalix.query.ServiceQuery;
 public class MonitorablesClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
-
-    private final static int pollInterval = 5000; // Milliseconds
+    private final static int pollForInfo = 3000; // Milliseconds
+    private final static int infoPollInterval = 60000; // Milliseconds
     private final ServiceQuery serviceQuery;
     private final HttpClient httpClient;
 
@@ -42,15 +42,35 @@ public class MonitorablesClient {
 
     public void start() {
         Timer timer = new Timer();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                pollMonitorableSystems();
+                pingPoll();
             }
-        }, 0, pollInterval);
+        }, 0, pollForInfo);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                infoPoll();
+            }
+        }, 0, infoPollInterval);
     }
 
-    private void pollMonitorableSystems() {
+    private void pingPoll() {
+        serviceQuery.resolveAll()
+            .ifSuccess(services -> {
+                for (var service : services) {
+                    ping(service);
+                }
+            })
+            .onFailure(e -> {
+                logger.error("Failed to poll monitorable systems.", e);
+            });
+    }
+
+    private void infoPoll() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
                 System.out.println("Number of services: " + services.size());
@@ -62,6 +82,23 @@ public class MonitorablesClient {
             })
             .onFailure(e -> {
                 logger.error("Failed to poll monitorable systems.", e);
+            });
+    }
+
+    private void ping(ServiceDescription service) {
+        final var address = service.provider().socketAddress();
+        httpClient.send(address, new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri("/monitorable/ping")
+            .header("accept", "application/json"))
+            .flatMap(result -> result
+                .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+            .ifSuccess(pingData -> {
+                System.out.println("Got ping from " + service.name());
+            })
+            .onFailure(e -> {
+                System.out.println("No ping from " + service.name());
+                // TODO: Raise an alarm
             });
     }
 
