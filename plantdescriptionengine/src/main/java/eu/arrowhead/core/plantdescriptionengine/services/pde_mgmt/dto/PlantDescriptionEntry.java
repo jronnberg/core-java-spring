@@ -83,6 +83,34 @@ public interface PlantDescriptionEntry {
     }
 
     /**
+     * @param entry A Plant Description Entry.
+     * @return A copy of the given entry, with 'active' set to false.
+     */
+    static PlantDescriptionEntryDto deactivated(PlantDescriptionEntry entry) {
+        List<PdeSystemDto> systems = new ArrayList<>();
+        List<ConnectionDto> connections = new ArrayList<>();
+
+        for (PdeSystem system : entry.systems()) {
+            systems.add((PdeSystemDto)system);
+        }
+
+        for (Connection connection : entry.connections()) {
+            connections.add((ConnectionDto)connection);
+        }
+
+        return new PlantDescriptionEntryBuilder()
+            .id(entry.id())
+            .plantDescription(entry.plantDescription())
+            .active(false)
+            .include(entry.include())
+            .systems(systems)
+            .connections(connections)
+            .createdAt(entry.createdAt())
+            .updatedAt(Instant.now())
+            .build();
+    }
+
+    /**
      * @param oldEntry Target plant description entry to update.
      * @param newFields A plant description update.
      * @return A copy of the target plant description updated with the fields

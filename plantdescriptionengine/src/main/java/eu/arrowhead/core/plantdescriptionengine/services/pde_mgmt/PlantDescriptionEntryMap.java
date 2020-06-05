@@ -78,11 +78,21 @@ public class PlantDescriptionEntryMap {
      */
     public void put(final PlantDescriptionEntryDto entry) throws BackingStoreException {
         backingStore.write(entry);
-        boolean isNew = !entries.containsKey(entry.id());
+
+        final boolean isNew = !entries.containsKey(entry.id());
+        final var currentlyActive = activeEntry();
+
+        // Possible deactivate the currently active entry:
+        if (entry.active() && currentlyActive != null) {
+            final var deactivatedEntry = PlantDescriptionEntry.deactivated(currentlyActive);
+            entries.put(deactivatedEntry.id(), deactivatedEntry);
+            for (var listener : listeners) {
+                listener.onPlantDescriptionUpdated(entry);
+            }
+        }
 
         entries.put(entry.id(), entry);
 
-        // Notify listeners:
         for (var listener : listeners) {
             if (isNew) {
                 listener.onPlantDescriptionAdded(entry);
