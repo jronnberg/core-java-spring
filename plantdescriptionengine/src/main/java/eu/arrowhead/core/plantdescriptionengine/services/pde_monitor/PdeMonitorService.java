@@ -16,7 +16,7 @@ import se.arkalix.util.concurrent.Future;
 public class PdeMonitorService {
 
     private final ArSystem arSystem;
-    private final MonitorableClient monitorableClient;
+    private final MonitorablesClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
     private final PlantDescriptionEntryMap entryMap;
@@ -41,7 +41,7 @@ public class PdeMonitorService {
         this.entryMap = entryMap;
         this.secure = secure;
 
-        this.monitorableClient = new MonitorableClient(arSystem, httpClient, monitorInfo);
+        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo);
     }
 
     /**
@@ -69,13 +69,6 @@ public class PdeMonitorService {
 
         monitorableClient.start();
         return arSystem.provide(service);
-    }
-
-    /**
-     * Determines whether or not this service is running in secure mode.
-     */
-    boolean isSecure() {
-        return secure;
     }
 
 }

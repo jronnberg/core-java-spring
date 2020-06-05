@@ -18,9 +18,9 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.query.ServiceQuery;
 
-public class MonitorableClient {
+public class MonitorablesClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonitorableClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
 
     private final static int pollInterval = 5000; // Milliseconds
     private final ServiceQuery serviceQuery;
@@ -28,7 +28,7 @@ public class MonitorableClient {
 
     private final MonitorInfo monitorInfo;
 
-    MonitorableClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
+    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
@@ -53,7 +53,9 @@ public class MonitorableClient {
     private void pollMonitorableSystems() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
+                System.out.println("Number of services: " + services.size());
                 for (var service : services) {
+                    System.out.println(service.provider().name());
                     retrieveId(service);
                     retrieveSystemData(service);
                 }

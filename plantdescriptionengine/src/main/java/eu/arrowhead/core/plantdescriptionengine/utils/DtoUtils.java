@@ -1,7 +1,9 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.ConnectionDto;
@@ -113,7 +115,7 @@ public final class DtoUtils {
             var systemBuilder = new SystemEntryBuilder().systemId(system.systemId())
                     .metadata(system.metadata().orElse(null)).ports(ports);
 
-            // If there any monitor info left, that means it has not been
+            // If there is any monitor info left, that means it has not been
             // matched to a specific service, and should be presented on the
             // system entry itself.
             if (systemMonitorInfo.size() > 0) {
@@ -141,5 +143,28 @@ public final class DtoUtils {
             .createdAt(entry.createdAt())
             .updatedAt(entry.updatedAt())
             .build();
+    }
+
+    /**
+     * @param a A String to String map (system or port metadata.).
+     * @param b A String to String map (system or port metadata.).
+     *
+     * @return The union of maps a and b, where the values in b override the
+     *         values of a in case of collisions.
+     */
+    public static Map<String, String> mergeMetadata(Map<String, String> a, Map<String, String> b) {
+        Map<String, String> result = new HashMap<>();
+        if (a != null) {
+            for (var key : a.keySet()) {
+                result.put(key, a.get(key));
+            }
+        }
+        if (b != null) {
+            for (var key : b.keySet()) {
+                result.put(key, b.get(key));
+            }
+        }
+
+        return result;
     }
 }

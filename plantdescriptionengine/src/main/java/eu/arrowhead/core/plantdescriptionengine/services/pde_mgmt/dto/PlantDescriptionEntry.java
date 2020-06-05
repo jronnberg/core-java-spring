@@ -179,10 +179,14 @@ public interface PlantDescriptionEntry {
         return serviceDefinitionName;
     }
 
-    default String getSystemName(String systemId) { // TODO: Remove this method when it is now longer used.
+    /**
+     * @param systemId Internal (to the PDE) identifier of a system.
+     * @return The system with the given ID.
+     */
+    default PdeSystem getSystem(String systemId) {
         for (var system : systems()) {
             if (system.systemId().equals(systemId)) {
-                return system.systemName().orElse(null);
+                return system;
             }
         }
         return null;

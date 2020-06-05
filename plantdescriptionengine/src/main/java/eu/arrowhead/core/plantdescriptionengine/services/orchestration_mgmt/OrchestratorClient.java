@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Port;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.ProviderSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryList;
@@ -22,6 +25,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
+import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
@@ -134,25 +138,24 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Connection connection = entry.connections().get(connectionIndex);
 
-        SrSystem consumerSystem = systemTracker.getSystem(connection.consumer().systemId()); // TODO: Use system name here?
-        SrSystem providerSystem = systemTracker.getSystem(connection.producer().systemId());
+        SrSystem consumerSystemSrEntry = systemTracker.getSystem(connection.consumer().systemId());
+        SrSystem providerSystemSrEntry = systemTracker.getSystem(connection.producer().systemId());
 
-        // TODO: The system names will no longer be required once the
-        // orchestrator is updated to create rules based on metadata.
-        String consumerName = entry.getSystemName(connection.consumer().systemId());
-        String providerName = entry.getSystemName(connection.producer().systemId());
+        Objects.requireNonNull(consumerSystemSrEntry, "Consumer system with ID '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        Objects.requireNonNull(providerSystemSrEntry, "Producer system with ID '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
 
-        Objects.requireNonNull(consumerSystem, "Consumer system '" + consumerName + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
-        Objects.requireNonNull(providerSystem, "Producer system '" + providerName + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        PdeSystem providerSystem = entry.getSystem(connection.producer().systemId());
+        String portName = connection.producer().portName();
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
-            .consumerSystemId(consumerSystem.id())
+            .consumerSystemId(consumerSystemSrEntry.id())
+            .attribute(providerSystem.portMetadata(portName))
             .providerSystem(new ProviderSystemBuilder()
-                .systemName(providerSystem.systemName())
-                .address(providerSystem.address())
-                .port(providerSystem.port())
+                .systemName(providerSystemSrEntry.systemName())
+                .address(providerSystemSrEntry.address())
+                .port(providerSystemSrEntry.port())
                 .build())
             .priority(1); // TODO: Remove hard-coded value
 
