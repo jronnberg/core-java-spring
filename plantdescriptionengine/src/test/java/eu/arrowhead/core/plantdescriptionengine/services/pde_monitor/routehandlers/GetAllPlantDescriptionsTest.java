@@ -8,6 +8,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -338,5 +340,119 @@ public class GetAllPlantDescriptionsTest {
         }
     }
 
-    // TODO: Test pagination as well.
+    @Test
+    public void shouldPaginate() throws BackingStoreException {
+
+        final List<Integer> entryIds = Arrays.asList(32, 11, 25, 3, 24, 35);
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        for (int id : entryIds) {
+            entryMap.put(TestUtils.createEntry(id));
+        }
+
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final HttpServiceResponse response = new MockResponse();
+        final int page = 1;
+        final int itemsPerPage = 2;
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("id"),
+                "page", List.of(String.valueOf(page)),
+                "item_per_page", List.of(String.valueOf(itemsPerPage))
+            ))
+            .build();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.status().isPresent());
+                assertEquals(HttpStatus.OK, response.status().get());
+
+                assertTrue(response.body().isPresent());
+                var entries = (PlantDescriptionEntryList)response.body().get();
+                assertEquals(itemsPerPage, entries.count());
+
+                // Sort the entry ID:s, so that their order will match that of
+                // the response data.
+                Collections.sort(entryIds);
+
+                for (int i = 0; i < itemsPerPage; i++) {
+                    int index = page * itemsPerPage + i;
+                    assertEquals((int)entryIds.get(index), entries.data().get(i).id(), 0);
+                }
+
+            }).onFailure(e -> {
+                e.printStackTrace();
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldRejectNegativePage() throws BackingStoreException {
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final HttpServiceResponse response = new MockResponse();
+        final int page = -1;
+        final int itemsPerPage = 2;
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "page", List.of(String.valueOf(page)),
+                "item_per_page", List.of(String.valueOf(itemsPerPage))
+            ))
+            .build();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.status().isPresent());
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+
+                assertTrue(response.body().isPresent());
+                String expectedErrMsg = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                assertEquals(expectedErrMsg, response.body().get());
+
+            }).onFailure(e -> {
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldRequireItemPerPage() throws BackingStoreException {
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final HttpServiceResponse response = new MockResponse();
+        final int page = 4;
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "page", List.of(String.valueOf(page))
+            ))
+            .build();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.status().isPresent());
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                assertTrue(response.body().isPresent());
+                String expectedErrMsg = "<Missing parameter: item_per_page.>";
+                assertEquals(expectedErrMsg, response.body().get());
+
+            }).onFailure(e -> {
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
 }

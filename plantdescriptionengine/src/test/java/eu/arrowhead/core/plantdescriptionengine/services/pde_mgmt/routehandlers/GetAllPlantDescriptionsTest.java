@@ -283,8 +283,8 @@ public class GetAllPlantDescriptionsTest {
             entryMap.put(TestUtils.createEntry(id));
         }
 
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
-        HttpServiceResponse response = new MockResponse();
+        final var handler = new GetAllPlantDescriptions(entryMap);
+        final HttpServiceResponse response = new MockResponse();
         final int page = 1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -328,9 +328,8 @@ public class GetAllPlantDescriptionsTest {
     public void shouldRejectNegativePage() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
-        HttpServiceResponse response = new MockResponse();
+        final var handler = new GetAllPlantDescriptions(entryMap);
+        final HttpServiceResponse response = new MockResponse();
         final int page = -1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -362,9 +361,8 @@ public class GetAllPlantDescriptionsTest {
     public void shouldRequireItemPerPage() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
-        HttpServiceResponse response = new MockResponse();
+        final var handler = new GetAllPlantDescriptions(entryMap);
+        final HttpServiceResponse response = new MockResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
