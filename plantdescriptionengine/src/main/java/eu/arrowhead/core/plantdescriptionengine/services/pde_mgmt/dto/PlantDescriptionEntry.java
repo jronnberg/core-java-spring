@@ -203,7 +203,8 @@ public interface PlantDescriptionEntry {
         }
 
         // TODO: Remove this and instead validate all plant descriptions.
-        Objects.requireNonNull(serviceDefinitionName, "Could not find producer serviceDefinitionName in Plant Description Entry");
+        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex + 
+            " in Plant Description Entry '" + plantDescription() + "'");
         return serviceDefinitionName;
     }
 

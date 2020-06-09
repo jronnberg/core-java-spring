@@ -94,7 +94,7 @@ public class MonitorablesClient {
         final var address = service.provider().socketAddress();
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
-            .uri("/monitorable/ping")
+            .uri(service.uri() + "/ping")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
@@ -112,7 +112,7 @@ public class MonitorablesClient {
 
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
-            .uri("/monitorable/inventoryid")
+            .uri(service.uri() + "/inventoryid")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
@@ -120,6 +120,7 @@ public class MonitorablesClient {
                 monitorInfo.putInventoryId(service, inventoryId.id());
             })
             .onFailure(e -> {
+                e.printStackTrace();
                 // TODO: Error handling, raise an alarm?
             });
     }
@@ -129,7 +130,7 @@ public class MonitorablesClient {
 
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
-            .uri("/monitorable/systemdata")
+            .uri(service.uri() + "/systemdata")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
@@ -137,6 +138,7 @@ public class MonitorablesClient {
                 monitorInfo.putSystemData(service, systemData.data());
             })
             .onFailure(e -> {
+                e.printStackTrace();
                 // TODO: Error handling, raise an alarm?
             });
     }
