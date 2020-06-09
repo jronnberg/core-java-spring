@@ -120,6 +120,7 @@ public class PdeMain {
         final var strategy = new OrchestrationStrategy(
             new OrchestrationPattern()
                 .isIncludingService(true)
+                .option(OrchestrationOption.METADATA_SEARCH, true)
                 .option(OrchestrationOption.PING_PROVIDERS, true)
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 
@@ -134,7 +135,7 @@ public class PdeMain {
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
         if (!secureMode) {
-            systemBuilder.name("pde").insecure(); // TODO: Use some other name?
+            systemBuilder.name("pde").insecure();
         } else {
             final String trustStorePath = appProps.getProperty("server.ssl.pde.trust-store");
             final char[] trustStorePassword = appProps.getProperty("server.ssl.pde.trust-store-password").toCharArray();
@@ -153,6 +154,7 @@ public class PdeMain {
 
     /**
      * Loads an identity object.
+     * 
      * The provided arguments {@code keyPassword} and {@code keyStorePassword}
      * are cleared for security reasons.
      * If this function fails, the entire application is terminated.
@@ -187,6 +189,7 @@ public class PdeMain {
 
     /**
      * Loads a trust store.
+     * 
      * The provided argument {@code password} is cleared for security reasons.
      * If this function fails, the entire application is terminated.
      *
@@ -212,6 +215,7 @@ public class PdeMain {
 
     /**
      * Main method of the Plant Description Engine.
+     * 
      * Provides Plant Description management and monitoring services to the
      * Arrowhead system.
      */
