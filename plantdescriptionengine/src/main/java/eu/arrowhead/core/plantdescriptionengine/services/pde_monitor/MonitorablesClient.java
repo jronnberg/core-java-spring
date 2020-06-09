@@ -12,6 +12,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemD
 import se.arkalix.ArSystem;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
+import se.arkalix.descriptor.TransportDescriptor;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
@@ -22,10 +23,9 @@ public class MonitorablesClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
     private final static int pollForInfo = 3000; // Milliseconds
-    private final static int infoPollInterval = 60000; // Milliseconds
-    private final ServiceQuery serviceQuery;
+    private final static int infoPollInterval = 6000; // Milliseconds
+    private ServiceQuery serviceQuery;
     private final HttpClient httpClient;
-
     private final MonitorInfo monitorInfo;
 
     MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
@@ -33,22 +33,25 @@ public class MonitorablesClient {
         Objects.requireNonNull(httpClient, "Expected HTTP client");
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
 
-        serviceQuery = arSystem.consume()
-            .name("monitorable")
-            .encodings(EncodingDescriptor.JSON);
         this.httpClient = httpClient;
         this.monitorInfo = monitorInfo;
+
+        serviceQuery = arSystem.consume()
+            .name("monitorable")
+            .transports(TransportDescriptor.HTTP)
+            .encodings(EncodingDescriptor.JSON);
     }
 
     public void start() {
         Timer timer = new Timer();
-
+        /*
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 pingPoll();
             }
         }, 0, pollForInfo);
+        */
 
         timer.schedule(new TimerTask() {
             @Override
@@ -58,6 +61,7 @@ public class MonitorablesClient {
         }, 0, infoPollInterval);
     }
 
+    /*
     private void pingPoll() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
@@ -69,6 +73,7 @@ public class MonitorablesClient {
                 logger.error("Failed to poll monitorable systems.", e);
             });
     }
+    */
 
     private void infoPoll() {
         serviceQuery.resolveAll()

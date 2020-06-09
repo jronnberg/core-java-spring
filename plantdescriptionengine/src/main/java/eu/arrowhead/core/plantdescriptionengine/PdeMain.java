@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -20,6 +21,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.S
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
+import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.core.plugin.or.OrchestrationOption;
@@ -122,6 +124,7 @@ public class PdeMain {
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
+            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO))
             .localPort(pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder()
                 .orchestrationStrategy(strategy)
