@@ -21,8 +21,10 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.Orch
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import se.arkalix.ArSystem;
-import se.arkalix.core.plugin.ArOrchestrationStrategy;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
+import se.arkalix.core.plugin.or.OrchestrationOption;
+import se.arkalix.core.plugin.or.OrchestrationPattern;
+import se.arkalix.core.plugin.or.OrchestrationStrategy;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
@@ -112,10 +114,17 @@ public class PdeMain {
     private static ArSystem createArSystem(Properties appProps, InetSocketAddress serviceRegistryAddress) {
 
         final int pdePort = Integer.parseInt(appProps.getProperty("server.port"));
+
+        final var strategy = new OrchestrationStrategy(
+            new OrchestrationPattern()
+                .isIncludingService(true)
+                .option(OrchestrationOption.PING_PROVIDERS, true)
+                .option(OrchestrationOption.OVERRIDE_STORE, false));
+
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
             .localPort(pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder()
-                .orchestrationStrategy(ArOrchestrationStrategy.STORED_ONLY)
+                .orchestrationStrategy(strategy)
                 .serviceRegistrySocketAddress(serviceRegistryAddress)
                 .build());
 
