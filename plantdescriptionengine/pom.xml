@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
-    <kalix.version>0.3.4</kalix.version>
+    <kalix.version>0.4.2</kalix.version>
   </properties>
 
   <dependencies>
