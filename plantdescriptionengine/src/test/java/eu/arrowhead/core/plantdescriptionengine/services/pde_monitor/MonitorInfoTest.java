@@ -54,7 +54,7 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "x");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class MonitorInfoTest {
             "c", "3"
         );
 
-        assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
     }
 
     @Test
@@ -122,8 +122,8 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = new HashMap<>();
 
-        assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
-        assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.empty()));
+        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.empty()));
     }
 
     @Test
@@ -137,12 +137,12 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "2");
         Map<String, String> serviceMetadata = Map.of("a", "1");
 
-        assertTrue(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
 
         systemMetadata = Map.of("a", "1");
         serviceMetadata = Map.of("a", "2");
 
-        assertFalse(info.matchesPort(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
 
     }
 
