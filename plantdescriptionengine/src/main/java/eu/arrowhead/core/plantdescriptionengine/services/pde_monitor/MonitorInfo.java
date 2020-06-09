@@ -34,26 +34,45 @@ public class MonitorInfo {
         /**
          * Returns true if the given parameters matches this instances metadata.
          *
-         * More specifically, returns true if {@code serviceMetadata} is
-         * present, and the union of {@code systemMetadata} and
-         * {@code serviceMetadata} is a subset of this instance's metadata.
+         * More specifically, returns true if {@code portMetadata} is present,
+         * and the union of {@code systemMetadata} and {@code portMetadata} is a
+         * superset of this instance's metadata.
          *
          * @param systemMetadata Metadata relating to a particular system
          *                       (read from a system in a Plant Description
          *                       Entry).
-         * @param serviceMetadata Metadata relating to a particular service
+         * @param portMetadata Metadata relating to a particular service
          *                        (read from one of the ports of a system in a
          *                        Plant Description Entry).
          */
-		public boolean matchesPort(
-            Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> serviceMetadata
+		public boolean matchesPortMetadata(
+            Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> portMetadata
         ) {
-            if (!serviceMetadata.isPresent() || serviceMetadata.get().size() == 0) {
+            if (!portMetadata.isPresent() || portMetadata.get().size() == 0) {
                 return false;
             }
-            var mergedMetadata = DtoUtils.mergeMetadata(systemMetadata.orElse(new HashMap<>()), serviceMetadata.get());
+        
+            var mergedMetadata = DtoUtils.mergeMetadata(systemMetadata.orElse(new HashMap<>()), portMetadata.get());
             return isSubset(mergedMetadata, metadata);
-		}
+        }
+        
+        /**
+         * Returns true if the given parameters matches this instances metadata.
+         *
+         * More specifically, returns true if {@code systemMetadata} is
+         * not present, or is a superset of this instance's metadata.
+         *
+         * @param systemMetadata Metadata relating to a particular system
+         *                       (read from a system in a Plant Description
+         *                       Entry).
+         */
+		public boolean matchesSystemMetadata(Optional<Map<String, String>> systemMetadata) {
+            if (!systemMetadata.isPresent()) {
+                    return true;
+            }
+			return isSubset(metadata, systemMetadata.get());
+        }
+        
     }
 
     private final Map<String, Bundle> infoBundles = new ConcurrentHashMap<>();

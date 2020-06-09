@@ -55,21 +55,21 @@ public final class DtoUtils {
     }
 
     /**
-     * Returns a copy of a Plant Description Entry supplemented with monitor info.
+     * Returns a Plant Description Entry supplemented with monitor info.
      *
      * Note that the resulting copy will be an instance of {@link
      * eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto},
      * while the source entry is a {@link
      * eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry}
-     * instance. This function is the glue between the mgmt and monitor packages,
-     * letting data pass from one one to the other.
+     * instance. This function is the glue between the mgmt and monitor
+     * packages, letting data pass from one one to the other.
      *
      * @param entry       The source entry on which the new one will be based.
      * @param monitorInfo Object used for keeping track of inventory data of
      *                    monitorable systems.
      * @return A PlantDescriptionEntry with all the information contained in the
-     *         {@code entry} parameter, supplemented with any relevant info in the
-     *         {@code monitorInfo} parameter.
+     *         {@code entry} parameter, supplemented with any relevant info in
+     *         the {@code monitorInfo} parameter.
      *
      */
     public static PlantDescriptionEntryDto extend(
@@ -79,8 +79,9 @@ public final class DtoUtils {
 
         for (var system : entry.systems()) {
 
-            List<MonitorInfo.Bundle> systemMonitorInfo = monitorInfo.getSystemInfo(
-                system.systemName().orElse(null), system.metadata().orElse(null)
+            List<MonitorInfo.Bundle> systemInfoList = monitorInfo.getSystemInfo(
+                system.systemName().orElse(null),
+                system.metadata().orElse(null)
             );
 
             List<PortEntryDto> ports = new ArrayList<>();
@@ -88,10 +89,10 @@ public final class DtoUtils {
 
                 MonitorInfo.Bundle serviceMonitorInfo = null;
 
-                for (var infoBundle : systemMonitorInfo) {
-                    if (infoBundle.matchesPort(system.metadata(), port.metadata())) {
-                        serviceMonitorInfo = infoBundle;
-                        systemMonitorInfo.remove(infoBundle);
+                for (var info : systemInfoList) {
+                    if (info.matchesPortMetadata(system.metadata(), port.metadata())) {
+                        serviceMonitorInfo = info;
+                        systemInfoList.remove(info);
                         break;
                     }
                 }
@@ -112,22 +113,23 @@ public final class DtoUtils {
                 ports.add(portBuilder.build());
             }
 
-            var systemBuilder = new SystemEntryBuilder().systemId(system.systemId())
-                    .metadata(system.metadata().orElse(null)).ports(ports);
+            var systemBuilder = new SystemEntryBuilder()
+                .systemId(system.systemId())
+                .metadata(system.metadata().orElse(null))
+                .ports(ports);
 
             // If there is any monitor info left, that means it has not been
-            // matched to a specific service, and should be presented on the
-            // system entry itself.
-            if (systemMonitorInfo.size() > 0) {
-                var infoBundle = systemMonitorInfo.get(0);
-                systemBuilder
-                    .inventoryId(infoBundle.inventoryId)
-                    .systemData(infoBundle.systemData);
+            // matched to a specific service, and should possibly be presented
+            // on the system entry itself.
+            if (systemInfoList.size() > 0) {
+                var infoBundle = systemInfoList.get(0);
+                if (infoBundle.matchesSystemMetadata(system.metadata())) {
+                    systemBuilder
+                        .inventoryId(infoBundle.inventoryId)
+                        .systemData(infoBundle.systemData);
+                }
             }
 
-            if (system.metadata().isPresent()) {
-                systemBuilder.metadata(system.metadata().get());
-            }
             systems.add(systemBuilder.build());
         }
 
