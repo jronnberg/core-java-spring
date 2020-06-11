@@ -120,7 +120,7 @@ public class PdeMain {
         final var strategy = new OrchestrationStrategy(
             new OrchestrationPattern()
                 .isIncludingService(true)
-                .option(OrchestrationOption.METADATA_SEARCH, true)
+                .option(OrchestrationOption.METADATA_SEARCH, false)
                 .option(OrchestrationOption.PING_PROVIDERS, true)
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 
@@ -154,7 +154,7 @@ public class PdeMain {
 
     /**
      * Loads an identity object.
-     * 
+     *
      * The provided arguments {@code keyPassword} and {@code keyStorePassword}
      * are cleared for security reasons.
      * If this function fails, the entire application is terminated.
@@ -189,7 +189,7 @@ public class PdeMain {
 
     /**
      * Loads a trust store.
-     * 
+     *
      * The provided argument {@code password} is cleared for security reasons.
      * If this function fails, the entire application is terminated.
      *
@@ -215,14 +215,13 @@ public class PdeMain {
 
     /**
      * Main method of the Plant Description Engine.
-     * 
+     *
      * Provides Plant Description management and monitoring services to the
      * Arrowhead system.
      */
     public static void main(final String[] args) {
 
         Properties appProps = new Properties();
-        Properties demoProps = new Properties();
 
         try {
             if (args.length == 1) {
@@ -234,8 +233,6 @@ public class PdeMain {
                 appProps.load(ClassLoader.getSystemResourceAsStream("application.properties"));
             }
 
-            // Read demo properties (TODO: Remove them)
-            demoProps.load(ClassLoader.getSystemResourceAsStream("demo.properties"));
         } catch (IOException e) {
             logger.error("Failed to read application.properties.", e);
             System.exit(74);
@@ -249,8 +246,8 @@ public class PdeMain {
 
         systemTracker.refreshSystems().flatMap(result -> {
             final CloudDto cloud = new CloudBuilder()
-                .name(demoProps.getProperty("cloud.name"))
-                .operator(demoProps.getProperty("cloud.operator"))
+                .name(appProps.getProperty("cloud.name"))
+                .operator(appProps.getProperty("cloud.operator"))
                 .build();
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
