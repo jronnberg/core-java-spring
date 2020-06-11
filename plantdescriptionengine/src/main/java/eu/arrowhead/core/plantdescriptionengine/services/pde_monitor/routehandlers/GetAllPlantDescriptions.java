@@ -14,6 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
@@ -81,7 +82,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         if (parser.hasError()) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(parser.getErrorMessage());
+            response.body(ErrorMessage.of(parser.getErrorMessage()));
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                 parser.getErrorMessage());
             return Future.done();

@@ -10,6 +10,7 @@ import java.util.List;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
@@ -35,9 +36,10 @@ public class GetPlantDescriptionTest {
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                String expectedBody = "Plant Description with ID " + nonExistentEntryId + " not found.";
                 assertEquals(HttpStatus.NOT_FOUND, response.status().get());
-                assertEquals(response.body().get(), expectedBody);
+                String expectedErrorMessage = "Plant Description with ID " + nonExistentEntryId + " not found.";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
                 assertNull(e);
             });

@@ -65,7 +65,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
                 if (entry == null) {
                     return response
                         .status(HttpStatus.NOT_FOUND)
-                        .body("Plant Description with ID " + idString + " not found.");
+                        .body(ErrorMessage.of("Plant Description with ID '" + idString + "' not found."));
                 }
 
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
