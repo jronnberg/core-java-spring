@@ -31,7 +31,8 @@ public class MockResponse implements HttpServiceResponse {
 
     @Override
     public HttpServiceResponse body(DtoEncoding encoding, DtoWritable data) {
-        throw new UnsupportedOperationException();
+        _body = data;
+        return this;
     }
 
     @Override

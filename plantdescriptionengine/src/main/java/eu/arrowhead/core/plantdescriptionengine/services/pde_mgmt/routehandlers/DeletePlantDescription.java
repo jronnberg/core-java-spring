@@ -56,7 +56,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
 
         if (entryMap.get(id) == null) {
             response.status(HttpStatus.NOT_FOUND);
-            response.body("Plant Description with ID " + id + " not found.");
+            response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
             return Future.done();
         }
 
@@ -65,7 +65,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
         } catch (BackingStoreException e) {
             logger.error("Failed to remove Plant Description Entry from backing store", e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.body("Encountered an error while deleting entry file.");
+            response.body(ErrorMessage.of("Encountered an error while deleting entry file."));
             return Future.done();
         }
 

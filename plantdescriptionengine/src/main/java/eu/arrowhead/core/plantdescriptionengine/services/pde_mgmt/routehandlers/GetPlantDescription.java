@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers
 
 import java.util.Objects;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.net.http.HttpStatus;
@@ -45,7 +46,7 @@ public class GetPlantDescription implements HttpRouteHandler {
             id = Integer.parseInt(idString);
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(idString + " is not a valid Plant Description Entry ID.");
+            response.body(ErrorMessage.of(idString + " is not a valid Plant Description Entry ID."));
             response.status(HttpStatus.BAD_REQUEST);
             return Future.done();
         }
@@ -53,7 +54,7 @@ public class GetPlantDescription implements HttpRouteHandler {
         final PlantDescriptionEntryDto entry = entryMap.get(id);
 
         if (entry == null) {
-            response.body("Plant Description with ID " + id + " not found.");
+            response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
             response.status(HttpStatus.NOT_FOUND);
             return Future.done();
         }

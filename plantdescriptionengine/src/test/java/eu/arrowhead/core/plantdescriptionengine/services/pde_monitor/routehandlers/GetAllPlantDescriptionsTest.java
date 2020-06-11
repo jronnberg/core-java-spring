@@ -11,12 +11,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
@@ -291,8 +291,10 @@ public class GetAllPlantDescriptionsTest {
                 assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                 assertTrue(response.body().isPresent());
-                final String errorMessage = (String)(response.body().get());
-                assertEquals("<Missing parameter: filter_value.>", errorMessage);
+
+                String expectedErrorMessage = "<Missing parameter: filter_value.>";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
                 e.printStackTrace();
                 assertNull(e);
@@ -429,8 +431,9 @@ public class GetAllPlantDescriptionsTest {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
 
                 assertTrue(response.body().isPresent());
-                String expectedErrMsg = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-                assertEquals(expectedErrMsg, response.body().get());
+                String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
 
             }).onFailure(e -> {
                 assertNull(e);
@@ -460,8 +463,10 @@ public class GetAllPlantDescriptionsTest {
                 assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                 assertTrue(response.body().isPresent());
-                String expectedErrMsg = "<Missing parameter: item_per_page.>";
-                assertEquals(expectedErrMsg, response.body().get());
+
+                String expectedErrorMessage = "<Missing parameter: item_per_page.>";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
 
             }).onFailure(e -> {
                 assertNull(e);

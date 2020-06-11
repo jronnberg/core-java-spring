@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
@@ -72,14 +73,16 @@ public class DeletePlantDescriptionTest {
                     assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     assertTrue(response.body().isPresent());
-
-                    String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
-                    assertEquals(response.body().get(), expectedBody);
+                    String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
+                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
+                    e.printStackTrace();
                     assertNull(e);
                 });
         } catch (Exception e) {
+            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -101,10 +104,9 @@ public class DeletePlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
                     assertTrue(response.body().isPresent());
-                    assertEquals(
-                        response.body().get(),
-                        "Plant Description with ID " + nonExistentId + " not found."
-                    );
+                    String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
+                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
                     assertNull(e);
