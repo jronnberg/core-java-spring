@@ -98,10 +98,9 @@ public final class DtoUtils {
                 }
 
                 var portBuilder = new PortEntryBuilder()
-                    // TODO: Hiding the implementation of 'consumer' default
-                    // values in here feels a bit iffy:
                     .portName(port.portName())
                     .serviceDefinition(port.serviceDefinition())
+                    // 'consumer' defaults to false when no value is set:
                     .consumer(port.consumer().orElse(false))
                     .metadata(port.metadata().orElse(null));
 
