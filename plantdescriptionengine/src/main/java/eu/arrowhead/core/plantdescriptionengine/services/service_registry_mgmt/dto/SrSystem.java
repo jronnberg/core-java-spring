@@ -9,7 +9,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 import java.util.Optional;
 
 /**
- * Data Transfer Object (DTO) interface for systems registered in service registry.
+ * Data Transfer Object (DTO) interface for systems registered in the Service
+ * Registry.
  */
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)

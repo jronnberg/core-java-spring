@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 
+import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,13 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryList;
+import se.arkalix.description.ProviderDescription;
+import se.arkalix.description.ServiceDescription;
+import se.arkalix.descriptor.InterfaceDescriptor;
+import se.arkalix.descriptor.SecurityDescriptor;
+import se.arkalix.dto.json.value.JsonBoolean;
+import se.arkalix.dto.json.value.JsonObject;
+import se.arkalix.dto.json.value.JsonPair;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -65,7 +73,7 @@ public class GetAllPlantDescriptionsTest {
         }
     }
 
-    // @Test TODO: Implement and enable this test!
+    @Test
     public void shouldExtendWithMonitorData() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
@@ -89,12 +97,20 @@ public class GetAllPlantDescriptionsTest {
             .build();
 
         entryMap.put(entry);
-        final Map<String, String> systemData = new HashMap<>();
-        systemData.put("a", "1");
-        systemData.put("b", "2");
+        JsonObject systemData = new JsonObject(List.of(
+            new JsonPair("a", JsonBoolean.TRUE)
+        ));
+        final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        ServiceDescription serviceDescription = new ServiceDescription.Builder()
+            .name("service-name")
+            .uri("/abc")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .provider(provider)
+            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+            .build();
 
-        // monitorInfo.putInventoryId(systemName, inventoryId);
-        // monitorInfo.putSystemData(systemName, systemData);
+        monitorInfo.putInventoryId(serviceDescription, inventoryId);
+        monitorInfo.putSystemData(serviceDescription, systemData);
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
         final HttpServiceRequest request = new MockRequest();
