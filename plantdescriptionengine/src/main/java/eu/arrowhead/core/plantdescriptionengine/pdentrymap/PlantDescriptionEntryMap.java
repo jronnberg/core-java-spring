@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.pdentrymap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
@@ -17,12 +17,9 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 /**
  * Object for keeping track of Plant Description entries.
  * Each instance Keeps a reference to a
- * {@link eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.BackingStore},
+ * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore},
  * which is used to store Plant Description Entries in some permanent storage
- * (e.g. to file a database).
- *
- * TODO: This class is used by the monitor service as well, so it should be
- *       moved out of the management package.
+ * (e.g. to file or a database).
  */
 public class PlantDescriptionEntryMap {
 

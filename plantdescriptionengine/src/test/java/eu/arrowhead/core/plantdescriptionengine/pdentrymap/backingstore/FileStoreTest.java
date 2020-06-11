@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore;
+package eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -14,7 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
 /**
  * Unit test for the
- * {@link eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.FileStore}
+ * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FileStore}
  * class.
  */
 public class FileStoreTest {

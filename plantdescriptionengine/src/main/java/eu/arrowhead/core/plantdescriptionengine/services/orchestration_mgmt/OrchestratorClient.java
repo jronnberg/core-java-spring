@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -154,7 +154,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 .address(providerSystemSrEntry.address())
                 .port(providerSystemSrEntry.port())
                 .build())
-            .priority(1); // TODO: Remove hard-coded value
+            .priority(1); // What priority should be used?
 
         if (client.isSecure()) {
             builder.serviceInterfaceName("HTTP-SECURE-JSON");
@@ -275,8 +275,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
         } else {
             if (logger.isWarnEnabled()) {
-                // TODO: This isn't strictly true: the count is zero if the rules already exist.
-                logger.warn("The active Plant Description (" + entryName + ") does not have any connections.");
+                logger.warn("No new rules were created for Plant Descriptin '" + entryName + "'."); // TODO: Should something be done in this case?
             }
         }
     }

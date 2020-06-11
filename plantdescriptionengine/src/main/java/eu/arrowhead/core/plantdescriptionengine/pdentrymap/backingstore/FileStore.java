@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore;
+package eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
