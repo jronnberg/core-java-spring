@@ -13,7 +13,7 @@ import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;

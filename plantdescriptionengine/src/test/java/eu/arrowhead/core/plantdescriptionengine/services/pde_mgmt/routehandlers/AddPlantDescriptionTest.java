@@ -7,9 +7,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;

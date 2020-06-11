@@ -8,9 +8,9 @@ import javax.net.ssl.SSLException;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
 

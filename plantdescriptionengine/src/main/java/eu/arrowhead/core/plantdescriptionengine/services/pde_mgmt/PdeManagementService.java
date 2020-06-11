@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DeletePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetAllPlantDescriptions;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.AddPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetPlantDescription;
