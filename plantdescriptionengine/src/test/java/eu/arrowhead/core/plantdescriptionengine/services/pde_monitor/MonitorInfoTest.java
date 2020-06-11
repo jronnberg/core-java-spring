@@ -194,7 +194,7 @@ public class MonitorInfoTest {
 
         String inventoryIdA = "id-A";
         String inventoryIdB = "id-B";
-        
+
         var monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(serviceA, inventoryIdA);
         monitorInfo.putInventoryId(serviceB, inventoryIdB);
@@ -239,7 +239,7 @@ public class MonitorInfoTest {
         var systemInfo = systemInfoList.get(0);
         assertEquals(newInventoryId, systemInfo.inventoryId);
     }
-    
+
     @Test
     public void shouldMergeData() {
         ServiceDescription  service = createServiceDescription();
@@ -251,9 +251,9 @@ public class MonitorInfoTest {
         JsonObject systemData = new JsonObject(List.of(
             new JsonPair("b", JsonBoolean.FALSE)
         ));
-    
+
         monitorInfo.putSystemData(service, systemData);
-        
+
         var systemInfoList = monitorInfo.getSystemInfo(service.provider().name(), null);
         assertEquals(1, systemInfoList.size());
 

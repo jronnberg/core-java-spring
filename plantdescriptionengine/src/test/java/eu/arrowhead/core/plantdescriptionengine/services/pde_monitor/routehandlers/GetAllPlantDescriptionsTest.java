@@ -21,11 +21,17 @@ import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntry
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryList;
 import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
@@ -65,6 +71,145 @@ public class GetAllPlantDescriptionsTest {
                 assertTrue(response.body().isPresent());
                 final var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(entryIds.size(), entries.count());
+            }).onFailure(e -> {
+                assertNull(e);
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldPreserveConnections() throws BackingStoreException {
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        final Instant now = Instant.now();
+        final List<ConnectionDto> connections = new ArrayList<>();
+        final String consumerPortName = "consumer-port";
+        final String consumerSystemId = "consumer-id";
+        final String producerPortName = "provider-port";
+        final String producerSystemId = "provider-id";
+        connections.add(
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .portName(consumerPortName)
+                    .systemId(consumerSystemId)
+                    .build())
+                .producer(new SystemPortBuilder()
+                    .portName(producerPortName)
+                    .systemId(producerSystemId)
+                    .build())
+                .build()
+        );
+
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1f)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(connections)
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        entryMap.put(entry);
+
+        final var monitorInfo = new MonitorInfo();
+
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest();
+        final HttpServiceResponse response = new MockResponse();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.body().isPresent());
+
+                final var entries = (PlantDescriptionEntryList)response.body().get();
+                final var retrievedEntry = entries.data().get(0);
+                assertEquals(1, retrievedEntry.connections().size());
+
+                Connection connection = retrievedEntry.connections().get(0);
+
+                var consumer = connection.consumer();
+                var producer = connection.producer();
+
+                assertEquals(consumer.systemId(), consumerSystemId);
+                assertEquals(producer.systemId(), producerSystemId);
+
+                assertEquals(consumer.portName(), consumerPortName);
+                assertEquals(producer.portName(), producerPortName);
+
+            }).onFailure(e -> {
+                assertNull(e);
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldPreservePorts() throws BackingStoreException {
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        final Instant now = Instant.now();
+        final Map<String, String> metadata = Map.of("a", "b");
+        final boolean isConsumer = true;
+        final String portName = "Port-A";
+        final String serviceDefinition = "Service-A";
+        final List<PortDto> ports = List.of(
+            new PortBuilder()
+                .consumer(isConsumer)
+                .metadata(metadata)
+                .portName(portName)
+                .serviceDefinition(serviceDefinition)
+                .build()
+        );
+
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName("System A")
+            .systemId("system_a")
+            .ports(ports)
+            .build();
+
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1f)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        entryMap.put(entry);
+
+        final var monitorInfo = new MonitorInfo();
+
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final HttpServiceRequest request = new MockRequest();
+        final HttpServiceResponse response = new MockResponse();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.body().isPresent());
+
+                final var entries = (PlantDescriptionEntryList)response.body().get();
+                final var retrievedEntry = entries.data().get(0);
+                final var retrievedSystem = retrievedEntry.systems().get(0);
+                assertEquals(1, retrievedSystem.ports().size());
+
+                final var retrievedPort = retrievedSystem.ports().get(0);
+                assertEquals(isConsumer, retrievedPort.consumer().get());
+                assertEquals(metadata, retrievedPort.metadata().get());
+                assertEquals(portName, retrievedPort.portName());
+                assertEquals(serviceDefinition, retrievedPort.serviceDefinition());
+
             }).onFailure(e -> {
                 assertNull(e);
             });
