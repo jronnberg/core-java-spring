@@ -5,11 +5,13 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionUpdateDto;
+import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -29,7 +31,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public UpdatePlantDescription(PlantDescriptionEntryMap entryMap) {
+    public UpdatePlantDescription(final PlantDescriptionEntryMap entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }
@@ -39,7 +41,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
      * by the id parameter with the information in the PlantDescriptionUpdate
      * parameter.
      *
-     * @param request HTTP request containing a PlantDescriptionUpdate.
+     * @param request  HTTP request containing a PlantDescriptionUpdate.
      * @param response HTTP response containing the updated entry.
      */
     @Override
@@ -47,14 +49,14 @@ public class UpdatePlantDescription implements HttpRouteHandler {
         return request
             .bodyAs(PlantDescriptionUpdateDto.class)
             .map(newFields -> {
-                String idString = request.pathParameter(0);
+                final String idString = request.pathParameter(0);
                 int id;
 
                 try {
                     id = Integer.parseInt(idString);
-                } catch (NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     response.status(HttpStatus.BAD_REQUEST);
-                    response.body(idString + " is not a valid Plant Description Entry ID.");
+                    response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid Plant Description Entry ID."));
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 

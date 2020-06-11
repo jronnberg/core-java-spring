@@ -5,8 +5,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -46,8 +48,9 @@ public class DeletePlantDescription implements HttpRouteHandler {
         try {
             id = Integer.parseInt(request.pathParameter(0));
         } catch (NumberFormatException e) {
+            final String errMsg = "'" + request.pathParameter(0) + "' is not a valid Plant Description Entry ID.";
+            response.body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(request.pathParameter(0) + " is not a valid Plant Description Entry ID.");
             return Future.done();
         }
 
