@@ -21,8 +21,7 @@ public class PdeManagementService {
     /**
      * Class constructor.
      *
-     * @param entryMap An object that maps ID:s to Plant Description
-     *                 Entries.
+     * @param entryMap An object that maps ID:s to Plant Description Entries.
      * @param secure   Indicates whether the service should run in secure mode.
      */
     public PdeManagementService(PlantDescriptionEntryMap entryMap, boolean secure) {
