@@ -5,11 +5,13 @@ import java.util.Objects;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DeletePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetAllPlantDescriptions;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.services.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.AddPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.UpdatePlantDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
+import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 
@@ -51,7 +53,8 @@ public class PdeManagementService {
             .post("/pd", new AddPlantDescription(entryMap))
             .delete("/pd/#id", new DeletePlantDescription(entryMap))
             .put("/pd/#id", new ReplacePlantDescription(entryMap))
-            .patch("/pd/#id", new UpdatePlantDescription(entryMap));
+            .patch("/pd/#id", new UpdatePlantDescription(entryMap))
+            .catcher(DtoReadException.class, new DtoReadExceptionCatcher());
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());
