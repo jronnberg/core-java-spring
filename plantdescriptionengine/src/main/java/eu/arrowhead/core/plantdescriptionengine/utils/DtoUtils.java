@@ -90,7 +90,9 @@ public final class DtoUtils {
                 MonitorInfo.Bundle serviceMonitorInfo = null;
 
                 for (var info : systemInfoList) {
-                    if (info.matchesPortMetadata(system.metadata(), port.metadata())) {
+                    boolean matchesServiceDefinition = info.serviceDefinition.equals(port.serviceDefinition());
+                    boolean matchesPort = info.matchesPortMetadata(system.metadata(), port.metadata());
+                    if (matchesServiceDefinition && matchesPort) {
                         serviceMonitorInfo = info;
                         systemInfoList.remove(info);
                         break;

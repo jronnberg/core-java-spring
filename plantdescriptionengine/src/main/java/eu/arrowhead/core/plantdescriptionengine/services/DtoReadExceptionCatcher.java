@@ -13,7 +13,6 @@ public class DtoReadExceptionCatcher implements HttpCatcherHandler<DtoReadExcept
     @Override
     public Future<?> handle(DtoReadException throwable, HttpServiceRequest request, HttpServiceResponse response)
             throws Exception {
-                System.out.println();
         response.status(HttpStatus.BAD_REQUEST)
             .body(ErrorMessage.of(throwable.getMessage()));
         return Future.done();
