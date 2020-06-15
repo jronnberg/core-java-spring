@@ -87,28 +87,36 @@ public final class DtoUtils {
             List<PortEntryDto> ports = new ArrayList<>();
             for (var port : system.ports()) {
 
-                MonitorInfo.Bundle serviceMonitorInfo = null;
-
-                for (var info : systemInfoList) {
-                    boolean matchesServiceDefinition = info.serviceDefinition.equals(port.serviceDefinition());
-                    boolean matchesPort = info.matchesPortMetadata(system.metadata(), port.metadata());
-                    if (matchesServiceDefinition && matchesPort) {
-                        serviceMonitorInfo = info;
-                        systemInfoList.remove(info);
-                        break;
-                    }
-                }
+                // 'consumer' defaults to false when no value is set:
+                boolean isConsumer = port.consumer().orElse(false);
 
                 var portBuilder = new PortEntryBuilder()
                     .portName(port.portName())
                     .serviceDefinition(port.serviceDefinition())
-                    // 'consumer' defaults to false when no value is set:
-                    .consumer(port.consumer().orElse(false))
+                    .consumer(isConsumer)
                     .metadata(port.metadata().orElse(null));
 
-                if (serviceMonitorInfo != null) {
-                    portBuilder.systemData(serviceMonitorInfo.systemData);
-                    portBuilder.inventoryId(serviceMonitorInfo.inventoryId);
+                // Only add monitor info to ports where this system is the
+                // provider:
+                if (!isConsumer) {
+
+                    MonitorInfo.Bundle serviceMonitorInfo = null;
+
+                    for (var info : systemInfoList) {
+                        boolean matchesServiceDefinition = info.serviceDefinition.equals(port.serviceDefinition());
+                        boolean matchesPort = info.matchesPortMetadata(system.metadata(), port.metadata());
+
+                        if (matchesServiceDefinition && matchesPort) {
+                            serviceMonitorInfo = info;
+                            systemInfoList.remove(info);
+                            break;
+                        }
+                    }
+
+                    if (serviceMonitorInfo != null) {
+                        portBuilder.systemData(serviceMonitorInfo.systemData);
+                        portBuilder.inventoryId(serviceMonitorInfo.inventoryId);
+                    }
                 }
 
                 ports.add(portBuilder.build());
