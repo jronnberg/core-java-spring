@@ -42,6 +42,7 @@ public class MonitorInfoTest {
     public void shouldMatch() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of(
             "a", "1",
             "b", "2"
@@ -49,7 +50,7 @@ public class MonitorInfoTest {
         JsonObject systemData = null;
         String inventoryId = null;
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, systemData, inventoryId);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, systemData, inventoryId);
 
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
@@ -61,11 +62,12 @@ public class MonitorInfoTest {
     public void shouldNotMatch() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of(
             "a", "1",
             "b", "2"
         );
-        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "x");
         Map<String, String> serviceMetadata = Map.of("b", "2");
@@ -77,13 +79,14 @@ public class MonitorInfoTest {
     public void supersetShouldMatch() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of(
             "a", "1",
             "b", "2",
             "c", "3"
         );
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
@@ -95,12 +98,13 @@ public class MonitorInfoTest {
     public void subsetsShouldNotMatch() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of(
             "a", "1",
             "b", "2"
         );
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of(
@@ -115,9 +119,10 @@ public class MonitorInfoTest {
     public void shouldRequireServiceMetadata() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of("a", "1");
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = new HashMap<>();
@@ -130,9 +135,10 @@ public class MonitorInfoTest {
     public void serviceShouldOverrideSystem() {
 
         String systemName = "System A";
+        String serviceDefinition = "Service A";
         Map<String, String> metadata = Map.of("a", "1");
 
-        var info = new MonitorInfo.Bundle(systemName, metadata, null, null);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "2");
         Map<String, String> serviceMetadata = Map.of("a", "1");
@@ -155,6 +161,7 @@ public class MonitorInfoTest {
         JsonObject jsonObject = new JsonObject(List.of(
             new JsonPair("a", JsonBoolean.TRUE)
         ));
+
         var monitorInfo = new MonitorInfo();
         monitorInfo.putSystemData(serviceDescription, jsonObject);
 

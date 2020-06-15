@@ -18,14 +18,20 @@ public class MonitorInfo {
 
     public static class Bundle {
         public final JsonObject systemData;
+        public final String serviceDefinition;
         public final Map<String, String> metadata;
         public final String inventoryId;
         public final String systemName;
 
         Bundle(
-            String systemName, Map<String, String> metadata, JsonObject systemData, String inventoryId
+            String systemName,
+            String serviceDefinition,
+            Map<String, String> metadata,
+            JsonObject systemData,
+            String inventoryId
         ) {
             this.systemData = systemData;
+            this.serviceDefinition = serviceDefinition;
             this.inventoryId = inventoryId;
             this.systemName = systemName;
             this.metadata = metadata;
@@ -51,11 +57,11 @@ public class MonitorInfo {
             if (!portMetadata.isPresent() || portMetadata.get().size() == 0) {
                 return false;
             }
-        
+
             var mergedMetadata = DtoUtils.mergeMetadata(systemMetadata.orElse(new HashMap<>()), portMetadata.get());
             return isSubset(mergedMetadata, metadata);
         }
-        
+
         /**
          * Returns true if the given parameters matches this instances metadata.
          *
@@ -72,7 +78,7 @@ public class MonitorInfo {
             }
 			return isSubset(metadata, systemMetadata.get());
         }
-        
+
     }
 
     private final Map<String, Bundle> infoBundles = new ConcurrentHashMap<>();
@@ -104,9 +110,9 @@ public class MonitorInfo {
         Bundle oldBundle = infoBundles.get(key);
         Bundle newBundle;
         if (oldBundle == null) {
-            newBundle = new Bundle(systemName, metadata, null, inventoryId);
+            newBundle = new Bundle(systemName, service.name(), metadata, null, inventoryId);
         } else {
-            newBundle = new Bundle(systemName, metadata, oldBundle.systemData, inventoryId);
+            newBundle = new Bundle(systemName, service.name(), metadata, oldBundle.systemData, inventoryId);
         }
         infoBundles.put(key, newBundle);
     }
@@ -117,10 +123,11 @@ public class MonitorInfo {
         Map<String, String> metadata = service.metadata();
         Bundle oldBundle = infoBundles.get(key);
         Bundle newBundle;
+
         if (oldBundle == null) {
-            newBundle = new Bundle(systemName, metadata, data, null);
+            newBundle = new Bundle(systemName, service.name(), metadata, data, null);
         } else {
-            newBundle = new Bundle(systemName, metadata, data, oldBundle.inventoryId);
+            newBundle = new Bundle(systemName, service.name(), metadata, data, oldBundle.inventoryId);
         }
         infoBundles.put(key, newBundle);
     }
