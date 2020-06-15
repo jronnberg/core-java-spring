@@ -79,7 +79,7 @@ public class PlantDescriptionEntryMap {
         final boolean isNew = !entries.containsKey(entry.id());
         final var currentlyActive = activeEntry();
 
-        // Possible deactivate the currently active entry:
+        // Possibly deactivate the currently active entry:
         if (entry.active() && currentlyActive != null) {
             final var deactivatedEntry = PlantDescriptionEntry.deactivated(currentlyActive);
             entries.put(deactivatedEntry.id(), deactivatedEntry);
