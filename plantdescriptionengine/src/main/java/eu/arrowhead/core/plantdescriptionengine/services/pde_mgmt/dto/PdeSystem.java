@@ -46,4 +46,16 @@ public interface PdeSystem {
         Port port = getPort(portName);
         return DtoUtils.mergeMetadata(metadata().orElse(null), port.metadata().orElse(null));
     }
+
+    /**
+     * @return True if the system has a port with the given name.
+     */
+    default boolean hasPort(String portName) {
+        for (var port : ports()) {
+            if (port.portName().equals(portName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

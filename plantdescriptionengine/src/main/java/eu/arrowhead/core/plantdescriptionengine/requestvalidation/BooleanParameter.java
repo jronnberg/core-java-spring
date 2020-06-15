@@ -56,7 +56,7 @@ public class BooleanParameter extends QueryParameter {
 
         String value = possibleValue.get();
         if (!(value.equals("true") || value.equals("false"))) {
-            parser.report(new ParseError(name + " must be true or false, not " + value + "."));
+            parser.report(new ParseError("'" + name + "' must be true or false, not '" + value + "'."));
         }
 
         parser.putBoolean(name, value.equals("true"));
