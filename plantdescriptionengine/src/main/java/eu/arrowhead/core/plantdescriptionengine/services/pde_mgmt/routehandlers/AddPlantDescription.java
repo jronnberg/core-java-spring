@@ -5,8 +5,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -38,25 +40,28 @@ public class AddPlantDescription implements HttpRouteHandler {
      * Handles an HTTP request to add a new Plant Description to the PDE.
      *
      * @param request  HTTP request object containing a Plant Description.
-     * @param response HTTP response containing the newly created Plant
-     *                 Description entry.
+     * @param response HTTP response containing the newly created Plant Description
+     *                 entry.
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
-        return request
-            .bodyAs(PlantDescriptionDto.class)
-            .map(description -> {
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
+        return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
+            final var validator = new PlantDescriptionValidator(description);
+            if (validator.hasError()) {
+                return response
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ErrorMessage.of(validator.getErrorMessage()));
+            } else {
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
                 try {
                     entryMap.put(entry);
                 } catch (final BackingStoreException e) {
                     logger.error("Failure when communicating with backing store.", e);
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-                return response
-                    .status(HttpStatus.CREATED)
-                    .body(entry);
-            });
+                return response.status(HttpStatus.CREATED).body(entry);
+            }
+        });
     }
 }

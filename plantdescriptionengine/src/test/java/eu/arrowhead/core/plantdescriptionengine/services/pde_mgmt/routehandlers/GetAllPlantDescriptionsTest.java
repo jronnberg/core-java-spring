@@ -224,6 +224,58 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
+    public void shouldRejectNonBooleans() throws BackingStoreException {
+        final List<Integer> entryIds = List.of(0, 1, 2);
+        final int activeEntryId = 3;
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        for (int id : entryIds) {
+            entryMap.put(TestUtils.createEntry(id));
+        }
+
+        final Instant now = Instant.now();
+        entryMap.put(new PlantDescriptionEntryBuilder()
+            .id(activeEntryId)
+            .plantDescription("Plant Description XY")
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build());
+
+        final String nonBoolean = "Not a boolean";
+
+        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(entryMap);
+        HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "filter_field", List.of("active"),
+                "filter_value", List.of(nonBoolean)
+            ))
+            .build();
+        HttpServiceResponse response = new MockResponse();
+
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertTrue(response.status().isPresent());
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                assertTrue(response.body().isPresent());
+                String expectedErrorMessage = "<'filter_value' must be true or false, not '" + nonBoolean + "'.>";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(e -> {
+                e.printStackTrace();
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
     public void shouldFilterEntries() throws BackingStoreException {
 
         final List<Integer> entryIds = List.of(0, 1, 2);
