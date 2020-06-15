@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.pdentrymap;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -145,6 +146,35 @@ public class PlantDescriptionEntryMapTest {
         entryMap.remove(activeEntry.id());
 
         assertNull(entryMap.activeEntry());
+    }
+
+    @Test
+    public void shouldDeactivateEntry() throws BackingStoreException {
+        final float idA = 1f;
+        final float idB = 2f;
+        final Instant now = Instant.now();
+        final var builder = new PlantDescriptionEntryBuilder()
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .active(true)
+            .createdAt(now)
+            .updatedAt(now);
+        final var entryA = builder
+            .id(idA)
+            .plantDescription("Plant Description A")
+            .build();
+        final var entryB = builder
+            .id(idB)
+            .plantDescription("Plant Description B")
+            .build();
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+
+        entryMap.put(entryA);
+
+        assertTrue(entryMap.get(idA).active());
+        entryMap.put(entryB);
+        assertFalse(entryMap.get(idA).active());
     }
 
     @Test
