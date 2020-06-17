@@ -5,8 +5,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -58,6 +60,12 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 }
 
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
+                final var validator = new PlantDescriptionValidator(entry);
+                if (validator.hasError()) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(ErrorMessage.of(validator.getErrorMessage()));
+                }
 
                 try {
                     entryMap.put(entry);

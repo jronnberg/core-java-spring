@@ -47,21 +47,21 @@ public class AddPlantDescription implements HttpRouteHandler {
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
-            final var validator = new PlantDescriptionValidator(description);
+            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
+            final var validator = new PlantDescriptionValidator(entry);
             if (validator.hasError()) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
                     .body(ErrorMessage.of(validator.getErrorMessage()));
-            } else {
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
-                try {
-                    entryMap.put(entry);
-                } catch (final BackingStoreException e) {
-                    logger.error("Failure when communicating with backing store.", e);
-                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-                return response.status(HttpStatus.CREATED).body(entry);
             }
+
+            try {
+                entryMap.put(entry);
+            } catch (final BackingStoreException e) {
+                logger.error("Failure when communicating with backing store.", e);
+                return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return response.status(HttpStatus.CREATED).body(entry);
         });
     }
 }

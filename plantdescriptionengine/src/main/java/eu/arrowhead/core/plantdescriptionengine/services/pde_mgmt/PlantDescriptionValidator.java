@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystem;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 
 /**
  * Class for validating the Plant Descriptions.
@@ -20,20 +20,34 @@ public class PlantDescriptionValidator {
     /**
      * Constructor.
      *
-     * @param pd A Plant Description to be validated.
+     * @param entry A Plant Description Entry to be validated.
      */
-    public PlantDescriptionValidator(PlantDescription pd) {
+    public PlantDescriptionValidator(PlantDescriptionEntry entry) {
+
+        validateConnections(entry);
+
+        for (var system : entry.systems()) {
+            ensureUniquePorts(system);
+        }
+    }
+
+    /**
+     * Validates the connections of a Plant Description Entry.
+     * @param entry Entry whose connections are to be validated.
+     */
+    private void validateConnections(PlantDescriptionEntry entry) {
+
         boolean producerFound = false;
         boolean consumerFound = false;
 
-        for (var connection : pd.connections()) {
+        for (var connection : entry.connections()) {
             final var producer = connection.producer();
             final var consumer = connection.consumer();
 
             final String producerId = producer.systemId();
             final String consumerId = consumer.systemId();
 
-            for (var system : pd.systems()) {
+            for (var system : entry.systems()) {
 
                 if (producerId.equals(system.systemId())) {
                     producerFound = true;
@@ -55,20 +69,16 @@ public class PlantDescriptionValidator {
                 errors.add("A connection refers to the missing system '" + consumerId + "'");
             }
         }
-
-        for (var system : pd.systems()) {
-            ensureUniquePorts(system);
-        }
     }
 
     /**
      * Ensures that the given system's ports are all unique.
      *
-     * The PDE must be able to differentiate between the ports of a system.
-     * When multiple ports share the same serviceDefinition, they must have
-     * different metadata. This method ensures that this property holds.
+     * The PDE must be able to differentiate between the ports of a system. When
+     * multiple ports share the same serviceDefinition, they must have different
+     * metadata. This method ensures that this property holds.
      *
-     *  TODO: Check that metadata is unique
+     * TODO: Check that metadata is unique
      *
      * @param system The system whose ports will be validated.
      */
