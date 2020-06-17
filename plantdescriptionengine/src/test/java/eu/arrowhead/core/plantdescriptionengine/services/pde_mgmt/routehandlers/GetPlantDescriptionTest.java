@@ -44,6 +44,7 @@ public class GetPlantDescriptionTest {
                 assertNull(e);
             });
         } catch (Exception e) {
+            e.printStackTrace();
             assertNull(e);
         }
     }

@@ -118,9 +118,11 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
+                    e.printStackTrace();
                     assertNull(e);
                 });
         } catch (Exception e) {
+            e.printStackTrace();
             assertNull(e);
         }
     }

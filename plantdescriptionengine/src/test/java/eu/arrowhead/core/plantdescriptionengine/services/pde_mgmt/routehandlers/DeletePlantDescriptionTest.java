@@ -112,6 +112,7 @@ public class DeletePlantDescriptionTest {
                     assertNull(e);
                 });
         } catch (Exception e) {
+            e.printStackTrace();
             assertNull(e);
         }
     }
