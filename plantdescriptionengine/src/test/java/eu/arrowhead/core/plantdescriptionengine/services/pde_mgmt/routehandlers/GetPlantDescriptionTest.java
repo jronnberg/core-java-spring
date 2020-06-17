@@ -2,7 +2,6 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 
@@ -68,10 +67,8 @@ public class GetPlantDescriptionTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.OK, response.status().get());
 
-                assertTrue(response.body().isPresent());
                 var returnedEntry = (PlantDescriptionEntry)response.body().get();
                 assertEquals(returnedEntry.id(), entryId, 0); // TODO: Add 'equals' method to entries and do a proper comparison?
             }).onFailure(e -> {
@@ -102,7 +99,6 @@ public class GetPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                 })
                 .onFailure(e -> {

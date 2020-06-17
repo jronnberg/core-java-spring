@@ -2,8 +2,6 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 
 import static org.junit.Assert.assertNull;
@@ -43,7 +41,6 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.OK, response.status().get());
                     assertNull(entryMap.get(entryId));
                 })
@@ -70,9 +67,7 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -103,7 +98,6 @@ public class DeletePlantDescriptionTest {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);

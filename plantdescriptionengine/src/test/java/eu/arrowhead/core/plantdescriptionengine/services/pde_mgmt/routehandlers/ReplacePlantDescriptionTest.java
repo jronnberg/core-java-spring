@@ -13,14 +13,19 @@ import static org.junit.Assert.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -43,10 +48,8 @@ public class ReplacePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
-                    assertTrue(response.body().isPresent());
 
                     PlantDescriptionEntry entry = (PlantDescriptionEntry)response.body().get();
                     assertTrue(entry.matchesDescription(description));
@@ -92,10 +95,8 @@ public class ReplacePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
-                    assertTrue(response.body().isPresent());
                     PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
                     assertEquals(returnedEntry.plantDescription(), newName);
                     assertEquals(sizeBeforePut, entryMap.getEntries().size());
@@ -123,12 +124,70 @@ public class ReplacePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
 
                     String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
                     assertEquals(response.body().get(), expectedBody);
+                })
+                .onFailure(e -> {
+                    assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldRequireUniquePortnames() throws BackingStoreException {
+        final int entryId = 1;
+        final String systemId = "system_a";
+        final String portName = "port_a";
+
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var handler = new ReplacePlantDescription(entryMap);
+
+        entryMap.put(TestUtils.createEntry(entryId));
+
+        final List<PortDto> consumerPorts = List.of(
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_a")
+                .consumer(true)
+                .build(),
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_b")
+                .consumer(true)
+                .build()
+        );
+
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(systemId)
+            .ports(consumerPorts)
+            .build();
+
+        final var description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(consumerSystem))
+            .include(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .build();
+
+        final HttpServiceResponse response = new MockResponse();
+        final MockRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(description)
+            .build();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    String expectedErrorMessage = "<Duplicate port name '" +
+                        portName + "' in system '" + systemId + "'>";
+                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
                     assertNull(e);

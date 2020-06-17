@@ -48,10 +48,8 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
-                    assertTrue(response.body().isPresent());
 
                     PlantDescriptionEntry entry = (PlantDescriptionEntry)response.body().get();
                     assertTrue(entry.matchesDescription(description));
@@ -135,9 +133,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<A connection refers to the missing system '" + missingId + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -217,9 +213,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<A connection refers to the missing system '" + missingId + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -299,9 +293,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<Connection refers to the missing consumer port '" +
                         invalidPort + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
@@ -382,9 +374,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<Connection refers to the missing producer port '" +
                         invalidPort + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
@@ -475,9 +465,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<" + consumerId + " has multiple ports with service definition '" +
                         serviceDefinition + "' without metadata.>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
@@ -553,9 +541,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<" + consumerId +
                         " has duplicate metadata for ports with service definition '" + serviceDefinition + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
@@ -615,7 +601,6 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
                 })
                 .onFailure(e -> {
@@ -668,9 +653,7 @@ public class AddPlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<Duplicate port name '" +
                         portName + "' in system '" + systemId + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();

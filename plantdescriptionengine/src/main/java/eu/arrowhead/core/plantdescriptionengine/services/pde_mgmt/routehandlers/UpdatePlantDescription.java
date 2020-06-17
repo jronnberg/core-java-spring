@@ -69,14 +69,14 @@ public class UpdatePlantDescription implements HttpRouteHandler {
                         .body(ErrorMessage.of("Plant Description with ID '" + idString + "' not found."));
                 }
 
-                final var validator = new PlantDescriptionValidator(entry);
+                final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
+
+                final var validator = new PlantDescriptionValidator(updatedEntry);
                 if (validator.hasError()) {
                     return response
                         .status(HttpStatus.BAD_REQUEST)
                         .body(ErrorMessage.of(validator.getErrorMessage()));
                 }
-
-                final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
 
                 try {
                     entryMap.put(updatedEntry);
