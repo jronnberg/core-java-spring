@@ -339,7 +339,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the alarm | `true` | |
+| `id` | Integer | Id of the alarm | `true` | |
 | `systemName` | String | Identity of the system | `true` | |
 | `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | `true` | |
 | `severity` | String | One out of `indeterminate/critical/major/minor/warning/cleared` | `true` | |
@@ -355,7 +355,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | `true` | |
+| `count` | Integer | Number of records found | `true` | |
 | `data` | Array\<[PdeAlarm](#pdealarm)> | Array of [PDE Alarms](#pdealarm) | `true` | |
 
 ### PdeAlarmUpdate
@@ -370,7 +370,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the entry | `true` ||
+| `id` | Integer | Id of the entry | `true` ||
 | `plantDescription` | String | Plant description name| `true` ||
 | `active` | Boolean | Is this the active plant description | `true` ||
 | `systems` | Array\<[SystemEntry](#systementry)> | Array with systems expected to be present in the plant | `true` ||
@@ -383,7 +383,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | `true` ||
+| `count` | Integer | Number of records found | `true` ||
 | `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### PortEntry
@@ -420,11 +420,11 @@ types.
 
 | JSON Type | Description |
 | --------- | ----------- |
-| Value | Any out of Object, Array, String, Number, Boolean or Null. |
+| Value | Any out of Object, Array, String, Integer, Boolean or Null. |
 | Object \<A> | An unordered collection of [String: Value] pairs, where each Value conforms to type A. |
 | Array \<A> | An ordered collection of Value elements, where each element conforms to type A. |
 | String | An arbitrary UTF-8 string. |
-| Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
+| Integer | 32-bit signed two's complement integer, which has a minimum value of -2<sup>31</sup> and a maximum value of 2<sup>31</sup>-1 |
 | Boolean | One out of `true` or `false`. |
 | Null | Must be null. |
 

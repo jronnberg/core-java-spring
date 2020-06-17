@@ -15,7 +15,7 @@ output types are only denoted when accepted or returned, respectively, by the in
 All abstract data types named in this section are defined in the [Information model](#information-model) section.
 
 ### interface GetInventoryData(InventoryId): [InventoryData](#struct-inventorydata)
-Called to acquire the application system's inventory data, identified by `ÌnventoryId`. 
+Called to acquire the application system's inventory data, identified by `ÌnventoryId`.
 
 ### interface GetInventorySystems(): [SystemList](#struct-systemlist)
 Called to acquire for systems present in the Inventory system.
@@ -30,13 +30,13 @@ which are used to represent things like hashes and identifiers.
 
 ### struct InventoryData
 
-| Field | Type | Description | 
+| Field | Type | Description |
 | ----- | ---- | ----------- |
 | `data` | Custom | System specific data - key-value pairs |
 
 ### struct System
 
-| Field | Type | Description | Mandatory |  
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
 | `inventoryId` | String | The systems Id in this Inventory system | `true` |
 | `systemName` | String | Identity of the system | `false` |
@@ -44,9 +44,9 @@ which are used to represent things like hashes and identifiers.
 
 ### struct SystemList
 
-| Field | Type | Description | Mandatory | 
+| Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
-| `count` | Number | Number of records found | `true` |
+| `count` | Integer | Number of records found | `true` |
 | `data` | Array\<[System](#struct-system)> | Array of [Systems](#struct-system) that the Inventory contains | true |
 
 ### Primitives
@@ -54,7 +54,7 @@ Types and structures mentioned throughout this document that are assumed to be a
 of this service. The concrete interpretations of each of these types and structures must be provided by any IDD
 document claiming to implement this service.
 
-| Type | Description | 
+| Type | Description |
 | ---- | ----------- |
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Custom | Any suitable type chosen by the implementor of the service.|

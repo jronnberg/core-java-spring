@@ -115,7 +115,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory |
 | ----- | ---- | ----------- | --------- |
-| `count` | Number | Number of records found | `true` |
+| `count` | Integer | Number of records found | `true` |
 | `data` | Array\<[System](#system)> | Array of [Systems](#system) that the Inventory contains | `true` |
 
 
@@ -129,11 +129,11 @@ types.
 
 | JSON Type | Description |
 | --------- | ----------- |
-| Value | Any out of Object, Array, String, Number, Boolean or Null. |
+| Value | Any out of Object, Array, String, Integer, Boolean or Null. |
 | Object \<A> | An unordered collection of [String: Value] pairs, where each Value conforms to type A. |
 | Array \<A> | An ordered collection of Value elements, where each element conforms to type A. |
 | String | An arbitrary UTF-8 string. |
-| Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
+| Integer | 32-bit signed two's complement integer, which has a minimum value of -2<sup>31</sup> and a maximum value of 2<sup>31</sup>-1 |
 | Boolean | One out of `true` or `false`. |
 | Null | Must be null. |
 

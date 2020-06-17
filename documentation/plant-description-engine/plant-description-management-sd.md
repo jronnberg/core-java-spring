@@ -60,7 +60,7 @@ which are used to represent things like dates.
 | ----- | ---- | ----------- | --------- | ------------- |
 | `plantDescription` | String | Plant description name | `true` | |
 | `active` | Boolean | Is this the active plant description | `false` | `false` |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | [] |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `false` | [] |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 
@@ -68,10 +68,10 @@ which are used to represent things like dates.
 
 | Field | Type | Description | Mandatory | Note |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the entry | `true` | |
+| `id` | Integer | Id of the entry | `true` | |
 | `plantDescription` | String | Plant description name| `true` | |
 | `active` | Boolean | Is this the active plant description | `true` | |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `true` | |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `true` | |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | DateTime | Creation date of the entry | `true` | |
@@ -81,7 +81,7 @@ which are used to represent things like dates.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `count` | Number | Number of records found |
+| `count` | Integer | Number of records found |
 | `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
 
 ### struct PlantDescriptionUpdate
@@ -92,7 +92,7 @@ Currently only the following values can be updated. If a field is not present th
 | ----- | ---- | ----------- | --------- |
 | `plantDescription` | String | Plant description name | `false` |
 | `active` | Boolean | Is this the active plant description | `false` |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `false` |
 | `systems` | Array\<[System](#struct-system)> | Array with systems expected to be present in the plant | `false` |
 | `connections` | Array\<[Connection](#struct-connection)> | Array with connection that should be populated into the Orchestrator | `false` |
 
@@ -130,7 +130,7 @@ document claiming to implement this service.
 | Array \<A> | An ordered collection of elements, where each element conforms to type A. |
 | Boolean | One out of `true` or `false`. |
 | DateTime | Pinpoints a specific moment in time. |
-| Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
+| Integer | 32-bit signed two's complement integer, which has a minimum value of -2<sup>31</sup> and a maximum value of 2<sup>31</sup>-1 |
 | String | An arbitrary UTF-8 string. |
 
 [PDE]:plant-description-engine-sysd.md
