@@ -561,7 +561,7 @@ JSON object with the following fields:
 | ----- | ---- | ----------- | --------- | ------------- |
 | `plantDescription` | String | Plant description name | `true` | |
 | `active` | Boolean | Is this the active plant description | `false` | `false` |
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | [] |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `false` | [] |
 | `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 
@@ -570,10 +570,10 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `id` | Number | Id of the entry | `true` ||
+| `id` | Integer | Id of the entry | `true` ||
 | `plantDescription` | String | Plant description name| `true` ||
 | `active` | Boolean | Is this the active plant description | `true` ||
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `true` | |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `true` | |
 | `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `true` ||
 | `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `true` ||
 | `createdAt` | [DateTime](#alias-datetime--string) | Creation date of the entry | `true` ||
@@ -584,7 +584,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `count` | Number | Number of records found | `true` ||
+| `count` | Integer | Number of records found | `true` ||
 | `data` | Array\<[PlantDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### PlantDescriptionUpdate
@@ -596,7 +596,7 @@ Currently only the following values can be updated. If a field is not present th
 | ----- | ---- | ----------- | --------- | ------------- |
 | `plantDescription` | String | Plant description name | `false` ||
 | `active` | Boolean | Is this the active plant description | `false` ||
-| `include` | Array\<Number>| Array with Ids of other PDs that are included in this PD | `false` | |
+| `include` | Array\<Integer>| Array with Ids of other PDs that are included in this PD | `false` | |
 | `systems` | Array\<[System](#system)> | Array with systems expected to be present in the plant | `false` ||
 | `connections` | Array\<[Connection](#connection)> | Array with connection that should be populated into the Orchestrator | `false` ||
 
@@ -625,7 +625,7 @@ JSON object with the following fields:
 
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
-| `systemId` | Number | Identity of the system within the PDE | `true` | |
+| `systemId` | String | Identity of the system within the PDE | `true` | |
 | `portName` | String | Identity of the port | `true` | |
 
 
@@ -639,11 +639,11 @@ types.
 
 | JSON Type | Description |
 | --------- | ----------- |
-| Value | Any out of Object, Array, String, Number, Boolean or Null. |
+| Value | Any out of Object, Array, String, Integer, Boolean or Null. |
 | Object \<A> | An unordered collection of [String: Value] pairs, where each Value conforms to type A. |
 | Array \<A> | An ordered collection of Value elements, where each element conforms to type A. |
 | String | An arbitrary UTF-8 string. |
-| Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
+| Integer | 32-bit signed two's complement integer, which has a minimum value of -2<sup>31</sup> and a maximum value of 2<sup>31</sup>-1 |
 | Boolean | One out of `true` or `false`. |
 | Null | Must be null. |
 

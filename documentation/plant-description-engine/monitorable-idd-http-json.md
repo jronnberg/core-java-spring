@@ -14,12 +14,12 @@ The rest of this document describes how to realize the [Monitorable] service usi
 This section describes the interfaces that must be exposed by [Monitorable] services. In particular, the below
 subsection first names the HTTP method and path used to call the interface, after which it names an abstract
 interface from the [Monitorable] service description document, output type, as well as errors that can be thrown. The
-interface is expected to respond with HTTP status code 200 OK for all successful calls. 
+interface is expected to respond with HTTP status code 200 OK for all successful calls.
 
 ### GET {baseURL}/inventoryid
  - __Interface:	GetInventoryId__
  - __Output: [InventoryId](#inventoryid)__
-	 
+
 Called to acquire the application systems Inventory id.
 
 Example of valid invocation:
@@ -42,7 +42,7 @@ Content-Type: application/json
 ### GET {baseURL}/systemdata
  - __Interface: GetSystemData__
  - __Output: [SystemData](#systemdata)__
-	 
+
 Called to acquire the latest copy of the application systems monitorable system data.
 
 Example of valid invocation:
@@ -62,16 +62,16 @@ Content-Type: application/json
 		"key1": "value1",
 		"key2": 2,
 		"key3": {
-			"key3_key1": 1	
+			"key3_key1": 1
 		}
-	}		
+	}
 }
 ```
 
 ### GET {baseURL}/ping
  - __Interface: Ping__
  - __Output: Any valid JSON object__
-	 
+
 Called to check that the application system is alive and responding to service requests.
 
 Example of valid invocation:
@@ -100,7 +100,7 @@ in this section, there is also a list of implicit [primitive](#primitives) types
 ### InventoryId
 JSON object with the following fields:
 
-| Field | Type | Description | Mandatory | Default value | 
+| Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | String | The systems Id in an Inventory system | `false` | |
 
@@ -122,11 +122,11 @@ types.
 
 | JSON Type | Description |
 | --------- | ----------- |
-| Value | Any out of Object, Array, String, Number, Boolean or Null. |
+| Value | Any out of Object, Array, String, Integer, Boolean or Null. |
 | Object \<A> | An unordered collection of [String: Value] pairs, where each Value conforms to type A. |
 | Array \<A> | An ordered collection of Value elements, where each element conforms to type A. |
 | String | An arbitrary UTF-8 string. |
-| Number | Any IEEE 754 binary64 floating point number, except for +Inf, -Inf and NaN. |
+| Integer | 32-bit signed two's complement integer, which has a minimum value of -2<sup>31</sup> and a maximum value of 2<sup>31</sup>-1 |
 | Boolean | One out of `true` or `false`. |
 | Null | Must be null. |
 
