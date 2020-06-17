@@ -46,10 +46,8 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.OK, response.status().get());
 
-                assertTrue(response.body().isPresent());
                 var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(entryIds.size(), entries.count());
             }).onFailure(e -> {
@@ -207,9 +205,7 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                assertTrue(response.body().isPresent());
                 String expectedErrorMessage = "<Missing parameter: filter_value.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -259,9 +255,7 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                assertTrue(response.body().isPresent());
                 String expectedErrorMessage = "<'filter_value' must be true or false, not '" + nonBoolean + "'.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -310,10 +304,8 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.OK, response.status().get());
 
-                assertTrue(response.body().isPresent());
                 var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(1, entries.count());
                 assertEquals(entries.data().get(0).id(), activeEntryId, 0);
@@ -352,10 +344,8 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.OK, response.status().get());
 
-                assertTrue(response.body().isPresent());
                 var entries = (PlantDescriptionEntryList)response.body().get();
                 assertEquals(itemsPerPage, entries.count());
 
@@ -396,10 +386,8 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
 
-                assertTrue(response.body().isPresent());
                 String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -428,9 +416,7 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                assertTrue(response.body().isPresent());
                 String expectedErrorMessage = "<Missing parameter: item_per_page.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
