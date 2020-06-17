@@ -22,28 +22,28 @@ public interface PlantDescriptionEntry {
     final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return (int)(e1.id() - e2.id());
+            return e1.id() - e2.id();
         }
     };
 
     final static Comparator<PlantDescriptionEntry> CREATED_AT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return (int)(e1.createdAt().compareTo(e2.createdAt()));
+            return e1.createdAt().compareTo(e2.createdAt());
         }
     };
 
     final static Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return (int)(e1.updatedAt().compareTo(e2.updatedAt()));
+            return e1.updatedAt().compareTo(e2.updatedAt());
         }
     };
 
-    float id();
+    int id();
     String plantDescription();
     boolean active();
-    List<Float> include();
+    List<Integer> include();
     List<SystemEntry> systems();
     List<Connection> connections();
     Instant createdAt();
