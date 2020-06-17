@@ -31,9 +31,9 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReadEntriesFromBackingStore() throws BackingStoreException {
         final BackingStore store = new InMemoryBackingStore();
-        final List<Float> entryIds = List.of(1f, 2f, 3f);
+        final List<Integer> entryIds = List.of(1, 2, 3);
 
-        for (float id : entryIds) {
+        for (int id : entryIds) {
             store.write(TestUtils.createEntry(id));
         }
 
@@ -45,7 +45,7 @@ public class PlantDescriptionEntryMapTest {
             assertTrue(entryIds.contains(entry.id()));
         }
 
-        float id0 = entryIds.get(0);
+        int id0 = entryIds.get(0);
         entryMap.remove(id0);
 
         final var newEntryMap = new PlantDescriptionEntryMap(store);
@@ -71,9 +71,9 @@ public class PlantDescriptionEntryMapTest {
     public void shouldReturnAllEntries() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final List<Float> entryIds = List.of(16f, 39f, 244f);
+        final List<Integer> entryIds = List.of(16, 39, 244);
 
-        for (float id : entryIds) {
+        for (int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
         }
 
@@ -90,8 +90,8 @@ public class PlantDescriptionEntryMapTest {
     public void shouldReturnListDto() throws BackingStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
-        final List<Float> entryIds = List.of(16f, 39f, 244f);
-        for (float id : entryIds) {
+        final List<Integer> entryIds = List.of(16, 39, 244);
+        for (int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
         }
 
@@ -106,7 +106,7 @@ public class PlantDescriptionEntryMapTest {
 
     @Test
     public void shouldRemoveEntries() throws BackingStoreException {
-        float entryId = 24f;
+        int entryId = 24;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
         entryMap.put(entry);
@@ -150,8 +150,8 @@ public class PlantDescriptionEntryMapTest {
 
     @Test
     public void shouldDeactivateEntry() throws BackingStoreException {
-        final float idA = 1f;
-        final float idB = 2f;
+        final int idA = 1;
+        final int idB = 2;
         final Instant now = Instant.now();
         final var builder = new PlantDescriptionEntryBuilder()
             .include(new ArrayList<>())
@@ -203,9 +203,9 @@ public class PlantDescriptionEntryMapTest {
 
         final class Listener implements PlantDescriptionUpdateListener {
 
-            float lastAdded = -1f;
-            float lastUpdated = -1f;
-            float lastRemoved = -1f;
+            int lastAdded = -1;
+            int lastUpdated = -1;
+            int lastRemoved = -1;
 
             @Override
             public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {

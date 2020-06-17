@@ -24,7 +24,7 @@ public interface PlantDescriptionEntry {
     final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return (int)(e1.id() - e2.id());
+            return e1.id() - e2.id();
         }
     };
 
@@ -42,10 +42,10 @@ public interface PlantDescriptionEntry {
         }
     };
 
-    float id();
+    int id();
     String plantDescription();
     boolean active();
-    List<Float> include();
+    List<Integer> include();
     List<PdeSystem> systems();
     List<Connection> connections();
     Instant createdAt();
@@ -56,7 +56,7 @@ public interface PlantDescriptionEntry {
      * @param id Identifier to be used for the new entry.
      * @return A new plant entry based on the given description.
      */
-    static PlantDescriptionEntryDto from(PlantDescriptionDto description, float id) {
+    static PlantDescriptionEntryDto from(PlantDescriptionDto description, int id) {
         List<PdeSystemDto> systems = new ArrayList<>();
         List<ConnectionDto> connections = new ArrayList<>();
 
@@ -203,7 +203,7 @@ public interface PlantDescriptionEntry {
         }
 
         // TODO: Remove this and instead validate all plant descriptions.
-        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex + 
+        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex +
             " in Plant Description Entry '" + plantDescription() + "'");
         return serviceDefinitionName;
     }

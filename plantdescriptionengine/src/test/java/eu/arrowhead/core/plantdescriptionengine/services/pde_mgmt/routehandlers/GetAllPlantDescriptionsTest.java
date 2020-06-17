@@ -140,7 +140,7 @@ public class GetAllPlantDescriptionsTest {
                 final var entries = (PlantDescriptionEntryList)response1.body().get();
                 assertEquals(numEntries, entries.count());
 
-                float previousId = entries.data().get(0).id();
+                int previousId = entries.data().get(0).id();
                 for (int i = 1; i < entries.count(); i++) {
                     final var entry = entries.data().get(i);
                     assertTrue(entry.id() <= previousId);
@@ -355,7 +355,7 @@ public class GetAllPlantDescriptionsTest {
 
                 for (int i = 0; i < itemsPerPage; i++) {
                     int index = page * itemsPerPage + i;
-                    assertEquals((int)entryIds.get(index), entries.data().get(i).id(), 0);
+                    assertEquals((int)entryIds.get(index), entries.data().get(i).id());
                 }
 
             }).onFailure(e -> {

@@ -19,6 +19,6 @@ public interface PlantDescriptionUpdate {
     Optional<Boolean> active();
     Optional<List<PdeSystem>> systems();
     Optional<List<Connection>> connections();
-    Optional<List<Float>> include();
+    Optional<List<Integer>> include();
 
 }

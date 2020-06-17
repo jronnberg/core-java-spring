@@ -39,7 +39,7 @@ public class FileStore implements BackingStore {
      * @return The file path to use for reading or writing a Plant Description
      *         Entry to disk.
      */
-    private Path getFilePath(final float entryId) {
+    private Path getFilePath(final int entryId) {
         return Paths.get(descriptionDirectory, entryId + ".json");
     }
 
@@ -100,7 +100,7 @@ public class FileStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void remove(final float entryId) throws BackingStoreException {
+    public void remove(final int entryId) throws BackingStoreException {
         final Path filepath = getFilePath(entryId);
         try {
             Files.delete(filepath);
