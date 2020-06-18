@@ -68,7 +68,7 @@ public class SystemTracker {
      * Note that the returned data will be stale if the system in question has
      * changed state since the last call to {@link #refreshSystems()}.
      *
-     *
+     * TODO: Remove?
      * @param systemId ID of a system to be retrieved.
      * @return The desired system, if it is present in the local cache.
      */

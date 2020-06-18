@@ -32,7 +32,9 @@ public class PdeMonitorService {
      * @param httpClient  Object for communicating with monitorable services.
      * @param insecure Indicates whether the service should run in secure mode.
      */
-    public PdeMonitorService(ArSystem arSystem, PlantDescriptionEntryMap entryMap, HttpClient httpClient, boolean secure) {
+    public PdeMonitorService(
+        ArSystem arSystem, PlantDescriptionEntryMap entryMap, HttpClient httpClient, boolean secure
+    ) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(entryMap, "Expected plant description map");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
