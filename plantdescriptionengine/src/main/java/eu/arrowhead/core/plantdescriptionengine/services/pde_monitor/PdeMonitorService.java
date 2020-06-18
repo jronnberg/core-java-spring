@@ -13,6 +13,10 @@ import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
+/**
+ * This service enables monitoring of a plant and related alarms raised by Plant
+ * Description Engine core system.
+ */
 public class PdeMonitorService {
 
     private final ArSystem arSystem;

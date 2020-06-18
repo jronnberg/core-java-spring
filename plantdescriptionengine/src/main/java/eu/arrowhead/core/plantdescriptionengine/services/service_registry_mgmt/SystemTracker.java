@@ -22,8 +22,7 @@ public class SystemTracker {
     private InetSocketAddress serviceRegistryAddress = null;
     private boolean initialized;
 
-    private Map<Integer, SrSystem> systemsById = new ConcurrentHashMap<>();
-    private Map<String, SrSystem> systemsByName = new ConcurrentHashMap<>();
+    private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
 
     /**
      * Class constructor
@@ -55,8 +54,7 @@ public class SystemTracker {
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
                 for (var system : systemList.data()) {
-                    systemsById.put(system.id(), system);
-                    systemsByName.put(system.systemName(), system);
+                    systems.put(system.systemName(), system);
                 }
                 initialized = true;
                 return Future.done();
@@ -68,31 +66,17 @@ public class SystemTracker {
      * Note that the returned data will be stale if the system in question has
      * changed state since the last call to {@link #refreshSystems()}.
      *
-     * TODO: Remove?
-     * @param systemId ID of a system to be retrieved.
+     *
+     * @param systemId ID of a system to be retrieved. Note that this is the
+     *                 system ID used internally by the PDE, not the one found
+     *                 in the Service Registry.
      * @return The desired system, if it is present in the local cache.
      */
-    public SrSystem getSystem(int systemId) {
+    public SrSystem getSystem(String systemId) {
         if (!initialized) {
             throw new IllegalStateException("SystemTracker has not been initialized.");
         }
-        return systemsById.get(systemId);
-    }
-
-    /**
-     * Retrieves the specified system.
-     * Note that the returned data will be stale if the system in question has
-     * changed state since the last call to {@link #refreshSystems()}.
-     *
-     *
-     * @param systemName Name of a system to be retrieved.
-     * @return The desired system, if it is present in the local cache.
-     */
-    public SrSystem getSystem(String name) {
-        if (!initialized) {
-            throw new IllegalStateException("SystemTracker has not been initialized.");
-        }
-        return systemsByName.get(name);
+        return systems.get(systemId);
     }
 
 }

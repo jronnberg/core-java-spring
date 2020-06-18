@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import java.net.InetSocketAddress;
-import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystemBuilder;
 import se.arkalix.net.http.client.HttpClient;
 
 /**
@@ -13,24 +13,29 @@ import se.arkalix.net.http.client.HttpClient;
  */
 public class MockSystemTracker extends SystemTracker {
 
+    // System ID -> system
+    Map<String, SrSystem> systems = new HashMap<>();
+
     public MockSystemTracker(HttpClient httpClient, InetSocketAddress serviceRegistryAddress) {
         super(httpClient, serviceRegistryAddress);
     }
 
     /**
-     * @param systemName Name of a system to be retrieved.
+     * @param systemName ID of a system to be retrieved.
      * @return A mock system with the specified name.
      */
-    public SrSystem getSystem(String name) {
-        return new SrSystemBuilder()
-            .id(0)
-            .systemName(name)
-            .address("0.0.0.0")
-            .port(5000)
-            .authenticationInfo(null)
-            .createdAt(Instant.now().toString())
-            .updatedAt(Instant.now().toString())
-            .build();
+    public SrSystem getSystem(String systemId) {
+        return (systems.get(systemId));
     }
+
+    /**
+     * Adds a new system to the system tracker.
+     *
+     * @param systemId ID of the system to add.
+     * @param system The system to add.
+     */
+    public void addSystem(String systemId, SrSystem system) {
+        systems.put(systemId, system);
+	}
 
 }

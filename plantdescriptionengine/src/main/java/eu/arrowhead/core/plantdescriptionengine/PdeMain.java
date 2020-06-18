@@ -41,7 +41,7 @@ public class PdeMain {
      * @return HTTP client useful for consuming Arrowhead services as a
      *         privileged system.
      */
-    private static HttpClient createSysopHttpClient(Properties appProps) {
+    static HttpClient createSysopHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
         HttpClient client = null;
         try {
@@ -77,7 +77,7 @@ public class PdeMain {
      * @return HTTP client useful for consuming Arrowhead services as a
      *         non-privileged system.
      */
-    private static HttpClient createPdeHttpClient(Properties appProps) {
+    static HttpClient createPdeHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
         HttpClient client = null;
         try {
