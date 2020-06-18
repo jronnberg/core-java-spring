@@ -22,7 +22,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.SystemPortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
 import se.arkalix.net.http.client.HttpClient;
 
@@ -35,19 +35,62 @@ public class OrchestratorClientTest {
             .name("Cloud_a")
             .operator("Operator_a")
             .build();
-        SystemTracker systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker);
+
+        MockSystemTracker systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
 
         final PlantDescriptionEntry entry = createEntry();
+
+        var consumerSystem = entry.systems().get(0);
+        var providerSystem = entry.systems().get(1);
+
+        var consumerSrSystem = new SrSystemBuilder()
+            .id(0)
+            .systemName(consumerSystem.systemName().get())
+            .address("0.0.0.0")
+            .port(5000)
+            .authenticationInfo(null)
+            .createdAt(Instant.now().toString())
+            .updatedAt(Instant.now().toString())
+            .build();
+
+        var providerSrSystem = new SrSystemBuilder()
+            .id(1)
+            .systemName(providerSystem.systemName().get())
+            .address("0.0.0.0")
+            .port(5001)
+            .authenticationInfo(null)
+            .createdAt(Instant.now().toString())
+            .updatedAt(Instant.now().toString())
+            .build();
+
+        var orchestratorSrSystem = new SrSystemBuilder()
+            .id(2)
+            .systemName("orchestrator")
+            .address("0.0.0.0")
+            .port(5002)
+            .authenticationInfo(null)
+            .createdAt(Instant.now().toString())
+            .updatedAt(Instant.now().toString())
+            .build();
+
+        systemTracker.addSystem(consumerSystem.systemId(), consumerSrSystem);
+        systemTracker.addSystem(providerSystem.systemId(), providerSrSystem);
+        systemTracker.addSystem("orchestrator", orchestratorSrSystem);
+
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker);
         var rule = orchestratorClient.createRule(entry, 0);
 
         assertEquals(cloud.name(), rule.cloud().name());
         assertEquals(cloud.operator(), rule.cloud().operator());
-        // TODO: Compare attributes and metadata
+        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
+        assertEquals(providerSrSystem.systemName(), rule.providerSystem().systemName());
+        assertEquals(providerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
+        assertEquals(cloud.name(), rule.cloud().name());
+        assertEquals(cloud.operator(), rule.cloud().operator());
     }
 
     private PlantDescriptionEntry createEntry() {
-        final String consumerId = "system_1"
+        final String consumerId = "system_1";
         final String producerId = "system_2";
         final String consumerPort = "port_1";
         final String producerPort = "port_2";
@@ -71,11 +114,13 @@ public class OrchestratorClientTest {
 
         final PdeSystemDto consumerSystem = new PdeSystemBuilder()
             .systemId(consumerId)
+            .systemName("Consumer A")
             .ports(consumerPorts)
             .build();
 
         final PdeSystemDto producerSystem = new PdeSystemBuilder()
             .systemId(producerId)
+            .systemName("Producer A")
             .ports(producerPorts)
             .build();
 

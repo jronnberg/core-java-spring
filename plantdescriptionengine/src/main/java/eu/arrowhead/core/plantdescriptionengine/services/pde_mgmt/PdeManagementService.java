@@ -15,6 +15,10 @@ import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 
+/**
+ * This service enables management of Plant Descriptions in the Plant
+ * Description Engine (PDE) core system.
+ */
 public class PdeManagementService {
 
     private final PlantDescriptionEntryMap entryMap;
