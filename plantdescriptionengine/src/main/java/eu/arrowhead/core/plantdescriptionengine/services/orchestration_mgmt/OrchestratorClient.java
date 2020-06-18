@@ -130,7 +130,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      *                        connection list.
      * @return An Orchestrator rule that embodies the specified connection.
      */
-    private StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
+    StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
         final Connection connection = entry.connections().get(connectionIndex);

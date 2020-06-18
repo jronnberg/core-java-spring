@@ -238,10 +238,11 @@ public class PdeMain {
             System.exit(74);
         }
 
-        final HttpClient sysopClient = createSysopHttpClient(appProps);
         final String serviceRegistryIp = appProps.getProperty("service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(appProps.getProperty("service_registry.port"));
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
+
+        final HttpClient sysopClient = createSysopHttpClient(appProps);
         final var systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
 
         systemTracker.refreshSystems().flatMap(result -> {
