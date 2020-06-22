@@ -13,6 +13,9 @@ import org.junit.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
@@ -29,7 +32,7 @@ import se.arkalix.net.http.client.HttpClient;
 public class OrchestratorClientTest {
 
     @Test
-    public void shouldCreateRule() throws SSLException {
+    public void shouldCreateRule() throws SSLException, RuleBackingStoreException {
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final CloudDto cloud = new CloudBuilder()
             .name("Cloud_a")
@@ -77,7 +80,9 @@ public class OrchestratorClientTest {
         systemTracker.addSystem(providerSystem.systemId(), providerSrSystem);
         systemTracker.addSystem("orchestrator", orchestratorSrSystem);
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker);
+        final RuleBackingStore backingStore = new InMemoryBackingStore();
+
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker, backingStore);
         var rule = orchestratorClient.createRule(entry, 0);
 
         assertEquals(cloud.name(), rule.cloud().name());

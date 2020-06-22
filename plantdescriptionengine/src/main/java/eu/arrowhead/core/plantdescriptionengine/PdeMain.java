@@ -21,6 +21,8 @@ import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.S
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleFileStore;
 import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -252,7 +254,9 @@ public class PdeMain {
                 .build();
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
-            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker);
+            final String ruleDirectory = appProps.getProperty("orchestration_rules");
+            final RuleBackingStore backingStore = new RuleFileStore(ruleDirectory);
+            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker, backingStore);
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FileStore(plantDescriptionsDirectory));
