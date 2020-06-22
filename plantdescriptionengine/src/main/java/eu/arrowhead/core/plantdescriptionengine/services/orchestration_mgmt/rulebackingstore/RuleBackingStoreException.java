@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore;
+package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore;
 
 /**
  * Signifies the failure for a BackingStore instance to communicate with its
