@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt;
+package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -13,21 +13,24 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.ServiceDefinitionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.ServiceInterfaceBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystemBuilder;
 
 /**
- * Unit test for the {@link eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.RuleMap}.
+ * Unit test for the
+ * {@link eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.RuleMap}.
  */
 public class RuleMapTest {
 
-    private StoreEntryDto createRule() {
+    private StoreEntryDto createRule(int id) {
         return new StoreEntryBuilder()
-            .id(8)
+            .id(id)
             .serviceDefinition(new ServiceDefinitionBuilder()
-                .id(0)
-                .createdAt("2020-05-13 13:01:41")
+                .id(0).createdAt("2020-05-13 13:01:41")
                 .updatedAt("2020-05-13 13:01:41")
                 .serviceDefinition("Service definition")
                 .build())
@@ -39,8 +42,7 @@ public class RuleMapTest {
                 .build())
             .foreign(false)
             .providerSystem(new SrSystemBuilder()
-                .id(1)
-                .systemName("Provider system")
+                .id(1).systemName("Provider system")
                 .address("0.0.0.0")
                 .port(56789)
                 .build())
@@ -57,7 +59,7 @@ public class RuleMapTest {
     }
 
     private StoreEntryListDto createRuleList() {
-        var entries = List.of(createRule(), createRule());
+        var entries = List.of(createRule(0), createRule(1));
         return new StoreEntryListBuilder()
             .count(entries.size())
             .data(entries)
@@ -65,24 +67,26 @@ public class RuleMapTest {
     }
 
     @Test
-    public void shouldStoreRuleIds() {
-        final RuleMap map = new RuleMap();
+    public void shouldStoreRuleIds() throws RuleBackingStoreException {
+        final RuleBackingStore backingStore = new InMemoryBackingStore();
+        final RuleMap map = new RuleMap(backingStore);
         StoreEntryListDto ruleList = createRuleList();
-        int plantDescriptionEntryID = 99;
+        int plantDescriptionEntryId = 99;
 
-        map.put(plantDescriptionEntryID, ruleList);
-        var storedIds = map.get(plantDescriptionEntryID);
+        map.put(plantDescriptionEntryId, ruleList);
+        var storedIds = map.get(plantDescriptionEntryId);
 
         assertNotNull(storedIds);
-        assertEquals(storedIds.size(), ruleList.data().size());
+        assertEquals(ruleList.data().size(), storedIds.size());
         for (var rule : ruleList.data()) {
             assertTrue(storedIds.contains(rule.id()));
         }
     }
 
     @Test
-    public void shouldRemoveRuleIds() {
-        final RuleMap map = new RuleMap();
+    public void shouldRemoveRuleIds() throws RuleBackingStoreException {
+        final RuleBackingStore backingStore = new InMemoryBackingStore();
+        final RuleMap map = new RuleMap(backingStore);
         StoreEntryListDto ruleList = createRuleList();
         int plantDescriptionEntryID = 36;
 

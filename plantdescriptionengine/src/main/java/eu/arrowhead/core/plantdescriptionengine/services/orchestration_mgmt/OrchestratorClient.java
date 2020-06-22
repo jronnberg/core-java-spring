@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -21,6 +22,9 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.RuleMap;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulemap.backingstore.RuleBackingStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
 import se.arkalix.dto.DtoEncoding;
@@ -49,34 +53,25 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param cloud DTO describing a Arrowhead Cloud.
      * @param SystemTracker Object used to keep track of registered Arrowhead
      *                      systems.
+     * @throws RuleBackingStoreException
      */
-    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker) {
+    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker,
+            RuleBackingStore backingStore
+    ) throws RuleBackingStoreException {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(systemTracker, "Expected System tracker");
+        Objects.requireNonNull(backingStore, "Expected backing store");
 
         this.client = client;
         this.cloud = cloud;
         this.systemTracker = systemTracker;
-        ruleMap = new RuleMap();
+        ruleMap = new RuleMap(backingStore);
 
         SrSystem orchestrator = systemTracker.getSystem(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
-    }
-
-    /**
-     * Retrieve all active rules from the Orchestrator.
-     *
-     * @return A Future which will contain the requested rules.
-     */
-    private Future<StoreEntryListDto> getRules() {
-        return client.send(orchestratorAddress, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri("/orchestrator/mgmt/store")
-            .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
     /**
@@ -90,36 +85,33 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         entryMap.addListener(this);
         activeEntry = entryMap.activeEntry();
 
-        // TODO: This is a temporary solution.
-        // Delete all rules in the orchestrator, create new ones for the active
-        // Plant Description Entry.
-        return getRules()
-            .flatMap(rules -> {
-                var deletions = rules.data()
-                    .stream()
-                    .map(rule -> deleteRule(rule.id()))
-                    .collect(Collectors.toList());
+        // Delete any rules previously created by the PDE:
+        var deletions = new ArrayList<Future<Void>>();
+        for (var entry : ruleMap.all().values()) {
+            for (var ruleId : entry) {
+                deletions.add(deleteRule(ruleId));
+            }
 
-                return Futures.serialize(deletions).flatMap(deletionResult -> {
+        }
+
+        return Futures.serialize(deletions).flatMap(deletionResult -> {
+            if (logger.isInfoEnabled()) {
+                logger.info("Deleted all rules in Orchestrator.");
+            }
+
+            if (activeEntry == null) {
+                return Future.done();
+            }
+
+            return postRules(activeEntry)
+                .flatMap(postResult -> {
                     if (logger.isInfoEnabled()) {
-                        logger.info("Deleted all rules in Orchestrator.");
+                        logger.info("Created rules for Plant Description Entry '"
+                            + activeEntry.plantDescription() + "'.");
                     }
-
-                    if (activeEntry == null) {
-                        return Future.done();
-                    }
-
-                    return postRules(activeEntry)
-                        .flatMap(postResult -> {
-                            if (logger.isInfoEnabled()) {
-                                logger.info("Created rules for Plant Description Entry '"
-                                    + activeEntry.plantDescription() + "'.");
-                            }
-                            return Future.done();
-                        });
+                    return Future.done();
                 });
             });
-
     }
 
     /**
@@ -138,8 +130,18 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         SrSystem consumerSystemSrEntry = systemTracker.getSystem(connection.consumer().systemId());
         SrSystem providerSystemSrEntry = systemTracker.getSystem(connection.producer().systemId());
 
-        Objects.requireNonNull(consumerSystemSrEntry, "Consumer system with ID '" + connection.consumer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
-        Objects.requireNonNull(providerSystemSrEntry, "Producer system with ID '" + connection.producer().systemId() + "' not found in Service Registry"); // TODO: Proper handling, raise an alarm?
+        if (consumerSystemSrEntry == null) {
+            logger.error("Consumer system with ID '" + connection.consumer().systemId() +
+                "' not found in Service Registry");
+            // TODO: Proper handling, raise an alarm?
+            return null;
+        }
+        if (providerSystemSrEntry == null) {
+            logger.error("Producer system with ID '" + connection.producer().systemId() +
+                "' not found in Service Registry");
+            // TODO: Proper handling, raise an alarm?
+            return null;
+        }
 
         PdeSystem providerSystem = entry.getSystem(connection.producer().systemId());
         String portName = connection.producer().portName();
@@ -187,7 +189,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         return systemTracker.refreshSystems() // TODO: Make the system tracker refresh itself automatically instead.
             .flatMap(result -> {
                 for (int i = 0; i < numConnections; i++) {
-                    rules.add(createRule(entry, i));
+                    var rule = createRule(entry, i);
+                    if (rule != null) { // TODO: Remove this check when createRule() has been fixed (no longer returns null)
+                        rules.add(rule);
+                    }
                 }
 
                 return client
@@ -234,7 +239,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.done();
         }
 
-        List<Integer> rulesToRemove = ruleMap.get(entry.id());
+        Set<Integer> rulesToRemove = ruleMap.get(entry.id());
 
         if (rulesToRemove == null) {
             return Future.done();
@@ -295,6 +300,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         boolean shouldDeleteCurrentRules = entry.active() || entryWasDeactivated;
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteRules(activeEntry) : Future.done();
+
         final Future<StoreEntryListDto> postRulesTask = shouldPostRules
             ? postRules(entry)
             : Future.success(emptyRuleList());
