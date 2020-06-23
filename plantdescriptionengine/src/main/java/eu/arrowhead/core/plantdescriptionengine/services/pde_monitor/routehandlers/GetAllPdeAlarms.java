@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
-
+import alarmmanager.AlarmManager;
+import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -12,6 +13,12 @@ import se.arkalix.util.concurrent.Future;
  */
 public class GetAllPdeAlarms implements HttpRouteHandler {
 
+    private final AlarmManager alarmManager;
+
+    public GetAllPdeAlarms(AlarmManager alarmManager) {
+        this.alarmManager = alarmManager;
+    }
+
     /**
      * Handles an HTTP call to acquire a list of PDE alarms raised by the PDE.
      *
@@ -20,8 +27,8 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
-
-        response.status(HttpStatus.OK).body();
+        response.body(DtoEncoding.JSON, alarmManager.getAlarmList());
+        response.status(HttpStatus.OK);
         return Future.done();
     }
 }

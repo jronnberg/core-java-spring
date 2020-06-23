@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
@@ -47,28 +48,31 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
+    private final AlarmManager alarmManager;
 
     /**
      * Class constructor.
      *
-     * @param client Object for sending HTTP messages to the Orchestrator.
-     * @param cloud DTO describing a Arrowhead Cloud.
+     * @param client        Object for sending HTTP messages to the Orchestrator.
+     * @param cloud         DTO describing a Arrowhead Cloud.
      * @param SystemTracker Object used to keep track of registered Arrowhead
-     *                      systems.
+     *                      systems. // TODO: Too many parameters, use the builder
+     *                      pattern instead
      * @throws RuleStoreException
      */
-    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker,
-            RuleStore backingStore
-    ) throws RuleStoreException {
+    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker, RuleStore backingStore,
+            AlarmManager alarmManager) throws RuleStoreException {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(systemTracker, "Expected System tracker");
         Objects.requireNonNull(backingStore, "Expected backing store");
+        Objects.requireNonNull(alarmManager, "Expected alarm manager");
 
         this.client = client;
         this.cloud = cloud;
         this.systemTracker = systemTracker;
         this.backingStore = backingStore;
+        this.alarmManager = alarmManager;
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -93,15 +97,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 return Future.done();
             }
 
-            return postRules(activeEntry)
-                .flatMap(postResult -> {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Created rules for Plant Description Entry '"
-                            + activeEntry.plantDescription() + "'.");
-                    }
-                    return Future.done();
-                });
+            return postRules(activeEntry).flatMap(postResult -> {
+                if (logger.isInfoEnabled()) {
+                    logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
+                }
+                return Future.done();
             });
+        });
     }
 
     /**
@@ -136,13 +138,15 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null) {
-            logger.error("Consumer system with ID '" + consumerId + "' not found in Service Registry");
-            // TODO: Proper handling, raise an alarm?
+            final String errMsg = "Consumer system with ID '" + consumerId + "' not found in Service Registry";
+            logger.error(errMsg);
+            alarmManager.raiseAlarm(errMsg, AlarmManager.Severity.minor);
             return null;
         }
         if (providerSystemSrEntry == null) {
-            logger.error("Producer system with ID '" + providerId + "' not found in Service Registry");
-            // TODO: Proper handling, raise an alarm?
+            final String errMsg = "Producer system with ID '" + providerId + "' not found in Service Registry";
+            logger.error(errMsg);
+            alarmManager.raiseAlarm(errMsg, AlarmManager.Severity.minor);
             return null;
         }
 
@@ -172,8 +176,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Posts Orchestrator rules for the given Plant Description Entry.
      *
-     * For each connection in the given entry, a corresponding rule is posted to
-     * the Orchestrator.
+     * For each connection in the given entry, a corresponding rule is posted to the
+     * Orchestrator.
      *
      * @param entry A Plant Description Entry.
      * @return A Future which will contain a list of the created rules.
