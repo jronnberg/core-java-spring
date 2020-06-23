@@ -9,16 +9,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
 
 public class PdeMonitorServiceTest {
 
     @Test
-    public void shouldProvideService() throws BackingStoreException, SSLException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldProvideService() throws PdStoreException, SSLException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
         final ArSystem arSystem = new ArSystem.Builder()
@@ -38,8 +38,8 @@ public class PdeMonitorServiceTest {
     }
 
     @Test
-    public void shouldNotAllowSecureService() throws BackingStoreException, SSLException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldNotAllowSecureService() throws PdStoreException, SSLException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
         final ArSystem arSystem = new ArSystem.Builder()

@@ -14,7 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
 /**
  * Unit test for the
- * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FileStore}
+ * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FilePdStore}
  * class.
  */
 public class FileStoreTest {
@@ -38,8 +38,8 @@ public class FileStoreTest {
 
 
     @Test
-    public void ShouldWriteEntries() throws BackingStoreException {
-        final BackingStore store = new FileStore(entryDirectory);
+    public void ShouldWriteEntries() throws PdStoreException {
+        final PdStore store = new FilePdStore(entryDirectory);
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
@@ -55,8 +55,8 @@ public class FileStoreTest {
     }
 
     @Test
-    public void ShouldRemoveEntries() throws BackingStoreException {
-        final BackingStore store = new FileStore(entryDirectory);
+    public void ShouldRemoveEntries() throws PdStoreException {
+        final PdStore store = new FilePdStore(entryDirectory);
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {

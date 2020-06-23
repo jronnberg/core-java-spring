@@ -12,8 +12,8 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -22,9 +22,9 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class GetPlantDescriptionTest {
 
     @Test
-    public void shouldRespondWithNotFound() throws BackingStoreException {
+    public void shouldRespondWithNotFound() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new GetPlantDescription(entryMap);
         final int nonExistentEntryId = 0;
 
@@ -49,11 +49,11 @@ public class GetPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRespondWithStoredEntry() throws BackingStoreException {
+    public void shouldRespondWithStoredEntry() throws PdStoreException {
 
         int entryId = 39;
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);
@@ -80,12 +80,12 @@ public class GetPlantDescriptionTest {
     }
 
     @Test
-    public void shouldNotAcceptInvalidId() throws BackingStoreException {
+    public void shouldNotAcceptInvalidId() throws PdStoreException {
 
         int entryId = 24;
         String invalidId = "Invalid";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);

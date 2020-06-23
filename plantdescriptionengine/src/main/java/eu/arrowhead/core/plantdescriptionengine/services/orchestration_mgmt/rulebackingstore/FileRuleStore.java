@@ -19,7 +19,7 @@ import java.util.Set;
  * case the PDE is restarted. This class provides that functionality, writing
  * rules and their relationship to Plant Descriptions to file.
  */
-public class RuleFileStore implements RuleBackingStore {
+public class FileRuleStore implements RuleStore {
 
     // File path to the directory for storing the IDs of created Orchestration
     // rules created by the PDE:
@@ -29,9 +29,9 @@ public class RuleFileStore implements RuleBackingStore {
      * Class constructor.
      *
      * @param ruleFilepath File path to the directory for storing rules.
-     * @throws RuleBackingStoreException
+     * @throws RuleStoreException
      */
-    public RuleFileStore(final String descriptionDirectory) {
+    public FileRuleStore(final String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Orchestrator Rule directory");
         this.ruleFilepath = descriptionDirectory;
     }
@@ -40,7 +40,7 @@ public class RuleFileStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public Set<Integer> readRules() throws RuleBackingStoreException {
+    public Set<Integer> readRules() throws RuleStoreException {
         final File file = new File(ruleFilepath);
         final var result = new HashSet<Integer>();
 
@@ -53,7 +53,7 @@ public class RuleFileStore implements RuleBackingStore {
                 result.add(scanner.nextInt());
             }
         } catch (FileNotFoundException e) {
-            throw new RuleBackingStoreException(e);
+            throw new RuleStoreException(e);
         }
         return result;
     }
@@ -62,7 +62,7 @@ public class RuleFileStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void setRules(Set<Integer> rules) throws RuleBackingStoreException {
+    public void setRules(Set<Integer> rules) throws RuleStoreException {
 
         final File file = new File(ruleFilepath);
 
@@ -84,7 +84,7 @@ public class RuleFileStore implements RuleBackingStore {
             writer.close();
 
         } catch (IOException e) {
-            throw new RuleBackingStoreException("Failed to write orchestration rule to file", e);
+            throw new RuleStoreException("Failed to write orchestration rule to file", e);
         }
     }
 
@@ -92,7 +92,7 @@ public class RuleFileStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void removeAll() throws RuleBackingStoreException {
+    public void removeAll() throws RuleStoreException {
         new File(ruleFilepath).delete();
     }
 }

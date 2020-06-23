@@ -12,22 +12,22 @@ import java.util.Set;
  * case the PDE is restarted. This interface defines the operations of classes
  * providing such storage.
  */
-public interface RuleBackingStore {
+public interface RuleStore {
 
     /**
      * @return A set containing the IDs of all Orchestrator rules currently
      *         stored by this instance.
      */
-    Set<Integer> readRules() throws RuleBackingStoreException;
+    Set<Integer> readRules() throws RuleStoreException;
 
     /**
      * Replaces the current set of rules with the one provided.
      */
-    void setRules(Set<Integer> rules) throws RuleBackingStoreException;
+    void setRules(Set<Integer> rules) throws RuleStoreException;
 
     /**
      * Removes all stored rules.
      */
-    void removeAll() throws RuleBackingStoreException;
+    void removeAll() throws RuleStoreException;
 
 }

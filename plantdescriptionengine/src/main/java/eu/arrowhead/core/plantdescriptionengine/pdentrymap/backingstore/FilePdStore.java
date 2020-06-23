@@ -17,7 +17,7 @@ import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.DtoWriteException;
 import se.arkalix.dto.binary.ByteArrayReader;
 
-public class FileStore implements BackingStore {
+public class FilePdStore implements PdStore {
 
     // File path to the directory for storing JSON representations of plant
     // descriptions:
@@ -28,9 +28,9 @@ public class FileStore implements BackingStore {
      *
      * @param descriptionDirectory File path to the directory for storing Plant
      *                             Description.
-     * @throws BackingStoreException
+     * @throws PdStoreException
      */
-    public FileStore(final String descriptionDirectory) {
+    public FilePdStore(final String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
         this.descriptionDirectory = descriptionDirectory;
     }
@@ -47,7 +47,7 @@ public class FileStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public List<PlantDescriptionEntryDto> readEntries() throws BackingStoreException {
+    public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
         final File directory = new File(descriptionDirectory);
         directory.mkdir();
 
@@ -55,7 +55,7 @@ public class FileStore implements BackingStore {
 
         // Read all Plant Description entries into memory.
         if (directoryListing == null) {
-            throw new BackingStoreException(new FileNotFoundException());
+            throw new PdStoreException(new FileNotFoundException());
         }
 
         final var result = new ArrayList<PlantDescriptionEntryDto>();
@@ -65,7 +65,7 @@ public class FileStore implements BackingStore {
                 bytes = Files.readAllBytes(child.toPath());
                 result.add(PlantDescriptionEntryDto.readJson(new ByteArrayReader(bytes)));
             } catch (DtoReadException | IOException e) {
-                throw new BackingStoreException(e);
+                throw new PdStoreException(e);
             }
         }
         return result;
@@ -75,7 +75,7 @@ public class FileStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void write(final PlantDescriptionEntryDto entry) throws BackingStoreException {
+    public void write(final PlantDescriptionEntryDto entry) throws PdStoreException {
         final Path path = getFilePath(entry.id());
         // Create the file and parent directories, if they do not already exist:
         try {
@@ -92,7 +92,7 @@ public class FileStore implements BackingStore {
             entry.writeJson(writer);
             out.close();
         } catch (IOException | DtoWriteException e) {
-            throw new BackingStoreException("Failed to write Plant Description Entry to file", e);
+            throw new PdStoreException("Failed to write Plant Description Entry to file", e);
         }
     }
 
@@ -100,12 +100,12 @@ public class FileStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void remove(final int entryId) throws BackingStoreException {
+    public void remove(final int entryId) throws PdStoreException {
         final Path filepath = getFilePath(entryId);
         try {
             Files.delete(filepath);
         } catch (final IOException e) {
-            throw new BackingStoreException("Failed to delete Plant Description Entry file", e);
+            throw new PdStoreException("Failed to delete Plant Description Entry file", e);
         }
     }
 }

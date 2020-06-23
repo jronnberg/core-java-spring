@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FileStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.PdeMonitorService;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleFileStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.FileRuleStore;
 import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -255,11 +255,11 @@ public class PdeMain {
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
-            final RuleBackingStore backingStore = new RuleFileStore(ruleDirectory);
+            final RuleStore backingStore = new FileRuleStore(ruleDirectory);
             final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker, backingStore);
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
-            final var entryMap = new PlantDescriptionEntryMap(new FileStore(plantDescriptionsDirectory));
+            final var entryMap = new PlantDescriptionEntryMap(new FilePdStore(plantDescriptionsDirectory));
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
 
             final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));

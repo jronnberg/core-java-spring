@@ -24,8 +24,8 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.StoreRuleDto;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleBackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
 import se.arkalix.dto.DtoEncoding;
@@ -46,7 +46,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private PlantDescriptionEntry activeEntry = null;
     private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
-    private final RuleBackingStore backingStore;
+    private final RuleStore backingStore;
 
     /**
      * Class constructor.
@@ -55,11 +55,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param cloud DTO describing a Arrowhead Cloud.
      * @param SystemTracker Object used to keep track of registered Arrowhead
      *                      systems.
-     * @throws RuleBackingStoreException
+     * @throws RuleStoreException
      */
     public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker,
-            RuleBackingStore backingStore
-    ) throws RuleBackingStoreException {
+            RuleStore backingStore
+    ) throws RuleStoreException {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(systemTracker, "Expected System tracker");

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -62,7 +62,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
 
         try {
             entryMap.remove(id);
-        } catch (BackingStoreException e) {
+        } catch (PdStoreException e) {
             logger.error("Failed to remove Plant Description Entry from backing store", e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
             response.body(ErrorMessage.of("Encountered an error while deleting entry file."));

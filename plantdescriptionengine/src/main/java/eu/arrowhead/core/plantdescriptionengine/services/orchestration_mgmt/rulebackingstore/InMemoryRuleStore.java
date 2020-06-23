@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * Created for development purposes, not to be used in production.
  */
-public class InMemoryBackingStore implements RuleBackingStore {
+public class InMemoryRuleStore implements RuleStore {
 
     private Set<Integer> rules = new HashSet<>();
 
@@ -16,7 +16,7 @@ public class InMemoryBackingStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public Set<Integer> readRules() throws RuleBackingStoreException {
+    public Set<Integer> readRules() throws RuleStoreException {
         return new HashSet<Integer>(rules);
     }
 
@@ -24,7 +24,7 @@ public class InMemoryBackingStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void setRules(Set<Integer> newRules) throws RuleBackingStoreException {
+    public void setRules(Set<Integer> newRules) throws RuleStoreException {
         rules = new HashSet<>(newRules);
     }
 
@@ -32,7 +32,7 @@ public class InMemoryBackingStore implements RuleBackingStore {
      * {@inheritDoc}
      */
     @Override
-    public void removeAll() throws RuleBackingStoreException {
+    public void removeAll() throws RuleStoreException {
         rules.clear();
     }
 
