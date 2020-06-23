@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import java.util.Objects;
 
+import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPlantDescriptions;
@@ -59,13 +60,12 @@ public class PdeMonitorService {
      *
      */
     public Future<ArServiceHandle> provide() {
-
-        var service = new HttpService()
+        final var service = new HttpService()
             .name("plant-description-monitor")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
             .get("/pd", new GetAllPlantDescriptions(monitorInfo, entryMap))
-            .get("/alarm", new GetAllPdeAlarms());
+            .get("/alarm", new GetAllPdeAlarms(new AlarmManager()));
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

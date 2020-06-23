@@ -13,6 +13,7 @@ import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FilePdStore;
@@ -256,7 +257,8 @@ public class PdeMain {
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
             final RuleStore backingStore = new FileRuleStore(ruleDirectory);
-            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker, backingStore);
+            final var alarmManager = new AlarmManager();
+            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker, backingStore, alarmManager);
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FilePdStore(plantDescriptionsDirectory));

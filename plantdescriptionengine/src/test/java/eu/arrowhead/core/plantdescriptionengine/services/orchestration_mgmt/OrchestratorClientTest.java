@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.InMemoryRuleStore;
@@ -82,7 +83,8 @@ public class OrchestratorClientTest {
 
         final RuleStore backingStore = new InMemoryRuleStore();
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker, backingStore);
+        final var orchestratorClient = new OrchestratorClient(
+            httpClient, cloud, systemTracker, backingStore, new AlarmManager());
         var rule = orchestratorClient.createRule(entry, 0);
 
         assertEquals(cloud.name(), rule.cloud().name());
