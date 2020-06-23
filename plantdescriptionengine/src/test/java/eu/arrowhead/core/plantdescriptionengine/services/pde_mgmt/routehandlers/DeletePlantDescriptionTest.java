@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import se.arkalix.net.http.HttpStatus;
@@ -22,9 +22,9 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class DeletePlantDescriptionTest {
 
     @Test
-    public void shouldDeleteEntries() throws BackingStoreException {
+    public void shouldDeleteEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new DeletePlantDescription(entryMap);
         final int entryId = 14;
         entryMap.put(TestUtils.createEntry(entryId));
@@ -53,8 +53,8 @@ public class DeletePlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectInvalidId() throws BackingStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldRejectInvalidId() throws PdStoreException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new DeletePlantDescription(entryMap);
         final String invalidEntryId = "InvalidId";
 
@@ -83,8 +83,8 @@ public class DeletePlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectNonexistentIds() throws BackingStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldRejectNonexistentIds() throws PdStoreException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new DeletePlantDescription(entryMap);
         final int nonExistentId = 392;
 

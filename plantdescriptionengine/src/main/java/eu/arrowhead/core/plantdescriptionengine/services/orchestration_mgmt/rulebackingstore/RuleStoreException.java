@@ -4,18 +4,18 @@ package eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rul
  * Signifies the failure for a BackingStore instance to communicate with its
  * underlying storage.
  */
-public class RuleBackingStoreException extends Exception {
+public class RuleStoreException extends Exception {
     private static final long serialVersionUID = 2925941409432190728L;
 
-    public RuleBackingStoreException(String errorMessage) {
+    public RuleStoreException(String errorMessage) {
         super(errorMessage);
     }
 
-    public RuleBackingStoreException(Throwable throwable) {
+    public RuleStoreException(Throwable throwable) {
         super(throwable);
     }
 
-    public RuleBackingStoreException(String errorMessage, Throwable throwable) {
+    public RuleStoreException(String errorMessage, Throwable throwable) {
         super(errorMessage, throwable);
     }
 }

@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
@@ -31,7 +31,7 @@ public class PlantDescriptionEntryMap {
     private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     // Non-volatile storage for entries:
-    private final BackingStore backingStore;
+    private final PdStore backingStore;
 
     // Integer for storing the next plant description entry ID to be used:
     private AtomicInteger nextId = new AtomicInteger();
@@ -40,9 +40,9 @@ public class PlantDescriptionEntryMap {
      * Class constructor.
      *
      * @param backingStore Non-volatile storage for entries.
-     * @throws BackingStoreException If backing store operations fail.
+     * @throws PdStoreException If backing store operations fail.
      */
-    public PlantDescriptionEntryMap(BackingStore backingStore) throws BackingStoreException {
+    public PlantDescriptionEntryMap(PdStore backingStore) throws PdStoreException {
         Objects.requireNonNull(backingStore, "Expected backing store");
         this.backingStore = backingStore;
 
@@ -68,12 +68,12 @@ public class PlantDescriptionEntryMap {
      * Any registered {@code PlantDescriptionUpdateListener} are notified.
      *
      * @param entry Entry to store in the map.
-     * @throws BackingStoreException If the entry is not successfully stored in
+     * @throws PdStoreException If the entry is not successfully stored in
      *                               permanent storage. In this case, the entry
      *                               will not be stored in memory either, and no
      *                               listeners will be notified.
      */
-    public void put(final PlantDescriptionEntryDto entry) throws BackingStoreException {
+    public void put(final PlantDescriptionEntryDto entry) throws PdStoreException {
         backingStore.write(entry);
 
         final boolean isNew = !entries.containsKey(entry.id());
@@ -108,12 +108,12 @@ public class PlantDescriptionEntryMap {
      * The entry is removed from memory and from the backing store.
      *
      * @param id ID of the entry to remove.
-     * @throws BackingStoreException If the entry is not successfully removed
+     * @throws PdStoreException If the entry is not successfully removed
      *                               from permanent storage. In this case, the
      *                               entry will not be stored in memory either,
      *                               and no listeners will be notified.
      */
-    public void remove(int id) throws BackingStoreException {
+    public void remove(int id) throws PdStoreException {
         backingStore.remove(id);
         var entry = entries.remove(id);
 

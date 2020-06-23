@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStore;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -29,8 +29,8 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 public class PlantDescriptionEntryMapTest {
 
     @Test
-    public void shouldReadEntriesFromBackingStore() throws BackingStoreException {
-        final BackingStore store = new InMemoryBackingStore();
+    public void shouldReadEntriesFromBackingStore() throws PdStoreException {
+        final PdStore store = new InMemoryPdStore();
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
@@ -55,10 +55,10 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldReturnEntryById() throws BackingStoreException {
+    public void shouldReturnEntryById() throws PdStoreException {
         int entryId = 16;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         entryMap.put(entry);
 
         final var storedEntry = entryMap.get(entryId);
@@ -68,9 +68,9 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldReturnAllEntries() throws BackingStoreException {
+    public void shouldReturnAllEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
 
         for (int id : entryIds) {
@@ -87,9 +87,9 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldReturnListDto() throws BackingStoreException {
+    public void shouldReturnListDto() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
         for (int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
@@ -105,10 +105,10 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldRemoveEntries() throws BackingStoreException {
+    public void shouldRemoveEntries() throws PdStoreException {
         int entryId = 24;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         entryMap.put(entry);
         entryMap.remove(entryId);
         final var storedEntry = entryMap.get(entryId);
@@ -117,7 +117,7 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldTrackActiveEntry() throws BackingStoreException {
+    public void shouldTrackActiveEntry() throws PdStoreException {
         final Instant now = Instant.now();
         final var builder = new PlantDescriptionEntryBuilder()
             .include(new ArrayList<>())
@@ -135,7 +135,7 @@ public class PlantDescriptionEntryMapTest {
             .plantDescription("Plant Description B")
             .active(false)
             .build();
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         entryMap.put(activeEntry);
         entryMap.put(inactiveEntry);
@@ -149,7 +149,7 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldDeactivateEntry() throws BackingStoreException {
+    public void shouldDeactivateEntry() throws PdStoreException {
         final int idA = 1;
         final int idB = 2;
         final Instant now = Instant.now();
@@ -168,7 +168,7 @@ public class PlantDescriptionEntryMapTest {
             .id(idB)
             .plantDescription("Plant Description B")
             .build();
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         entryMap.put(entryA);
 
@@ -178,9 +178,9 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldGenerateUniqueIds() throws BackingStoreException {
+    public void shouldGenerateUniqueIds() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final List<PlantDescriptionEntryDto> entries = List.of(
             TestUtils.createEntry(entryMap.getUniqueId()),
             TestUtils.createEntry(entryMap.getUniqueId()),
@@ -199,7 +199,7 @@ public class PlantDescriptionEntryMapTest {
     }
 
     @Test
-    public void shouldNotifyListeners() throws BackingStoreException {
+    public void shouldNotifyListeners() throws PdStoreException {
 
         final class Listener implements PlantDescriptionUpdateListener {
 
@@ -223,7 +223,7 @@ public class PlantDescriptionEntryMapTest {
             }
         }
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 16;

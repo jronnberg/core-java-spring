@@ -13,9 +13,9 @@ import org.junit.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.InMemoryBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleBackingStore;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleBackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.InMemoryRuleStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStore;
+import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
@@ -32,7 +32,7 @@ import se.arkalix.net.http.client.HttpClient;
 public class OrchestratorClientTest {
 
     @Test
-    public void shouldCreateRule() throws SSLException, RuleBackingStoreException {
+    public void shouldCreateRule() throws SSLException, RuleStoreException {
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final CloudDto cloud = new CloudBuilder()
             .name("Cloud_a")
@@ -80,7 +80,7 @@ public class OrchestratorClientTest {
         systemTracker.addSystem(providerSystem.systemId(), providerSrSystem);
         systemTracker.addSystem("orchestrator", orchestratorSrSystem);
 
-        final RuleBackingStore backingStore = new InMemoryBackingStore();
+        final RuleStore backingStore = new InMemoryRuleStore();
 
         final var orchestratorClient = new OrchestratorClient(httpClient, cloud, systemTracker, backingStore);
         var rule = orchestratorClient.createRule(entry, 0);

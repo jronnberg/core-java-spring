@@ -19,8 +19,8 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
@@ -47,10 +47,10 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class GetAllPlantDescriptionsTest {
 
     @Test
-    public void shouldRespondWithStoredEntries() throws BackingStoreException {
+    public void shouldRespondWithStoredEntries() throws PdStoreException {
 
         final List<Integer> entryIds = List.of(0, 1, 2, 3);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         for (final int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
@@ -78,9 +78,9 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldPreserveConnections() throws BackingStoreException {
+    public void shouldPreserveConnections() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         final Instant now = Instant.now();
         final List<ConnectionDto> connections = new ArrayList<>();
@@ -147,9 +147,9 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldPreservePorts() throws BackingStoreException {
+    public void shouldPreservePorts() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         final Instant now = Instant.now();
         final Map<String, String> metadata = Map.of("a", "b");
@@ -213,9 +213,9 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldExtendWithMonitorData() throws BackingStoreException {
+    public void shouldExtendWithMonitorData() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var monitorInfo = new MonitorInfo();
         final String systemName = "System A";
         final String inventoryId = "system_a_inventory_id";
@@ -276,8 +276,8 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldSortEntries() throws BackingStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldSortEntries() throws PdStoreException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         final Instant createdAt1 = Instant.parse("2020-05-27T14:48:00.00Z");
         final Instant createdAt2 = Instant.parse("2020-06-27T14:48:00.00Z");
@@ -410,8 +410,8 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldRejectInvalidParameters() throws BackingStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+    public void shouldRejectInvalidParameters() throws PdStoreException {
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var monitorInfo = new MonitorInfo();
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
@@ -442,11 +442,11 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldFilterEntries() throws BackingStoreException {
+    public void shouldFilterEntries() throws PdStoreException {
 
         final List<Integer> entryIds = List.of(0, 1, 2);
         final int activeEntryId = 3;
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         for (final int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
@@ -493,10 +493,10 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldPaginate() throws BackingStoreException {
+    public void shouldPaginate() throws PdStoreException {
 
         final List<Integer> entryIds = Arrays.asList(32, 11, 25, 3, 24, 35);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         for (int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
@@ -542,9 +542,9 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldRejectNegativePage() throws BackingStoreException {
+    public void shouldRejectNegativePage() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
         final HttpServiceResponse response = new MockResponse();
         final int page = -1;
@@ -574,9 +574,9 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldRequireItemPerPage() throws BackingStoreException {
+    public void shouldRequireItemPerPage() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
 
         final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
         final HttpServiceResponse response = new MockResponse();

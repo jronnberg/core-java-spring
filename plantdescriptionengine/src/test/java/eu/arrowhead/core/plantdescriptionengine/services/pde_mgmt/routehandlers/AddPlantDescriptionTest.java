@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryBackingStore;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
@@ -35,9 +35,9 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class AddPlantDescriptionTest {
 
     @Test
-    public void shouldCreateEntry() throws BackingStoreException {
+    public void shouldCreateEntry() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockResponse();
@@ -67,7 +67,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectMissingConsumer() throws BackingStoreException {
+    public void shouldRejectMissingConsumer() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -76,7 +76,7 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -147,7 +147,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectMissingProvider() throws BackingStoreException {
+    public void shouldRejectMissingProvider() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -156,7 +156,7 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -227,7 +227,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectInvalidConsumerPort() throws BackingStoreException {
+    public void shouldRejectInvalidConsumerPort() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -236,7 +236,7 @@ public class AddPlantDescriptionTest {
         final String invalidPort = "no_such_port";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -308,7 +308,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectInvalidProducerPort() throws BackingStoreException {
+    public void shouldRejectInvalidProducerPort() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -317,7 +317,7 @@ public class AddPlantDescriptionTest {
         final String invalidPort = "no_such_port";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -389,7 +389,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRequireMetadataToDifferentiateBetweenPorts() throws BackingStoreException {
+    public void shouldRequireMetadataToDifferentiateBetweenPorts() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -397,7 +397,7 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -480,7 +480,7 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRejectNonuniqueMetadata() throws BackingStoreException {
+    public void shouldRejectNonuniqueMetadata() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -489,7 +489,7 @@ public class AddPlantDescriptionTest {
         final String serviceDefinition = "service_a";
         final Map<String, String> sharedMetadata = Map.of("x", "y");
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -556,13 +556,13 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldAcceptUniqueMetadata() throws BackingStoreException {
+    public void shouldAcceptUniqueMetadata() throws PdStoreException {
 
         final String serviceDefinition = "service_a";
         final Map<String, String> metadataA = Map.of("a", "1");
         final Map<String, String> metadataB = Map.of("a", "2");
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(
@@ -612,11 +612,11 @@ public class AddPlantDescriptionTest {
     }
 
     @Test
-    public void shouldRequireUniquePortnames() throws BackingStoreException {
+    public void shouldRequireUniquePortnames() throws PdStoreException {
         final String systemId = "system_a";
         final String portName = "port_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryBackingStore());
+        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
         final var handler = new AddPlantDescription(entryMap);
 
         final List<PortDto> consumerPorts = List.of(

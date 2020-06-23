@@ -4,18 +4,18 @@ package eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore;
  * Signifies the failure for a BackingStore instance to communicate with its
  * underlying storage.
  */
-public class BackingStoreException extends Exception {
+public class PdStoreException extends Exception {
     private static final long serialVersionUID = 2925941409432190728L;
 
-    public BackingStoreException(String errorMessage) {
+    public PdStoreException(String errorMessage) {
         super(errorMessage);
     }
 
-    public BackingStoreException(Throwable throwable) {
+    public PdStoreException(Throwable throwable) {
         super(throwable);
     }
 
-    public BackingStoreException(String errorMessage, Throwable throwable) {
+    public PdStoreException(String errorMessage, Throwable throwable) {
         super(errorMessage, throwable);
     }
 }

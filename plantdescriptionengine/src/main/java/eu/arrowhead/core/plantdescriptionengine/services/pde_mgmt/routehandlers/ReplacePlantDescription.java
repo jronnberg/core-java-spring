@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.BackingStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -69,7 +69,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
 
                 try {
                     entryMap.put(entry);
-                } catch (final BackingStoreException e) {
+                } catch (final PdStoreException e) {
                     logger.error("Failed to write Plant Description Entry update to backing store.", e);
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
