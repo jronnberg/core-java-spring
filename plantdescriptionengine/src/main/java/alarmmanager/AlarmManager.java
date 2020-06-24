@@ -21,33 +21,60 @@ public class AlarmManager {
         cleared
     }
 
-    private List<PdeAlarmDto> alarms = new ArrayList<>();
-
-    List<PdeAlarm> getAllAlarms() {
-        return new ArrayList<>(alarms);
+    public enum Cause {
+        systemInactive
     }
 
+    private final List<PdeAlarmDto> alarms = new ArrayList<>();
+
+    /**
+     * @return A list containing all currently active alarms.
+     */
 	public PdeAlarmListDto getAlarmList() {
         return new PdeAlarmListBuilder()
             .count(alarms.size())
             .data(alarms)
             .build();
-	}
+    }
 
-	public void raiseAlarm(String systemName, String description, Severity severity) {
+    public void clearAlarm(String systemName, Cause cause) {
+        // TODO: Implement
+    }
+
+    private static String getDescription(String systemName, Cause cause) {
+        switch (cause) {
+            case systemInactive:
+                return "System '" + systemName + "' appears to be inactive.";
+            default:
+                throw new RuntimeException("Invalid alarm cause.");
+        }
+    }
+
+	public void raiseAlarm(String systemName, Cause cause, Severity severity) {
+        // TODO: Concurrency handling
         final Instant now = Instant.now();
-        alarms.add(new PdeAlarmBuilder()
+        final PdeAlarmDto newAlarm = new PdeAlarmBuilder()
+            .id(alarms.size())
             .systemName(systemName)
             .acknowledged(false)
             .severity(severity.toString())
-            .description(description)
+            .description(getDescription(systemName, cause))
             .raisedAt(now)
             .updatedAt(now)
-            .build());
+            .build();
+
+        // If an alarm already exists for this issue, return immediately.
+        for (final var existingAlarm : alarms) {
+            if (PdeAlarm.sameIssue(newAlarm, existingAlarm)) {
+                return;
+            }
+        }
+
+        alarms.add(newAlarm);
     }
 
-    public void raiseAlarm(String description, Severity severity) {
-        raiseAlarm("N/A", description, severity);
+    public void raiseAlarm(Cause cause, Severity severity) {
+        raiseAlarm("N/A", cause, severity);
 	}
 
 }

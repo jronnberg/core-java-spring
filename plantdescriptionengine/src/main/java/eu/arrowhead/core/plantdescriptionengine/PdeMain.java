@@ -272,7 +272,7 @@ public class PdeMain {
                     return arSystem.provide(pdeManagementService.getService());
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, entryMap, pdeClient, secureMode).provide();
+                    return new PdeMonitorService(arSystem, entryMap, pdeClient, alarmManager, secureMode).provide();
                 });
         })
         .onFailure(throwable -> {
