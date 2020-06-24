@@ -3,7 +3,6 @@ package eu.arrowhead.core.plantdescriptionengine.utils;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;

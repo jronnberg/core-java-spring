@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
 import se.arkalix.ArSystem;
@@ -22,19 +23,21 @@ import se.arkalix.query.ServiceQuery;
 public class MonitorablesClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
-    private final static int pollForInfo = 3000; // Milliseconds
     private final static int infoPollInterval = 6000; // Milliseconds
+    private final static int pingPollInterval = 10000; // Milliseconds
     private ServiceQuery serviceQuery;
     private final HttpClient httpClient;
     private final MonitorInfo monitorInfo;
+    private final AlarmManager alarmManager;
 
-    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
+    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo, AlarmManager alarmManager) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
-        Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
+        Objects.requireNonNull(alarmManager, "Expected Alarm manager");
 
         this.httpClient = httpClient;
         this.monitorInfo = monitorInfo;
+        this.alarmManager = alarmManager;
 
         serviceQuery = arSystem.consume()
             .name("monitorable")
@@ -44,15 +47,16 @@ public class MonitorablesClient {
 
     public void start() {
         Timer timer = new Timer();
-        /*
+
+        // Periodically check if all monitorable services are active
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 pingPoll();
             }
-        }, 0, pollForInfo);
-        */
+        }, 0, pingPollInterval);
 
+        // Periodically request data from all monitorable services
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -61,7 +65,9 @@ public class MonitorablesClient {
         }, 0, infoPollInterval);
     }
 
-    /*
+    /**
+     * Check if each monitorable service is active.
+     */
     private void pingPoll() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
@@ -73,8 +79,10 @@ public class MonitorablesClient {
                 logger.error("Failed to poll monitorable systems.", e);
             });
     }
-    */
 
+    /**
+     * Retrieve new data from each monitorable service.
+     */
     private void infoPoll() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
@@ -92,18 +100,18 @@ public class MonitorablesClient {
 
     private void ping(ServiceDescription service) {
         final var address = service.provider().socketAddress();
+        final String providerName = service.provider().name();
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri(service.uri() + "/ping")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
-            .ifSuccess(pingData -> {
-                System.out.println("Got ping from " + service.name());
+            .ifSuccess(result -> {
+                // alarmManager.clearAlarm(AlarmManager.Cause.systemInactive, AlarmManager.Severity.warning);
             })
             .onFailure(e -> {
-                System.out.println("No ping from " + service.name());
-                // TODO: Raise an alarm
+                alarmManager.raiseAlarm(AlarmManager.Cause.systemInactive, AlarmManager.Severity.warning);
             });
     }
 

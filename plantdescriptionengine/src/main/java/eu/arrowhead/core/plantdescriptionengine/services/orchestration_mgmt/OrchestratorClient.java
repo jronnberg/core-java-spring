@@ -48,7 +48,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
-    private final AlarmManager alarmManager;
 
     /**
      * Class constructor.
@@ -60,19 +59,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      *                      pattern instead
      * @throws RuleStoreException
      */
-    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker, RuleStore backingStore,
-            AlarmManager alarmManager) throws RuleStoreException {
+    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker, RuleStore backingStore, AlarmManager alarmManager) throws RuleStoreException {
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(systemTracker, "Expected System tracker");
         Objects.requireNonNull(backingStore, "Expected backing store");
-        Objects.requireNonNull(alarmManager, "Expected alarm manager");
+        Objects.requireNonNull(alarmManager, "Expected alarm manager"); // TODO: Remove alarmManager argument if it is not needed
 
         this.client = client;
         this.cloud = cloud;
         this.systemTracker = systemTracker;
         this.backingStore = backingStore;
-        this.alarmManager = alarmManager;
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -140,13 +137,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         if (consumerSystemSrEntry == null) {
             final String errMsg = "Consumer system with ID '" + consumerId + "' not found in Service Registry";
             logger.error(errMsg);
-            alarmManager.raiseAlarm(errMsg, AlarmManager.Severity.minor);
             return null;
         }
         if (providerSystemSrEntry == null) {
             final String errMsg = "Producer system with ID '" + providerId + "' not found in Service Registry";
             logger.error(errMsg);
-            alarmManager.raiseAlarm(errMsg, AlarmManager.Severity.minor);
             return null;
         }
 

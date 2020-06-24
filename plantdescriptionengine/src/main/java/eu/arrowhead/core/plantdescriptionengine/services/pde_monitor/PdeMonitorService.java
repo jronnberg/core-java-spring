@@ -26,6 +26,7 @@ public class PdeMonitorService {
 
     private final PlantDescriptionEntryMap entryMap;
     private final boolean secure;
+    private final AlarmManager alarmManager;
 
     /**
      * Class constructor.
@@ -38,17 +39,23 @@ public class PdeMonitorService {
      * @param insecure Indicates whether the service should run in secure mode.
      */
     public PdeMonitorService(
-        ArSystem arSystem, PlantDescriptionEntryMap entryMap, HttpClient httpClient, boolean secure
+        ArSystem arSystem,
+        PlantDescriptionEntryMap entryMap,
+        HttpClient httpClient,
+        AlarmManager alarmManager,
+        boolean secure
     ) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(entryMap, "Expected plant description map");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
+        Objects.requireNonNull(alarmManager, "Expected Alarm manager");
 
         this.arSystem = arSystem;
         this.entryMap = entryMap;
+        this.alarmManager = alarmManager;
         this.secure = secure;
 
-        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo);
+        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
     }
 
     /**
@@ -65,7 +72,7 @@ public class PdeMonitorService {
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
             .get("/pd", new GetAllPlantDescriptions(monitorInfo, entryMap))
-            .get("/alarm", new GetAllPdeAlarms(new AlarmManager()));
+            .get("/alarm", new GetAllPdeAlarms(alarmManager));
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

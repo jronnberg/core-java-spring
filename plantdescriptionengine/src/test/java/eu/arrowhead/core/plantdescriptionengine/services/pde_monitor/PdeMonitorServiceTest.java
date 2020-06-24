@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import org.junit.Test;
 
+import alarmmanager.AlarmManager;
 
 import javax.net.ssl.SSLException;
 
@@ -25,7 +26,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, false);
+        final var service = new PdeMonitorService(arSystem, entryMap, client, new AlarmManager(), false);
 
         service.provide()
             .ifSuccess(result -> {
@@ -46,7 +47,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, true);
+        final var service = new PdeMonitorService(arSystem, entryMap, client, new AlarmManager(), true);
 
         service.provide()
             .ifSuccess(result -> {
