@@ -6,7 +6,7 @@
   <groupId>eu.arrowhead</groupId>
   <artifactId>arrowhead-plantdescriptionengine</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <name>Arrowhead Plant Description Engine</name>
   <description>Arrowhead Plant Description Engine core service</description>
 

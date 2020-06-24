@@ -22,6 +22,7 @@ public class SystemTracker {
     private InetSocketAddress serviceRegistryAddress = null;
     private boolean initialized;
 
+    // Map from system name to system:
     private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
 
     /**
@@ -67,16 +68,30 @@ public class SystemTracker {
      * changed state since the last call to {@link #refreshSystems()}.
      *
      *
-     * @param systemId ID of a system to be retrieved. Note that this is the
-     *                 system ID used internally by the PDE, not the one found
-     *                 in the Service Registry.
+     * @param systemName Name of a system.
      * @return The desired system, if it is present in the local cache.
      */
-    public SrSystem getSystem(String systemId) {
+    public SrSystem getSystemByName(String systemName) {
         if (!initialized) {
             throw new IllegalStateException("SystemTracker has not been initialized.");
         }
-        return systems.get(systemId);
+        return systems.get(systemName);
+    }
+
+    /**
+     * Retrieves the specified system.
+     * Note that the returned data will be stale if the system in question has
+     * changed state since the last call to {@link #refreshSystems()}.
+     *
+     *
+     * @param systemName Name of a system.
+     * @return The desired system, if it is present in the local cache.
+     */
+    public SrSystem getSystem(String systemName) {
+        if (!initialized) {
+            throw new IllegalStateException("SystemTracker has not been initialized.");
+        }
+        return systems.get(systemName);
     }
 
 }

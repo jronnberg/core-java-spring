@@ -70,7 +70,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.systemTracker = systemTracker;
         this.backingStore = backingStore;
 
-        SrSystem orchestrator = systemTracker.getSystem(ORCHESTRATOR_SYSTEM_NAME);
+        SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
@@ -116,31 +116,43 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
         final Connection connection = entry.connections().get(connectionIndex);
+        final String consumerId = connection.consumer().systemId();
+        final String providerId = connection.producer().systemId();
+        final PdeSystem consumer = entry.getSystem(consumerId);
+        final PdeSystem provider = entry.getSystem(providerId);
 
-        SrSystem consumerSystemSrEntry = systemTracker.getSystem(connection.consumer().systemId());
-        SrSystem providerSystemSrEntry = systemTracker.getSystem(connection.producer().systemId());
+        // TODO: In the future, we will be able to create Orchestration rules
+        // using system name *or* metadata. For now, we assume that systemName
+        // is present.
+
+        if (!consumer.systemName().isPresent() || !provider.systemName().isPresent()) {
+            logger.error("Cannot create rules for Plant Description '" +
+                entry.plantDescription() +
+                "'. The current version of the PDE requires all Plant Description systems to specify a system name.");
+            return null;
+        }
+
+        SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
+        SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null) {
-            logger.error("Consumer system with ID '" + connection.consumer().systemId() +
-                "' not found in Service Registry");
+            logger.error("Consumer system with ID '" + consumerId + "' not found in Service Registry");
             // TODO: Proper handling, raise an alarm?
             return null;
         }
         if (providerSystemSrEntry == null) {
-            logger.error("Producer system with ID '" + connection.producer().systemId() +
-                "' not found in Service Registry");
+            logger.error("Producer system with ID '" + providerId + "' not found in Service Registry");
             // TODO: Proper handling, raise an alarm?
             return null;
         }
 
-        PdeSystem providerSystem = entry.getSystem(connection.producer().systemId());
         String portName = connection.producer().portName();
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)
             .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
             .consumerSystemId(consumerSystemSrEntry.id())
-            .attribute(providerSystem.portMetadata(portName))
+            .attribute(provider.portMetadata(portName))
             .providerSystem(new ProviderSystemBuilder()
                 .systemName(providerSystemSrEntry.systemName())
                 .address(providerSystemSrEntry.address())
@@ -183,6 +195,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     if (rule != null) { // TODO: Remove this check when createRule() has been fixed (no longer returns null)
                         rules.add(rule);
                     }
+                }
+
+                if (rules.size() == 0) {
+                    // No rules to create, return an empty list.
+                    return Future.success(new StoreEntryListBuilder()
+                        .count(0)
+                        .build());
                 }
 
                 return client
@@ -268,7 +287,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
         } else {
             if (logger.isWarnEnabled()) {
-                logger.warn("No new rules were created for Plant Descriptin '" + entryName + "'."); // TODO: Should something be done in this case?
+                logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should something be done in this case?
             }
         }
     }
@@ -322,6 +341,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .onFailure(throwable -> {
                 logger.error("Encountered an error while handling the new Plant Description '"
                     + entry.plantDescription() + "'", throwable);
+
             });
     }
 
