@@ -76,8 +76,8 @@ public class OrchestratorClientTest {
             .updatedAt(Instant.now().toString())
             .build();
 
-        systemTracker.addSystem(consumerSystem.systemId(), consumerSrSystem);
-        systemTracker.addSystem(providerSystem.systemId(), providerSrSystem);
+        systemTracker.addSystem(consumerSystem.systemName().get(), consumerSrSystem);
+        systemTracker.addSystem(providerSystem.systemName().get(), providerSrSystem);
         systemTracker.addSystem("orchestrator", orchestratorSrSystem);
 
         final RuleStore backingStore = new InMemoryRuleStore();
