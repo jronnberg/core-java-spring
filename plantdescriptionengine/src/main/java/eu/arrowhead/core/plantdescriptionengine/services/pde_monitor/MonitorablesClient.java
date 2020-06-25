@@ -108,10 +108,12 @@ public class MonitorablesClient {
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
-                // alarmManager.clearAlarm(AlarmManager.Cause.systemInactive, AlarmManager.Severity.warning);
+                System.out.println("Successful ping");
+                alarmManager.clearAlarm(providerName, AlarmManager.Cause.systemInactive);
             })
             .onFailure(e -> {
-                alarmManager.raiseAlarm(AlarmManager.Cause.systemInactive, AlarmManager.Severity.warning);
+                System.out.println("Failed ping");
+                alarmManager.raiseAlarm(providerName, AlarmManager.Cause.systemInactive);
             });
     }
 

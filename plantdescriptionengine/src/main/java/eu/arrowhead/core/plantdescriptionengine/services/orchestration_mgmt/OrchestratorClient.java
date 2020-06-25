@@ -55,16 +55,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param client        Object for sending HTTP messages to the Orchestrator.
      * @param cloud         DTO describing a Arrowhead Cloud.
      * @param SystemTracker Object used to keep track of registered Arrowhead
-     *                      systems. // TODO: Too many parameters, use the builder
-     *                      pattern instead
+     *                      systems.
+     * @param alarmManager  Object used for managing PDE alarms. // TODO: Remove this parameter?
      * @throws RuleStoreException
      */
     public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker, RuleStore backingStore, AlarmManager alarmManager) throws RuleStoreException {
+        // TODO: Too many parameters, use the builder pattern instead
         Objects.requireNonNull(client, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(systemTracker, "Expected System tracker");
         Objects.requireNonNull(backingStore, "Expected backing store");
-        Objects.requireNonNull(alarmManager, "Expected alarm manager"); // TODO: Remove alarmManager argument if it is not needed
+        Objects.requireNonNull(alarmManager, "Expected alarm manager");
 
         this.client = client;
         this.cloud = cloud;

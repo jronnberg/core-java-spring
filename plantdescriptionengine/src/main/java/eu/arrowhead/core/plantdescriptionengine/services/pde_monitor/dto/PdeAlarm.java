@@ -27,17 +27,4 @@ public interface PdeAlarm {
     Optional<Instant> clearedAt();
     Optional<Instant> acknowledgedAt();
 
-    /**
-     * @param a A PdeAlarm.
-     * @param b A PdeAlarm.
-     * @return True and only true if the two alarms refer to the same issue.
-     */
-	static boolean sameIssue(PdeAlarm a, PdeAlarm b) {
-        return (
-            a.systemName().equals(b.systemName()) &&
-            a.severity() == b.severity() &&
-            a.description().equals(b.description())
-        );
-	}
-
 }
