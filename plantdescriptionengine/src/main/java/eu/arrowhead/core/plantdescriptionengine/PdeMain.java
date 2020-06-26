@@ -248,6 +248,9 @@ public class PdeMain {
         final HttpClient sysopClient = createSysopHttpClient(appProps);
 
         final SystemTracker systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
+
+        // Make the system tracker globally accessible:
+        Locator.setSystemTracker(systemTracker);
         systemTracker.refreshSystems().flatMap(result -> {
 
             // Create a globally accessible alarm manager:
@@ -260,12 +263,7 @@ public class PdeMain {
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
-            final var orchestratorClient = new OrchestratorClient.Builder()
-                .httpClient(sysopClient)
-                .cloud(cloud)
-                .ruleStore(new FileRuleStore(ruleDirectory))
-                .systemTracker(systemTracker)
-                .build();
+            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, new FileRuleStore(ruleDirectory));
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FilePdStore(plantDescriptionsDirectory));

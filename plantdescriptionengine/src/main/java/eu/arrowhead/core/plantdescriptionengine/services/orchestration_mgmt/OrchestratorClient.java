@@ -46,7 +46,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final CloudDto cloud;
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
     private PlantDescriptionEntry activeEntry = null;
-    private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
 
@@ -54,16 +53,22 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Class constructor.
      *
+     * @param httpClient Object for sending HTTP messages to the Orchestrator.
+     * @param cloud      DTO describing a Arrowhead Cloud.
+     * @param ruleStore  Object providing permanent storage for Orchestration
+     *                   rule data.
      * @throws RuleStoreException
      */
-    private OrchestratorClient(Builder builder) {
+    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore) throws RuleStoreException {
+        Objects.requireNonNull(httpClient, "Expected HttpClient");
+        Objects.requireNonNull(cloud, "Expected cloud");
+        Objects.requireNonNull(ruleStore, "Expected backing store");
 
-        this.client = builder.httpClient();
-        this.cloud = builder.cloud();
-        this.systemTracker = builder.systemTracker();
-        this.backingStore = builder.ruleStore();
+        this.client = httpClient;
+        this.cloud = cloud;
+        this.backingStore = ruleStore;
 
-        SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
+        SrSystem orchestrator = Locator.getSystemTracker().getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
@@ -123,6 +128,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return null;
         }
 
+        final SystemTracker systemTracker = Locator.getSystemTracker();
         SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
         SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
@@ -177,7 +183,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         List<DtoWritable> rules = new ArrayList<>();
 
-        return systemTracker.refreshSystems() // TODO: Make the system tracker refresh itself automatically instead.
+        return Locator.getSystemTracker().refreshSystems() // TODO: Make the system tracker refresh itself automatically instead.
             .flatMap(result -> {
                 for (int i = 0; i < numConnections; i++) {
                     var rule = createRule(entry, i);
@@ -367,97 +373,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 logger.error("Encountered an error while attempting to delete Plant Description '"
                     + entry.plantDescription() + "'", throwable);
             });
-    }
-
-    /**
-     * Builder class used for instantiating OrchestratorClients.
-     */
-    public static class Builder {
-
-        HttpClient httpClient_ = null;
-        CloudDto cloud_ = null;
-        SystemTracker systemTracker_ = null;
-        RuleStore ruleStore_ = null;
-
-        /**
-         * @param aHttpClient Object for sending HTTP messages to the
-         *                    Orchestrator.
-         * @return This instance.
-         */
-        public Builder httpClient(HttpClient aHttpClient) {
-            this.httpClient_ = aHttpClient;
-            return this;
-        }
-
-        /**
-         * The HTTP Client assigned to this instance.
-         */
-        public HttpClient httpClient() {
-            return  httpClient_;
-        }
-
-        /**
-         * @param aCloud DTO describing a Arrowhead Cloud.
-         * @return This instance.
-         */
-        public Builder cloud(CloudDto aCloud) {
-            this.cloud_ = aCloud;
-            return this;
-        }
-
-        /**
-         * The Cloud DTO assigned to this instance.
-         */
-        public CloudDto cloud() {
-            return  cloud_;
-        }
-
-        /**
-         * @param SystemTracker Object used to keep track of registered
-         *                      Arrowhead systems.
-         * @return This instance.
-         */
-        public Builder systemTracker(SystemTracker aSystemTracker) {
-            this.systemTracker_ = aSystemTracker;
-            return this;
-        }
-
-        /**
-         * The system tracker assigned to this instance.
-         */
-        public SystemTracker systemTracker() {
-            return  systemTracker_;
-        }
-
-        /**
-         * @param aHttpClient
-         * @return This instance.
-         */
-        public Builder ruleStore(RuleStore aRuleStore) {
-            this.ruleStore_ = aRuleStore;
-            return this;
-        }
-
-        /**
-         * The Orchestrator rule backing store assigned to this instance.
-         */
-        public RuleStore ruleStore() {
-            return  ruleStore_;
-        }
-
-        /**
-         * @return An orchestrator client built using the values assigned to this
-         *         instance.
-         * @throws RuleStoreException
-         */
-        public OrchestratorClient build() {
-            Objects.requireNonNull(httpClient_, "Expected HttpClient");
-            Objects.requireNonNull(cloud_, "Expected cloud");
-            Objects.requireNonNull(systemTracker_, "Expected System tracker");
-            Objects.requireNonNull(ruleStore_, "Expected rule store");
-            return new OrchestratorClient(this);
-        }
-
     }
 
 }
