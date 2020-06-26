@@ -19,10 +19,10 @@ import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntry
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.PdeMonitorService;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.dto.CloudDto;
-import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStore;
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.FileRuleStore;
 import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
@@ -246,9 +246,13 @@ public class PdeMain {
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
 
         final HttpClient sysopClient = createSysopHttpClient(appProps);
-        final var systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
 
+        final SystemTracker systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
         systemTracker.refreshSystems().flatMap(result -> {
+
+            // Create a globally accessible alarm manager:
+            Locator.setAlarmManager(new AlarmManager());
+
             final CloudDto cloud = new CloudBuilder()
                 .name(appProps.getProperty("cloud.name"))
                 .operator(appProps.getProperty("cloud.operator"))
@@ -256,14 +260,11 @@ public class PdeMain {
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
-            final RuleStore backingStore = new FileRuleStore(ruleDirectory);
-            final var alarmManager = new AlarmManager();
             final var orchestratorClient = new OrchestratorClient.Builder()
                 .httpClient(sysopClient)
                 .cloud(cloud)
+                .ruleStore(new FileRuleStore(ruleDirectory))
                 .systemTracker(systemTracker)
-                .ruleStore(backingStore)
-                .alarmManager(alarmManager)
                 .build();
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
@@ -278,7 +279,7 @@ public class PdeMain {
                     return arSystem.provide(pdeManagementService.getService());
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, entryMap, pdeClient, alarmManager, secureMode).provide();
+                    return new PdeMonitorService(arSystem, entryMap, pdeClient, secureMode).provide();
                 });
         })
         .onFailure(throwable -> {
