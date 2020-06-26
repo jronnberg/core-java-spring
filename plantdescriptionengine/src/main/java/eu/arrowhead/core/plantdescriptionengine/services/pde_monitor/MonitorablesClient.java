@@ -109,11 +109,11 @@ public class MonitorablesClient {
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 System.out.println("Successful ping");
-                alarmManager.clearAlarm(providerName, AlarmManager.Cause.systemInactive);
+                alarmManager.clearAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
             })
             .onFailure(e -> {
                 System.out.println("Failed ping");
-                alarmManager.raiseAlarm(providerName, AlarmManager.Cause.systemInactive);
+                alarmManager.raiseAlarmBySystemByName(providerName, AlarmManager.Cause.systemInactive);
             });
     }
 

@@ -48,29 +48,21 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
+    private final AlarmManager alarmManager;
+
 
     /**
      * Class constructor.
      *
-     * @param client        Object for sending HTTP messages to the Orchestrator.
-     * @param cloud         DTO describing a Arrowhead Cloud.
-     * @param SystemTracker Object used to keep track of registered Arrowhead
-     *                      systems.
-     * @param alarmManager  Object used for managing PDE alarms. // TODO: Remove this parameter?
      * @throws RuleStoreException
      */
-    public OrchestratorClient(HttpClient client, CloudDto cloud, SystemTracker systemTracker, RuleStore backingStore, AlarmManager alarmManager) throws RuleStoreException {
-        // TODO: Too many parameters, use the builder pattern instead
-        Objects.requireNonNull(client, "Expected HttpClient");
-        Objects.requireNonNull(cloud, "Expected cloud");
-        Objects.requireNonNull(systemTracker, "Expected System tracker");
-        Objects.requireNonNull(backingStore, "Expected backing store");
-        Objects.requireNonNull(alarmManager, "Expected alarm manager");
+    private OrchestratorClient(Builder builder) {
 
-        this.client = client;
-        this.cloud = cloud;
-        this.systemTracker = systemTracker;
-        this.backingStore = backingStore;
+        this.client = builder.httpClient();
+        this.cloud = builder.cloud();
+        this.systemTracker = builder.systemTracker();
+        this.backingStore = builder.ruleStore();
+        this.alarmManager = builder.alarmManager();
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -137,6 +129,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         if (consumerSystemSrEntry == null) {
             final String errMsg = "Consumer system with ID '" + consumerId + "' not found in Service Registry";
+            // alarmManager.raiseAlarm();
             logger.error(errMsg);
             return null;
         }
@@ -198,10 +191,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 }
 
                 if (rules.size() == 0) {
-                    // No rules to create, return an empty list.
-                    return Future.success(new StoreEntryListBuilder()
-                        .count(0)
-                        .build());
+                    return Future.success(emptyRuleList());
                 }
 
                 return client
@@ -218,7 +208,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return An empty {@code StoreEntryListDto}.
      */
     private StoreEntryListDto emptyRuleList() {
-        return new StoreEntryListBuilder().count(0).data(new ArrayList<>()).build();
+        return new StoreEntryListBuilder().count(0).build();
     }
 
     /**
@@ -381,6 +371,115 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 logger.error("Encountered an error while attempting to delete Plant Description '"
                     + entry.plantDescription() + "'", throwable);
             });
+    }
+
+    /**
+     * Builder class used for instantiating OrchestratorClients.
+     */
+    public static class Builder {
+
+        HttpClient httpClient_ = null;
+        CloudDto cloud_ = null;
+        SystemTracker systemTracker_ = null;
+        RuleStore ruleStore_ = null;
+        AlarmManager alarmManager_ = null;
+
+        /**
+         * @param aHttpClient Object for sending HTTP messages to the
+         *                    Orchestrator.
+         * @return This instance.
+         */
+        public Builder httpClient(HttpClient aHttpClient) {
+            this.httpClient_ = aHttpClient;
+            return this;
+        }
+
+        /**
+         * The HTTP Client assigned to this instance.
+         */
+        public HttpClient httpClient() {
+            return  httpClient_;
+        }
+
+        /**
+         * @param aCloud DTO describing a Arrowhead Cloud.
+         * @return This instance.
+         */
+        public Builder cloud(CloudDto aCloud) {
+            this.cloud_ = aCloud;
+            return this;
+        }
+
+        /**
+         * The Cloud DTO assigned to this instance.
+         */
+        public CloudDto cloud() {
+            return  cloud_;
+        }
+
+        /**
+         * @param SystemTracker Object used to keep track of registered
+         *                      Arrowhead systems.
+         * @return This instance.
+         */
+        public Builder systemTracker(SystemTracker aSystemTracker) {
+            this.systemTracker_ = aSystemTracker;
+            return this;
+        }
+
+        /**
+         * The system tracker assigned to this instance.
+         */
+        public SystemTracker systemTracker() {
+            return  systemTracker_;
+        }
+
+        /**
+         * @param aHttpClient
+         * @return This instance.
+         */
+        public Builder ruleStore(RuleStore aRuleStore) {
+            this.ruleStore_ = aRuleStore;
+            return this;
+        }
+
+        /**
+         * The Orchestrator rule backing store assigned to this instance.
+         */
+        public RuleStore ruleStore() {
+            return  ruleStore_;
+        }
+
+        /**
+         * @param alarmManager  Object used for managing PDE alarms.
+         * @return This instance.
+         */
+        public Builder alarmManager(AlarmManager anAlarmManager) {
+            this.alarmManager_ = anAlarmManager;
+            return this;
+        }
+
+        /**
+         * The alarm manager assigned to this instance.
+         */
+        public AlarmManager alarmManager() {
+            return  alarmManager_;
+        }
+
+        /**
+         * @return An orchestrator client built using the values assigned to this
+         *         instance.
+         * @throws RuleStoreException
+         */
+        public OrchestratorClient build() {
+            Objects.requireNonNull(httpClient_, "Expected HttpClient");
+            Objects.requireNonNull(cloud_, "Expected cloud");
+            Objects.requireNonNull(systemTracker_, "Expected System tracker");
+            Objects.requireNonNull(ruleStore_, "Expected rule store");
+            Objects.requireNonNull(alarmManager_, "Expected alarm manager");
+            return new OrchestratorClient(this);
+        }
+
     }
 
 }

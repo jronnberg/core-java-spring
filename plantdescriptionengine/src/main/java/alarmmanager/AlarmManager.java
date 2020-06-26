@@ -24,7 +24,8 @@ public class AlarmManager {
         /**
          * Internal representation of an alarm.
          */
-        AlarmData(String systemName, Cause cause) {
+        AlarmData(String systemId, String systemName, Cause cause) {
+            this.systemId = systemId;
             this.systemName = systemName;
             this.cause = cause;
             this.acknowledged = false;
@@ -34,6 +35,7 @@ public class AlarmManager {
         }
 
         public final String systemName;
+        public final String systemId;
         public final Cause cause;
         public boolean acknowledged;
         public Instant raisedAt;
@@ -49,12 +51,20 @@ public class AlarmManager {
             }
         }
 
-        public boolean matches(String systemName, Cause cause) {
-            System.out.println("Checking for match");
-            System.out.println(systemName + ", " + cause);
-            System.out.println(this.systemName + ", " + this.cause);
-            System.out.println(this.systemName.equals(systemName) && this.cause == cause);
-            return this.systemName.equals(systemName) && this.cause == cause;
+        public boolean matches(String systemId, String systemName, Cause cause) {
+            if (systemName == null && systemId == null) {
+                return false;
+            }
+            if (systemName != null && !systemName.equals(this.systemName)) {
+                return false;
+            }
+            if (systemId != null && !systemId.equals(this.systemId)) {
+                return false;
+            }
+            if (this.cause != cause) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -101,30 +111,40 @@ public class AlarmManager {
             .build();
     }
 
-    public void clearAlarm(String systemName, Cause cause) {
-        System.out.println("Clearing alarms:");
-        final var clearedAlarms = alarms
-            .stream()
-            .filter(alarm -> alarm.matches(systemName, cause))
-            .collect(Collectors.toList());
-            System.out.println(clearedAlarms);
-        alarms.removeAll(clearedAlarms);
-    }
-
-	public void raiseAlarm(String systemName, Cause cause) {
+    private void raiseAlarm(String systemId, String systemName, Cause cause) {
         // TODO: Concurrency handling
 
         // Check if this alarm has already been raised:
         for (final var alarm : alarms) {
-            if (alarm.matches(systemName, cause)) {
+            if (alarm.matches(systemId, systemName, cause)) {
                 return;
             }
         }
-        alarms.add(new AlarmData(systemName, cause));
+        alarms.add(new AlarmData(systemId, systemName, cause));
     }
 
-    public void raiseAlarm(Cause cause) {
-        raiseAlarm("N/A", cause);
-	}
+	public void raiseAlarmBySystemByName(String systemName, Cause cause) {
+        raiseAlarm(null, systemName, cause);
+    }
+
+    public void raiseAlarmForSystemById(String systemId, Cause cause) {
+        raiseAlarm(systemId, null, cause);
+    }
+
+    private void clearAlarm(String systemId, String systemName, Cause cause) {
+        final var clearedAlarms = alarms
+            .stream()
+            .filter(alarm -> alarm.matches(systemId, systemName, cause))
+            .collect(Collectors.toList());
+        alarms.removeAll(clearedAlarms);
+    }
+
+    public void clearAlarmBySystemName(String systemName, Cause cause) {
+        clearAlarm(null, systemName, cause);
+    }
+
+    public void clearAlarmBySystemId(String systemId, Cause cause) {
+        clearAlarm(systemId, null, cause);
+    }
 
 }
