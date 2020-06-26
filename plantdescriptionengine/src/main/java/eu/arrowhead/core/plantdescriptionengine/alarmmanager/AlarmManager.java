@@ -1,10 +1,9 @@
-package alarmmanager;
+package eu.arrowhead.core.plantdescriptionengine.alarmmanager;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmBuilder;
@@ -40,7 +39,7 @@ public class AlarmManager {
         public boolean acknowledged;
         public Instant raisedAt;
         public Instant updatedAt;
-        public Optional<Instant> acknowledgedAt = Optional.empty();
+        public Instant acknowledgedAt = null;
 
         private String description() {
             String identifier = (systemId == null)
@@ -57,7 +56,7 @@ public class AlarmManager {
             }
         }
 
-        public boolean matches(String systemId, String systemName, Cause cause) {
+        private boolean matches(String systemId, String systemName, Cause cause) {
             if (systemName == null && systemId == null) {
                 return false;
             }
@@ -104,7 +103,7 @@ public class AlarmManager {
 
         for (final var alarm : alarms) {
             Severity severity = severityByCause.get(alarm.cause);
-            final var alarmBuilder = new PdeAlarmBuilder()
+            alarmDtos.add(new PdeAlarmBuilder()
                 .id(alarms.size())
                 .systemId(alarm.systemId)
                 .systemName(alarm.systemName)
@@ -112,11 +111,9 @@ public class AlarmManager {
                 .severity(severity.toString())
                 .description(alarm.description())
                 .raisedAt(alarm.raisedAt)
-                .updatedAt(alarm.updatedAt);
-            if (alarm.acknowledgedAt.isPresent()) {
-                alarmBuilder.acknowledgedAt(alarm.acknowledgedAt.get());
-            }
-            alarmDtos.add(alarmBuilder.build());
+                .updatedAt(alarm.updatedAt)
+                .acknowledgedAt(alarm.acknowledgedAt)
+                .build());
         }
 
         return new PdeAlarmListBuilder()
@@ -137,7 +134,7 @@ public class AlarmManager {
         alarms.add(new AlarmData(systemId, systemName, cause));
     }
 
-	public void raiseAlarmBySystemByName(String systemName, Cause cause) {
+	public void raiseAlarmBySystemName(String systemName, Cause cause) {
         raiseAlarm(null, systemName, cause);
     }
 

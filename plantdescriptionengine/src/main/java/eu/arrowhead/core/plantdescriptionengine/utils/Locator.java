@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 
 /**
  * Singleton class for providing a global point of access to services.
