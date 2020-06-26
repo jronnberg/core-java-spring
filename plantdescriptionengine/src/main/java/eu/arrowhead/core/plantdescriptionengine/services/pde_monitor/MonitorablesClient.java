@@ -7,7 +7,7 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
@@ -111,7 +111,7 @@ public class MonitorablesClient {
             })
             .onFailure(e -> {
                 System.out.println("Failed ping");
-                Locator.getAlarmManager().raiseAlarmBySystemByName(providerName, AlarmManager.Cause.systemInactive);
+                Locator.getAlarmManager().raiseAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
             });
     }
 

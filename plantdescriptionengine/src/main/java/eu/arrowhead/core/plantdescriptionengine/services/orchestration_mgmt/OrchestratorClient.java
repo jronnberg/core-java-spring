@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
 import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;

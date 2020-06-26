@@ -2,8 +2,6 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import org.junit.Test;
 
-import alarmmanager.AlarmManager;
-
 import javax.net.ssl.SSLException;
 
 import static org.junit.Assert.assertNull;
