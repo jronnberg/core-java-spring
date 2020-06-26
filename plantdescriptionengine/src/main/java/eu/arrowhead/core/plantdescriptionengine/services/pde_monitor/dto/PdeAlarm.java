@@ -18,7 +18,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PdeAlarm {
 
     int id();
-    String systemName();
+    Optional<String> systemName();
+    Optional<String> systemId();
     boolean acknowledged();
     String severity();
     String description();
