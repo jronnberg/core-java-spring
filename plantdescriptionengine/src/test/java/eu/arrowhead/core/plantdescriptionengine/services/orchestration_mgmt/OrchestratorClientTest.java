@@ -82,9 +82,14 @@ public class OrchestratorClientTest {
         systemTracker.addSystem("orchestrator", orchestratorSrSystem);
 
         final RuleStore backingStore = new InMemoryRuleStore();
+        final var orchestratorClient = new OrchestratorClient.Builder()
+            .httpClient(httpClient)
+            .cloud(cloud)
+            .systemTracker(systemTracker)
+            .ruleStore(backingStore)
+            .alarmManager(new AlarmManager())
+            .build();
 
-        final var orchestratorClient = new OrchestratorClient(
-            httpClient, cloud, systemTracker, backingStore, new AlarmManager());
         var rule = orchestratorClient.createRule(entry, 0);
 
         assertEquals(cloud.name(), rule.cloud().name());

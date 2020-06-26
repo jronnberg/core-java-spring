@@ -258,7 +258,13 @@ public class PdeMain {
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
             final RuleStore backingStore = new FileRuleStore(ruleDirectory);
             final var alarmManager = new AlarmManager();
-            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, systemTracker, backingStore, alarmManager);
+            final var orchestratorClient = new OrchestratorClient.Builder()
+                .httpClient(sysopClient)
+                .cloud(cloud)
+                .systemTracker(systemTracker)
+                .ruleStore(backingStore)
+                .alarmManager(alarmManager)
+                .build();
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var entryMap = new PlantDescriptionEntryMap(new FilePdStore(plantDescriptionsDirectory));

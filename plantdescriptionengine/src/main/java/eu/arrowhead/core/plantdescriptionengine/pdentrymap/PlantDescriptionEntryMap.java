@@ -15,8 +15,8 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListDto;
 
 /**
- * Object for keeping track of Plant Description entries.
- * Each instance Keeps a reference to a
+ * Object used to keep track of Plant Description entries.
+ * It keeps a reference to a
  * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore},
  * which is used to store Plant Description Entries in some permanent storage
  * (e.g. to file or a database).
