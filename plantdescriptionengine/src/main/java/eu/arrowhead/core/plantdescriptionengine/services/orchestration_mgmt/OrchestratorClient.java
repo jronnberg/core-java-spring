@@ -128,14 +128,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null) {
-            final String errMsg = "Consumer system with ID '" + consumerId + "' not found in Service Registry";
-            // alarmManager.raiseAlarm();
-            logger.error(errMsg);
+            alarmManager.raiseAlarmBySystemId(consumerId, AlarmManager.Cause.systemNotRegistered);
             return null;
         }
         if (providerSystemSrEntry == null) {
-            final String errMsg = "Producer system with ID '" + providerId + "' not found in Service Registry";
-            logger.error(errMsg);
+            alarmManager.raiseAlarmBySystemId(providerId, AlarmManager.Cause.systemNotRegistered);
             return null;
         }
 

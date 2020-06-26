@@ -14,9 +14,9 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlar
 
 public class AlarmManager {
 
-    private Map<Cause, Severity> severityByCause = Map.of(
-        Cause.systemInactive, Severity.warning
-        // TODO: Add severities for all possible causes
+    private static Map<Cause, Severity> severityByCause = Map.of(
+        Cause.systemInactive, Severity.warning,
+        Cause.systemNotRegistered, Severity.warning
     );
 
     private class AlarmData {
@@ -43,9 +43,15 @@ public class AlarmManager {
         public Optional<Instant> acknowledgedAt = Optional.empty();
 
         private String description() {
+            String identifier = (systemId == null)
+                ? "named '" + systemName + "'"
+                : "with ID '" + systemId + "'";
+
             switch (cause) {
                 case systemInactive:
-                    return "System '" + systemName + "' appears to be inactive.";
+                    return "System " + identifier + " appears to be inactive.";
+                case systemNotRegistered:
+                    return "System " + identifier + " cannot be found in the Service Registry.";
                 default:
                     throw new RuntimeException("Invalid alarm cause.");
             }
@@ -78,7 +84,14 @@ public class AlarmManager {
     }
 
     public enum Cause {
-        systemInactive
+        systemInactive,
+        systemNotRegistered
+    }
+
+    static {
+        for (final var cause : Cause.values()) {
+            assert severityByCause.containsKey(cause);
+        }
     }
 
     private final List<AlarmData> alarms = new ArrayList<>();
@@ -93,6 +106,7 @@ public class AlarmManager {
             Severity severity = severityByCause.get(alarm.cause);
             final var alarmBuilder = new PdeAlarmBuilder()
                 .id(alarms.size())
+                .systemId(alarm.systemId)
                 .systemName(alarm.systemName)
                 .acknowledged(alarm.acknowledged)
                 .severity(severity.toString())
@@ -127,7 +141,7 @@ public class AlarmManager {
         raiseAlarm(null, systemName, cause);
     }
 
-    public void raiseAlarmForSystemById(String systemId, Cause cause) {
+    public void raiseAlarmBySystemId(String systemId, Cause cause) {
         raiseAlarm(systemId, null, cause);
     }
 
