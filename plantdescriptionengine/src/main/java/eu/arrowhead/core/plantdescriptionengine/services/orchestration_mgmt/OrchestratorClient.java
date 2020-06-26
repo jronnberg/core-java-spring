@@ -29,6 +29,7 @@ import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rule
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
+import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
@@ -48,7 +49,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final SystemTracker systemTracker;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
-    private final AlarmManager alarmManager;
 
 
     /**
@@ -62,7 +62,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.cloud = builder.cloud();
         this.systemTracker = builder.systemTracker();
         this.backingStore = builder.ruleStore();
-        this.alarmManager = builder.alarmManager();
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -128,11 +127,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null) {
-            alarmManager.raiseAlarmBySystemId(consumerId, AlarmManager.Cause.systemNotRegistered);
+            Locator.getAlarmManager().raiseAlarmBySystemId(consumerId, AlarmManager.Cause.systemNotRegistered);
             return null;
         }
         if (providerSystemSrEntry == null) {
-            alarmManager.raiseAlarmBySystemId(providerId, AlarmManager.Cause.systemNotRegistered);
+            Locator.getAlarmManager().raiseAlarmBySystemId(providerId, AlarmManager.Cause.systemNotRegistered);
             return null;
         }
 
@@ -379,7 +378,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         CloudDto cloud_ = null;
         SystemTracker systemTracker_ = null;
         RuleStore ruleStore_ = null;
-        AlarmManager alarmManager_ = null;
 
         /**
          * @param aHttpClient Object for sending HTTP messages to the
@@ -448,22 +446,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         /**
-         * @param alarmManager  Object used for managing PDE alarms.
-         * @return This instance.
-         */
-        public Builder alarmManager(AlarmManager anAlarmManager) {
-            this.alarmManager_ = anAlarmManager;
-            return this;
-        }
-
-        /**
-         * The alarm manager assigned to this instance.
-         */
-        public AlarmManager alarmManager() {
-            return  alarmManager_;
-        }
-
-        /**
          * @return An orchestrator client built using the values assigned to this
          *         instance.
          * @throws RuleStoreException
@@ -473,7 +455,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             Objects.requireNonNull(cloud_, "Expected cloud");
             Objects.requireNonNull(systemTracker_, "Expected System tracker");
             Objects.requireNonNull(ruleStore_, "Expected rule store");
-            Objects.requireNonNull(alarmManager_, "Expected alarm manager");
             return new OrchestratorClient(this);
         }
 

@@ -26,7 +26,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, new AlarmManager(), false);
+        final var service = new PdeMonitorService(arSystem, entryMap, client, false);
 
         service.provide()
             .ifSuccess(result -> {
@@ -47,7 +47,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, new AlarmManager(), true);
+        final var service = new PdeMonitorService(arSystem, entryMap, client, true);
 
         service.provide()
             .ifSuccess(result -> {

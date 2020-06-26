@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
+import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.ArSystem;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -28,16 +29,13 @@ public class MonitorablesClient {
     private ServiceQuery serviceQuery;
     private final HttpClient httpClient;
     private final MonitorInfo monitorInfo;
-    private final AlarmManager alarmManager;
 
-    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo, AlarmManager alarmManager) {
+    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
-        Objects.requireNonNull(alarmManager, "Expected Alarm manager");
 
         this.httpClient = httpClient;
         this.monitorInfo = monitorInfo;
-        this.alarmManager = alarmManager;
 
         serviceQuery = arSystem.consume()
             .name("monitorable")
@@ -109,11 +107,11 @@ public class MonitorablesClient {
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 System.out.println("Successful ping");
-                alarmManager.clearAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
+                Locator.getAlarmManager().clearAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
             })
             .onFailure(e -> {
                 System.out.println("Failed ping");
-                alarmManager.raiseAlarmBySystemByName(providerName, AlarmManager.Cause.systemInactive);
+                Locator.getAlarmManager().raiseAlarmBySystemByName(providerName, AlarmManager.Cause.systemInactive);
             });
     }
 
