@@ -69,9 +69,9 @@ public class PlantDescriptionEntryMap {
      *
      * @param entry Entry to store in the map.
      * @throws PdStoreException If the entry is not successfully stored in
-     *                               permanent storage. In this case, the entry
-     *                               will not be stored in memory either, and no
-     *                               listeners will be notified.
+     *                          permanent storage. In this case, the entry will
+     *                          not be stored in memory either, and no listeners
+     *                          will be notified.
      */
     public void put(final PlantDescriptionEntryDto entry) throws PdStoreException {
         backingStore.write(entry);

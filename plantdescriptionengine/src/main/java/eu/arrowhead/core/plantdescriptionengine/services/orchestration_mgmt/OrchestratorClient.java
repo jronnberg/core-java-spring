@@ -130,8 +130,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         final SystemTracker systemTracker = Locator.getSystemTracker();
-        SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
-        SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
+        final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
+        final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         boolean systemsNotFound = false;
 

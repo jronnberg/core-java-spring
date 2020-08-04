@@ -51,6 +51,8 @@ public class AlarmManager {
                     return "System " + identifier + " appears to be inactive.";
                 case systemNotRegistered:
                     return "System " + identifier + " cannot be found in the Service Registry.";
+                case systemNotInDescription:
+                    return "System " + identifier + " is not present in the active Plant Description";
                 default:
                     throw new RuntimeException("Invalid alarm cause.");
             }
@@ -84,7 +86,8 @@ public class AlarmManager {
 
     public enum Cause {
         systemInactive,
-        systemNotRegistered
+        systemNotRegistered,
+        systemNotInDescription
     }
 
     static {
