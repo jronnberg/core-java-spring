@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.pdentrymap;
+package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStore;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -37,7 +37,7 @@ public class PlantDescriptionEntryMapTest {
             store.write(TestUtils.createEntry(id));
         }
 
-        final var entryMap = new PlantDescriptionEntryMap(store);
+        final var entryMap = new PlantDescriptionTracker(store);
         var storedEntries = entryMap.getEntries();
 
         assertEquals(entryIds.size(), storedEntries.size());
@@ -48,7 +48,7 @@ public class PlantDescriptionEntryMapTest {
         int id0 = entryIds.get(0);
         entryMap.remove(id0);
 
-        final var newEntryMap = new PlantDescriptionEntryMap(store);
+        final var newEntryMap = new PlantDescriptionTracker(store);
         storedEntries = newEntryMap.getEntries();
 
         assertEquals(entryIds.size() - 1, storedEntries.size());
@@ -58,7 +58,7 @@ public class PlantDescriptionEntryMapTest {
     public void shouldReturnEntryById() throws PdStoreException {
         int entryId = 16;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         entryMap.put(entry);
 
         final var storedEntry = entryMap.get(entryId);
@@ -70,7 +70,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReturnAllEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
 
         for (int id : entryIds) {
@@ -89,7 +89,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldReturnListDto() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
         for (int id : entryIds) {
             entryMap.put(TestUtils.createEntry(id));
@@ -108,7 +108,7 @@ public class PlantDescriptionEntryMapTest {
     public void shouldRemoveEntries() throws PdStoreException {
         int entryId = 24;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         entryMap.put(entry);
         entryMap.remove(entryId);
         final var storedEntry = entryMap.get(entryId);
@@ -135,7 +135,7 @@ public class PlantDescriptionEntryMapTest {
             .plantDescription("Plant Description B")
             .active(false)
             .build();
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
 
         entryMap.put(activeEntry);
         entryMap.put(inactiveEntry);
@@ -168,7 +168,7 @@ public class PlantDescriptionEntryMapTest {
             .id(idB)
             .plantDescription("Plant Description B")
             .build();
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
 
         entryMap.put(entryA);
 
@@ -180,7 +180,7 @@ public class PlantDescriptionEntryMapTest {
     @Test
     public void shouldGenerateUniqueIds() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<PlantDescriptionEntryDto> entries = List.of(
             TestUtils.createEntry(entryMap.getUniqueId()),
             TestUtils.createEntry(entryMap.getUniqueId()),
@@ -223,7 +223,7 @@ public class PlantDescriptionEntryMapTest {
             }
         }
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 16;

@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.FilePdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.PdeMonitorService;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
@@ -266,18 +266,18 @@ public class PdeMain {
             final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, new FileRuleStore(ruleDirectory));
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
-            final var entryMap = new PlantDescriptionEntryMap(new FilePdStore(plantDescriptionsDirectory));
+            final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
 
             final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
-            return orchestratorClient.initialize(entryMap)
+            return orchestratorClient.initialize(pdTracker)
                 .flatMap(orchstratorInitializationResult -> {
-                    var pdeManagementService = new PdeManagementService(entryMap, secureMode);
+                    var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
                     return arSystem.provide(pdeManagementService.getService());
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, entryMap, pdeClient, secureMode).provide();
+                    return new PdeMonitorService(arSystem, pdTracker, pdeClient, secureMode).provide();
                 });
         })
         .onFailure(throwable -> {

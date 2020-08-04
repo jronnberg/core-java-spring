@@ -14,10 +14,10 @@ import static org.junit.Assert.assertEquals;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescription;
@@ -35,7 +35,7 @@ public class ReplacePlantDescriptionTest {
     @Test
     public void shouldCreateEntry() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
         final PlantDescription description = TestUtils.createDescription();
@@ -69,7 +69,7 @@ public class ReplacePlantDescriptionTest {
     @Test
     public void shouldReplaceExistingEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(entryMap);
         final int entryId = 87;
 
@@ -111,7 +111,7 @@ public class ReplacePlantDescriptionTest {
 
     @Test
     public void shouldRejectInvalidId() throws PdStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(entryMap);
         final String invalidEntryId = "InvalidId";
 
@@ -143,7 +143,7 @@ public class ReplacePlantDescriptionTest {
         final String systemId = "system_a";
         final String portName = "port_a";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(entryMap);
 
         entryMap.put(TestUtils.createEntry(entryId));

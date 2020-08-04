@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.pdentrymap;
+package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 

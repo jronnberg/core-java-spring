@@ -7,9 +7,9 @@ import javax.net.ssl.SSLException;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
 
@@ -17,14 +17,14 @@ public class PdeMonitorServiceTest {
 
     @Test
     public void shouldProvideService() throws PdStoreException, SSLException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
         final ArSystem arSystem = new ArSystem.Builder()
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, false);
+        final var service = new PdeMonitorService(arSystem, pdTracker, client, false);
 
         service.provide()
             .ifSuccess(result -> {
@@ -38,7 +38,7 @@ public class PdeMonitorServiceTest {
 
     @Test
     public void shouldNotAllowSecureService() throws PdStoreException, SSLException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
         final ArSystem arSystem = new ArSystem.Builder()

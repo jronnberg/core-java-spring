@@ -3,7 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers
 import java.util.Objects;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -16,14 +16,14 @@ import se.arkalix.util.concurrent.Future;
  */
 public class GetPlantDescription implements HttpRouteHandler {
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker entryMap;
 
     /**
      * Class constructor
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public GetPlantDescription(PlantDescriptionEntryMap entryMap) {
+    public GetPlantDescription(PlantDescriptionTracker entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }

@@ -2,7 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor;
 
 import java.util.Objects;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPlantDescriptions;
 import se.arkalix.ArServiceHandle;
@@ -23,7 +23,7 @@ public class PdeMonitorService {
     private final MonitorablesClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker entryMap;
     private final boolean secure;
 
     /**
@@ -38,7 +38,7 @@ public class PdeMonitorService {
      */
     public PdeMonitorService(
         ArSystem arSystem,
-        PlantDescriptionEntryMap entryMap,
+        PlantDescriptionTracker entryMap,
         HttpClient httpClient,
         boolean secure
     ) {

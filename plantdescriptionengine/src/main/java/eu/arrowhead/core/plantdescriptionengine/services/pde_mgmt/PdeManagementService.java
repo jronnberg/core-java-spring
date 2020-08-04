@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.DeletePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.GetAllPlantDescriptions;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.AddPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers.ReplacePlantDescription;
@@ -21,21 +21,21 @@ import se.arkalix.security.access.AccessPolicy;
  */
 public class PdeManagementService {
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker pdTracker;
     private final boolean secure;
 
     /**
      * Class constructor.
      *
-     * @param entryMap An object that maps ID:s to Plant Description Entries.
+     * @param pdTracker An object that keeps track of Plant Description Entries.
      * @param secure   Indicates whether the service should run in secure mode.
      */
-    public PdeManagementService(PlantDescriptionEntryMap entryMap, boolean secure) {
+    public PdeManagementService(PlantDescriptionTracker pdTracker, boolean secure) {
 
-        Objects.requireNonNull(entryMap, "Expected AR System");
-        Objects.requireNonNull(entryMap, "Expected plant description map");
+        Objects.requireNonNull(pdTracker, "Expected AR System");
+        Objects.requireNonNull(pdTracker, "Expected plant description map");
 
-        this.entryMap = entryMap;
+        this.pdTracker = pdTracker;
         this.secure = secure;
     }
 
@@ -52,12 +52,12 @@ public class PdeManagementService {
             .name("pde-mgmt")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/mgmt")
-            .get("/pd/#id", new GetPlantDescription(entryMap))
-            .get("/pd", new GetAllPlantDescriptions(entryMap))
-            .post("/pd", new AddPlantDescription(entryMap))
-            .delete("/pd/#id", new DeletePlantDescription(entryMap))
-            .put("/pd/#id", new ReplacePlantDescription(entryMap))
-            .patch("/pd/#id", new UpdatePlantDescription(entryMap))
+            .get("/pd/#id", new GetPlantDescription(pdTracker))
+            .get("/pd", new GetAllPlantDescriptions(pdTracker))
+            .post("/pd", new AddPlantDescription(pdTracker))
+            .delete("/pd/#id", new DeletePlantDescription(pdTracker))
+            .put("/pd/#id", new ReplacePlantDescription(pdTracker))
+            .patch("/pd/#id", new UpdatePlantDescription(pdTracker))
             .catcher(DtoReadException.class, new DtoReadExceptionCatcher());
 
         if (secure) {

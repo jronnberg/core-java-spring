@@ -10,10 +10,10 @@ import java.util.List;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -24,7 +24,7 @@ public class GetPlantDescriptionTest {
     @Test
     public void shouldRespondWithNotFound() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new GetPlantDescription(entryMap);
         final int nonExistentEntryId = 0;
 
@@ -53,7 +53,7 @@ public class GetPlantDescriptionTest {
 
         int entryId = 39;
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);
@@ -85,7 +85,7 @@ public class GetPlantDescriptionTest {
         int entryId = 24;
         String invalidId = "Invalid";
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
         entryMap.put(TestUtils.createEntry(entryId));
 
         GetPlantDescription handler = new GetPlantDescription(entryMap);

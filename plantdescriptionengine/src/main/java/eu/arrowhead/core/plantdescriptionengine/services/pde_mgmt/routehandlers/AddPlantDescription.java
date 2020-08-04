@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -24,16 +24,16 @@ import se.arkalix.util.concurrent.Future;
 public class AddPlantDescription implements HttpRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(AddPlantDescription.class);
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker PdTracker;
 
     /**
      * Class constructor
      *
-     * @param entryMap Object that keeps track of Plant Description Enties.
+     * @param pdTracker Object that keeps track of Plant Description Entries.
      */
-    public AddPlantDescription(PlantDescriptionEntryMap entryMap) {
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
-        this.entryMap = entryMap;
+    public AddPlantDescription(PlantDescriptionTracker pdTracker) {
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
+        this.PdTracker = pdTracker;
     }
 
     /**
@@ -47,7 +47,7 @@ public class AddPlantDescription implements HttpRouteHandler {
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
-            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, entryMap.getUniqueId());
+            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, PdTracker.getUniqueId());
             final var validator = new PlantDescriptionValidator(entry);
             if (validator.hasError()) {
                 return response
@@ -56,7 +56,7 @@ public class AddPlantDescription implements HttpRouteHandler {
             }
 
             try {
-                entryMap.put(entry);
+                PdTracker.put(entry);
             } catch (final PdStoreException e) {
                 logger.error("Failure when communicating with backing store.", e);
                 return response.status(HttpStatus.INTERNAL_SERVER_ERROR);

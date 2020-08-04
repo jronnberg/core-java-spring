@@ -17,10 +17,10 @@ import java.util.Map;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
@@ -50,15 +50,15 @@ public class GetAllPlantDescriptionsTest {
     public void shouldRespondWithStoredEntries() throws PdStoreException {
 
         final List<Integer> entryIds = List.of(0, 1, 2, 3);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         for (final int id : entryIds) {
-            entryMap.put(TestUtils.createEntry(id));
+            pdTracker.put(TestUtils.createEntry(id));
         }
 
         final var monitorInfo = new MonitorInfo();
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
         final HttpServiceResponse response = new MockResponse();
 
@@ -80,7 +80,7 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldPreserveConnections() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         final Instant now = Instant.now();
         final List<ConnectionDto> connections = new ArrayList<>();
@@ -112,11 +112,11 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build();
 
-        entryMap.put(entry);
+        pdTracker.put(entry);
 
         final var monitorInfo = new MonitorInfo();
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
         final HttpServiceResponse response = new MockResponse();
 
@@ -149,7 +149,7 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldPreservePorts() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         final Instant now = Instant.now();
         final Map<String, String> metadata = Map.of("a", "b");
@@ -182,11 +182,11 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build();
 
-        entryMap.put(entry);
+        pdTracker.put(entry);
 
         final var monitorInfo = new MonitorInfo();
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
         final HttpServiceResponse response = new MockResponse();
 
@@ -215,7 +215,7 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldExtendWithMonitorData() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final String systemName = "System A";
         final PdeSystemDto system = new PdeSystemBuilder()
             .systemName(systemName)
@@ -233,7 +233,7 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build();
 
-        entryMap.put(entry);
+        pdTracker.put(entry);
         final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
         ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name("service-name")
@@ -252,7 +252,7 @@ public class GetAllPlantDescriptionsTest {
         monitorInfo.putInventoryId(serviceDescription, inventoryId);
         monitorInfo.putSystemData(serviceDescription, systemData);
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
         final HttpServiceResponse response = new MockResponse();
 
@@ -278,7 +278,7 @@ public class GetAllPlantDescriptionsTest {
 
     @Test
     public void shouldSortEntries() throws PdStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         final Instant createdAt1 = Instant.parse("2020-05-27T14:48:00.00Z");
         final Instant createdAt2 = Instant.parse("2020-06-27T14:48:00.00Z");
@@ -319,15 +319,15 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(updatedAt3)
             .build();
 
-        entryMap.put(entry1);
-        entryMap.put(entry2);
-        entryMap.put(entry3);
+        pdTracker.put(entry1);
+        pdTracker.put(entry2);
+        pdTracker.put(entry3);
 
-        final int numEntries = entryMap.getListDto().count();
+        final int numEntries = pdTracker.getListDto().count();
 
         final var monitorInfo = new MonitorInfo();
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest idDescendingRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "sort_field", List.of("id"),
@@ -412,10 +412,10 @@ public class GetAllPlantDescriptionsTest {
 
     @Test
     public void shouldRejectInvalidParameters() throws PdStoreException {
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var monitorInfo = new MonitorInfo();
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active")
@@ -447,15 +447,15 @@ public class GetAllPlantDescriptionsTest {
 
         final List<Integer> entryIds = List.of(0, 1, 2);
         final int activeEntryId = 3;
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         for (final int id : entryIds) {
-            entryMap.put(TestUtils.createEntry(id));
+            pdTracker.put(TestUtils.createEntry(id));
         }
 
         final var monitorInfo = new MonitorInfo();
         final Instant now = Instant.now();
-        entryMap.put(new PlantDescriptionEntryBuilder()
+        pdTracker.put(new PlantDescriptionEntryBuilder()
             .id(activeEntryId)
             .plantDescription("Plant Description 1B")
             .active(true)
@@ -466,7 +466,7 @@ public class GetAllPlantDescriptionsTest {
             .updatedAt(now)
             .build());
 
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, entryMap);
+        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "filter_field", List.of("active"),
@@ -497,13 +497,13 @@ public class GetAllPlantDescriptionsTest {
     public void shouldPaginate() throws PdStoreException {
 
         final List<Integer> entryIds = Arrays.asList(32, 11, 25, 3, 24, 35);
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         for (int id : entryIds) {
-            entryMap.put(TestUtils.createEntry(id));
+            pdTracker.put(TestUtils.createEntry(id));
         }
 
-        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
         final HttpServiceResponse response = new MockResponse();
         final int page = 1;
         final int itemsPerPage = 2;
@@ -545,8 +545,8 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldRejectNegativePage() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
-        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
         final HttpServiceResponse response = new MockResponse();
         final int page = -1;
         final int itemsPerPage = 2;
@@ -577,9 +577,9 @@ public class GetAllPlantDescriptionsTest {
     @Test
     public void shouldRequireItemPerPage() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
-        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), entryMap);
+        final var handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
         final HttpServiceResponse response = new MockResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()

@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
@@ -77,13 +77,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Initializes the Orchestrator client.
      *
-     * @param entryMap
+     * @param pdTracker A Plant Description tracker.
      * @return
      */
-    public Future<Void> initialize(PlantDescriptionEntryMap entryMap) {
+    public Future<Void> initialize(PlantDescriptionTracker pdTracker) {
 
-        entryMap.addListener(this);
-        activeEntry = entryMap.activeEntry();
+        pdTracker.addListener(this);
+        activeEntry = pdTracker.activeEntry();
 
         return deleteActiveRules().flatMap(deletionResult -> {
 
