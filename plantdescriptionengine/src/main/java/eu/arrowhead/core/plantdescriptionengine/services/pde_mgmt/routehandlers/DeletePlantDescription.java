@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -22,16 +22,16 @@ public class DeletePlantDescription implements HttpRouteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DeletePlantDescription.class);
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor
      *
-     * @param entryMap Object that keeps track of Plant Description Enties.
+     * @param pdTracker Object that keeps track of Plant Description Entries.
      */
-    public DeletePlantDescription(PlantDescriptionEntryMap entryMap) {
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
-        this.entryMap = entryMap;
+    public DeletePlantDescription(PlantDescriptionTracker pdTracker) {
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Entry Tracker");
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -54,14 +54,14 @@ public class DeletePlantDescription implements HttpRouteHandler {
             return Future.done();
         }
 
-        if (entryMap.get(id) == null) {
+        if (pdTracker.get(id) == null) {
             response.status(HttpStatus.NOT_FOUND);
             response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
             return Future.done();
         }
 
         try {
-            entryMap.remove(id);
+            pdTracker.remove(id);
         } catch (PdStoreException e) {
             logger.error("Failed to remove Plant Description Entry from backing store", e);
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);

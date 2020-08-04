@@ -15,7 +15,7 @@ import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamPars
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto;
@@ -34,7 +34,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker entryMap;
     private final MonitorInfo monitorInfo;
 
     /**
@@ -44,7 +44,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * @param monitorInfo Object that stores information on monitorable systems.
      *
      */
-    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionEntryMap entryMap
+    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker entryMap
     ) {
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry Map");

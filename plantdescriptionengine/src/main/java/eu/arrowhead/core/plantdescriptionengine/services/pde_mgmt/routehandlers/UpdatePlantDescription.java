@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.PlantDescriptionEntryMap;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -25,14 +25,14 @@ import se.arkalix.util.concurrent.Future;
 public class UpdatePlantDescription implements HttpRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(UpdatePlantDescription.class);
 
-    private final PlantDescriptionEntryMap entryMap;
+    private final PlantDescriptionTracker entryMap;
 
     /**
      * Class constructor
      *
      * @param entryMap Object that keeps track of Plant Description Enties.
      */
-    public UpdatePlantDescription(final PlantDescriptionEntryMap entryMap) {
+    public UpdatePlantDescription(final PlantDescriptionTracker entryMap) {
         Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
         this.entryMap = entryMap;
     }

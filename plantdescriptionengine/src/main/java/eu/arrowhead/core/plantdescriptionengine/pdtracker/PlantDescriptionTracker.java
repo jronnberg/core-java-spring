@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.pdentrymap;
+package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStore;
-import eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
@@ -17,18 +17,18 @@ import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescr
 /**
  * Object used to keep track of Plant Description entries.
  * It keeps a reference to a
- * {@link eu.arrowhead.core.plantdescriptionengine.pdentrymap.backingstore},
+ * {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore},
  * which is used to store Plant Description Entries in some permanent storage
  * (e.g. to file or a database).
  */
-public class PlantDescriptionEntryMap {
+public class PlantDescriptionTracker {
 
     // List of instances that need to be informed of any changes to Plant
     // Description Entries.
     List<PlantDescriptionUpdateListener> listeners = new ArrayList<>();
 
     // ID-to-entry mapping
-    private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
+    private final Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     // Non-volatile storage for entries:
     private final PdStore backingStore;
@@ -42,7 +42,7 @@ public class PlantDescriptionEntryMap {
      * @param backingStore Non-volatile storage for entries.
      * @throws PdStoreException If backing store operations fail.
      */
-    public PlantDescriptionEntryMap(PdStore backingStore) throws PdStoreException {
+    public PlantDescriptionTracker(PdStore backingStore) throws PdStoreException {
         Objects.requireNonNull(backingStore, "Expected backing store");
         this.backingStore = backingStore;
 

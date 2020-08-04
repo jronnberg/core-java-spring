@@ -15,7 +15,8 @@ public class AlarmManager {
 
     private static Map<Cause, Severity> severityByCause = Map.of(
         Cause.systemInactive, Severity.warning,
-        Cause.systemNotRegistered, Severity.warning
+        Cause.systemNotRegistered, Severity.warning,
+        Cause.systemNotInDescription, Severity.warning
     );
 
     private class AlarmData {
@@ -92,7 +93,8 @@ public class AlarmManager {
 
     static {
         for (final var cause : Cause.values()) {
-            assert severityByCause.containsKey(cause);
+            assert severityByCause.containsKey(cause) :
+                "AlarmManager's severityByCause map not populated with all possible causes.";
         }
     }
 
