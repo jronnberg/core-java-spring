@@ -216,9 +216,7 @@ public class GetAllPlantDescriptionsTest {
     public void shouldExtendWithMonitorData() throws PdStoreException {
 
         final var entryMap = new PlantDescriptionEntryMap(new InMemoryPdStore());
-        final var monitorInfo = new MonitorInfo();
         final String systemName = "System A";
-        final String inventoryId = "system_a_inventory_id";
         final PdeSystemDto system = new PdeSystemBuilder()
             .systemName(systemName)
             .systemId("system_a")
@@ -236,9 +234,6 @@ public class GetAllPlantDescriptionsTest {
             .build();
 
         entryMap.put(entry);
-        JsonObject systemData = new JsonObject(List.of(
-            new JsonPair("a", JsonBoolean.TRUE)
-        ));
         final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
         ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name("service-name")
@@ -248,6 +243,12 @@ public class GetAllPlantDescriptionsTest {
             .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
             .build();
 
+        final String inventoryId = "system_a_inventory_id";
+        JsonObject systemData = new JsonObject(List.of(
+            new JsonPair("a", JsonBoolean.TRUE)
+        ));
+
+        final var monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(serviceDescription, inventoryId);
         monitorInfo.putSystemData(serviceDescription, systemData);
 

@@ -62,7 +62,7 @@ public final class DtoUtils {
      * while the source entry is a {@link
      * eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry}
      * instance. This function is the glue between the mgmt and monitor
-     * packages, letting data pass from one one to the other.
+     * packages, letting data flow from one one to the other.
      *
      * @param entry       The source entry on which the new one will be based.
      * @param monitorInfo Object used for keeping track of inventory data of
@@ -157,8 +157,8 @@ public final class DtoUtils {
     }
 
     /**
-     * @param a A String to String map (system or port metadata.).
-     * @param b A String to String map (system or port metadata.).
+     * @param a A String to String map (system or port metadata).
+     * @param b A String to String map (system or port metadata).
      *
      * @return The union of maps a and b, where the values in b override the
      *         values of a in case of collisions.
