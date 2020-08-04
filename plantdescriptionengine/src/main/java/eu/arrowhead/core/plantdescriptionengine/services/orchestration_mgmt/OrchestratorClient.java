@@ -106,6 +106,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param entry           Plant Description Entry to which the rule will belong.
      * @param connectionIndex The index of the related connection within the entry's
      *                        connection list.
+     *
      * @return An Orchestrator rule that embodies the specified connection.
      */
     StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
@@ -132,12 +133,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
         SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
+        boolean systemsNotFound = false;
+
         if (consumerSystemSrEntry == null) {
             Locator.getAlarmManager().raiseAlarmBySystemId(consumerId, AlarmManager.Cause.systemNotRegistered);
-            return null;
+            systemsNotFound = true;
         }
         if (providerSystemSrEntry == null) {
             Locator.getAlarmManager().raiseAlarmBySystemId(providerId, AlarmManager.Cause.systemNotRegistered);
+            systemsNotFound = true;
+        }
+        if (systemsNotFound) {
             return null;
         }
 
