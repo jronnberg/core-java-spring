@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
@@ -133,17 +132,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
         final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
-        boolean systemsNotFound = false;
-
-        if (consumerSystemSrEntry == null) {
-            Locator.getAlarmManager().raiseAlarmBySystemId(consumerId, AlarmManager.Cause.systemNotRegistered);
-            systemsNotFound = true;
-        }
-        if (providerSystemSrEntry == null) {
-            Locator.getAlarmManager().raiseAlarmBySystemId(providerId, AlarmManager.Cause.systemNotRegistered);
-            systemsNotFound = true;
-        }
-        if (systemsNotFound) {
+        if (consumerSystemSrEntry == null || providerSystemSrEntry == null) {
             return null;
         }
 
