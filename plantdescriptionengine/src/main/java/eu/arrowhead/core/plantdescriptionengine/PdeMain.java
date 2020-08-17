@@ -268,8 +268,10 @@ public class PdeMain {
 
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
-
             final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
+            final PdMismatchDetector mismatchDetector = new PdMismatchDetector(pdTracker);
+
+            mismatchDetector.run();
 
             return orchestratorClient.initialize(pdTracker)
                 .flatMap(orchstratorInitializationResult -> {

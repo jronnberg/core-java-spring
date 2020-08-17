@@ -129,4 +129,8 @@ public class SystemTracker {
         listeners.add(listener);
     }
 
+    public List<SrSystem> getSystems() {
+        return new ArrayList<SrSystem>(systems.values());
+    }
+
 }

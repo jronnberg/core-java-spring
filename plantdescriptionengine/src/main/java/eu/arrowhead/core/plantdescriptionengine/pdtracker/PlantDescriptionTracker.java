@@ -60,6 +60,7 @@ public class PlantDescriptionTracker {
      * @return An unused Plant Description Entry ID.
      */
     public int getUniqueId() {
+        // TODO: This method does not actually ensure that the ID is unique.
         return nextId.getAndIncrement();
     }
 
@@ -85,6 +86,7 @@ public class PlantDescriptionTracker {
             final var deactivatedEntry = PlantDescriptionEntry.deactivated(currentlyActive);
             entries.put(deactivatedEntry.id(), deactivatedEntry);
             for (var listener : listeners) {
+                listener.onPlantDescriptionUpdated(deactivatedEntry);
                 listener.onPlantDescriptionUpdated(entry);
             }
         }
@@ -109,10 +111,10 @@ public class PlantDescriptionTracker {
      * The entry is removed from memory and from the backing store.
      *
      * @param id ID of the entry to remove.
-     * @throws PdStoreException If the entry is not successfully removed
-     *                               from permanent storage. In this case, the
-     *                               entry will not be stored in memory either,
-     *                               and no listeners will be notified.
+     * @throws PdStoreException If the entry is not successfully removed from
+     *                          permanent storage. In this case, the entry will
+     *                          not be stored in memory either, and no listeners
+     *                          will be notified.
      */
     public void remove(int id) throws PdStoreException {
         backingStore.remove(id);
@@ -144,8 +146,9 @@ public class PlantDescriptionTracker {
     }
 
     /**
-     * Registers another object to be notified whenever a Plant Description
-     * Entry is added, updated or deleted.
+     * Registers another object to be notified whenever a Plant Description Entry is
+     * added, updated or deleted.
+     *
      * @param listener
      */
     public void addListener(PlantDescriptionUpdateListener listener) {
