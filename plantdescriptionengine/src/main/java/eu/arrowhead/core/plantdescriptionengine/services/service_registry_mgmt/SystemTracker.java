@@ -1,6 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +23,10 @@ public class SystemTracker {
     private final HttpClient httpClient;
     private InetSocketAddress serviceRegistryAddress = null;
     private boolean initialized;
+
+    // List of instances that need to be informed when systems are added or
+    // removed from the service registry.
+    List<SystemUpdateListener> listeners = new ArrayList<>();
 
     // Map from system name to system:
     private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
@@ -54,6 +60,8 @@ public class SystemTracker {
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
+                reportChanges(systemList);
+                systems.clear();
                 for (var system : systemList.data()) {
                     systems.put(system.systemName(), system);
                 }
@@ -63,9 +71,42 @@ public class SystemTracker {
     }
 
     /**
-     * Retrieves the specified system.
-     * Note that the returned data will be stale if the system in question has
-     * changed state since the last call to {@link #refreshSystems()}.
+     * Informs all registered listeners of which systems have been added or
+     * removed from the service registry since the last refresh.
+     *
+     * @param newSystems
+     */
+    private void reportChanges(SrSystemListDto newSystems) {
+
+        // Report removed systems
+        for (var oldSystem: systems.values()) {
+            boolean stillPresent = newSystems.data()
+                .stream()
+                .anyMatch(newSystem -> newSystem.systemName().equals(oldSystem.systemName()));
+            if (!stillPresent) {
+                for (var listener: listeners) {
+                    listener.onSystemRemoved(oldSystem);
+                }
+            }
+        }
+
+        // Report added systems
+        for (var newSystem : newSystems.data()) {
+            boolean wasPresent = systems.values()
+                .stream()
+                .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
+            if (!wasPresent) {
+                for (var listener: listeners) {
+                    listener.onSystemAdded(newSystem);
+                }
+            }
+        }
+    }
+
+    /**
+     * Retrieves the specified system. Note that the returned data will be stale if
+     * the system in question has changed state since the last call to
+     * {@link #refreshSystems()}.
      *
      *
      * @param systemName Name of a system.
@@ -79,19 +120,13 @@ public class SystemTracker {
     }
 
     /**
-     * Retrieves the specified system.
-     * Note that the returned data will be stale if the system in question has
-     * changed state since the last call to {@link #refreshSystems()}.
+     * Registers another object to be notified whenever a system is added or
+     * removed.
      *
-     *
-     * @param systemName Name of a system.
-     * @return The desired system, if it is present in the local cache.
+     * @param listener
      */
-    public SrSystem getSystem(String systemName) {
-        if (!initialized) {
-            throw new IllegalStateException("SystemTracker has not been initialized.");
-        }
-        return systems.get(systemName);
+    public void addListener(SystemUpdateListener listener) {
+        listeners.add(listener);
     }
 
 }
