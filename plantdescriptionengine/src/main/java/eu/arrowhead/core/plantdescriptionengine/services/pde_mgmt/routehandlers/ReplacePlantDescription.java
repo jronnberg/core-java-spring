@@ -24,16 +24,16 @@ import se.arkalix.util.concurrent.Future;
 public class ReplacePlantDescription implements HttpRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(ReplacePlantDescription.class);
 
-    private final PlantDescriptionTracker entryMap;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor
      *
-     * @param entryMap Object that keeps track of Plant Description Enties.
+     * @param pdTracker Object that keeps track of Plant Description Enties.
      */
-    public ReplacePlantDescription(PlantDescriptionTracker entryMap) {
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
-        this.entryMap = entryMap;
+    public ReplacePlantDescription(PlantDescriptionTracker pdTracker) {
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Entry map");
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -68,7 +68,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 }
 
                 try {
-                    entryMap.put(entry);
+                    pdTracker.put(entry);
                 } catch (final PdStoreException e) {
                     logger.error("Failed to write Plant Description Entry update to backing store.", e);
                     return response.status(HttpStatus.INTERNAL_SERVER_ERROR);

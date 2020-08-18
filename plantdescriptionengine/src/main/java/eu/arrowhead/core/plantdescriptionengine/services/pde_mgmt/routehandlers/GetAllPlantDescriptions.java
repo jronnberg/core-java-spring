@@ -31,16 +31,16 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
-    private final PlantDescriptionTracker entryMap;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor
      *
-     * @param entryMap Object that keeps track of Plant Description Enties.
+     * @param pdTracker Object that keeps track of Plant Description Enties.
      */
-    public GetAllPlantDescriptions(PlantDescriptionTracker entryMap) {
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
-        this.entryMap = entryMap;
+    public GetAllPlantDescriptions(PlantDescriptionTracker pdTracker) {
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Entry map");
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -78,7 +78,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             return Future.done();
         }
 
-        List<PlantDescriptionEntryDto> entries = entryMap.getEntries();
+        List<PlantDescriptionEntryDto> entries = pdTracker.getEntries();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {

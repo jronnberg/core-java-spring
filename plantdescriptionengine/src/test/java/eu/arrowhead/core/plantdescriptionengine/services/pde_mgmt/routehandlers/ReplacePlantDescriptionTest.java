@@ -35,8 +35,8 @@ public class ReplacePlantDescriptionTest {
     @Test
     public void shouldCreateEntry() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new ReplacePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new ReplacePlantDescription(pdTracker);
         final int entryId = 87;
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockResponse();
@@ -54,7 +54,7 @@ public class ReplacePlantDescriptionTest {
                     PlantDescriptionEntry entry = (PlantDescriptionEntry)response.body().get();
                     assertTrue(entry.matchesDescription(description));
 
-                    var entryInMap = entryMap.get(entry.id());
+                    var entryInMap = pdTracker.get(entry.id());
                     assertNotNull(entryInMap);
                     // TODO: Compare 'entryInMap' with 'entry'.
                 })
@@ -69,8 +69,8 @@ public class ReplacePlantDescriptionTest {
     @Test
     public void shouldReplaceExistingEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new ReplacePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new ReplacePlantDescription(pdTracker);
         final int entryId = 87;
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
@@ -88,9 +88,9 @@ public class ReplacePlantDescriptionTest {
             .body(description)
             .build();
 
-        entryMap.put(entry);
+        pdTracker.put(entry);
 
-        final int sizeBeforePut = entryMap.getEntries().size();
+        final int sizeBeforePut = pdTracker.getEntries().size();
 
         try {
             handler.handle(request, response)
@@ -99,7 +99,7 @@ public class ReplacePlantDescriptionTest {
                     assertNotNull(response.body());
                     PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
                     assertEquals(returnedEntry.plantDescription(), newName);
-                    assertEquals(sizeBeforePut, entryMap.getEntries().size());
+                    assertEquals(sizeBeforePut, pdTracker.getEntries().size());
                 })
                 .onFailure(throwable -> {
                     assertNull(throwable);
@@ -111,8 +111,8 @@ public class ReplacePlantDescriptionTest {
 
     @Test
     public void shouldRejectInvalidId() throws PdStoreException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new ReplacePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new ReplacePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -143,10 +143,10 @@ public class ReplacePlantDescriptionTest {
         final String systemId = "system_a";
         final String portName = "port_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new ReplacePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new ReplacePlantDescription(pdTracker);
 
-        entryMap.put(TestUtils.createEntry(entryId));
+        pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()

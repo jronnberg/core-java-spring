@@ -23,13 +23,13 @@ public class PdeMonitorService {
     private final MonitorablesClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
 
-    private final PlantDescriptionTracker entryMap;
+    private final PlantDescriptionTracker pdTracker;
     private final boolean secure;
 
     /**
      * Class constructor.
      *
-     * @param entryMap An object that maps ID:s to Plant Description
+     * @param pdTracker An object that maps ID:s to Plant Description
      *                 Entries.
      * @param arSystem An Arrowhead Framework system used to provide this
      *                 service.
@@ -38,16 +38,16 @@ public class PdeMonitorService {
      */
     public PdeMonitorService(
         ArSystem arSystem,
-        PlantDescriptionTracker entryMap,
+        PlantDescriptionTracker pdTracker,
         HttpClient httpClient,
         boolean secure
     ) {
         Objects.requireNonNull(arSystem, "Expected AR System");
-        Objects.requireNonNull(entryMap, "Expected plant description map");
+        Objects.requireNonNull(pdTracker, "Expected plant description tracker");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
 
         this.arSystem = arSystem;
-        this.entryMap = entryMap;
+        this.pdTracker = pdTracker;
         this.secure = secure;
 
         this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo);
@@ -66,7 +66,7 @@ public class PdeMonitorService {
             .name("plant-description-monitor")
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
-            .get("/pd", new GetAllPlantDescriptions(monitorInfo, entryMap))
+            .get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
             .get("/alarm", new GetAllPdeAlarms());
 
         if (secure) {

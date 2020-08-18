@@ -16,16 +16,16 @@ import se.arkalix.util.concurrent.Future;
  */
 public class GetPlantDescription implements HttpRouteHandler {
 
-    private final PlantDescriptionTracker entryMap;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor
      *
-     * @param entryMap Object that keeps track of Plant Description Enties.
+     * @param pdTracker Object that keeps track of Plant Description Enties.
      */
-    public GetPlantDescription(PlantDescriptionTracker entryMap) {
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry map");
-        this.entryMap = entryMap;
+    public GetPlantDescription(PlantDescriptionTracker pdTracker) {
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -51,7 +51,7 @@ public class GetPlantDescription implements HttpRouteHandler {
             return Future.done();
         }
 
-        final PlantDescriptionEntryDto entry = entryMap.get(id);
+        final PlantDescriptionEntryDto entry = pdTracker.get(id);
 
         if (entry == null) {
             response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
