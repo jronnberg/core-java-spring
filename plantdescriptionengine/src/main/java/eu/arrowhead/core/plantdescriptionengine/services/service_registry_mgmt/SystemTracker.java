@@ -26,10 +26,10 @@ public class SystemTracker {
 
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
-    List<SystemUpdateListener> listeners = new ArrayList<>();
+    protected List<SystemUpdateListener> listeners = new ArrayList<>();
 
     // Map from system name to system:
-    private Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    protected Map<String, SrSystem> systems = new ConcurrentHashMap<>();
 
     /**
      * Class constructor

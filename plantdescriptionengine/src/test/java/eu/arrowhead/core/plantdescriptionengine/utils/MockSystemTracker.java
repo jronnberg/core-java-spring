@@ -1,8 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
@@ -12,9 +10,6 @@ import se.arkalix.net.http.client.HttpClient;
  * Subclass of SystemTracker used for testing purposes.
  */
 public class MockSystemTracker extends SystemTracker {
-
-    // Map from system name to system:
-    Map<String, SrSystem> systems = new HashMap<>();
 
     public MockSystemTracker(HttpClient httpClient, InetSocketAddress serviceRegistryAddress) {
         super(httpClient, serviceRegistryAddress);
@@ -37,6 +32,9 @@ public class MockSystemTracker extends SystemTracker {
      */
     public void addSystem(String systemName, SrSystem system) {
         systems.put(systemName, system);
-	}
+        for (var listener: listeners) {
+            listener.onSystemAdded(system);
+        }
+    }
 
 }
