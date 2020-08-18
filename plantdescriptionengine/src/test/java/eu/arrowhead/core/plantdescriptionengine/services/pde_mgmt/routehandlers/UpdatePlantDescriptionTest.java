@@ -32,8 +32,8 @@ public class UpdatePlantDescriptionTest {
     @Test
     public void shouldReplaceExistingEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new UpdatePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new UpdatePlantDescription(pdTracker);
         final int entryId = 87;
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
@@ -47,9 +47,9 @@ public class UpdatePlantDescriptionTest {
             .body(update)
             .build();
 
-        entryMap.put(entry);
+        pdTracker.put(entry);
 
-        final int sizeBeforePut = entryMap.getEntries().size();
+        final int sizeBeforePut = pdTracker.getEntries().size();
 
         try {
             handler.handle(request, response)
@@ -57,7 +57,7 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(HttpStatus.OK, response.status().get());
                     PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
                     assertEquals(returnedEntry.plantDescription(), newName);
-                    assertEquals(sizeBeforePut, entryMap.getEntries().size());
+                    assertEquals(sizeBeforePut, pdTracker.getEntries().size());
                 })
                 .onFailure(throwable -> {
                     assertNull(throwable);
@@ -69,8 +69,8 @@ public class UpdatePlantDescriptionTest {
 
     @Test
     public void shouldRejectInvalidId() throws PdStoreException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new UpdatePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new UpdatePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -98,8 +98,8 @@ public class UpdatePlantDescriptionTest {
 
     @Test
     public void shouldRejectNonexistentIds() throws PdStoreException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new UpdatePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new UpdatePlantDescription(pdTracker);
         final int nonExistentId = 9;
 
         HttpServiceRequest request = new MockRequest.Builder()

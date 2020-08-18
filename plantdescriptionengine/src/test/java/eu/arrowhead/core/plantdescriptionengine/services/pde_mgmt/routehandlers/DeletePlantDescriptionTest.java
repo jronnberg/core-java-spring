@@ -24,10 +24,10 @@ public class DeletePlantDescriptionTest {
     @Test
     public void shouldDeleteEntries() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new DeletePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new DeletePlantDescription(pdTracker);
         final int entryId = 14;
-        entryMap.put(TestUtils.createEntry(entryId));
+        pdTracker.put(TestUtils.createEntry(entryId));
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
@@ -36,13 +36,13 @@ public class DeletePlantDescriptionTest {
         HttpServiceResponse response = new MockResponse();
 
         // Make sure that the entry is there before we delete it.
-        assertNotNull(entryMap.get(entryId));
+        assertNotNull(pdTracker.get(entryId));
 
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.OK, response.status().get());
-                    assertNull(entryMap.get(entryId));
+                    assertNull(pdTracker.get(entryId));
                 })
                 .onFailure(e -> {
                     assertNull(e);
@@ -54,8 +54,8 @@ public class DeletePlantDescriptionTest {
 
     @Test
     public void shouldRejectInvalidId() throws PdStoreException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new DeletePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new DeletePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -84,8 +84,8 @@ public class DeletePlantDescriptionTest {
 
     @Test
     public void shouldRejectNonexistentIds() throws PdStoreException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new DeletePlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new DeletePlantDescription(pdTracker);
         final int nonExistentId = 392;
 
         HttpServiceRequest request = new MockRequest.Builder()

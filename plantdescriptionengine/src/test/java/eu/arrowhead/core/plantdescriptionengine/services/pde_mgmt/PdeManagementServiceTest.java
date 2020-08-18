@@ -15,15 +15,15 @@ public class PdeManagementServiceTest {
 
     @Test
     public void shouldProvideSecureService() throws PdStoreException, SSLException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var service = new PdeManagementService(entryMap, true).getService();
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var service = new PdeManagementService(pdTracker, true).getService();
         assertEquals(AccessPolicy.cloud(), service.accessPolicy());
     }
 
     @Test
     public void shouldProvideInsecureService() throws PdStoreException, SSLException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var service = new PdeManagementService(entryMap, false).getService();
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var service = new PdeManagementService(pdTracker, false).getService();
 
         assertEquals(AccessPolicy.unrestricted(), service.accessPolicy());
     }

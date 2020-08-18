@@ -34,7 +34,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GetAllPlantDescriptions.class);
 
-    private final PlantDescriptionTracker entryMap;
+    private final PlantDescriptionTracker pdTracker;
     private final MonitorInfo monitorInfo;
 
     /**
@@ -44,13 +44,13 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * @param monitorInfo Object that stores information on monitorable systems.
      *
      */
-    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker entryMap
+    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
     ) {
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
-        Objects.requireNonNull(entryMap, "Expected Plant Description Entry Map");
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
 
         this.monitorInfo = monitorInfo;
-        this.entryMap = entryMap;
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -88,7 +88,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             return Future.done();
         }
 
-        var entries = entryMap.getEntries();
+        var entries = pdTracker.getEntries();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {

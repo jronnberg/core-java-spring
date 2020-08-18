@@ -24,8 +24,8 @@ public class GetPlantDescriptionTest {
     @Test
     public void shouldRespondWithNotFound() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new GetPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new GetPlantDescription(pdTracker);
         final int nonExistentEntryId = 0;
 
         HttpServiceRequest request = new MockRequest.Builder()
@@ -53,10 +53,10 @@ public class GetPlantDescriptionTest {
 
         int entryId = 39;
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        entryMap.put(TestUtils.createEntry(entryId));
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        pdTracker.put(TestUtils.createEntry(entryId));
 
-        GetPlantDescription handler = new GetPlantDescription(entryMap);
+        GetPlantDescription handler = new GetPlantDescription(pdTracker);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
@@ -85,10 +85,10 @@ public class GetPlantDescriptionTest {
         int entryId = 24;
         String invalidId = "Invalid";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        entryMap.put(TestUtils.createEntry(entryId));
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        pdTracker.put(TestUtils.createEntry(entryId));
 
-        GetPlantDescription handler = new GetPlantDescription(entryMap);
+        GetPlantDescription handler = new GetPlantDescription(pdTracker);
 
         HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(invalidId))

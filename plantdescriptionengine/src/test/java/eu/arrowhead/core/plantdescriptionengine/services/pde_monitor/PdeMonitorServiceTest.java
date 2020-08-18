@@ -38,14 +38,14 @@ public class PdeMonitorServiceTest {
 
     @Test
     public void shouldNotAllowSecureService() throws PdStoreException, SSLException {
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
         final ArSystem arSystem = new ArSystem.Builder()
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, entryMap, client, true);
+        final var service = new PdeMonitorService(arSystem, pdTracker, client, true);
 
         service.provide()
             .ifSuccess(result -> {

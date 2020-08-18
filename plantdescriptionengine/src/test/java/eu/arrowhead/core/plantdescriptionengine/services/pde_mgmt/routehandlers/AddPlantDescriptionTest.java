@@ -37,8 +37,8 @@ public class AddPlantDescriptionTest {
     @Test
     public void shouldCreateEntry() throws PdStoreException {
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockResponse();
         final MockRequest request = new MockRequest.Builder()
@@ -54,7 +54,7 @@ public class AddPlantDescriptionTest {
                     PlantDescriptionEntry entry = (PlantDescriptionEntry)response.body().get();
                     assertTrue(entry.matchesDescription(description));
 
-                    var entryInMap = entryMap.get(entry.id());
+                    var entryInMap = pdTracker.get(entry.id());
                     assertNotNull(entryInMap);
                     // TODO: Compare 'entryInMap' with 'entry'.
                 })
@@ -76,8 +76,8 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -156,8 +156,8 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -236,8 +236,8 @@ public class AddPlantDescriptionTest {
         final String invalidPort = "no_such_port";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -317,8 +317,8 @@ public class AddPlantDescriptionTest {
         final String invalidPort = "no_such_port";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -397,8 +397,8 @@ public class AddPlantDescriptionTest {
         final String producerPort = "port_2";
         final String serviceDefinition = "service_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -489,8 +489,8 @@ public class AddPlantDescriptionTest {
         final String serviceDefinition = "service_a";
         final Map<String, String> sharedMetadata = Map.of("x", "y");
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -562,8 +562,8 @@ public class AddPlantDescriptionTest {
         final Map<String, String> metadataA = Map.of("a", "1");
         final Map<String, String> metadataB = Map.of("a", "2");
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
@@ -616,8 +616,8 @@ public class AddPlantDescriptionTest {
         final String systemId = "system_a";
         final String portName = "port_a";
 
-        final var entryMap = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var handler = new AddPlantDescription(entryMap);
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
