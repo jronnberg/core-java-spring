@@ -1,11 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
@@ -56,13 +58,19 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
     }
 
     private void checkSystems() {
-
         final var alarmManager = Locator.getAlarmManager();
         final List<SrSystem> registeredSystems = Locator.getSystemTracker().getSystems();
         final PlantDescriptionEntry activeEntry = pdTracker.activeEntry();
+        final List<PdeSystem> pdSystems;
+        if (activeEntry == null) {
+            pdSystems = new ArrayList<>();
+        } else {
+            pdSystems = activeEntry.systems();
+        }
 
-        for (final var entrySystem : activeEntry.systems()) {
+        for (final var entrySystem : pdSystems) {
             String systemName = null;
+
             for (final var registeredSystem : registeredSystems) {
                 // TODO: Look for a match using metadata as well
                 final Optional<String> name = entrySystem.systemName();
@@ -82,7 +90,7 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
 
         for (final SrSystem registeredSystem : registeredSystems) {
             String systemId = null;
-            for (final var entrySystem : activeEntry.systems()) {
+            for (final var entrySystem : pdSystems) {
                 // TODO: Look for a match using metadata as well
                 final Optional<String> name = entrySystem.systemName();
                 if (name.isPresent() && name.get().equals(registeredSystem.systemName())) {

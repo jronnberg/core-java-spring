@@ -32,6 +32,7 @@ public class AlarmManager {
 
             raisedAt = Instant.now();
             updatedAt = Instant.now();
+            clearedAt = null;
         }
 
         public final String systemName;
@@ -40,6 +41,7 @@ public class AlarmManager {
         public boolean acknowledged;
         public Instant raisedAt;
         public Instant updatedAt;
+        public Instant clearedAt;
         public Instant acknowledgedAt = null;
 
         private String description() {
@@ -99,6 +101,7 @@ public class AlarmManager {
     }
 
     private final List<AlarmData> alarms = new ArrayList<>();
+    private final List<AlarmData> clearedAlarms = new ArrayList<>();
 
     /**
      * @return A list containing all currently active alarms.
@@ -106,7 +109,11 @@ public class AlarmManager {
 	public PdeAlarmListDto getAlarmList() {
         final var alarmDtos = new ArrayList<PdeAlarmDto>();
 
-        for (final var alarm : alarms) {
+        final List<AlarmData> allAlarms = new ArrayList<>();
+        allAlarms.addAll(alarms);
+        allAlarms.addAll(clearedAlarms);
+
+        for (final var alarm : allAlarms) {
             Severity severity = severityByCause.get(alarm.cause);
             alarmDtos.add(new PdeAlarmBuilder()
                 .id(alarms.size())
@@ -117,6 +124,7 @@ public class AlarmManager {
                 .description(alarm.description())
                 .raisedAt(alarm.raisedAt)
                 .updatedAt(alarm.updatedAt)
+                .clearedAt(alarm.clearedAt)
                 .acknowledgedAt(alarm.acknowledgedAt)
                 .build());
         }
@@ -148,11 +156,15 @@ public class AlarmManager {
     }
 
     private void clearAlarm(String systemId, String systemName, Cause cause) {
-        final var clearedAlarms = alarms
+        final List<AlarmData> newlyCleared = alarms
             .stream()
             .filter(alarm -> alarm.matches(systemId, systemName, cause))
             .collect(Collectors.toList());
-        alarms.removeAll(clearedAlarms);
+        for (var alarm : newlyCleared) {
+            alarm.clearedAt = Instant.now();
+        }
+        clearedAlarms.addAll(newlyCleared);
+        alarms.removeAll(newlyCleared);
     }
 
     public void clearAlarmBySystemName(String systemName, Cause cause) {
