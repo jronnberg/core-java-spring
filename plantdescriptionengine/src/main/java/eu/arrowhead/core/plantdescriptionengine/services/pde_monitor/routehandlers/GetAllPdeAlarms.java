@@ -1,7 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -21,7 +21,11 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
-        response.body(DtoEncoding.JSON, Locator.getAlarmManager().getAlarmList());
+        final var alarms = Locator.getAlarmManager().getAlarms();
+        response.body(new PdeAlarmListBuilder()
+            .data(alarms)
+            .count(alarms.size())
+            .build());
         response.status(HttpStatus.OK);
         return Future.done();
     }
