@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.routehandlers;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,14 +53,14 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
         final List<QueryParameter> requiredParameters = null;
-        final List<QueryParameter> acceptedParameters = Arrays.asList(
+        final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
                 .min(0)
                 .requires(new IntParameter("item_per_page")),
             new StringParameter("sort_field")
-                .legalValues(Arrays.asList("id", "createdAt", "updatedAt")),
+                .legalValues(List.of("id", "createdAt", "updatedAt")),
             new StringParameter("direction")
-                .legalValues(Arrays.asList("ASC", "DESC"))
+                .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
             new StringParameter("filter_field")
                 .legalValue("active")
@@ -97,7 +96,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         if (parser.getString("filter_field").isPresent()) {
             boolean filterValue = parser.getBoolean("filter_value").get();
-            PlantDescriptionEntry.filterOnActive(entries, filterValue);
+            PlantDescriptionEntry.filterByActive(entries, filterValue);
         }
 
         response

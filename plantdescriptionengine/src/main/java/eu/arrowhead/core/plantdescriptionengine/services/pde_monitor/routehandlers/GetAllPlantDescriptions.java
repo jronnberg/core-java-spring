@@ -1,7 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,13 +8,13 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
-import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto;
@@ -64,14 +63,14 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
         final List<QueryParameter> requiredParameters = null;
-        final List<QueryParameter> acceptedParameters = Arrays.asList(
+        final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
                 .min(0)
                 .requires(new IntParameter("item_per_page")),
             new StringParameter("sort_field")
-                .legalValues(Arrays.asList("id", "createdAt", "updatedAt")),
+                .legalValues(List.of("id", "createdAt", "updatedAt")),
             new StringParameter("direction")
-                .legalValues(Arrays.asList("ASC", "DESC"))
+                .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
             new StringParameter("filter_field")
                 .legalValue("active")
@@ -107,7 +106,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         if (parser.getString("filter_field").isPresent()) {
             boolean filterValue = parser.getBoolean("filter_value").get();
-            PlantDescriptionEntry.filterOnActive(entries, filterValue);
+            PlantDescriptionEntry.filterByActive(entries, filterValue);
         }
 
         // Extend each Plant Description Entry with monitor data retrieved from

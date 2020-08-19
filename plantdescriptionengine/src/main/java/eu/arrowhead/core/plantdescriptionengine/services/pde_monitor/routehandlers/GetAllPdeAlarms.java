@@ -1,5 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
+import java.util.List;
+import java.util.Optional;
+
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.net.http.HttpStatus;
@@ -21,7 +28,26 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+
+        final List<QueryParameter> requiredParameters = null;
+        final List<QueryParameter> acceptedParameters = List.of(
+            new StringParameter("filter_field")
+                .legalValues(List.of("systemName"))
+                .requires(new StringParameter("filter_value"))
+        );
+
+        final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
         final var alarms = Locator.getAlarmManager().getAlarms();
+
+        final Optional<String> filterField = parser.getString("filter_field");
+
+        if (filterField.isPresent()) {
+            String filterValue = parser.getString("filter_value").get();
+            if (filterField.get().equals("systemName")) {
+                PdeAlarm.filterBySystemName(alarms, filterValue);
+            }
+        }
+
         response.body(new PdeAlarmListBuilder()
             .data(alarms)
             .count(alarms.size())

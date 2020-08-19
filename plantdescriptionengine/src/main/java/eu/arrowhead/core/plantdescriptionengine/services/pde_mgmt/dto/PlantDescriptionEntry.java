@@ -168,9 +168,13 @@ public interface PlantDescriptionEntry {
         }
     }
 
-    static void filterOnActive(
-        List<? extends PlantDescriptionEntry> entries, boolean active
-    ) {
+    /**
+     * Filters the given list based on the elements' 'active' values.
+     * @param alarms  A list of Plant Description entries.
+     * @param active  If true, active entries are removed. If false, inactive
+     *                entries are removed.
+     */
+    static void filterByActive(List<? extends PlantDescriptionEntry> entries, boolean active) {
         if (active) {
             entries.removeIf(entry -> !entry.active());
         } else {
