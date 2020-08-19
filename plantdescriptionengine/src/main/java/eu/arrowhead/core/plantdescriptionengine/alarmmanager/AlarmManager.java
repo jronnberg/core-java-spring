@@ -155,9 +155,12 @@ public class AlarmManager {
             .stream()
             .filter(alarm -> alarm.matches(systemId, systemName, cause))
             .collect(Collectors.toList());
+
         for (var alarm : newlyCleared) {
             alarm.clearedAt = Instant.now();
+            alarm.updatedAt = Instant.now();
         }
+
         clearedAlarms.addAll(newlyCleared);
         alarms.removeAll(newlyCleared);
     }

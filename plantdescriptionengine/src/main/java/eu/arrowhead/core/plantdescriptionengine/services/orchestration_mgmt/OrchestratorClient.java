@@ -178,27 +178,23 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         List<DtoWritable> rules = new ArrayList<>();
 
-        return Locator.getSystemTracker().refreshSystems() // TODO: Make the system tracker refresh itself automatically instead.
-            .flatMap(result -> {
-                for (int i = 0; i < numConnections; i++) {
-                    var rule = createRule(entry, i);
-                    if (rule != null) { // TODO: Remove this check when createRule() has been fixed (no longer returns null)
-                        rules.add(rule);
-                    }
-                }
+        for (int i = 0; i < numConnections; i++) {
+            var rule = createRule(entry, i);
+            if (rule != null) { // TODO: Remove this check when createRule() has been fixed (no longer returns null)
+                rules.add(rule);
+            }
+        }
 
-                if (rules.size() == 0) {
-                    return Future.success(emptyRuleList());
-                }
+        if (rules.size() == 0) {
+            return Future.success(emptyRuleList());
+        }
 
-                return client
-                    .send(orchestratorAddress, new HttpClientRequest()
-                        .method(HttpMethod.POST)
-                        .uri("/orchestrator/mgmt/store")
-                        .body(DtoEncoding.JSON, rules)
-                        .header("accept", "application/json"))
-                    .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
-            });
+        return client.send(orchestratorAddress, new HttpClientRequest()
+            .method(HttpMethod.POST)
+            .uri("/orchestrator/mgmt/store")
+            .body(DtoEncoding.JSON, rules)
+            .header("accept", "application/json"))
+            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
     /**
