@@ -21,7 +21,6 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreEx
 import eu.arrowhead.core.plantdescriptionengine.services.orchestration_mgmt.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListDto;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
@@ -59,8 +58,8 @@ public class PdMismatchDetectorTest {
             .build();
 
         pdTracker.put(entry);
-        final PdeAlarmListDto alarms = alarmManager.getAlarmList();
-        final var alarm = alarms.data().get(0);
+        final var alarms = alarmManager.getAlarms();
+        final var alarm = alarms.get(0);
         assertEquals(systemId, alarm.systemId().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
@@ -112,9 +111,9 @@ public class PdMismatchDetectorTest {
             .build();
 
         systemTracker.addSystem(systemName, srSystem);
-        final var alarms = alarmManager.getAlarmList();
-        final var alarm = alarms.data().get(0);
-        assertEquals(1, alarms.count());
+        final var alarms = alarmManager.getAlarms();
+        final var alarm = alarms.get(0);
+        assertEquals(1, alarms.size());
         assertEquals(systemId, alarm.systemId().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());

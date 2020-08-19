@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListDto;
 
 public class AlarmManager {
 
@@ -104,10 +102,10 @@ public class AlarmManager {
     private final List<AlarmData> clearedAlarms = new ArrayList<>();
 
     /**
-     * @return A list containing all currently active alarms.
+     * @return A list containing all alarms.
      */
-	public PdeAlarmListDto getAlarmList() {
-        final var alarmDtos = new ArrayList<PdeAlarmDto>();
+	public List<PdeAlarmDto> getAlarms() {
+        final List<PdeAlarmDto> alarmDtos = new ArrayList<>();
 
         final List<AlarmData> allAlarms = new ArrayList<>();
         allAlarms.addAll(alarms);
@@ -129,10 +127,7 @@ public class AlarmManager {
                 .build());
         }
 
-        return new PdeAlarmListBuilder()
-            .count(alarmDtos.size())
-            .data(alarmDtos)
-            .build();
+        return alarmDtos;
     }
 
     private void raiseAlarm(String systemId, String systemName, Cause cause) {
