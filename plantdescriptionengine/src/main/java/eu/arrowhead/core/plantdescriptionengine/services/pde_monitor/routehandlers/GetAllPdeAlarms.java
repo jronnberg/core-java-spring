@@ -32,7 +32,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
             new StringParameter("filter_field")
-                .legalValues(List.of("systemName"))
+                .legalValues(List.of("systemName", "severity"))
                 .requires(new StringParameter("filter_value"))
         );
 
@@ -45,6 +45,8 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             String filterValue = parser.getString("filter_value").get();
             if (filterField.get().equals("systemName")) {
                 PdeAlarm.filterBySystemName(alarms, filterValue);
+            } else if (filterField.get().equals("severity")) {
+                PdeAlarm.filterBySeverity(alarms, filterValue);
             }
         }
 

@@ -112,7 +112,7 @@ public class AlarmManager {
         allAlarms.addAll(clearedAlarms);
 
         for (final var alarm : allAlarms) {
-            Severity severity = severityByCause.get(alarm.cause);
+            Severity severity = (alarm.clearedAt == null) ? severityByCause.get(alarm.cause) : Severity.cleared;
             alarmDtos.add(new PdeAlarmBuilder()
                 .id(alarms.size())
                 .systemId(alarm.systemId)
