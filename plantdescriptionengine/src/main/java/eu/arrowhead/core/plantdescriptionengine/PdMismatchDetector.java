@@ -30,6 +30,9 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
     public void run() {
         pdTracker.addListener(this);
         Locator.getSystemTracker().addListener(this);
+
+        // Initial check for mismatches:
+        checkSystems();
     }
 
     @Override

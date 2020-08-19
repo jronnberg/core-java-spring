@@ -251,7 +251,7 @@ public class PdeMain {
 
         // Make the system tracker globally accessible:
         Locator.setSystemTracker(systemTracker);
-        systemTracker.refreshSystems().flatMap(result -> {
+        systemTracker.startPollingForSystems().flatMap(result -> {
 
             // Create a globally accessible alarm manager:
             Locator.setAlarmManager(new AlarmManager());

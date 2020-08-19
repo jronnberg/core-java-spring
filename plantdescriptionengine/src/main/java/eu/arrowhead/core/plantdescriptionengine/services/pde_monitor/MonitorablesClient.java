@@ -44,7 +44,7 @@ public class MonitorablesClient {
     }
 
     public void start() {
-        Timer timer = new Timer();
+        final var timer = new Timer();
 
         // Periodically check if all monitorable services are active
         timer.schedule(new TimerTask() {
@@ -84,7 +84,6 @@ public class MonitorablesClient {
     private void infoPoll() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
-                System.out.println("Number of services: " + services.size());
                 for (var service : services) {
                     System.out.println(service.provider().name());
                     retrieveId(service);

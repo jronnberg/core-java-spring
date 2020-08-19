@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.dto.SrSystem;
@@ -23,6 +25,7 @@ public class SystemTracker {
     private final HttpClient httpClient;
     private InetSocketAddress serviceRegistryAddress = null;
     private boolean initialized;
+    private int pollInterval = 5000;
 
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
@@ -53,7 +56,7 @@ public class SystemTracker {
      * The retrieved systems are stored locally, and can be accessed using
      * {@link #getComponentAt(String) getSystem}.
      */
-    public Future<Void> refreshSystems() {
+    private Future<Void> pollForSystems() {
         return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/serviceregistry/mgmt/systems")
@@ -77,7 +80,6 @@ public class SystemTracker {
      * @param newSystems
      */
     private void reportChanges(SrSystemListDto newSystems) {
-
         // Report removed systems
         for (var oldSystem: systems.values()) {
             boolean stillPresent = newSystems.data()
@@ -106,7 +108,7 @@ public class SystemTracker {
     /**
      * Retrieves the specified system. Note that the returned data will be stale if
      * the system in question has changed state since the last call to
-     * {@link #refreshSystems()}.
+     * {@link #pollForSystems()}.
      *
      *
      * @param systemName Name of a system.
@@ -131,6 +133,28 @@ public class SystemTracker {
 
     public List<SrSystem> getSystems() {
         return new ArrayList<SrSystem>(systems.values());
+    }
+
+    /**
+     * Starts polling the Service Registry for registered systems.
+     * @return A Future that completes on the first reply from the Service
+     *         Registry.
+     */
+    public Future<Void> startPollingForSystems() {
+        final var timer = new Timer();
+
+        return pollForSystems().flatMap(result -> {
+
+            // Periodically poll the Service Registry for systems.
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    pollForSystems();
+                }
+            }, 0, pollInterval);
+
+            return Future.done();
+        });
     }
 
 }
