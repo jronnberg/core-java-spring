@@ -32,10 +32,10 @@ public interface PdeAlarm {
     /**
      * Filters out cleared/uncleared alarms from the given list.
      * @param alarms  A list of PDE alarms.
-     * @param cleared If true, cleared alarms are removed. If false, uncleared
+     * @param cleared If true, uncleared alarms are removed. If false, cleared
      *                alarms are removed.
      */
-    static void filterByCleared(List<? extends PdeAlarm> alarms, boolean cleared) {
+    static void filterCleared(List<? extends PdeAlarm> alarms, boolean cleared) {
         if (cleared) {
             alarms.removeIf(alarm -> alarm.clearedAt().isEmpty());
         } else {
@@ -44,12 +44,35 @@ public interface PdeAlarm {
     }
 
     /**
+     * Filters out cleared/uncleared alarms from the given list.
+     * @param alarms       A list of PDE alarms.
+     * @param acknowledged If true, unacknowledged alarms are removed. If false,
+     *                     acknowledged alarms are removed.
+     */
+    static void filterAcknowledged(List<? extends PdeAlarm> alarms, boolean acknowledged) {
+        if (acknowledged) {
+            alarms.removeIf(alarm -> alarm.acknowledged());
+        } else {
+            alarms.removeIf(alarm -> !alarm.acknowledged());
+        }
+    }
+
+    /**
      * Filters the given list of alarms by system name.
      * @param alarms     A list of PDE alarms.
-     * @param systemNAme Only alarms with this system name are kept in the list.
+     * @param systemName Only alarms with this system name are kept in the list.
      */
 	static void filterBySystemName(List<PdeAlarmDto> alarms, String systemName) {
-        alarms.removeIf(alarm -> alarm.systemName().isEmpty() || !alarm.systemName().get().equals(systemName)
-        );
+        alarms.removeIf(alarm -> alarm.systemName().isEmpty() || !alarm.systemName().get().equals(systemName));
+    }
+
+    /**
+     * Filters the given list of alarms based on their severity.
+     * @param alarms   A list of PDE alarms.
+     * @param severity Only alarms with this severity are kept in the list.
+     */
+	static void filterBySeverity(List<PdeAlarmDto> alarms, String severity) {
+        alarms.removeIf(alarm -> !alarm.severity().equals(severity));
+
 	}
 }
