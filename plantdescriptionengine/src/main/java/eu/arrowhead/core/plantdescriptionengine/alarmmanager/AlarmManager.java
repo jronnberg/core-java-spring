@@ -4,12 +4,16 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmBuilder;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmDto;
 
 public class AlarmManager {
+
+    // Integer for storing the next alarm ID to be used:
+    private AtomicInteger nextId = new AtomicInteger();
 
     private static Map<Cause, Severity> severityByCause = Map.of(
         Cause.systemInactive, Severity.warning,
@@ -23,6 +27,7 @@ public class AlarmManager {
          * Internal representation of an alarm.
          */
         AlarmData(String systemId, String systemName, Cause cause) {
+            this.id = nextId.getAndIncrement();
             this.systemId = systemId;
             this.systemName = systemName;
             this.cause = cause;
@@ -33,14 +38,15 @@ public class AlarmManager {
             clearedAt = null;
         }
 
-        public final String systemName;
-        public final String systemId;
-        public final Cause cause;
-        public boolean acknowledged;
-        public Instant raisedAt;
-        public Instant updatedAt;
-        public Instant clearedAt;
-        public Instant acknowledgedAt = null;
+        final int id;
+        final String systemName;
+        final String systemId;
+        final Cause cause;
+        boolean acknowledged;
+        Instant raisedAt;
+        Instant updatedAt;
+        Instant clearedAt;
+        Instant acknowledgedAt = null;
 
         private String description() {
             String identifier = (systemId == null)
@@ -74,6 +80,25 @@ public class AlarmManager {
             }
             return true;
         }
+
+        /**
+         * @return A PdeAlarm DTO based on this alarm data.
+         */
+        public PdeAlarmDto toPdeAlarm() {
+            Severity severity = (clearedAt == null) ? severityByCause.get(cause) : Severity.cleared;
+            return new PdeAlarmBuilder()
+                .id(id)
+                .systemId(systemId)
+                .systemName(systemName)
+                .acknowledged(acknowledged)
+                .severity(severity.toString())
+                .description(description())
+                .raisedAt(raisedAt)
+                .updatedAt(updatedAt)
+                .clearedAt(clearedAt)
+                .acknowledgedAt(acknowledgedAt)
+                .build();
+        }
     }
 
     public enum Severity {
@@ -102,7 +127,7 @@ public class AlarmManager {
     private final List<AlarmData> clearedAlarms = new ArrayList<>();
 
     /**
-     * @return A list containing all alarms.
+     * @return A list containing all PDE alarms.
      */
 	public List<PdeAlarmDto> getAlarms() {
         final List<PdeAlarmDto> result = new ArrayList<>();
@@ -112,23 +137,24 @@ public class AlarmManager {
         allAlarms.addAll(clearedAlarms);
 
         for (final var alarm : allAlarms) {
-            Severity severity = (alarm.clearedAt == null) ? severityByCause.get(alarm.cause) : Severity.cleared;
-            result.add(new PdeAlarmBuilder()
-                .id(alarms.size())
-                .systemId(alarm.systemId)
-                .systemName(alarm.systemName)
-                .acknowledged(alarm.acknowledged)
-                .severity(severity.toString())
-                .description(alarm.description())
-                .raisedAt(alarm.raisedAt)
-                .updatedAt(alarm.updatedAt)
-                .clearedAt(alarm.clearedAt)
-                .acknowledgedAt(alarm.acknowledgedAt)
-                .build());
+            result.add(alarm.toPdeAlarm());
         }
 
         return result;
     }
+
+    /**
+     * @param id The ID of a PDE Alarm.
+     * @return The PDE Alarm with the given ID if it exists, null otherwise.
+     */
+    public PdeAlarmDto getAlarm(int id) {
+		for (final var alarm : alarms) {
+            if (alarm.id == id) {
+                return alarm.toPdeAlarm();
+            }
+        }
+        return null;
+	}
 
     private void raiseAlarm(String systemId, String systemName, Cause cause) {
         // TODO: Concurrency handling

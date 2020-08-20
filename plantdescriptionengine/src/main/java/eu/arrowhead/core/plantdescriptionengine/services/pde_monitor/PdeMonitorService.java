@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPdeAlarms;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetPdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers.GetAllPlantDescriptions;
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
@@ -67,6 +68,7 @@ public class PdeMonitorService {
             .encodings(EncodingDescriptor.JSON)
             .basePath("/pde/monitor")
             .get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
+            .get("/alarm/#id", new GetPdeAlarm())
             .get("/alarm", new GetAllPdeAlarms());
 
         if (secure) {
