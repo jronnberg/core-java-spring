@@ -105,7 +105,7 @@ public class AlarmManager {
      * @return A list containing all alarms.
      */
 	public List<PdeAlarmDto> getAlarms() {
-        final List<PdeAlarmDto> alarmDtos = new ArrayList<>();
+        final List<PdeAlarmDto> result = new ArrayList<>();
 
         final List<AlarmData> allAlarms = new ArrayList<>();
         allAlarms.addAll(alarms);
@@ -113,7 +113,7 @@ public class AlarmManager {
 
         for (final var alarm : allAlarms) {
             Severity severity = (alarm.clearedAt == null) ? severityByCause.get(alarm.cause) : Severity.cleared;
-            alarmDtos.add(new PdeAlarmBuilder()
+            result.add(new PdeAlarmBuilder()
                 .id(alarms.size())
                 .systemId(alarm.systemId)
                 .systemName(alarm.systemName)
@@ -127,7 +127,7 @@ public class AlarmManager {
                 .build());
         }
 
-        return alarmDtos;
+        return result;
     }
 
     private void raiseAlarm(String systemId, String systemName, Cause cause) {
