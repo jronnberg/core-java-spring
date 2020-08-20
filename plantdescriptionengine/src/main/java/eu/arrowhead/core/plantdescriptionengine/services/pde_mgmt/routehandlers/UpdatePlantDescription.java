@@ -39,8 +39,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
 
     /**
      * Handles an HTTP request to update the Plant Description Entry specified
-     * by the id parameter with the information in the PlantDescriptionUpdate
-     * parameter.
+     * by the id parameter with the information  in the request body.
      *
      * @param request  HTTP request containing a PlantDescriptionUpdate.
      * @param response HTTP response containing the updated entry.

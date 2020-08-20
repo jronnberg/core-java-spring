@@ -125,6 +125,20 @@ public class AlarmManager {
 
     private final List<AlarmData> alarms = new ArrayList<>();
     private final List<AlarmData> clearedAlarms = new ArrayList<>();
+    
+    /**
+     * @param id The ID of a PDE Alarm.
+     * @return Data describing the alarm with the given ID if it exists, null
+     *         otherwise.
+     */
+    private AlarmData getAlarmData(int id) {
+		for (final var alarm : alarms) {
+            if (alarm.id == id) {
+                return alarm;
+            }
+        }
+        return null;
+	}
 
     /**
      * @return A list containing all PDE alarms.
@@ -148,13 +162,12 @@ public class AlarmManager {
      * @return The PDE Alarm with the given ID if it exists, null otherwise.
      */
     public PdeAlarmDto getAlarm(int id) {
-		for (final var alarm : alarms) {
-            if (alarm.id == id) {
-                return alarm.toPdeAlarm();
-            }
+        final AlarmData alarmData = getAlarmData(id);
+        if (alarmData != null) {
+            return alarmData.toPdeAlarm();
         }
         return null;
-	}
+    }
 
     private void raiseAlarm(String systemId, String systemName, Cause cause) {
         // TODO: Concurrency handling
@@ -198,5 +211,18 @@ public class AlarmManager {
     public void clearAlarmBySystemId(String systemId, Cause cause) {
         clearAlarm(systemId, null, cause);
     }
+
+    /**
+     * @param id ID of an alarm.
+     * @param acknowledged The new value to assign to the alarm's acknowledged
+     *                     field.
+     */
+	public void setAcknowledged(int id, boolean acknowledged) throws IllegalArgumentException {
+        final AlarmData alarm = getAlarmData(id);
+        if (alarm == null) {
+            throw new IllegalArgumentException("There is no alarm with ID " + id);
+        }
+        alarm.acknowledged = acknowledged;
+	}
 
 }
