@@ -1,8 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
@@ -21,6 +27,7 @@ import se.arkalix.util.concurrent.Future;
  * Handles HTTP requests to retrieve PDE alarms.
  */
 public class GetAllPdeAlarms implements HttpRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GetAllPdeAlarms.class);
 
     /**
      * Handles an HTTP call to acquire a list of PDE alarms raised by the PDE.
@@ -32,6 +39,12 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
 
         final List<QueryParameter> requiredParameters = null;
+        List<String> severityValues = new ArrayList<>();
+        for (var severity : AlarmManager.Severity.values()) {
+            severityValues.add(severity.toString());
+        }
+        severityValues.add("not_cleared");
+
         final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
                 .min(0)
@@ -41,15 +54,21 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             new StringParameter("direction")
                 .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
-            new StringParameter("filter_field") // TODO: Remove filter_field, replace with severity, cleared, etc?
-                .legalValues(List.of("systemName", "severity")) // TODO: Add "acknowledged"
-                .requires(new StringParameter("filter_value")) // TODO: An incorrect value results in a server failure at the moment.
-        );
+            new StringParameter("severity")
+                .legalValues(severityValues)
+       );
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
-        List<PdeAlarmDto> alarms = Locator.getAlarmManager().getAlarms();
 
-        final Optional<String> filterField = parser.getString("filter_field");
+        if (parser.hasError()) {
+            response.status(HttpStatus.BAD_REQUEST);
+            response.body(ErrorMessage.of(parser.getErrorMessage()));
+            logger.error("Encountered the following error(s) while parsing an HTTP request: " +
+                parser.getErrorMessage());
+            return Future.done();
+        }
+
+        List<PdeAlarmDto> alarms = Locator.getAlarmManager().getAlarms();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
@@ -66,13 +85,9 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             alarms = alarms.subList(from, to);
         }
 
-        if (filterField.isPresent()) {
-            String filterValue = parser.getString("filter_value").get();
-            if (filterField.get().equals("systemName")) {
-                PdeAlarm.filterBySystemName(alarms, filterValue);
-            } else if (filterField.get().equals("severity")) {
-                PdeAlarm.filterBySeverity(alarms, filterValue);
-            }
+        final Optional<String> severityValue = parser.getString("severity");
+        if (severityValue.isPresent()) {
+            PdeAlarm.filterBySeverity(alarms, severityValue.get());
         }
 
         response.body(new PdeAlarmListBuilder()
