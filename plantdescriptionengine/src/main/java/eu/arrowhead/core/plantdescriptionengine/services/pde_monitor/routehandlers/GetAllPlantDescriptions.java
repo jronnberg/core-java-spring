@@ -39,8 +39,9 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
     /**
      * Class constructor
      *
-     * @param httpClient  Object for communicating with monitorable services.
      * @param monitorInfo Object that stores information on monitorable systems.
+     * @param pdTracker   Object that stores information on Plant Description
+     *                    entries.
      *
      */
     public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
