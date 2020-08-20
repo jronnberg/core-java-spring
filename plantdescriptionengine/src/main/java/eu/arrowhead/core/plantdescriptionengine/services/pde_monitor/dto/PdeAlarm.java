@@ -96,6 +96,10 @@ public interface PdeAlarm {
      * @param severity Only alarms with this severity are kept in the list.
      */
 	static void filterBySeverity(List<? extends PdeAlarm> alarms, String severity) {
+        if (severity.equals("not_cleared")) {
+            alarms.removeIf(alarm -> alarm.severity().equals("cleared"));
+            return;
+        }
         alarms.removeIf(alarm -> !alarm.severity().equals(severity));
 	}
 
