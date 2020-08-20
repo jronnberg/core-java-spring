@@ -55,6 +55,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             new StringParameter("direction")
                 .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
+            new StringParameter("systemName"),
             new StringParameter("severity")
                 .legalValues(severityValues),
             new BooleanParameter("acknowledged")
@@ -85,6 +86,11 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             int from = Math.max(page.get() * itemsPerPage, 0);
             int to = Math.min(from + itemsPerPage, alarms.size());
             alarms = alarms.subList(from, to);
+        }
+
+        final Optional<String> systemName = parser.getString("systemName");
+        if (systemName.isPresent()) {
+            PdeAlarm.filterBySystemName(alarms, systemName.get());
         }
 
         final Optional<String> severityValue = parser.getString("severity");
