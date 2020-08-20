@@ -34,30 +34,34 @@ Query params:
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
-| `filter_field` | filter by a given column | no |
-| `filter_value` | value to filter by | no |
+| `systemName` | filter by system name | no |
+| `acknowledged` | filter by acknowledged column | no |
+| `severity` | filter by severity | no |
 
 
 > **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
-> * `createdAt`
+> * `raisedAt`
 > * `updatedAt`
 
 > **Note:** Default value for `direction` is `ASC`. All possible values are:
 > * `ASC`
 > * `DESC`
 
-> **Note:**  Possible values for `filter_field` are:
-> * `systemName`
-> * `acknowledged`
-> * `severity`
+> **Note:**  Possible values for `acknowledged` are `true` and `false`.
 
-> **Note:**  If `filter_field` is set to `severity`, in addition to the possible values of `severity`, these values are possible for `filter_value`:
-> * `not_cleared` - Use to get all alarms that are not `cleared`
+> **Note:**  Possible values for `severity` are:
+> * `indeterminate`
+> * `critical`
+> * `major`
+> * `minor`
+> * `warning`
+> * `cleared`
+> * `not_cleared`
 
 Example of valid invocation:
 ```json
-GET /pde/monitor/alarm HTTP/1.1
+GET /pde/monitor/alarm?severity=major HTTP/1.1
 Accept: application/json
 ```
 
@@ -77,7 +81,7 @@ Content-Type: application/json
 				"severity": "major",
 				"description": "System not registered in Service Registry",
 				"raisedAt": "2020-03-13T16:54:00.511Z",
-				"modifiedAt": "2020-03-13T16:54:00.511Z"
+				"updatedAt": "2020-03-13T16:54:00.511Z"
 			}
 	]
 }
@@ -108,7 +112,7 @@ Content-Type: application/json
 	"severity": "major",
 	"description": "System not registered in Service Registry",
 	"raisedAt": "2020-03-13T16:54:00.511Z",
-	"modifiedAt": "2020-03-13T16:54:00.511Z"
+	"updatedAt": "2020-03-13T16:54:00.511Z"
 }
 ```
 
@@ -146,7 +150,7 @@ Content-Type: application/json
 	"description": "System not registered in Service Registry",
 	"raisedAt": "2020-03-13T16:54:00.511Z",
 	"acknowledgedAt": "2020-03-13T17:32:00.531Z",
-	"modifiedAt": "2020-03-13T17:32:00.531Z"
+	"updatedAt": "2020-03-13T17:32:00.531Z"
 }
 ```
 
@@ -167,8 +171,7 @@ Query params:
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
-| `filter_field` | filter by a given column | no |
-| `filter_value` | value to filter by | no |
+| `active` | filter by active column | no |
 
 > **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
@@ -179,8 +182,7 @@ Query params:
 > * `ASC`
 > * `DESC`
 
-> **Note:**  Possible values for `filter_field` are:
-> * `active`
+> **Note:**  Possible values for `active` are `true` and `false`.
 
 Example of valid invocation:
 
