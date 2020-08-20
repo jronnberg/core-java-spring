@@ -3,10 +3,12 @@ package eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.routehandl
 import java.util.List;
 import java.util.Optional;
 
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarm;
+import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmDto;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.net.http.HttpStatus;
@@ -31,15 +33,38 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
 
         final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
-            new StringParameter("filter_field")
-                .legalValues(List.of("systemName", "severity"))
-                .requires(new StringParameter("filter_value"))
+            new IntParameter("page")
+                .min(0)
+                .requires(new IntParameter("item_per_page")),
+            new StringParameter("sort_field")
+                .legalValues(List.of("id", "createdAt", "updatedAt")),
+            new StringParameter("direction")
+                .legalValues(List.of("ASC", "DESC"))
+                .setDefault("ASC"),
+            new StringParameter("filter_field") // TODO: Remove filter_field, replace with severity, cleared, etc?
+                .legalValues(List.of("systemName", "severity")) // TODO: Add "acknowledged"
+                .requires(new StringParameter("filter_value")) // TODO: An incorrect value results in a server failure at the moment.
         );
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
-        final var alarms = Locator.getAlarmManager().getAlarms();
+        List<PdeAlarmDto> alarms = Locator.getAlarmManager().getAlarms();
 
         final Optional<String> filterField = parser.getString("filter_field");
+
+        final Optional<String> sortField = parser.getString("sort_field");
+        if (sortField.isPresent()) {
+            final String sortDirection = parser.getString("direction").get();
+            final boolean sortAscending = (sortDirection.equals("ASC") ? true : false);
+            PdeAlarm.sort(alarms, sortField.get(), sortAscending);
+        }
+
+        final Optional<Integer> page = parser.getInt("page");
+        if (page.isPresent()) {
+            int itemsPerPage = parser.getInt("item_per_page").get();
+            int from = Math.max(page.get() * itemsPerPage, 0);
+            int to = Math.min(from + itemsPerPage, alarms.size());
+            alarms = alarms.subList(from, to);
+        }
 
         if (filterField.isPresent()) {
             String filterValue = parser.getString("filter_value").get();
