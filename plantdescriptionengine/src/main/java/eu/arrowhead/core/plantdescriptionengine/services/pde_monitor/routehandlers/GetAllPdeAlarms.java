@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
@@ -55,7 +56,8 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
                 .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
             new StringParameter("severity")
-                .legalValues(severityValues)
+                .legalValues(severityValues),
+            new BooleanParameter("acknowledged")
        );
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
@@ -88,6 +90,11 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         final Optional<String> severityValue = parser.getString("severity");
         if (severityValue.isPresent()) {
             PdeAlarm.filterBySeverity(alarms, severityValue.get());
+        }
+
+        final Optional<Boolean> acknowledged = parser.getBoolean("acknowledged");
+        if (acknowledged.isPresent()) {
+            PdeAlarm.filterAcknowledged(alarms, acknowledged.get());
         }
 
         response.body(new PdeAlarmListBuilder()

@@ -75,9 +75,9 @@ public interface PdeAlarm {
      */
     static void filterAcknowledged(List<? extends PdeAlarm> alarms, boolean acknowledged) {
         if (acknowledged) {
-            alarms.removeIf(alarm -> alarm.acknowledged());
-        } else {
             alarms.removeIf(alarm -> !alarm.acknowledged());
+        } else {
+            alarms.removeIf(alarm -> alarm.acknowledged());
         }
     }
 

@@ -60,6 +60,7 @@ public class IntParameter extends QueryParameter {
         if (!isInteger(value)) {
             parser.report(new ParseError("Query parameter '" + name +
                 "' must be a valid string, got " + value + "."));
+            return;
         }
 
         int intValue = Integer.parseInt(value);
