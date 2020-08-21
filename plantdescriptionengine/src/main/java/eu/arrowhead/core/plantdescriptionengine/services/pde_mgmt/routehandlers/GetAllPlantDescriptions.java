@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.ParseError;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
@@ -67,13 +68,15 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
                 .requires(new BooleanParameter("filter_value"))
         );
 
-        final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+        QueryParamParser parser;
 
-        if (parser.hasError()) {
+        try {
+            parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+        } catch(ParseError error) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(ErrorMessage.of(parser.getErrorMessage()));
+            response.body(ErrorMessage.of(error.getMessage()));
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
-                parser.getErrorMessage());
+                 error.getMessage());
             return Future.done();
         }
 

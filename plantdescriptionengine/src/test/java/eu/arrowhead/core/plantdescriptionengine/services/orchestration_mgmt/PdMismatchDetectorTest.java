@@ -116,7 +116,7 @@ public class PdMismatchDetectorTest {
         assertEquals(1, alarms.size());
         assertEquals(systemId, alarm.systemId().get());
         assertTrue(alarm.clearedAt().isPresent());
-        assertEquals("warning", alarm.severity());
+        assertEquals("cleared", alarm.severity());
         assertEquals("System with ID '" + systemId +  "' cannot be found in the Service Registry.", alarm.description());
         assertEquals(false, alarm.acknowledged());
     }

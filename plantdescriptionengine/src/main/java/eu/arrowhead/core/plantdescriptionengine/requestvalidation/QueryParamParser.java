@@ -35,9 +35,7 @@ public class QueryParamParser {
      * The parameters in {@code accepted} may be left out of the request, but if
      * present, must fulfill their requirements.
      *
-     * If the parameters are invalid, the method {@code hasError}
-     * will return true. In that case, {@code getErrorMessage} may be used to
-     * retrieve information about what went wrong.
+     * If the parameters are invalid, a {@link #ParseError} is thrown.
      *
      * If the parameters are valid, their values will be accessible via the
      * methods {@code getInt}, {@code getBoolean} and {@code getString}.
@@ -48,7 +46,9 @@ public class QueryParamParser {
      * @param accepted A list of accepted query parameters
      * @param request
      */
-    public QueryParamParser(List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request) {
+    public QueryParamParser(
+        List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request
+    ) throws ParseError {
 
         if (required == null) {
             required = new ArrayList<>();
@@ -61,6 +61,10 @@ public class QueryParamParser {
         this.required = required;
         this.accepted = accepted;
         parse(request);
+
+        if (hasError()) {
+            throw getCompoundError();
+        }
     }
 
     public boolean hasError() {
@@ -116,15 +120,15 @@ public class QueryParamParser {
     }
 
     /**
-     * @return A human-readable description of any errors that occured during
-     *         parsing.
+     * @return A compound error describing all individual errors that occured
+     *         during parsing.
      */
-	public String getErrorMessage() {
+	public ParseError getCompoundError() {
         List<String> errorMessages = new ArrayList<>();
         for (ParseError error : errors) {
             errorMessages.add("<" + error.getMessage() + ">");
         }
-        return String.join(", ", errorMessages);
+        return new ParseError(String.join(", ", errorMessages));
 	}
 
 }
