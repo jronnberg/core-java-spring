@@ -38,11 +38,11 @@ public abstract class QueryParameter {
      * Validate and parse the query parameter that this instance corresponds to.
      * If the parameter is present in the request, and it does not violate any
      * of the requirements imposed by this instance, it is stored in the given
-     * parser object. Any requirement violations are reported using the parsers
+     * parser object. Any requirement violations are reported using the parser's
      * {@code report} method.
      *
-     * @param request A HTTP service request.
-     * @param parser A query parameter parser instance.
+     * @param request  A HTTP service request.
+     * @param parser   A query parameter parser instance.
      * @param required If true, this method will report an error if the
      *                 parameter is not present in the request.
      */
