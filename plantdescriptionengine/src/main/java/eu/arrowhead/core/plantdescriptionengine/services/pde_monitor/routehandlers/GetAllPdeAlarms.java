@@ -11,6 +11,7 @@ import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
+import eu.arrowhead.core.plantdescriptionengine.requestvalidation.ParseError;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParamParser;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.StringParameter;
@@ -61,13 +62,15 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             new BooleanParameter("acknowledged")
        );
 
-        final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+       QueryParamParser parser;
 
-        if (parser.hasError()) {
+        try {
+            parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+        } catch(ParseError error) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(ErrorMessage.of(parser.getErrorMessage()));
+            response.body(ErrorMessage.of(error.getMessage()));
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
-                parser.getErrorMessage());
+                 error.getMessage());
             return Future.done();
         }
 
