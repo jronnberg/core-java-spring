@@ -3,10 +3,10 @@
     "plantDescription": "ArrowHead core",
     "active": true,
     "systems": [
-			  {
-					"systemName": "gatekeeper",
-					"systemId": "gatekeeper"
-				},
+        {
+            "systemName": "gatekeeper",
+            "systemId": "gatekeeper"
+        },
         {
             "systemName": "pde",
             "systemId": "pde",
@@ -37,17 +37,17 @@
                     "portName": "monitorable",
                     "serviceDefinition": "monitorable",
                     "consumer": false,
-									  "metadata": {
-											  "name": "test_system_2_1"
-					          }
+                    "metadata": {
+                        "name": "test_system_2_1"
+                    }
                 },
-							  {
+                {
                     "portName": "monitorable2",
                     "serviceDefinition": "monitorable",
                     "consumer": false,
-									  "metadata": {
-											  "name": "test_system_2_2"
-					          }
+                    "metadata": {
+                        "name": "test_system_2_2"
+                    }
                 }
             ]
         }
@@ -73,7 +73,7 @@
                 "portName": "monitorable"
             }
         },
-			  {
+        {
             "consumer": {
                 "systemId": "pde",
                 "portName": "monitorable"

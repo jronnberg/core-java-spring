@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
+import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.json.value.JsonObject;
 
@@ -58,8 +58,8 @@ public class MonitorInfo {
                 return false;
             }
 
-            var mergedMetadata = DtoUtils.mergeMetadata(systemMetadata.orElse(new HashMap<>()), portMetadata.get());
-            return isSubset(mergedMetadata, metadata);
+            var mergedMetadata = Metadata.merge(systemMetadata.orElse(new HashMap<>()), portMetadata.get());
+            return Metadata.isSubset(mergedMetadata, metadata);
         }
 
         /**
@@ -76,7 +76,7 @@ public class MonitorInfo {
             if (!systemMetadata.isPresent()) {
                     return true;
             }
-			return isSubset(metadata, systemMetadata.get());
+			return Metadata.isSubset(metadata, systemMetadata.get());
         }
 
     }
@@ -85,22 +85,6 @@ public class MonitorInfo {
 
     private String getKey(ServiceDescription service) {
         return service.provider().name() + service.uri();
-    }
-
-    /**
-     * Returns
-     * @param a A metadata object (mapping Strings to Strings).
-     * @param b A metadata object (mapping Strings to Strings).
-     *
-     * @return True if a is a subset of b.
-     */
-    private static boolean isSubset(Map<String, String> a, Map<String, String> b) {
-        for (String key : a.keySet()) {
-            if (!b.containsKey(key) || !b.get(key).equals(a.get(key))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void putInventoryId(ServiceDescription service, String inventoryId) {
@@ -137,7 +121,7 @@ public class MonitorInfo {
         for (var bundle : infoBundles.values()) {
             if (systemName != null && systemName.equals(bundle.systemName)) {
                 result.add(bundle);
-            } else if (metadata != null && isSubset(metadata, bundle.metadata)) {
+            } else if (metadata != null && Metadata.isSubset(metadata, bundle.metadata)) {
                 result.add(bundle);
             }
         }

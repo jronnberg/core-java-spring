@@ -85,7 +85,6 @@ public class MonitorablesClient {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
                 for (var service : services) {
-                    System.out.println(service.provider().name());
                     retrieveId(service);
                     retrieveSystemData(service);
                 }
