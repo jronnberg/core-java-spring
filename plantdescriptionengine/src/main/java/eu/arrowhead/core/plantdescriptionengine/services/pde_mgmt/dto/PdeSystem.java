@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
+import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
@@ -44,7 +44,7 @@ public interface PdeSystem {
      */
     default Map<String, String> portMetadata(String portName) {
         Port port = getPort(portName);
-        return DtoUtils.mergeMetadata(metadata().orElse(null), port.metadata().orElse(null));
+        return Metadata.merge(metadata().orElse(null), port.metadata().orElse(null));
     }
 
     /**

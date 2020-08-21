@@ -63,7 +63,7 @@ public class SystemTracker {
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
-                reportChanges(systemList);
+                reportChanges(systemList); // TODO: Report changes after the system list has been updated instead?
                 systems.clear();
                 for (var system : systemList.data()) {
                     systems.put(system.systemName(), system);

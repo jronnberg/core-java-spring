@@ -60,6 +60,15 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
         checkSystems();
     }
 
+    private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
+        final Optional<String> name = entrySystem.systemName();
+        if (name.isPresent() && name.get().equals(registeredSystem.systemName())) {
+            return true;
+        }
+        // TODO: Look for a match using metadata as well?
+        return false;
+    }
+
     private void checkSystems() {
         final var alarmManager = Locator.getAlarmManager();
         final List<SrSystem> registeredSystems = Locator.getSystemTracker().getSystems();
@@ -75,9 +84,7 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
             String systemName = null;
 
             for (final var registeredSystem : registeredSystems) {
-                // TODO: Look for a match using metadata as well
-                final Optional<String> name = entrySystem.systemName();
-                if (name.isPresent() && name.get().equals(registeredSystem.systemName())) {
+                if (systemsMatch(entrySystem, registeredSystem)) {
                     systemName = registeredSystem.systemName();
                 }
             }
@@ -94,9 +101,7 @@ public class PdMismatchDetector implements PlantDescriptionUpdateListener, Syste
         for (final SrSystem registeredSystem : registeredSystems) {
             String systemId = null;
             for (final var entrySystem : pdSystems) {
-                // TODO: Look for a match using metadata as well
-                final Optional<String> name = entrySystem.systemName();
-                if (name.isPresent() && name.get().equals(registeredSystem.systemName())) {
+                if (systemsMatch(entrySystem, registeredSystem)) {
                     systemId = entrySystem.systemId();
                 }
             }
