@@ -94,7 +94,7 @@ Currently only the following values can be updated. If a field is not present th
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `count` | Integer | Number of records found |
-| `data` | Array\<[PlanDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
+| `data` | Array\<[PlantDescriptionEntry](#struct-plantdescriptionentry)> | Array with Plant Description Entries |
 
 ### struct SystemEntry
 | Field | Type | Description | Mandatory | Note |
