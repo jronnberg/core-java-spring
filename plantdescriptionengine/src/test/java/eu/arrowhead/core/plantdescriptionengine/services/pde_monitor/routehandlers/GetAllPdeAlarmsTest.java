@@ -236,34 +236,32 @@ public class GetAllPdeAlarmsTest {
 
     @Test
     public void shouldRejectNegativePage() throws PdStoreException {
+        final var handler = new GetAllPdeAlarms();
+        int page = -3;
+        Locator.setAlarmManager(new AlarmManager());
+        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "page", List.of(String.valueOf(page)),
+                "item_per_page", List.of(String.valueOf(4))
+            ))
+            .build();
 
-        // final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        // final var handler = new GetAllPlantDescriptions(pdTracker);
-        // final HttpServiceResponse response = new MockResponse();
-        // final int page = -1;
-        // final int itemsPerPage = 2;
-        // final HttpServiceRequest request = new MockRequest.Builder()
-        //     .queryParameters(Map.of(
-        //         "page", List.of(String.valueOf(page)),
-        //         "item_per_page", List.of(String.valueOf(itemsPerPage))
-        //     ))
-        //     .build();
-
-        // try {
-        //     handler.handle(request, response)
-        //     .ifSuccess(result -> {
-        //         assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-
-        //         String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-        //         String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-        //         assertEquals(expectedErrorMessage, actualErrorMessage);
-
-        //     }).onFailure(e -> {
-        //         assertNull(e);
-        //     });
-        // } catch (Exception e) {
-        //     assertNull(e);
-        // }
+        try {
+            handler.handle(request, response)
+            .ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(e -> {
+                e.printStackTrace();
+                assertNull(e);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
     }
 
 }

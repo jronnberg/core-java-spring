@@ -32,7 +32,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
             id = Integer.parseInt(idString);
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
-            response.body(ErrorMessage.of(idString + " is not a valid PDE Alarm ID."));
+            response.body(ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
             response.status(HttpStatus.BAD_REQUEST);
             return Future.done();
         }
@@ -40,7 +40,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
         final PdeAlarmDto alarm = Locator.getAlarmManager().getAlarm(id);
 
         if (alarm == null) {
-            response.body(ErrorMessage.of("PDE Alarm with ID " + id + " not found."));
+            response.body(ErrorMessage.of("PDE Alarm with ID '" + id + "' not found."));
             response.status(HttpStatus.NOT_FOUND);
             return Future.done();
         }

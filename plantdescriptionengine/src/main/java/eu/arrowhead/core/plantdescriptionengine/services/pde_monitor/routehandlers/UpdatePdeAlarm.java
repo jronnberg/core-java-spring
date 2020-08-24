@@ -35,7 +35,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
                     id = Integer.parseInt(idString);
                 } catch (final NumberFormatException e) {
                     response.status(HttpStatus.BAD_REQUEST);
-                    response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid Plant Description Entry ID."));
+                    response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 
