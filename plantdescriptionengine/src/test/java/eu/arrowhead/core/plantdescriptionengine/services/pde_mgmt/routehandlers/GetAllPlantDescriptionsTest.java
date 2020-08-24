@@ -191,35 +191,6 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldRejectInvalidParameters() throws PdStoreException {
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
-        HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of(
-                "filter_field", List.of("active")
-                // Missing filter_value, invalid request!
-            ))
-            .build();
-        HttpServiceResponse response = new MockResponse();
-
-        try {
-            handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<Missing parameter: filter_value.>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(e -> {
-                e.printStackTrace();
-                assertNull(e);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertNull(e);
-        }
-    }
-
-    @Test
     public void shouldRejectNonBooleans() throws PdStoreException {
         final List<Integer> entryIds = List.of(0, 1, 2);
         final int activeEntryId = 3;
@@ -245,10 +216,7 @@ public class GetAllPlantDescriptionsTest {
 
         GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
         HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of(
-                "filter_field", List.of("active"),
-                "filter_value", List.of(nonBoolean)
-            ))
+            .queryParameters(Map.of("active", List.of(nonBoolean)))
             .build();
         HttpServiceResponse response = new MockResponse();
 
@@ -256,7 +224,7 @@ public class GetAllPlantDescriptionsTest {
             handler.handle(request, response)
             .ifSuccess(result -> {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<'filter_value' must be true or false, not '" + nonBoolean + "'.>";
+                String expectedErrorMessage = "<'active' must be true or false, not '" + nonBoolean + "'.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
@@ -294,10 +262,7 @@ public class GetAllPlantDescriptionsTest {
 
         GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
         HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of(
-                "filter_field", List.of("active"),
-                "filter_value", List.of("true")
-            ))
+            .queryParameters(Map.of("active", List.of("true")))
             .build();
         HttpServiceResponse response = new MockResponse();
 

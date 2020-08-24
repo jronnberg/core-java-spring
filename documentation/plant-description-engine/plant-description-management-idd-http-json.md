@@ -176,8 +176,7 @@ Query params:
 | `item_per_page` | maximum number of items returned | no |
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
-| `filter_field` | filter by a given column | no |
-| `filter_value` | value to filter by | no |
+| `active` | filter out active/inactive entries | no |
 
 > **Note:** Default value for `sort_field` is `id`. All possible values are:
 > * `id`
@@ -188,8 +187,7 @@ Query params:
 > * `ASC`
 > * `DESC`
 
-> **Note:**  Possible values for `filter_field` are:
-> * `active`
+> **Note:**  Possible values for `active` are `true` and `false`.
 
 Example of valid invocation:
 

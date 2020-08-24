@@ -74,9 +74,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             new StringParameter("direction")
                 .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),
-            new StringParameter("filter_field")
-                .legalValue("active")
-                .requires(new BooleanParameter("filter_value"))
+            new BooleanParameter("active")
         );
 
         QueryParamParser parser;
@@ -108,9 +106,9 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             entries = entries.subList(from, to);
         }
 
-        if (parser.getString("filter_field").isPresent()) {
-            boolean filterValue = parser.getBoolean("filter_value").get();
-            PlantDescriptionEntry.filterByActive(entries, filterValue);
+        final Optional<Boolean> active = parser.getBoolean("active");
+        if (active.isPresent()) {
+            PlantDescriptionEntry.filterByActive(entries, active.get());
         }
 
         // Extend each Plant Description Entry with monitor data retrieved from

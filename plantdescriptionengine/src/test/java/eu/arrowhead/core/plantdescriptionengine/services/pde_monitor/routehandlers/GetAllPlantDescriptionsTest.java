@@ -411,38 +411,6 @@ public class GetAllPlantDescriptionsTest {
     }
 
     @Test
-    public void shouldRejectInvalidParameters() throws PdStoreException {
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var monitorInfo = new MonitorInfo();
-
-        final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of(
-                "filter_field", List.of("active")
-                // Missing filter_value, invalid request!
-            ))
-            .build();
-        final HttpServiceResponse response = new MockResponse();
-
-        try {
-            handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-
-                String expectedErrorMessage = "<Missing parameter: filter_value.>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(e -> {
-                e.printStackTrace();
-                assertNull(e);
-            });
-        } catch (final Exception e) {
-            e.printStackTrace();
-            assertNull(e);
-        }
-    }
-
-    @Test
     public void shouldFilterEntries() throws PdStoreException {
 
         final List<Integer> entryIds = List.of(0, 1, 2);
@@ -468,10 +436,7 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of(
-                "filter_field", List.of("active"),
-                "filter_value", List.of("true")
-            ))
+            .queryParameters(Map.of("active", List.of("true")))
             .build();
         final HttpServiceResponse response = new MockResponse();
 
