@@ -68,7 +68,8 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
                 .min(0)
-                .requires(new IntParameter("item_per_page")),
+                .requires(new IntParameter("item_per_page")
+                    .min(0)),
             new StringParameter("sort_field")
                 .legalValues(List.of("id", "createdAt", "updatedAt")),
             new StringParameter("direction")
@@ -101,7 +102,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         final Optional<Integer> page = parser.getInt("page");
         if (page.isPresent()) {
             int itemsPerPage = parser.getInt("item_per_page").get();
-            int from = Math.max(page.get() * itemsPerPage, 0);
+            int from = Math.min(page.get() * itemsPerPage, entries.size());
             int to = Math.min(from + itemsPerPage, entries.size());
             entries = entries.subList(from, to);
         }

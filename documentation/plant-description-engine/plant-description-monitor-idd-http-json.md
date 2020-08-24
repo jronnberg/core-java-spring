@@ -386,7 +386,7 @@ JSON object with the following fields:
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `count` | Integer | Number of records found | `true` ||
-| `data` | Array\<[PlanDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
+| `data` | Array\<[PlantDescriptionEntry](#plantdescriptionentry)> | Array with Plant Description Entries | `true` ||
 
 ### PortEntry
 JSON object with the following fields:
