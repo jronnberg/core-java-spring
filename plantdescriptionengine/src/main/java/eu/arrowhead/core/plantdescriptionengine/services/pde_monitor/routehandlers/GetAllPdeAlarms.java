@@ -53,7 +53,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
                 .requires(new IntParameter("item_per_page")
                     .min(0)),
             new StringParameter("sort_field")
-                .legalValues(List.of("id", "createdAt", "updatedAt")),
+                .legalValues(List.of("id", "raisedAt", "updatedAt")),
             new StringParameter("direction")
                 .legalValues(List.of("ASC", "DESC"))
                 .setDefault("ASC"),

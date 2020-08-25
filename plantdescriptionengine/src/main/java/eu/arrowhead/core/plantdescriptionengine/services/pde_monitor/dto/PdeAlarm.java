@@ -27,17 +27,35 @@ public interface PdeAlarm {
         }
     };
 
-    final static Comparator<PdeAlarm> CREATED_AT_COMPARATOR = new Comparator<>() {
+    final static Comparator<PdeAlarm> RAISED_AT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PdeAlarm a1, PdeAlarm a2) {
             return a1.raisedAt().compareTo(a2.raisedAt());
         }
     };
 
-    final static Comparator<PdeAlarm> RAISED_AT_COMPARATOR = new Comparator<>() {
+    final static Comparator<PdeAlarm> UPDATED_AT_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(PdeAlarm a1, PdeAlarm a2) {
             return a1.updatedAt().compareTo(a2.updatedAt());
+        }
+    };
+
+    final static Comparator<PdeAlarm> CLEARED_AT_COMPARATOR = new Comparator<>() {
+        @Override
+        public int compare(PdeAlarm a1, PdeAlarm a2) {
+            Optional<Instant> cleared1 = a1.clearedAt();
+            Optional<Instant> cleared2 = a2.clearedAt();
+            if (cleared1.isEmpty() && cleared2.isEmpty()) {
+                return 0;
+            }
+            if (cleared1.isPresent() && cleared2.isEmpty()) {
+                return -1;
+            }
+            if (a1.clearedAt().isEmpty() && a2.clearedAt().isPresent()) {
+                return 1;
+            }
+            return cleared1.get().compareTo(cleared2.get());
         }
     };
 
@@ -109,14 +127,17 @@ public interface PdeAlarm {
             case "id":
                 comparator = ID_COMPARATOR;
                 break;
-            case "createdAt":
-                comparator = CREATED_AT_COMPARATOR;
-                break;
             case "raisedAt":
                 comparator = RAISED_AT_COMPARATOR;
                 break;
+            case "updatedAt":
+                comparator = UPDATED_AT_COMPARATOR;
+                break;
+            case "clearedAt":
+                comparator = CLEARED_AT_COMPARATOR;
+                break;
             default:
-                assert false : sortField + " is not a valid sort field for Plant Description Entries.";
+                assert false : sortField + " is not a valid sort field for PDE Alarms.";
         }
 
         if (sortAscending) {
