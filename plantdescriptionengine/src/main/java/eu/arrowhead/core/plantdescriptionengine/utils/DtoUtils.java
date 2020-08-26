@@ -3,17 +3,17 @@ package eu.arrowhead.core.plantdescriptionengine.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.ConnectionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.MonitorInfo;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PortEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PortEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.SystemEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.SystemEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.SystemPortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortBuilder;
 
 public final class DtoUtils {
 
@@ -21,9 +21,9 @@ public final class DtoUtils {
 
     /**
      * Converts the provided list of {@link
-     * eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.Connection}
+     * eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection}
      * to a list of {@link}
-     * eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.Connection}
+     * eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.Connection}
      * objects.
      *
      * @param connections A list of connections adhering to the mgmt package
@@ -56,9 +56,9 @@ public final class DtoUtils {
      * Returns a Plant Description Entry supplemented with monitor info.
      *
      * Note that the resulting copy will be an instance of {@link
-     * eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PlantDescriptionEntryDto},
+     * eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto},
      * while the source entry is a {@link
-     * eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry}
+     * eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry}
      * instance. This function is the glue between the mgmt and monitor
      * packages, letting data flow from one one to the other.
      *
@@ -71,7 +71,7 @@ public final class DtoUtils {
      *
      */
     public static PlantDescriptionEntryDto extend(
-            eu.arrowhead.core.plantdescriptionengine.services.pde_mgmt.dto.PlantDescriptionEntry entry,
+            eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry entry,
             MonitorInfo monitorInfo) {
         List<SystemEntryDto> systems = new ArrayList<>();
 

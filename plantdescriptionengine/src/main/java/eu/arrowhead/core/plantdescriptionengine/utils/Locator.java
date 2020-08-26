@@ -1,7 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 
 /**
  * Provides a global point of access to facilities that are fundamentally

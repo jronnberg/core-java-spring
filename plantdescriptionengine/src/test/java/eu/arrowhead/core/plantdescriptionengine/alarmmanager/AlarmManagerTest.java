@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarm;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 
 public class AlarmManagerTest {
 
