@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmSeverity;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.requestvalidation.IntParameter;
@@ -42,7 +42,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
 
         final List<QueryParameter> requiredParameters = null;
         List<String> severityValues = new ArrayList<>();
-        for (var severity : AlarmManager.Severity.values()) {
+        for (var severity : AlarmSeverity.values()) {
             severityValues.add(severity.toString());
         }
         severityValues.add("not_cleared");

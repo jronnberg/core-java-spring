@@ -49,7 +49,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
                     }
                 }
 
-                final var alarm = alarmManager.getAlarm(id);
+                final var alarm = alarmManager.getAlarmDto(id);
                 if (alarm == null) {
                     alarmNotFound = true;
                 }
@@ -61,7 +61,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
                 } else {
                     return response
                         .status(HttpStatus.OK)
-                        .body(alarmManager.getAlarm(id));
+                        .body(alarmManager.getAlarmDto(id));
                 }
 
             });

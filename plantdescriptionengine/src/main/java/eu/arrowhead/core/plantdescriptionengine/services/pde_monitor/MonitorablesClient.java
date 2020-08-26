@@ -7,7 +7,6 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.services.monitorable.dto.SystemDataDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
@@ -105,11 +104,11 @@ public class MonitorablesClient {
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 System.out.println("Successful ping");
-                Locator.getAlarmManager().clearAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
+                Locator.getAlarmManager().clearSystemInactive(providerName);
             })
             .onFailure(e -> {
                 System.out.println("Failed ping");
-                Locator.getAlarmManager().raiseAlarmBySystemName(providerName, AlarmManager.Cause.systemInactive);
+                Locator.getAlarmManager().raiseSystemInactive(providerName);
             });
     }
 
