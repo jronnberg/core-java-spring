@@ -273,7 +273,7 @@ public class PdeMain {
 
             return orchestratorClient.initialize(pdTracker)
                 .flatMap(orchstratorInitializationResult -> {
-                    final PdMismatchDetector mismatchDetector = new PdMismatchDetector(pdTracker);
+                    final var mismatchDetector = new SystemMismatchDetector(pdTracker);
                     mismatchDetector.run();
                     var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
                     return arSystem.provide(pdeManagementService.getService());
