@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 
 public class AlarmManager {
 
@@ -89,14 +89,6 @@ public class AlarmManager {
         activeAlarms.add(new Alarm(systemId, systemName, cause));
     }
 
-	// public void raiseAlarmBySystemName(String systemName, Cause cause) {
-    //     raiseAlarm(null, systemName, cause);
-    // }
-
-    // public void raiseAlarmBySystemId(String systemId, Cause cause) {
-    //     raiseAlarm(systemId, null, cause);
-    // }
-
     private void clearAlarm(String systemId, String systemName, AlarmCause cause) {
         final List<Alarm> newlyCleared = activeAlarms
             .stream()
@@ -112,13 +104,9 @@ public class AlarmManager {
         activeAlarms.removeAll(newlyCleared);
     }
 
-    // public void clearAlarmBySystemName(String systemName, Cause cause) {
-    //     clearAlarm(null, systemName, cause);
-    // }
-
-    // public void clearAlarmBySystemId(String systemId, Cause cause) {
-    //     clearAlarm(systemId, null, cause);
-    // }
+    public void clearAlarm(Alarm alarm) {
+        clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
+	}
 
 	public void raiseSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
         // TODO: Make use of the metadata.
@@ -128,24 +116,12 @@ public class AlarmManager {
         raiseAlarm(null, systemName.get(), AlarmCause.systemNotRegistered);
     }
 
-    // public void clearSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
-    //     // TODO: Make use of the metadata.
-    //     if (systemName.isEmpty()) {
-    //         throw new RuntimeException("This version of the PDE cannot handle unnamed systems.");
-    //     }
-    //     clearAlarm(null, systemName.get(), Cause.systemNotRegistered);
-    // }
-
-	public void clearAlarm(Alarm alarm) {
-        clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
-	}
-
-	public void clearSystemInactive(String systemName) {
-        clearAlarm(null, systemName, AlarmCause.systemInactive);
-	}
-
 	public void raiseSystemInactive(String systemName) {
         raiseAlarm(null, systemName, AlarmCause.systemInactive);
+    }
+
+    public void clearSystemInactive(String systemName) {
+        clearAlarm(null, systemName, AlarmCause.systemInactive);
 	}
 
 	public void raiseSystemNotInDescription(String systemName) {
