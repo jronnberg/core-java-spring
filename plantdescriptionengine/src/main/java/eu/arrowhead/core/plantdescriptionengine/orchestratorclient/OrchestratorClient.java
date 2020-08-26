@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
+package eu.arrowhead.core.plantdescriptionengine.orchestratorclient;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dt
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStore;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStoreException;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStore;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;

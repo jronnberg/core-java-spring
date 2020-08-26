@@ -17,10 +17,9 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidati
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.QueryParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryListBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;

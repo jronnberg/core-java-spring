@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
+package eu.arrowhead.core.plantdescriptionengine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
