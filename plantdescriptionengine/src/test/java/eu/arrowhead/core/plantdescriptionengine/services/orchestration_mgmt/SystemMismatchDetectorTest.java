@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.PdMismatchDetector;
+import eu.arrowhead.core.plantdescriptionengine.SystemMismatchDetector;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
@@ -26,12 +26,12 @@ import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
 import se.arkalix.net.http.client.HttpClient;
 
-public class PdMismatchDetectorTest {
+public class SystemMismatchDetectorTest {
 
     @Test
     public void shouldReportSystemNotRegistered() throws SSLException, RuleStoreException, PdStoreException {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var detector = new PdMismatchDetector(pdTracker);
+        final var detector = new SystemMismatchDetector(pdTracker);
         final var alarmManager = new AlarmManager();
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final var systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
@@ -71,7 +71,7 @@ public class PdMismatchDetectorTest {
     @Test
     public void shouldClearSystemNotRegistered() throws SSLException, RuleStoreException, PdStoreException {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var detector = new PdMismatchDetector(pdTracker);
+        final var detector = new SystemMismatchDetector(pdTracker);
         final var alarmManager = new AlarmManager();
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final var systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));

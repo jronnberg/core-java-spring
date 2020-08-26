@@ -15,10 +15,10 @@ import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.alarms.Alarm;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmCause;
 
-public class PdMismatchDetector implements PlantDescriptionUpdateListener, SystemUpdateListener {
+public class SystemMismatchDetector implements PlantDescriptionUpdateListener, SystemUpdateListener {
     private PlantDescriptionTracker pdTracker;
 
-    public PdMismatchDetector(PlantDescriptionTracker pdTracker) {
+    public SystemMismatchDetector(PlantDescriptionTracker pdTracker) {
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
         this.pdTracker = pdTracker;
     }
