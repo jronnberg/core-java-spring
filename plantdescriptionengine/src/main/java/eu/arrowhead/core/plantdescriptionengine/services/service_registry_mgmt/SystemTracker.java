@@ -63,12 +63,12 @@ public class SystemTracker {
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
-                reportChanges(systemList); // TODO: Report changes after the system list has been updated instead?
                 systems.clear();
                 for (var system : systemList.data()) {
                     systems.put(system.systemName(), system);
                 }
                 initialized = true;
+                notifyListeners(systemList);
                 return Future.done();
             });
     }
@@ -79,7 +79,7 @@ public class SystemTracker {
      *
      * @param newSystems
      */
-    private void reportChanges(SrSystemListDto newSystems) {
+    private void notifyListeners(SrSystemListDto newSystems) {
         // Report removed systems
         for (var oldSystem: systems.values()) {
             boolean stillPresent = newSystems.data()

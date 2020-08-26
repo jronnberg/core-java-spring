@@ -40,10 +40,10 @@ public class PdMismatchDetectorTest {
         Locator.setSystemTracker(systemTracker);
         detector.run();
 
-        final String systemId = "System_A";
+        final String systemName = "System A";
         final var system = new PdeSystemBuilder()
-            .systemId(systemId)
-            .systemName("System A")
+            .systemId("system_a")
+            .systemName(systemName)
             .ports(new ArrayList<>())
             .build();
         final var entry = new PlantDescriptionEntryBuilder()
@@ -60,10 +60,10 @@ public class PdMismatchDetectorTest {
         pdTracker.put(entry);
         final var alarms = alarmManager.getAlarms();
         final var alarm = alarms.get(0);
-        assertEquals(systemId, alarm.systemId().get());
+        assertEquals(systemName, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
-        assertEquals("System with ID '" + systemId +  "' cannot be found in the Service Registry.", alarm.description());
+        assertEquals("System named '" + systemName +  "' cannot be found in the Service Registry.", alarm.description());
         assertEquals(false, alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
     }
@@ -113,11 +113,12 @@ public class PdMismatchDetectorTest {
         systemTracker.addSystem(systemName, srSystem);
         final var alarms = alarmManager.getAlarms();
         final var alarm = alarms.get(0);
+
         assertEquals(1, alarms.size());
-        assertEquals(systemId, alarm.systemId().get());
+        assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals("System with ID '" + systemId +  "' cannot be found in the Service Registry.", alarm.description());
+        assertEquals("System named '" + systemName +  "' cannot be found in the Service Registry.", alarm.description());
         assertEquals(false, alarm.acknowledged());
     }
 }
