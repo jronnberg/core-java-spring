@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class AlarmManager {
         Cause.systemNotInDescription, Severity.warning
     );
 
-    private class AlarmData {
+    public class AlarmData {
 
         /**
          * Internal representation of an alarm.
@@ -39,9 +40,10 @@ public class AlarmManager {
         }
 
         final int id;
-        final String systemName;
-        final String systemId;
-        final Cause cause;
+        public final String systemName;
+        public final String systemId;
+        public final Cause cause;
+        public final Map<String, String> metadata = null; // TODO: Make use of this.
         boolean acknowledged;
         Instant raisedAt;
         Instant updatedAt;
@@ -69,6 +71,7 @@ public class AlarmManager {
             if (systemName == null && systemId == null) {
                 return false;
             }
+
             if (systemName != null && !systemName.equals(this.systemName)) {
                 return false;
             }
@@ -123,16 +126,16 @@ public class AlarmManager {
         }
     }
 
-    private final List<AlarmData> alarms = new ArrayList<>();
+    private final List<AlarmData> activeAlarms = new ArrayList<>();
     private final List<AlarmData> clearedAlarms = new ArrayList<>();
-    
+
     /**
      * @param id The ID of a PDE Alarm.
      * @return Data describing the alarm with the given ID if it exists, null
      *         otherwise.
      */
     private AlarmData getAlarmData(int id) {
-		for (final var alarm : alarms) {
+		for (final var alarm : activeAlarms) {
             if (alarm.id == id) {
                 return alarm;
             }
@@ -147,7 +150,7 @@ public class AlarmManager {
         final List<PdeAlarmDto> result = new ArrayList<>();
 
         final List<AlarmData> allAlarms = new ArrayList<>();
-        allAlarms.addAll(alarms);
+        allAlarms.addAll(activeAlarms);
         allAlarms.addAll(clearedAlarms);
 
         for (final var alarm : allAlarms) {
@@ -155,6 +158,13 @@ public class AlarmManager {
         }
 
         return result;
+    }
+
+    /**
+     * @return A list containing the raw alarm data stored by this instance.
+     */
+    public List<AlarmData> getActiveAlarmData(List<Cause> causes) {
+        return activeAlarms.stream().filter(alarm -> causes.contains(alarm.cause)).collect(Collectors.toList());
     }
 
     /**
@@ -173,12 +183,12 @@ public class AlarmManager {
         // TODO: Concurrency handling
 
         // Check if this alarm has already been raised:
-        for (final var alarm : alarms) {
+        for (final var alarm : activeAlarms) {
             if (alarm.matches(systemId, systemName, cause)) {
                 return;
             }
         }
-        alarms.add(new AlarmData(systemId, systemName, cause));
+        activeAlarms.add(new AlarmData(systemId, systemName, cause));
     }
 
 	public void raiseAlarmBySystemName(String systemName, Cause cause) {
@@ -190,7 +200,7 @@ public class AlarmManager {
     }
 
     private void clearAlarm(String systemId, String systemName, Cause cause) {
-        final List<AlarmData> newlyCleared = alarms
+        final List<AlarmData> newlyCleared = activeAlarms
             .stream()
             .filter(alarm -> alarm.matches(systemId, systemName, cause))
             .collect(Collectors.toList());
@@ -201,7 +211,7 @@ public class AlarmManager {
         }
 
         clearedAlarms.addAll(newlyCleared);
-        alarms.removeAll(newlyCleared);
+        activeAlarms.removeAll(newlyCleared);
     }
 
     public void clearAlarmBySystemName(String systemName, Cause cause) {
@@ -223,6 +233,26 @@ public class AlarmManager {
             throw new IllegalArgumentException("There is no alarm with ID " + id);
         }
         alarm.acknowledged = acknowledged;
+	}
+
+	public void raiseSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
+        // TODO: Make use of the metadata.
+        if (systemName.isEmpty()) {
+            throw new RuntimeException("This version of the PDE cannot handle unnamed systems.");
+        }
+        raiseAlarm(null, systemName.get(), Cause.systemNotRegistered);
+    }
+
+    public void clearSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
+        // TODO: Make use of the metadata.
+        if (systemName.isEmpty()) {
+            throw new RuntimeException("This version of the PDE cannot handle unnamed systems.");
+        }
+        clearAlarm(null, systemName.get(), Cause.systemNotRegistered);
+    }
+
+	public void clearAlarm(AlarmData alarm) {
+        clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
 	}
 
 }

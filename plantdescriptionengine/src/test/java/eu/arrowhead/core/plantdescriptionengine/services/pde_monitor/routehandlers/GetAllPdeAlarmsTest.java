@@ -23,7 +23,7 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class GetAllPdeAlarmsTest {
 
     @Test
-    public void shouldSortEntries() {
+    public void shouldSortById() {
 
         final String systemNameA = "System A";
         final String systemIdB = "system-b";
@@ -77,6 +77,77 @@ public class GetAllPdeAlarmsTest {
                 assertEquals(3, alarms.count());
 
                 int previousId = alarms.data().get(0).id();
+                for (int i = 1; i < alarms.count(); i++) {
+                    final var alarm = alarms.data().get(i);
+                    assertTrue(alarm.id() <= previousId);
+                    previousId = alarm.id();
+                }
+            }).onFailure(e -> {
+                e.printStackTrace();
+                assertNull(e);
+            });
+        } catch (final Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldSortByCreatedAt() {
+
+        final String systemNameA = "System A";
+        final String systemIdB = "system-b";
+        final String systemIdC = "system-c";
+
+        final var alarmManager = new AlarmManager();
+        Locator.setAlarmManager(alarmManager);
+
+        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
+        alarmManager.raiseAlarmBySystemId(systemIdB, AlarmManager.Cause.systemNotInDescription);
+        alarmManager.raiseAlarmBySystemId(systemIdC, AlarmManager.Cause.systemNotInDescription);
+        final var handler = new GetAllPdeAlarms();
+
+        final HttpServiceRequest ascRequest = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("id"),
+                "direction", List.of("ASC")
+            ))
+            .build();
+        final HttpServiceRequest descRequest = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("raisedAt"),
+                "direction", List.of("DESC")
+            ))
+            .build();
+
+        final HttpServiceResponse ascResponse = new MockResponse();
+        final HttpServiceResponse descResponse = new MockResponse();
+
+        try {
+            handler.handle(ascRequest, ascResponse)
+            .map(ascendingResult -> {
+                assertEquals(HttpStatus.OK, ascResponse.status().get());
+
+                final var alarms = (PdeAlarmList)ascResponse.body().get();
+                assertEquals(3, alarms.count());
+
+                int previousId = alarms.data().get(0).id();
+
+                for (int i = 1; i < alarms.count(); i++) {
+                    final var alarm = alarms.data().get(i);
+                    assertTrue(alarm.id() >= previousId);
+                    previousId = alarm.id();
+                }
+                return handler.handle(descRequest, descResponse);
+            })
+            .ifSuccess(descendingResult -> {
+                assertEquals(HttpStatus.OK, descResponse.status().get());
+
+                final var alarms = (PdeAlarmList)descResponse.body().get();
+                assertEquals(3, alarms.count());
+
+                int previousId = alarms.data().get(0).id();
+
                 for (int i = 1; i < alarms.count(); i++) {
                     final var alarm = alarms.data().get(i);
                     assertTrue(alarm.id() <= previousId);
