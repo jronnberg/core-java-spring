@@ -6,13 +6,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmList;
@@ -25,16 +27,12 @@ public class GetAllPdeAlarmsTest {
     @Test
     public void shouldSortById() {
 
-        final String systemNameA = "System A";
-        final String systemIdB = "system-b";
-        final String systemIdC = "system-c";
-
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
-        alarmManager.raiseAlarmBySystemId(systemIdB, AlarmManager.Cause.systemNotInDescription);
-        alarmManager.raiseAlarmBySystemId(systemIdC, AlarmManager.Cause.systemNotInDescription);
+        alarmManager.raiseSystemNotInDescription("systemNameA");
+        alarmManager.raiseSystemNotInDescription("systemNameB");
+        alarmManager.raiseSystemNotInDescription("systemNameC");
         final var handler = new GetAllPdeAlarms();
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
@@ -96,15 +94,15 @@ public class GetAllPdeAlarmsTest {
     public void shouldSortByCreatedAt() {
 
         final String systemNameA = "System A";
-        final String systemIdB = "system-b";
-        final String systemIdC = "system-c";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
 
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
-        alarmManager.raiseAlarmBySystemId(systemIdB, AlarmManager.Cause.systemNotInDescription);
-        alarmManager.raiseAlarmBySystemId(systemIdC, AlarmManager.Cause.systemNotInDescription);
+        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameA), null);
+        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameB), null);
+        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameC), null);
         final var handler = new GetAllPdeAlarms();
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
@@ -197,34 +195,38 @@ public class GetAllPdeAlarmsTest {
     public void shouldFilterEntries() throws PdStoreException {
 
         final String systemNameA = "System A";
-        final String systemIdB = "system-b";
-        final String systemIdC = "system-c";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
 
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
-        alarmManager.raiseAlarmBySystemId(systemIdB, AlarmManager.Cause.systemNotInDescription);
-        alarmManager.raiseAlarmBySystemId(systemIdC, AlarmManager.Cause.systemNotInDescription);
+        alarmManager.raiseSystemNotInDescription(systemNameA);
+        alarmManager.raiseSystemNotInDescription(systemNameB);
+        alarmManager.raiseSystemNotInDescription(systemNameC);
 
-        alarmManager.setAcknowledged(1, true);
-        alarmManager.clearAlarmBySystemId(systemIdC, AlarmManager.Cause.systemNotInDescription);
+        int alarmId = 0;
+        for (final var alarm : alarmManager.getAlarms()) {
+            if (alarm.systemName().get().equals(systemNameB)) {
+                alarmId = alarm.id();
+            }
+        }
+
+        alarmManager.setAcknowledged(alarmId, true);
+        alarmManager.clearSystemNotInDescription(systemNameC);
 
         final var handler = new GetAllPdeAlarms();
         final HttpServiceRequest nameRequest = new MockRequest.Builder()
-        .queryParameters(Map.of(
-            "systemName", List.of(systemNameA)
-        ))
-        .build();
+            .queryParameters(Map.of(
+                "systemName", List.of(systemNameA)))
+            .build();
         final HttpServiceRequest ackRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
-                "acknowledged", List.of("true")
-            ))
+                "acknowledged", List.of("true")))
             .build();
         final HttpServiceRequest severityRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
-                "severity", List.of("cleared")
-            ))
+                "severity", List.of("cleared")))
             .build();
 
         HttpServiceResponse nameResponse = new MockResponse();
@@ -244,13 +246,13 @@ public class GetAllPdeAlarmsTest {
                 assertEquals(HttpStatus.OK, ackResponse.status().get());
                 var alarms = (PdeAlarmList)ackResponse.body().get();
                 assertEquals(1, alarms.count());
-                assertEquals(systemIdB, alarms.data().get(0).systemId().get());
+                assertEquals(systemNameB, alarms.data().get(0).systemName().get());
                 return handler.handle(severityRequest, severityResponse);
             }).ifSuccess(severityResult -> {
                 assertEquals(HttpStatus.OK, severityResponse.status().get());
                 var alarms = (PdeAlarmList)severityResponse.body().get();
                 assertEquals(1, alarms.count());
-                assertEquals(systemIdC, alarms.data().get(0).systemId().get());
+                assertEquals(systemNameC, alarms.data().get(0).systemName().get());
             })
             .onFailure(e -> {
                 e.printStackTrace();
@@ -269,12 +271,17 @@ public class GetAllPdeAlarmsTest {
         Locator.setAlarmManager(alarmManager);
 
         for (int i = 0; i < 10; i++) {
-            alarmManager.raiseAlarmBySystemId("System-" + i, AlarmManager.Cause.systemInactive);
+            alarmManager.raiseSystemInactive("System-" + i);
+        }
+
+        final var ids = new ArrayList<Integer>();
+        for (final var alarm : alarmManager.getAlarms()) {
+            ids.add(alarm.id());
         }
 
         final var handler = new GetAllPdeAlarms();
         final HttpServiceResponse response = new MockResponse();
-        final int page = 2;
+        final int page = 0;
         final int itemsPerPage = 3;
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -292,7 +299,9 @@ public class GetAllPdeAlarmsTest {
                 assertEquals(itemsPerPage, alarms.count());
                 for (int i = 0; i < itemsPerPage; i++) {
                     int index = page * itemsPerPage + i;
-                    assertEquals(index, alarms.data().get(i).id());
+                    int alarmId = alarms.data().get(i).id();
+                    int expectedId = ids.get(index);
+                    assertEquals(expectedId, alarmId);
                 }
 
             }).onFailure(e -> {

@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.services.service_registry_mgmt.SystemTracker;
 
 /**

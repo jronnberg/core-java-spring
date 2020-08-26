@@ -10,7 +10,7 @@ import java.util.List;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarm;
 import se.arkalix.net.http.HttpStatus;
@@ -25,7 +25,7 @@ public class GetPdeAlarmTest {
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName("System A", AlarmManager.Cause.systemNotRegistered);
+        alarmManager.raiseSystemNotInDescription("System A");
         final var alarm = alarmManager.getAlarms().get(0);
 
         final HttpServiceRequest request = new MockRequest.Builder()

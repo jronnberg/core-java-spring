@@ -12,7 +12,7 @@ import java.util.List;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.services.pde_monitor.dto.PdeAlarmUpdateBuilder;
@@ -23,14 +23,14 @@ import se.arkalix.net.http.service.HttpServiceResponse;
 public class UpdatePdeAlarmTest {
 
     @Test
-    public void shouldUpdateAlarm() {
+    public void shouldAcknowledgeAlarm() {
 
         final String systemNameA = "System A";
 
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
+        alarmManager.raiseSystemNotInDescription(systemNameA);
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 
@@ -124,12 +124,10 @@ public class UpdatePdeAlarmTest {
     @Test
     public void shouldNotChangeAlarm() {
 
-        final String systemNameA = "System A";
-
         final var alarmManager = new AlarmManager();
         Locator.setAlarmManager(alarmManager);
 
-        alarmManager.raiseAlarmBySystemName(systemNameA, AlarmManager.Cause.systemNotRegistered);
+        alarmManager.raiseSystemNotInDescription("SystemA");
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 

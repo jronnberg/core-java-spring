@@ -37,7 +37,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
             return Future.done();
         }
 
-        final PdeAlarmDto alarm = Locator.getAlarmManager().getAlarm(id);
+        final PdeAlarmDto alarm = Locator.getAlarmManager().getAlarmDto(id);
 
         if (alarm == null) {
             response.body(ErrorMessage.of("PDE Alarm with ID '" + id + "' not found."));

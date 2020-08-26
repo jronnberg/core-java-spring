@@ -14,7 +14,7 @@ import java.util.List;
 import org.junit.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.PdMismatchDetector;
-import eu.arrowhead.core.plantdescriptionengine.alarmmanager.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
