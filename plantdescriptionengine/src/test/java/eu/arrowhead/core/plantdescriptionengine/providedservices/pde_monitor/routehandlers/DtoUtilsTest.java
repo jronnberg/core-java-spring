@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.utils;
+package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +16,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;

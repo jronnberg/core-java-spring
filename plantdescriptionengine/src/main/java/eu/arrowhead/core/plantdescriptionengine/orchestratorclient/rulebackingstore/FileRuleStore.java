@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore;
+package eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore;
 
 import java.io.BufferedWriter;
 import java.io.File;

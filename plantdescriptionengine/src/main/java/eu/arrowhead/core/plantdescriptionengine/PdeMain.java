@@ -19,11 +19,11 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracke
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.PdeMonitorService;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.FileRuleStore;
 import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
