@@ -28,7 +28,6 @@ import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingst
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
@@ -47,27 +46,32 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private PlantDescriptionEntry activeEntry = null;
     private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
     private final RuleStore backingStore;
+    private SystemTracker systemTracker;
 
 
     /**
      * Class constructor.
      *
-     * @param httpClient Object for sending HTTP messages to the Orchestrator.
-     * @param cloud      DTO describing a Arrowhead Cloud.
-     * @param ruleStore  Object providing permanent storage for Orchestration
-     *                   rule data.
+     * @param httpClient Object for sending HTTP messages to the
+     *                      Orchestrator.
+     * @param cloud DTO describing a Arrowhead Cloud.
+     * @param ruleStore Object providing permanent storage for Orchestration
+     *                  rule data.
+     * @param systemTracker Object used to track registered Arrowhead systems.
      * @throws RuleStoreException
      */
-    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore) throws RuleStoreException {
+    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker) throws RuleStoreException {
         Objects.requireNonNull(httpClient, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(ruleStore, "Expected backing store");
+        Objects.requireNonNull(systemTracker, "Expected System Tracker");
 
         this.client = httpClient;
         this.cloud = cloud;
         this.backingStore = ruleStore;
+        this.systemTracker = systemTracker;
 
-        SrSystem orchestrator = Locator.getSystemTracker().getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
+        SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
@@ -128,7 +132,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return null;
         }
 
-        final SystemTracker systemTracker = Locator.getSystemTracker();
         final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
         final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 

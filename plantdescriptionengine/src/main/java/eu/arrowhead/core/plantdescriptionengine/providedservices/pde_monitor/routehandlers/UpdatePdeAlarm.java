@@ -1,8 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
+import java.util.Objects;
+
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateDto;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
@@ -15,6 +17,17 @@ import se.arkalix.util.concurrent.Future;
  */
 public class UpdatePdeAlarm implements HttpRouteHandler {
 
+    private final AlarmManager alarmManager;
+
+    /**
+     * Constructor.
+     * @param alarmManager Object used for managing PDE alarms.
+     */
+    public UpdatePdeAlarm(AlarmManager alarmManager) {
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager.");
+        this.alarmManager = alarmManager;
+    }
+
     /**
      * Handles an HTTP request to update the Alarm specified by the id parameter
      * with the information in the request body.
@@ -24,7 +37,6 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
      */
     @Override
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
-        final var alarmManager = Locator.getAlarmManager();
         return request
             .bodyAs(PdeAlarmUpdateDto.class)
             .map(newFields -> {

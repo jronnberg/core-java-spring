@@ -21,7 +21,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.Pde
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
 import se.arkalix.ArServiceCache;
@@ -249,12 +248,7 @@ public class PdeMain {
 
         final SystemTracker systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
 
-        // Make the system tracker globally accessible:
-        Locator.setSystemTracker(systemTracker);
         systemTracker.startPollingForSystems().flatMap(result -> {
-
-            // Create a globally accessible alarm manager:
-            Locator.setAlarmManager(new AlarmManager());
 
             final CloudDto cloud = new CloudBuilder()
                 .name(appProps.getProperty("cloud.name"))
@@ -263,23 +257,26 @@ public class PdeMain {
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = appProps.getProperty("orchestration_rules");
-            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, new FileRuleStore(ruleDirectory));
+            final var orchestratorClient = new OrchestratorClient(
+                sysopClient, cloud, new FileRuleStore(ruleDirectory), systemTracker
+            );
             final String plantDescriptionsDirectory = appProps.getProperty("plant_descriptions");
 
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
             final boolean secureMode = Boolean.parseBoolean(appProps.getProperty("server.ssl.enabled"));
 
-
+            final AlarmManager alarmManager = new AlarmManager();
             return orchestratorClient.initialize(pdTracker)
                 .flatMap(orchstratorInitializationResult -> {
-                    final var mismatchDetector = new SystemMismatchDetector(pdTracker);
+                    final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
                     mismatchDetector.run();
                     var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
                     return arSystem.provide(pdeManagementService.getService());
                 })
                 .flatMap(mgmtServiceResult -> {
-                    return new PdeMonitorService(arSystem, pdTracker, pdeClient, secureMode).provide();
+                    return new PdeMonitorService(arSystem, pdTracker, pdeClient, alarmManager, secureMode)
+                        .provide();
                 });
         })
         .onFailure(throwable -> {

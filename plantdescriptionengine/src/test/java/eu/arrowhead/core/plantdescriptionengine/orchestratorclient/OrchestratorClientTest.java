@@ -26,7 +26,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Po
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
 import se.arkalix.net.http.client.HttpClient;
 
@@ -103,7 +102,6 @@ public class OrchestratorClientTest {
             .build();
 
         MockSystemTracker systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
-        Locator.setSystemTracker(systemTracker);
 
         final PlantDescriptionEntry entry = createEntry();
 
@@ -145,7 +143,7 @@ public class OrchestratorClientTest {
         systemTracker.addSystem("orchestrator", orchestratorSrSystem);
 
         final RuleStore backingStore = new InMemoryRuleStore();
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, backingStore);
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, backingStore, systemTracker);
 
         var rule = orchestratorClient.createRule(entry, 0);
 

@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
@@ -28,7 +27,6 @@ public class UpdatePdeAlarmTest {
         final String systemNameA = "System A";
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotInDescription(systemNameA);
         final var alarm = alarmManager.getAlarms().get(0);
@@ -41,7 +39,7 @@ public class UpdatePdeAlarmTest {
                 .build())
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new UpdatePdeAlarm();
+        final var handler = new UpdatePdeAlarm(alarmManager);
 
         try {
             handler.handle(request, response)
@@ -62,7 +60,6 @@ public class UpdatePdeAlarmTest {
     @Test
     public void shouldRejectInvalidId() {
 
-        Locator.setAlarmManager(new AlarmManager());
         final String invalidEntryId = "Invalid ID";
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(invalidEntryId)))
@@ -71,7 +68,7 @@ public class UpdatePdeAlarmTest {
                 .build())
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new UpdatePdeAlarm();
+        final var handler = new UpdatePdeAlarm(new AlarmManager());
 
         try {
             handler.handle(request, response)
@@ -93,7 +90,6 @@ public class UpdatePdeAlarmTest {
     @Test
     public void shouldRejectNonexistentId() {
 
-        Locator.setAlarmManager(new AlarmManager());
         final String nonexistentId = "31";
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(nonexistentId)))
@@ -102,7 +98,7 @@ public class UpdatePdeAlarmTest {
                 .build())
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new UpdatePdeAlarm();
+        final var handler = new UpdatePdeAlarm(new AlarmManager());
 
         try {
             handler.handle(request, response)
@@ -125,7 +121,6 @@ public class UpdatePdeAlarmTest {
     public void shouldNotChangeAlarm() {
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotInDescription("SystemA");
         final var alarm = alarmManager.getAlarms().get(0);
@@ -137,7 +132,7 @@ public class UpdatePdeAlarmTest {
                 .build())
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new UpdatePdeAlarm();
+        final var handler = new UpdatePdeAlarm(alarmManager);
 
         try {
             handler.handle(request, response)

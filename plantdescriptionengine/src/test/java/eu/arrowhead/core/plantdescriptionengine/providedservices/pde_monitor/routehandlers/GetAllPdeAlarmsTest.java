@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
@@ -28,12 +27,11 @@ public class GetAllPdeAlarmsTest {
     public void shouldSortById() {
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotInDescription("systemNameA");
         alarmManager.raiseSystemNotInDescription("systemNameB");
         alarmManager.raiseSystemNotInDescription("systemNameC");
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -98,12 +96,11 @@ public class GetAllPdeAlarmsTest {
         final String systemNameC = "System C";
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotRegistered(Optional.of(systemNameA), null);
         alarmManager.raiseSystemNotRegistered(Optional.of(systemNameB), null);
         alarmManager.raiseSystemNotRegistered(Optional.of(systemNameC), null);
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -164,8 +161,7 @@ public class GetAllPdeAlarmsTest {
     @Test
     public void shouldRejectNonBooleans() throws PdStoreException {
 
-        Locator.setAlarmManager(new AlarmManager());
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(new AlarmManager());
         final String nonBoolean = "Not a boolean";
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -199,7 +195,6 @@ public class GetAllPdeAlarmsTest {
         final String systemNameC = "System C";
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotInDescription(systemNameA);
         alarmManager.raiseSystemNotInDescription(systemNameB);
@@ -215,7 +210,7 @@ public class GetAllPdeAlarmsTest {
         alarmManager.setAcknowledged(alarmId, true);
         alarmManager.clearSystemNotInDescription(systemNameC);
 
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(alarmManager);
         final HttpServiceRequest nameRequest = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "systemName", List.of(systemNameA)))
@@ -268,7 +263,6 @@ public class GetAllPdeAlarmsTest {
     public void shouldPaginate() throws PdStoreException {
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         for (int i = 0; i < 10; i++) {
             alarmManager.raiseSystemInactive("System-" + i);
@@ -279,7 +273,7 @@ public class GetAllPdeAlarmsTest {
             ids.add(alarm.id());
         }
 
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(alarmManager);
         final HttpServiceResponse response = new MockResponse();
         final int page = 0;
         final int itemsPerPage = 3;
@@ -316,9 +310,8 @@ public class GetAllPdeAlarmsTest {
 
     @Test
     public void shouldRejectNegativePage() throws PdStoreException {
-        final var handler = new GetAllPdeAlarms();
+        final var handler = new GetAllPdeAlarms(new AlarmManager());
         int page = -3;
-        Locator.setAlarmManager(new AlarmManager());
         final HttpServiceResponse response = new MockResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(

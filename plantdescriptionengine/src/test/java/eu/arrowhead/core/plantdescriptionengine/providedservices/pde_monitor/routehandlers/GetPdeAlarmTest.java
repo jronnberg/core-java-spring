@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
@@ -23,7 +22,6 @@ public class GetPdeAlarmTest {
     public void shouldRetrieveAlarm() {
 
         final var alarmManager = new AlarmManager();
-        Locator.setAlarmManager(alarmManager);
 
         alarmManager.raiseSystemNotInDescription("System A");
         final var alarm = alarmManager.getAlarms().get(0);
@@ -32,7 +30,7 @@ public class GetPdeAlarmTest {
             .pathParameters(List.of(String.valueOf(alarm.id())))
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new GetPdeAlarm();
+        final var handler = new GetPdeAlarm(alarmManager);
 
         try {
             handler.handle(request, response)
@@ -55,13 +53,12 @@ public class GetPdeAlarmTest {
     @Test
     public void shouldRejectInvalidId() {
 
-        Locator.setAlarmManager(new AlarmManager());
         final String invalidEntryId = "Invalid ID";
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(invalidEntryId)))
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new GetPdeAlarm();
+        final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
             handler.handle(request, response)
@@ -83,13 +80,12 @@ public class GetPdeAlarmTest {
     @Test
     public void shouldRejectNonexistentId() {
 
-        Locator.setAlarmManager(new AlarmManager());
         final String nonexistentId = "31";
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(nonexistentId)))
             .build();
         final HttpServiceResponse response = new MockResponse();
-        final var handler = new GetPdeAlarm();
+        final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
             handler.handle(request, response)

@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 import java.util.Objects;
 
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPdeAlarms;
@@ -27,6 +28,7 @@ public class PdeMonitorService {
     private final ArSystem arSystem;
     private final MonitorablesClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
+    private final AlarmManager alarmManager;
 
     private final PlantDescriptionTracker pdTracker;
     private final boolean secure;
@@ -39,23 +41,27 @@ public class PdeMonitorService {
      * @param arSystem An Arrowhead Framework system used to provide this
      *                 service.
      * @param httpClient  Object for communicating with monitorable services.
+     * @param alarmManager Object used for managing PDE alarms.
      * @param insecure Indicates whether the service should run in secure mode.
      */
     public PdeMonitorService(
         ArSystem arSystem,
         PlantDescriptionTracker pdTracker,
         HttpClient httpClient,
+        AlarmManager alarmManager,
         boolean secure
     ) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(pdTracker, "Expected plant description tracker");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager");
 
         this.arSystem = arSystem;
         this.pdTracker = pdTracker;
+        this.alarmManager = alarmManager;
         this.secure = secure;
 
-        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo);
+        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
     }
 
     /**
@@ -73,9 +79,9 @@ public class PdeMonitorService {
             .basePath("/pde/monitor")
             .get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
             .get("/pd/#id", new GetPlantDescription(monitorInfo, pdTracker))
-            .get("/alarm/#id", new GetPdeAlarm())
-            .get("/alarm", new GetAllPdeAlarms())
-            .patch("/alarm/#id", new UpdatePdeAlarm());
+            .get("/alarm/#id", new GetPdeAlarm(alarmManager))
+            .get("/alarm", new GetAllPdeAlarms(alarmManager))
+            .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager));
             // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add this line?
 
         if (secure) {
