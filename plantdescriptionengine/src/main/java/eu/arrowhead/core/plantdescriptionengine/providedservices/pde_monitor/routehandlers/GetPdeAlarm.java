@@ -1,8 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
+import java.util.Objects;
+
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -13,6 +15,17 @@ import se.arkalix.util.concurrent.Future;
  * Handles HTTP requests to retrieve a specific PDE Alarm.
  */
 public class GetPdeAlarm implements HttpRouteHandler {
+
+    private final AlarmManager alarmManager;
+
+    /**
+     * Constructor.
+     * @param alarmManager Object used for managing PDE alarms.
+     */
+    public GetPdeAlarm(AlarmManager alarmManager) {
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager.");
+        this.alarmManager = alarmManager;
+    }
 
     /**
      * Handles an HTTP call to acquire the PDE Alarm specified by the id path
@@ -37,7 +50,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
             return Future.done();
         }
 
-        final PdeAlarmDto alarm = Locator.getAlarmManager().getAlarmDto(id);
+        final PdeAlarmDto alarm = alarmManager.getAlarmDto(id);
 
         if (alarm == null) {
             response.body(ErrorMessage.of("PDE Alarm with ID '" + id + "' not found."));

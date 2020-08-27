@@ -21,7 +21,6 @@ import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingst
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
 import se.arkalix.net.http.client.HttpClient;
 
@@ -30,13 +29,11 @@ public class SystemMismatchDetectorTest {
     @Test
     public void shouldReportSystemNotRegistered() throws SSLException, RuleStoreException, PdStoreException {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var detector = new SystemMismatchDetector(pdTracker);
-        final var alarmManager = new AlarmManager();
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final var systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
+        final var alarmManager = new AlarmManager();
+        final var detector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
 
-        Locator.setAlarmManager(alarmManager);
-        Locator.setSystemTracker(systemTracker);
         detector.run();
 
         final String systemName = "System A";
@@ -70,13 +67,11 @@ public class SystemMismatchDetectorTest {
     @Test
     public void shouldClearSystemNotRegistered() throws SSLException, RuleStoreException, PdStoreException {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        final var detector = new SystemMismatchDetector(pdTracker);
-        final var alarmManager = new AlarmManager();
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final var systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
+        final var alarmManager = new AlarmManager();
+        final var detector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
 
-        Locator.setAlarmManager(alarmManager);
-        Locator.setSystemTracker(systemTracker);
         detector.run();
 
         final String systemId = "System_A";

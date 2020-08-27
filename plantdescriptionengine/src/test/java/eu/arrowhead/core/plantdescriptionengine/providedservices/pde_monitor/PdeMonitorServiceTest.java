@@ -7,6 +7,7 @@ import javax.net.ssl.SSLException;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
@@ -24,7 +25,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, pdTracker, client, false);
+        final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), false);
 
         service.provide()
             .ifSuccess(result -> {
@@ -45,7 +46,7 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final var service = new PdeMonitorService(arSystem, pdTracker, client, true);
+        final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), true);
 
         service.provide()
             .ifSuccess(result -> {

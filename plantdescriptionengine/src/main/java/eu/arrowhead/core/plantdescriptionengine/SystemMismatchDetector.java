@@ -9,18 +9,30 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracke
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import eu.arrowhead.core.plantdescriptionengine.alarms.Alarm;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmCause;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 
 public class SystemMismatchDetector implements PlantDescriptionUpdateListener, SystemUpdateListener {
-    private PlantDescriptionTracker pdTracker;
+    private final PlantDescriptionTracker pdTracker;
+    private final SystemTracker systemTracker;
+    private final AlarmManager alarmManager;
 
-    public SystemMismatchDetector(PlantDescriptionTracker pdTracker) {
+    public SystemMismatchDetector(
+        PlantDescriptionTracker pdTracker,
+        SystemTracker systemTracker,
+        AlarmManager alarmManager
+    ) {
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
+        Objects.requireNonNull(systemTracker, "Expected System Tracker");
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager");
+
         this.pdTracker = pdTracker;
+        this.systemTracker = systemTracker;
+        this.alarmManager = alarmManager;
     }
 
     /**
@@ -30,7 +42,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     public void run() {
         pdTracker.addListener(this);
-        Locator.getSystemTracker().addListener(this);
+        systemTracker.addListener(this);
 
         // Initial check for mismatches:
         checkSystems();
@@ -103,8 +115,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     private void checkSystems() {
-        final var alarmManager = Locator.getAlarmManager();
-        final List<SrSystem> registeredSystems = Locator.getSystemTracker().getSystems();
+        final List<SrSystem> registeredSystems = systemTracker.getSystems();
         final PlantDescriptionEntry activeEntry = pdTracker.activeEntry();
         final List<PdeSystem> pdSystems;
 
@@ -152,7 +163,6 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     private void clearAlarms(List<SrSystem> registeredSystems, List<PdeSystem> pdSystems) {
-        final var alarmManager = Locator.getAlarmManager();
         final List<Alarm> activeAlarms = alarmManager.getActiveAlarmData(List.of(
             AlarmCause.systemNotInDescription,
             AlarmCause.systemNotRegistered

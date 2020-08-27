@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.SystemDataDto;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.ArSystem;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -29,13 +29,25 @@ public class MonitorablesClient {
     private ServiceQuery serviceQuery;
     private final HttpClient httpClient;
     private final MonitorInfo monitorInfo;
+    private final AlarmManager alarmManager;
 
-    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo) {
+    /**
+     * Constructor.
+     * @param arSystem     An Arrowhead Framework system used interact with the
+     *                     orchestrator.
+     * @param httpClient   Object for communicating with the other systems.
+     * @param monitorInfo  Object used for keeping track of inventory data of
+     *                     monitorable systems.
+     * @param alarmManager Object used for managing PDE alarms.
+     */
+    MonitorablesClient(ArSystem arSystem, HttpClient httpClient, MonitorInfo monitorInfo, AlarmManager alarmManager) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager");
 
         this.httpClient = httpClient;
         this.monitorInfo = monitorInfo;
+        this.alarmManager = alarmManager;
 
         serviceQuery = arSystem.consume()
             .name("monitorable")
@@ -105,11 +117,11 @@ public class MonitorablesClient {
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 System.out.println("Successful ping");
-                Locator.getAlarmManager().clearSystemInactive(providerName);
+                alarmManager.clearSystemInactive(providerName);
             })
             .onFailure(e -> {
                 System.out.println("Failed ping");
-                Locator.getAlarmManager().raiseSystemInactive(providerName);
+                alarmManager.raiseSystemInactive(providerName);
             });
     }
 

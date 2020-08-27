@@ -2,11 +2,13 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.ro
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmSeverity;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.BooleanParameter;
@@ -18,7 +20,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidati
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmListBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.Locator;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -30,6 +31,17 @@ import se.arkalix.util.concurrent.Future;
  */
 public class GetAllPdeAlarms implements HttpRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(GetAllPdeAlarms.class);
+
+    private final AlarmManager alarmManager;
+
+    /**
+     * Constructor.
+     * @param alarmManager Object used for managing PDE alarms.
+     */
+    public GetAllPdeAlarms(AlarmManager alarmManager) {
+        Objects.requireNonNull(alarmManager, "Expected Alarm Manager.");
+        this.alarmManager = alarmManager;
+    }
 
     /**
      * Handles an HTTP call to acquire a list of PDE alarms raised by the PDE.
@@ -75,7 +87,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             return Future.done();
         }
 
-        List<PdeAlarmDto> alarms = Locator.getAlarmManager().getAlarms();
+        List<PdeAlarmDto> alarms = alarmManager.getAlarms();
 
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
