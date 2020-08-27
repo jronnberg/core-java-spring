@@ -9,6 +9,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListDto;
 import se.arkalix.dto.DtoEncoding;
@@ -21,6 +24,7 @@ import se.arkalix.util.concurrent.Future;
  * Object used to keep track of registered Arrowhead systems.
  */
 public class SystemTracker {
+    private static final Logger logger = LoggerFactory.getLogger(SystemTracker.class);
 
     private final HttpClient httpClient;
     private InetSocketAddress serviceRegistryAddress = null;
@@ -63,12 +67,16 @@ public class SystemTracker {
             .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
+                List<SrSystem> newSystems = systemList.data();
+                List<SrSystem> oldSystems = new ArrayList<>(systems.values());
+
+                // Replace the stored list of registered systems.
                 systems.clear();
-                for (var system : systemList.data()) {
+                for (var system : newSystems) {
                     systems.put(system.systemName(), system);
                 }
                 initialized = true;
-                notifyListeners(systemList);
+                notifyListeners(oldSystems, newSystems);
                 return Future.done();
             });
     }
@@ -79,10 +87,10 @@ public class SystemTracker {
      *
      * @param newSystems
      */
-    private void notifyListeners(SrSystemListDto newSystems) {
+    private void notifyListeners(List<SrSystem> oldSystems, List<SrSystem> newSystems) {
         // Report removed systems
-        for (var oldSystem: systems.values()) {
-            boolean stillPresent = newSystems.data()
+        for (var oldSystem: oldSystems) {
+            boolean stillPresent = newSystems
                 .stream()
                 .anyMatch(newSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!stillPresent) {
@@ -93,11 +101,12 @@ public class SystemTracker {
         }
 
         // Report added systems
-        for (var newSystem : newSystems.data()) {
-            boolean wasPresent = systems.values()
+        for (var newSystem : newSystems) {
+            boolean wasPresent = oldSystems
                 .stream()
                 .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!wasPresent) {
+                System.out.println("System " + newSystem.systemName() + " was added.");
                 for (var listener: listeners) {
                     listener.onSystemAdded(newSystem);
                 }
@@ -106,8 +115,8 @@ public class SystemTracker {
     }
 
     /**
-     * Retrieves the specified system. Note that the returned data will be stale if
-     * the system in question has changed state since the last call to
+     * Retrieves the specified system. Note that the returned data will be stale
+     * if the system in question has changed state since the last call to
      * {@link #pollForSystems()}.
      *
      *
@@ -143,13 +152,18 @@ public class SystemTracker {
     public Future<Void> startPollingForSystems() {
         final var timer = new Timer();
 
+        System.out.println("Starting poll....");
+
         return pollForSystems().flatMap(result -> {
 
             // Periodically poll the Service Registry for systems.
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    pollForSystems();
+                    pollForSystems()
+                    .onFailure(error -> {
+                        logger.error("Failed to retrieve registered systems", error);
+                    });
                 }
             }, 0, pollInterval);
 

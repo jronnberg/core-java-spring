@@ -184,27 +184,19 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
                 }
             }
 
-            System.out.println("Missing system: " + alarm.systemName + ", " + alarm.systemId);
-
             // Check if the system is registered:
             boolean isRegistered = false;
             for (final var registeredSystem : registeredSystems) {
-                System.out.println("Checking " + registeredSystem.systemName());
                 if (alarmMatchesSystem(alarm, registeredSystem)) {
-                    System.out.println("Match.");
                     isRegistered = true;
                     break;
                 }
-                System.out.println("No match.");
             }
-
-            System.out.println("presentInPd: " + presentInPd + ", isRegistered: " + isRegistered);
 
             if (alarm.cause == AlarmCause.systemNotInDescription && (presentInPd || !isRegistered)) {
                 alarmManager.clearAlarm(alarm);
             }
             else if (alarm.cause == AlarmCause.systemNotRegistered && (!presentInPd || isRegistered)) {
-                System.out.println("Clearing systemNotRegistered!");
                 alarmManager.clearAlarm(alarm);
                 // alarmManager.clearAlarmBySystemId(alarm.systemId, AlarmManager.Cause.systemNotRegistered);
             }
