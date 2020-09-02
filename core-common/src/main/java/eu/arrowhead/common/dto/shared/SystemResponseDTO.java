@@ -1,7 +1,22 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.common.dto.shared;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -69,14 +84,30 @@ public class SystemResponseDTO implements Serializable {
 		if (this == obj) {
 			return true;
 		}
+		
 		if (obj == null) {
 			return false;
 		}
+		
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
+		
 		final SystemResponseDTO other = (SystemResponseDTO) obj;
 		
 		return Objects.equals(address, other.address) && Objects.equals(port, other.port) && Objects.equals(systemName, other.systemName);
+	}
+
+	@Override
+	public String toString() {
+		return new StringJoiner(", ", SystemResponseDTO.class.getSimpleName() + "[", "]")
+				.add("id=" + id)
+				.add("systemName='" + systemName + "'")
+				.add("address='" + address + "'")
+				.add("port=" + port)
+				.add("authenticationInfo='" + authenticationInfo + "'")
+				.add("createdAt='" + createdAt + "'")
+				.add("updatedAt='" + updatedAt + "'")
+				.toString();
 	}
 }

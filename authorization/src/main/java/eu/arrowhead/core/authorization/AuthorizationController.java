@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.authorization;
 
 import java.security.PublicKey;
@@ -597,10 +611,6 @@ public class AuthorizationController {
 		logger.debug("New token generation request received");
 		checkTokenGenerationRequest(request);
 		
-		if (request.getDuration() != null && request.getDuration().intValue() <= 0) {
-			request.setDuration(null);
-		}
-
 		final TokenGenerationResponseDTO response = tokenGenerationService.generateTokensResponse(request);
 		logger.debug("{} token(s) are generated for {}", calculateNumberOfTokens(response.getTokenData()), request.getConsumer().getSystemName());
 		
@@ -668,6 +678,10 @@ public class AuthorizationController {
 			if (!interfaceNameVerifier.isValid(intf)) {
 				throw new BadPayloadException("Specified interface name is not valid: " + intf, HttpStatus.SC_BAD_REQUEST, origin);
 			}
+		}
+		
+		if (provider.getTokenDuration() <= 0) {
+			provider.setTokenDuration(-1);
 		}
 	}
 

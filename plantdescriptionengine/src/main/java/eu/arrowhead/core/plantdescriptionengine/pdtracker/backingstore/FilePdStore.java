@@ -55,7 +55,8 @@ public class FilePdStore implements PdStore {
 
         // Read all Plant Description entries into memory.
         if (directoryListing == null) {
-            throw new PdStoreException(new FileNotFoundException());
+            throw new PdStoreException(new FileNotFoundException("Failed to read Plant Descriptions from directory '" +
+                descriptionDirectory + "'."));
         }
 
         final var result = new ArrayList<PlantDescriptionEntryDto>();

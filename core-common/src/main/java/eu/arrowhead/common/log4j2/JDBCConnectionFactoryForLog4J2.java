@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.common.log4j2;
 
 import java.io.File;
@@ -57,7 +71,7 @@ public class JDBCConnectionFactoryForLog4J2 {
 	//-------------------------------------------------------------------------------------------------
 	private static void init() throws IOException {
 		InputStream propStream = null;
-		File propertiesFile = new File(CoreCommonConstants.APPLICATION_PROPERTIES);
+		final File propertiesFile = new File(CoreCommonConstants.APPLICATION_PROPERTIES);
 		if (!propertiesFile.exists()) {
 			propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CoreCommonConstants.APPLICATION_PROPERTIES);
 		} else {

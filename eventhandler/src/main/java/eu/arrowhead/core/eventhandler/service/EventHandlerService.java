@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.eventhandler.service;
 
 import java.time.ZonedDateTime;
@@ -161,12 +175,12 @@ public class EventHandlerService {
 			throw new InvalidParameterException("Payload" + NULL_OR_BLANK_PARAMETER_ERROR_MESSAGE);
 		}
 		
-		ckeckTimeStamp(request.getTimeStamp());	
+		checkTimeStamp(request.getTimeStamp());	
 		checkSystemRequestDTO(request.getSource());
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private void ckeckTimeStamp(final String timeStampString) {
+	private void checkTimeStamp(final String timeStampString) {
 		logger.debug("ckeckTimeStamp started...");
 		
 		if (Utilities.isEmpty(timeStampString)) {

@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.authorization;
 
 import static org.junit.Assume.assumeFalse;
@@ -529,8 +543,8 @@ public class AuthorizationControllerTokenTest {
 		provider.setPort(18765);
 		provider.setAuthenticationInfo("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1aaeuv1I4bF5dxMIvUvLMxjRn309kdJewIIH08DfL17/LSssD70ZaLz0yxNfbPPQpFK8LMK+HQHDiGZH5yp4qJDuEgfmUrqWibnBIBc/K3Ob45lQy0zdFVtFsVJYBFVymQwgxJT6th0hI3RGLbCJMzbmpDzT7g0IDsN+64tMyi08ZCPrqk99uzYgioSSWNb9bhG2Z9646b3oiY5utQWRhP/2z/t6vVJHtRYeyaXPl6Z2M/5KnjpSvpSeZQhNrw+Is1DEE5DHiEjfQFWrLwDOqPKDrvmFyIlJ7P7OCMax6dIlSB7GEQSSP+j4eIxDWgjm+Pv/c02UVDc0x3xX/UGtNwIDAQAB");
 		
-		final TokenGenerationProviderDTO providerDTO = new TokenGenerationProviderDTO(provider, List.of("HTTP-SECURE-JSON"));
+		final TokenGenerationProviderDTO providerDTO = new TokenGenerationProviderDTO(provider, 6000, List.of("HTTP-SECURE-JSON"));
 		
-		return new TokenGenerationRequestDTO(consumer, consumerCloud, List.of(providerDTO), "aservice", null);
+		return new TokenGenerationRequestDTO(consumer, consumerCloud, List.of(providerDTO), "aservice");
 	}
 }

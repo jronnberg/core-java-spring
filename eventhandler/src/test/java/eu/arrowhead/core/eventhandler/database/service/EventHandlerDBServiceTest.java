@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.eventhandler.database.service;
 
 import static org.junit.Assert.assertFalse;
@@ -260,7 +274,7 @@ public class EventHandlerDBServiceTest {
 			eventHandlerDBService.getSubscriptionsResponse(page, size, direction, sortField);
 		} catch (final Exception ex) {
 			verify(subscriptionRepository, never()).findAll(any(PageRequest.class));
-			Assert.assertTrue(ex.getMessage().contains(" sortable field  is not available." ));
+			Assert.assertTrue(ex.getMessage().contains(" sortable field is not available." ));
 			throw ex;
 		}
 	}
@@ -365,7 +379,7 @@ public class EventHandlerDBServiceTest {
 			eventHandlerDBService.getSubscriptions(page, size, direction, sortField);
 		} catch (final Exception ex) {
 			verify(subscriptionRepository, never()).findAll(any(PageRequest.class));
-			Assert.assertTrue(ex.getMessage().contains(" sortable field  is not available."));
+			Assert.assertTrue(ex.getMessage().contains(" sortable field is not available."));
 			throw ex;
 		}
 	}
@@ -877,7 +891,7 @@ public class EventHandlerDBServiceTest {
 			verify(eventTypeRepository, times(1)).findByEventTypeName(any());
 			verify(eventTypeRepository, times(1)).saveAndFlush(any());
 			verify(subscriptionRepository, never()).findByEventTypeAndSubscriberSystem(any(), any());			
-			Assert.assertTrue(ex.getMessage().contains("Start Date sould be before End Date"));
+			Assert.assertTrue(ex.getMessage().contains("Start Date should be before End Date"));
 			throw ex;
 		}
 	}
@@ -907,7 +921,7 @@ public class EventHandlerDBServiceTest {
 			verify(eventTypeRepository, times(1)).findByEventTypeName(any());
 			verify(eventTypeRepository, times(1)).saveAndFlush(any());
 			verify(subscriptionRepository, times(0)).findByEventTypeAndSubscriberSystem(any(), any());			
-			Assert.assertTrue(ex.getMessage().contains("Start Date sould be before End Date"));
+			Assert.assertTrue(ex.getMessage().contains("Start Date should be before End Date"));
 			throw ex;
 		}
 	}
@@ -935,7 +949,7 @@ public class EventHandlerDBServiceTest {
 			verify(eventTypeRepository, times(1)).findByEventTypeName(any());
 			verify(eventTypeRepository, times(1)).saveAndFlush(any());
 			verify(subscriptionRepository, never()).findByEventTypeAndSubscriberSystem(any(), any());			
-			Assert.assertTrue(ex.getMessage().contains("If MatchMetaData is true filterMetaData sould not be null or empty"));
+			Assert.assertTrue(ex.getMessage().contains("If MatchMetaData is true filterMetaData should not be null or empty"));
 			throw ex;
 		}
 	}
@@ -963,7 +977,7 @@ public class EventHandlerDBServiceTest {
 			verify(eventTypeRepository, times(1)).findByEventTypeName(any());
 			verify(eventTypeRepository, times(1)).saveAndFlush(any());
 			verify(subscriptionRepository, never()).findByEventTypeAndSubscriberSystem(any(), any());			
-			Assert.assertTrue(ex.getMessage().contains("If MatchMetaData is true filterMetaData sould not be null or empty"));
+			Assert.assertTrue(ex.getMessage().contains("If MatchMetaData is true filterMetaData should not be null or empty"));
 			throw ex;
 		}
 	}
@@ -1132,7 +1146,7 @@ public class EventHandlerDBServiceTest {
 			verify(subscriptionPublisherConnectionRepository, never()).saveAll(any());
 			verify(subscriptionPublisherConnectionRepository, never()).flush();
 			verify(subscriptionRepository, never()).saveAndFlush(any());
-			Assert.assertTrue(ex.getMessage().contains("Subscription violates uniqueConstraint rules"));
+			Assert.assertTrue(ex.getMessage().contains("Subscription violates unique constraint rules"));
 			throw ex;
 		}
 	}
@@ -1469,6 +1483,7 @@ public class EventHandlerDBServiceTest {
 		final Set<SystemResponseDTO> authorizedPublishers = getSystemResponseDTOSet(7);
 		final Set<SubscriptionPublisherConnection> involvedPublisherSystems = Set.of();
 
+		when(subscriptionRepository.findById(anyLong())).thenReturn(Optional.of(subscription));
 		when(subscriptionPublisherConnectionRepository.findBySubscriptionEntry(any())).thenReturn(involvedPublisherSystems);
 		doNothing().when(subscriptionPublisherConnectionRepository).deleteInBatch(any());
 		doNothing().when(subscriptionRepository).refresh(any());
@@ -1494,6 +1509,7 @@ public class EventHandlerDBServiceTest {
 		final Set<SystemResponseDTO> authorizedPublishers = getSystemResponseDTOSet(7);
 		final Set<SubscriptionPublisherConnection> involvedPublisherSystems = Set.of();
 
+		when(subscriptionRepository.findById(anyLong())).thenReturn(Optional.of(subscription));
 		when(subscriptionPublisherConnectionRepository.findBySubscriptionEntry(any())).thenReturn(involvedPublisherSystems);
 		doNothing().when(subscriptionPublisherConnectionRepository).deleteInBatch(any());
 		doNothing().when(subscriptionRepository).refresh(any());

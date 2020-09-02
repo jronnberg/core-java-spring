@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.authorization.database.service;
 
 import static org.junit.Assert.assertEquals;
@@ -73,7 +87,7 @@ public class AuthorizationDBServiceInterCloudTest {
 	// methods
 	
 	//=================================================================================================
-	//Tests of getAuthorizationInterCloudEntries
+	// Tests of getAuthorizationInterCloudEntries
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test
@@ -90,7 +104,7 @@ public class AuthorizationDBServiceInterCloudTest {
 	}
 
 	//=================================================================================================
-	//Tests of getAuthorizationInterCloudEntryById
+	// Tests of getAuthorizationInterCloudEntryById
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test(expected = InvalidParameterException.class)
@@ -100,7 +114,7 @@ public class AuthorizationDBServiceInterCloudTest {
 	}
 	
 	//=================================================================================================
-	//Tests of removeAuthorizationInterCloudEntryById
+	// Tests of removeAuthorizationInterCloudEntryById
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test(expected = InvalidParameterException.class)
@@ -110,7 +124,7 @@ public class AuthorizationDBServiceInterCloudTest {
 	}
 
 	//=================================================================================================
-	//Tests of createBulkAuthorizationInterCloud
+	// Tests of createBulkAuthorizationInterCloud
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test(expected = InvalidParameterException.class)
@@ -224,7 +238,7 @@ public class AuthorizationDBServiceInterCloudTest {
 	}
 	
 	//=================================================================================================
-	//Tests of checkAuthorizationInterCloudResponse
+	// Tests of checkAuthorizationInterCloudResponse
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test(expected = InvalidParameterException.class)

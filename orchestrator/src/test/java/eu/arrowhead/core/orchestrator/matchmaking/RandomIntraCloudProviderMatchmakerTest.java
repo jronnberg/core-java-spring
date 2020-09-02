@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.orchestrator.matchmaking;
 
 import java.util.List;
@@ -8,8 +22,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import eu.arrowhead.common.dto.shared.OrchestrationResultDTO;
 import eu.arrowhead.common.dto.shared.PreferredProviderDataDTO;
-import eu.arrowhead.common.dto.shared.ServiceRegistryResponseDTO;
 import eu.arrowhead.common.dto.shared.SystemRequestDTO;
 import eu.arrowhead.common.dto.shared.SystemResponseDTO;
 
@@ -40,16 +54,16 @@ public class RandomIntraCloudProviderMatchmakerTest {
 	//-------------------------------------------------------------------------------------------------
 	@Test(expected = IllegalArgumentException.class)
 	public void doMatchmakingParamsNull() {
-		algorithm.doMatchmaking(List.of(new ServiceRegistryResponseDTO()), null);
+		algorithm.doMatchmaking(List.of(new OrchestrationResultDTO()), null);
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Test
 	public void doMatchmakingNoPreferred() {
-		final ServiceRegistryResponseDTO dto1 = new ServiceRegistryResponseDTO();
-		dto1.setId(1);
-		final ServiceRegistryResponseDTO dto2 = new ServiceRegistryResponseDTO();
-		dto2.setId(2);
+		final OrchestrationResultDTO dto1 = new OrchestrationResultDTO();
+		dto1.setVersion(1);
+		final OrchestrationResultDTO dto2 = new OrchestrationResultDTO();
+		dto2.setVersion(2);
 		
 		final long seed = System.currentTimeMillis();
 		IntraCloudProviderMatchmakingParameters params = new IntraCloudProviderMatchmakingParameters(List.of());
@@ -57,10 +71,10 @@ public class RandomIntraCloudProviderMatchmakerTest {
 		rng.setSeed(seed);
 		algorithm = new RandomIntraCloudProviderMatchmaker(); // to make sure the same seed is set
 		
-		final List<ServiceRegistryResponseDTO> srList = List.of(dto1, dto2);
-		final ServiceRegistryResponseDTO selected = algorithm.doMatchmaking(srList, params);
+		final List<OrchestrationResultDTO> orList = List.of(dto1, dto2);
+		final OrchestrationResultDTO selected = algorithm.doMatchmaking(orList, params);
 		
-		Assert.assertEquals(srList.get(rng.nextInt(2)).getId(), selected.getId());
+		Assert.assertEquals(orList.get(rng.nextInt(2)).getVersion().intValue(), selected.getVersion().intValue());
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -68,11 +82,11 @@ public class RandomIntraCloudProviderMatchmakerTest {
 	public void doMatchmakingNoPreferredMatch() {
 		final SystemResponseDTO system1 = new SystemResponseDTO(1, "system1", "localhost", 1234, null, null, null);
 		final SystemResponseDTO system2 = new SystemResponseDTO(1, "system2", "localhost", 4567, null, null, null);
-		final ServiceRegistryResponseDTO dto1 = new ServiceRegistryResponseDTO();
-		dto1.setId(1);
+		final OrchestrationResultDTO dto1 = new OrchestrationResultDTO();
+		dto1.setVersion(1);
 		dto1.setProvider(system1);
-		final ServiceRegistryResponseDTO dto2 = new ServiceRegistryResponseDTO();
-		dto2.setId(2);
+		final OrchestrationResultDTO dto2 = new OrchestrationResultDTO();
+		dto2.setVersion(2);
 		dto2.setProvider(system2);
 		
 		final SystemRequestDTO reqSystem = new SystemRequestDTO();
@@ -88,10 +102,10 @@ public class RandomIntraCloudProviderMatchmakerTest {
 		rng.setSeed(seed);
 		algorithm = new RandomIntraCloudProviderMatchmaker(); // to make sure the same seed is set
 		
-		final List<ServiceRegistryResponseDTO> srList = List.of(dto1, dto2);
-		final ServiceRegistryResponseDTO selected = algorithm.doMatchmaking(srList, params);
+		final List<OrchestrationResultDTO> orList = List.of(dto1, dto2);
+		final OrchestrationResultDTO selected = algorithm.doMatchmaking(orList, params);
 		
-		Assert.assertEquals(srList.get(rng.nextInt(2)).getId(), selected.getId());
+		Assert.assertEquals(orList.get(rng.nextInt(2)).getVersion().intValue(), selected.getVersion().intValue());
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -99,11 +113,11 @@ public class RandomIntraCloudProviderMatchmakerTest {
 	public void doMatchmakingPreferredMatch() {
 		final SystemResponseDTO system1 = new SystemResponseDTO(1, "system1", "localhost", 1234, null, null, null);
 		final SystemResponseDTO system2 = new SystemResponseDTO(1, "system2", "localhost", 4567, null, null, null);
-		final ServiceRegistryResponseDTO dto1 = new ServiceRegistryResponseDTO();
-		dto1.setId(1);
+		final OrchestrationResultDTO dto1 = new OrchestrationResultDTO();
+		dto1.setVersion(1);
 		dto1.setProvider(system1);
-		final ServiceRegistryResponseDTO dto2 = new ServiceRegistryResponseDTO();
-		dto2.setId(2);
+		final OrchestrationResultDTO dto2 = new OrchestrationResultDTO();
+		dto2.setVersion(2);
 		dto2.setProvider(system2);
 		
 		final SystemRequestDTO reqSystem = new SystemRequestDTO();
@@ -113,8 +127,8 @@ public class RandomIntraCloudProviderMatchmakerTest {
 		final PreferredProviderDataDTO ppDTO = new PreferredProviderDataDTO();
 		ppDTO.setProviderSystem(reqSystem);
 		
-		final ServiceRegistryResponseDTO selected = algorithm.doMatchmaking(List.of(dto1, dto2), new IntraCloudProviderMatchmakingParameters(List.of(ppDTO)));
+		final OrchestrationResultDTO selected = algorithm.doMatchmaking(List.of(dto1, dto2), new IntraCloudProviderMatchmakingParameters(List.of(ppDTO)));
 		
-		Assert.assertEquals(2, selected.getId());
+		Assert.assertEquals(2, selected.getVersion().intValue());
 	}
 }

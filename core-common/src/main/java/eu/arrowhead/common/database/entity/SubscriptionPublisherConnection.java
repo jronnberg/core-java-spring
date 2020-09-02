@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.common.database.entity;
 
 import java.time.ZonedDateTime;
@@ -18,6 +32,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "subscriptionId", "systemId" }))
 public class SubscriptionPublisherConnection {
+	
 	//=================================================================================================
 	// members
 	
@@ -33,7 +48,7 @@ public class SubscriptionPublisherConnection {
 	@JoinColumn(name = "systemId", referencedColumnName = "id", nullable = false)
 	private System system;
 	
-	@Column(nullable = false )
+	@Column(nullable = false)
 	private boolean authorized = false;
 	
 	@Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

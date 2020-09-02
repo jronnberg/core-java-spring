@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Copyright (c) 2019 AITIA
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   AITIA - implementation
+ *   Arrowhead Consortia - conceptualization
+ ********************************************************************************/
+
 package eu.arrowhead.core.authorization.database.service;
 
 import java.util.ArrayList;
@@ -629,7 +643,7 @@ public class AuthorizationDBService {
 						checkConstraintsOfAuthorizationIntraCloudTable(consumer, provider, service);
 						toBeSaved.add(new AuthorizationIntraCloud(consumer, provider, service));
 					} catch (final InvalidParameterException ex) {
-						//not throwing towards as in this bulk operation case should be only a warning
+						// not throwing towards as in this bulk operation case should be only a warning
 						logger.debug(ex.getMessage());
 					}
 				} else {
@@ -784,7 +798,7 @@ public class AuthorizationDBService {
 					checkConstraintsOfAuthorizationInterCloudTable(cloud, provider, service);
 					toBeSaved.add(new AuthorizationInterCloud(cloud, provider, service));
 				} catch (final InvalidParameterException ex) {
-					//not throwing towards as in this bulk operation case should be only a warning
+					// not throwing towards as in this bulk operation case should be only a warning
 					logger.debug(ex.getMessage());
 				}
 			} else {
