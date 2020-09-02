@@ -23,17 +23,17 @@ public class FileRuleStore implements RuleStore {
 
     // File path to the directory for storing the IDs of created Orchestration
     // rules created by the PDE:
-    private final String ruleFilepath;
+    private final String ruleFileDirectory;
 
     /**
      * Class constructor.
      *
-     * @param ruleFilepath File path to the directory for storing rules.
+     * @param ruleFileDirectory File path to the directory for storing rules.
      * @throws RuleStoreException
      */
     public FileRuleStore(final String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Orchestrator Rule directory");
-        this.ruleFilepath = descriptionDirectory;
+        this.ruleFileDirectory = descriptionDirectory;
     }
 
     /**
@@ -41,7 +41,7 @@ public class FileRuleStore implements RuleStore {
      */
     @Override
     public Set<Integer> readRules() throws RuleStoreException {
-        final File file = new File(ruleFilepath);
+        final File file = new File(ruleFileDirectory);
         final var result = new HashSet<Integer>();
 
         if (!file.isFile()) {
@@ -64,7 +64,7 @@ public class FileRuleStore implements RuleStore {
     @Override
     public void setRules(Set<Integer> rules) throws RuleStoreException {
 
-        final File file = new File(ruleFilepath);
+        final File file = new File(ruleFileDirectory + "/orchestration_rules.txt");
 
         try {
             // Create the file and parent directories, if they do not already
@@ -93,6 +93,6 @@ public class FileRuleStore implements RuleStore {
      */
     @Override
     public void removeAll() throws RuleStoreException {
-        new File(ruleFilepath).delete();
+        new File(ruleFileDirectory).delete();
     }
 }
