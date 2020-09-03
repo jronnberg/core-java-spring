@@ -275,11 +275,13 @@ public class OrchestratorService {
 		
 		final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries = getAuthorizedServiceRegistryEntries(entryList, orchestrationFormRequestDTO);
         
-		final OrchestrationResponseDTO result = getHighestPriorityCurrentlyWorkingStoreEntryFromEntryList(orchestrationFormRequestDTO, entryList, authorizedLocalServiceRegistryEntries);
-		
-		final List<OrchestrationResultDTO> orList = qosManager.filterReservedProviders(result.getResponse(), orchestrationFormRequestDTO.getRequesterSystem());
-		
-		return new OrchestrationResponseDTO(orList); 
+		final List<OrchestrationResponseDTO> highestPrio = getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(orchestrationFormRequestDTO, entryList, authorizedLocalServiceRegistryEntries);
+		final List <OrchestrationResultDTO> result = new ArrayList<>();
+		for (var responseDto : highestPrio) {
+			result.addAll(responseDto.getResponse());
+		}
+		result = qosManager.filterReservedProviders(result, orchestrationFormRequestDTO.getRequesterSystem());
+		return new OrchestrationResponseDTO(result); 
 	}
 
 	//-------------------------------------------------------------------------------------------------	
@@ -978,6 +980,37 @@ public class OrchestratorService {
 		}
         
         return new OrchestrationResponseDTO(); // empty response
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	private List<OrchestrationResponseDTO> getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(final OrchestrationFormRequestDTO request, final List<OrchestratorStore> entryList,
+																							   final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
+		logger.debug("getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList started...");																		
+		final List<OrchestrationResponseDTO> result = new ArrayList<>();
+		
+		if (entryList.size() == 0) {
+			return result;
+		}	
+		
+		// int priority = entryList.get(0).getPriority(); // Note: This assumes that the list is ordered by priority.
+		
+        for (final OrchestratorStore orchestratorStore : entryList) {
+			// if (orchestratorStore.getPriority() > priority) {
+			// 	break;
+			// }
+        	if (!orchestratorStore.isForeign()) {
+				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckLocalStoreEntry(orchestratorStore, request, authorizedLocalServiceRegistryEntries);
+				if (orchestrationResponseDTO != null && !orchestrationResponseDTO.getResponse().isEmpty()) {
+            		result.add(orchestrationResponseDTO);
+				}
+        	} else {    
+				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckForeignStoreEntry(orchestratorStore, request);
+				if (orchestrationResponseDTO != null && !orchestrationResponseDTO.getResponse().isEmpty()) {
+            		result.add(orchestrationResponseDTO);
+				}
+			}				
+		}
+        return result;
 	}
 
 	//-------------------------------------------------------------------------------------------------
