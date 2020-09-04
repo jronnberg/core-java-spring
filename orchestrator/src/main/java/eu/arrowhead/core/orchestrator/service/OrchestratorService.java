@@ -276,7 +276,7 @@ public class OrchestratorService {
 		final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries = getAuthorizedServiceRegistryEntries(entryList, orchestrationFormRequestDTO);
         
 		final List<OrchestrationResponseDTO> highestPrio = getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(orchestrationFormRequestDTO, entryList, authorizedLocalServiceRegistryEntries);
-		final List <OrchestrationResultDTO> result = new ArrayList<>();
+		List <OrchestrationResultDTO> result = new ArrayList<>();
 		for (var responseDto : highestPrio) {
 			result.addAll(responseDto.getResponse());
 		}
