@@ -519,7 +519,7 @@ public class OrchestratorStoreDBService {
 		final ServiceInterface validInterface = validateServiceInterfaceName(orchestratorStoreRequestDTO.getServiceInterfaceName());
 		final String validAttribute = Utilities.map2Text(orchestratorStoreRequestDTO.getAttribute());
 		
-		checkUniqueConstraintByConsumerSystemAndServiceAndProviderSystemIdAndInterfaceAndForeign(validConsumerSystem, validServiceDefinition, validProviderSystemId, validInterface, false);
+		// checkUniqueConstraintByConsumerSystemAndServiceAndProviderSystemIdAndInterfaceAndForeign(validConsumerSystem, validServiceDefinition, validProviderSystemId, validInterface, false);
 	
 		return new OrchestratorStore(validServiceDefinition, validConsumerSystem, false, validProviderSystemId, validInterface, validPriority, validAttribute);	
 	}
@@ -757,7 +757,7 @@ public class OrchestratorStoreDBService {
 	
 	//-------------------------------------------------------------------------------------------------	
 	private OrchestratorStore saveWithPriorityCheck(final OrchestratorStore orchestratorStore) {
-		logger.debug("saveWithPriorityCheck started...");
+		java.lang.System.out.println("saveWithPriorityCheck started...");
 
 		final System consumerSystem = orchestratorStore.getConsumerSystem();
 		final ServiceDefinition serviceDefinition = orchestratorStore.getServiceDefinition();
@@ -771,20 +771,12 @@ public class OrchestratorStoreDBService {
 			
 			return orchestratorStoreRepository.saveAndFlush(orchestratorStore);
 		} else {
-			final Map<Long,Integer> priorityMap = getPriorityMap(orchestratorStoreList);
-			
-			if (priorityMap.containsValue(priority)) {
-				orchestratorStore.setPriority(priority);
-				
-				return insertOrchestratorStoreWithPriority(orchestratorStoreList, orchestratorStore, priority);
-			} else {
-				orchestratorStore.setPriority(orchestratorStoreList.size() + 1);
-				
-				return orchestratorStoreRepository.saveAndFlush(orchestratorStore);
-			}
-		}		
-	}
-	
+			orchestratorStore.setPriority(priority);
+			return insertOrchestratorStoreWithPriority(orchestratorStoreList, orchestratorStore, priority);
+		}
+	}		
+}
+
 	//-------------------------------------------------------------------------------------------------	
 	private OrchestratorStore insertOrchestratorStoreWithPriority(final List<OrchestratorStore> orchestratorStoreList, final OrchestratorStore orchestratorStoreToInsert, final int priority) {
 		logger.debug("insertOrchestratorStoreWithPriority started...");
@@ -792,14 +784,14 @@ public class OrchestratorStoreDBService {
 		orchestratorStoreList.sort((o1, o2) -> Integer.compare(o1.getPriority(), o2.getPriority()));
 		Collections.reverse(orchestratorStoreList);
 		
-		for (final OrchestratorStore ochestratorStore : orchestratorStoreList) {
-			final int priorityFromList = ochestratorStore.getPriority();
+		// for (final OrchestratorStore ochestratorStore : orchestratorStoreList) {
+		// 	final int priorityFromList = ochestratorStore.getPriority();
 			
-			if (priority <= priorityFromList) {
-				ochestratorStore.setPriority(priorityFromList + 1);
-				orchestratorStoreRepository.saveAndFlush(ochestratorStore);
-			} 
-		}
+		// 	if (priority <= priorityFromList) {
+		// 		ochestratorStore.setPriority(priorityFromList + 1);
+		// 		orchestratorStoreRepository.saveAndFlush(ochestratorStore);
+		// 	} 
+		// }
 		
 		return orchestratorStoreRepository.saveAndFlush(orchestratorStoreToInsert);
 	}
