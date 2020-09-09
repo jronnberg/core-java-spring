@@ -775,7 +775,6 @@ public class OrchestratorStoreDBService {
 			return insertOrchestratorStoreWithPriority(orchestratorStoreList, orchestratorStore, priority);
 		}
 	}		
-}
 
 	//-------------------------------------------------------------------------------------------------	
 	private OrchestratorStore insertOrchestratorStoreWithPriority(final List<OrchestratorStore> orchestratorStoreList, final OrchestratorStore orchestratorStoreToInsert, final int priority) {
