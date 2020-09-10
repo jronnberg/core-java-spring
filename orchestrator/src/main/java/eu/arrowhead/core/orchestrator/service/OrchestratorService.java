@@ -274,14 +274,7 @@ public class OrchestratorService {
 		}
 		
 		final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries = getAuthorizedServiceRegistryEntries(entryList, orchestrationFormRequestDTO);
-        
-		final List<OrchestrationResponseDTO> highestPrio = getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(orchestrationFormRequestDTO, entryList, authorizedLocalServiceRegistryEntries);
-		List <OrchestrationResultDTO> result = new ArrayList<>();
-		for (var responseDto : highestPrio) {
-			result.addAll(responseDto.getResponse());
-		}
-		result = qosManager.filterReservedProviders(result, orchestrationFormRequestDTO.getRequesterSystem());
-		return new OrchestrationResponseDTO(result); 
+		return getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(orchestrationFormRequestDTO, entryList, authorizedLocalServiceRegistryEntries);
 	}
 
 	//-------------------------------------------------------------------------------------------------	
@@ -961,15 +954,24 @@ public class OrchestratorService {
 	}
 
 	//-------------------------------------------------------------------------------------------------
-	private OrchestrationResponseDTO getHighestPriorityCurrentlyWorkingStoreEntryFromEntryList(final OrchestrationFormRequestDTO request, final List<OrchestratorStore> entryList,
-																							   final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
-		logger.debug("getHighestPriorityCurrentlyWorkingStoreEntryFromEntryList started...");
+	private OrchestrationResponseDTO getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(final OrchestrationFormRequestDTO request, final List<OrchestratorStore> entryList, final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
+		logger.debug("getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList started...");																		
+
+		final List<OrchestrationResultDTO> results = new ArrayList<OrchestrationResultDTO>();
 		
+		if (entryList.size() == 0) {
+			return new OrchestrationResponseDTO();
+		}	
+		
+		int priority = entryList.get(0).getPriority(); // Note: This assumes that the list is ordered by priority.
         for (final OrchestratorStore orchestratorStore : entryList) {
+			if (orchestratorStore.getPriority() > priority) {
+				break;
+			}
         	if (!orchestratorStore.isForeign()) {
 				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckLocalStoreEntry(orchestratorStore, request, authorizedLocalServiceRegistryEntries);
 				if (orchestrationResponseDTO != null && !orchestrationResponseDTO.getResponse().isEmpty()) {
-            		return orchestrationResponseDTO;
+					results.addAll(orchestrationResponseDTO.getResponse());
 				}
         	} else {       		
 				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckForeignStoreEntry(orchestratorStore, request);
@@ -978,57 +980,66 @@ public class OrchestratorService {
 				}
 			}				
 		}
-        
-        return new OrchestrationResponseDTO(); // empty response
+        return new OrchestrationResponseDTO(results);
 	}
 	
-	//-------------------------------------------------------------------------------------------------
-	private List<OrchestrationResponseDTO> getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList(final OrchestrationFormRequestDTO request, final List<OrchestratorStore> entryList,
-																							   final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
-		logger.debug("getHighestPriorityCurrentlyWorkingStoreEntriesFromEntryList started...");																		
-		final List<OrchestrationResponseDTO> result = new ArrayList<>();
-		
-		if (entryList.size() == 0) {
-			return result;
-		}	
-		
-		// int priority = entryList.get(0).getPriority(); // Note: This assumes that the list is ordered by priority.
-		
-        for (final OrchestratorStore orchestratorStore : entryList) {
-			// if (orchestratorStore.getPriority() > priority) {
-			// 	break;
-			// }
-        	if (!orchestratorStore.isForeign()) {
-				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckLocalStoreEntry(orchestratorStore, request, authorizedLocalServiceRegistryEntries);
-				if (orchestrationResponseDTO != null && !orchestrationResponseDTO.getResponse().isEmpty()) {
-            		result.add(orchestrationResponseDTO);
-				}
-        	} else {    
-				final OrchestrationResponseDTO orchestrationResponseDTO = crossCheckForeignStoreEntry(orchestratorStore, request);
-				if (orchestrationResponseDTO != null && !orchestrationResponseDTO.getResponse().isEmpty()) {
-            		result.add(orchestrationResponseDTO);
-				}
-			}				
-		}
+	/**
+     * Returns
+     * @param a A metadata object.
+     * @param b A metadata object.
+     *
+     * @return True if a is a subset of b.
+     */
+    public static boolean isSubset(Map<String, String> a, Map<String, String> b) {
+        for (String key : a.keySet()) {
+            if (!b.containsKey(key) || !b.get(key).equals(a.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+	
+	/**
+	 * @param s A string on the format "<key1>=<value1>, <key2=value2>..."
+	 * @return A map containing the key value pairs listed in the given string.
+	 */
+	private static Map<String, String> parseMetadata(String s) {
+        final Map<String, String> result = new HashMap<>();
+        final String[] pairs = s.split(",");
+        for (final var pair : pairs) {
+            final String[] keyValue = pair.split("=");
+            final String key = keyValue[0].trim();
+            final String value = keyValue[1].trim();
+            result.put(key, value);
+        }
         return result;
-	}
+    }
 
 	//-------------------------------------------------------------------------------------------------
 	private OrchestrationResponseDTO crossCheckLocalStoreEntry(final OrchestratorStore orchestratorStore, final OrchestrationFormRequestDTO request, 
-															   final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
+	final List<ServiceRegistryResponseDTO> authorizedLocalServiceRegistryEntries) {
 		logger.debug("crossCheckLocalStoreEntry started ...");
 		
 		final Long providerSystemId = orchestratorStore.getProviderSystemId();
 		for (final ServiceRegistryResponseDTO serviceRegistryResponseDTO : authorizedLocalServiceRegistryEntries) {
-			if (serviceRegistryResponseDTO.getProvider().getId() == providerSystemId) {
-				List<OrchestrationResultDTO> orList = compileOrchestrationResponse(List.of(serviceRegistryResponseDTO), request);
-			    // Generate the authorization tokens if it is requested based on the service security (modifies the orList)
-			    orList = orchestratorDriver.generateAuthTokens(request, orList);
-
-			    return new OrchestrationResponseDTO(orList);
+			if (serviceRegistryResponseDTO.getProvider().getId() != providerSystemId) {
+				continue;
 			}
+				
+			// Check if the metadata matches:
+			String storeMetadata = orchestratorStore.getAttribute();
+			if (storeMetadata != null && !storeMetadata.equals("")) {
+				if (!isSubset(parseMetadata(storeMetadata), serviceRegistryResponseDTO.getMetadata())) {
+					System.out.println("    No metadata match, continue");
+					continue;
+				}
+			}
+
+			List<OrchestrationResultDTO> orList = compileOrchestrationResponse(List.of(serviceRegistryResponseDTO), request);
+			// Generate the authorization tokens if it is requested based on the service security (modifies the orList)
+			orList = orchestratorDriver.generateAuthTokens(request, orList);
+			return new OrchestrationResponseDTO(orList);
 		}
-		
 		return new OrchestrationResponseDTO(); // empty response
 	}
 
