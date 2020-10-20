@@ -87,7 +87,6 @@ public class PlantDescriptionTracker {
             entries.put(deactivatedEntry.id(), deactivatedEntry);
             for (var listener : listeners) {
                 listener.onPlantDescriptionUpdated(deactivatedEntry);
-                listener.onPlantDescriptionUpdated(entry);
             }
         }
 
