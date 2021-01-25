@@ -5,7 +5,6 @@ import java.util.Objects;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetPdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetPlantDescription;

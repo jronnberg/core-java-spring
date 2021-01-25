@@ -106,7 +106,6 @@ public class SystemTracker {
                 .stream()
                 .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!wasPresent) {
-                System.out.println("System " + newSystem.systemName() + " was added.");
                 for (var listener: listeners) {
                     listener.onSystemAdded(newSystem);
                 }
@@ -151,9 +150,6 @@ public class SystemTracker {
      */
     public Future<Void> startPollingForSystems() {
         final var timer = new Timer();
-
-        System.out.println("Starting poll....");
-
         return pollForSystems().flatMap(result -> {
 
             // Periodically poll the Service Registry for systems.

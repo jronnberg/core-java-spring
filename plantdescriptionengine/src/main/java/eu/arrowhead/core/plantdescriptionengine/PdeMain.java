@@ -279,6 +279,9 @@ public class PdeMain {
                         .provide();
                 });
         })
+        .ifSuccess(consumer -> {
+            logger.info("The PDE is up and running");
+        })
         .onFailure(throwable -> {
             logger.error("Failed to launch Plant Description Engine", throwable);
             System.exit(1);
