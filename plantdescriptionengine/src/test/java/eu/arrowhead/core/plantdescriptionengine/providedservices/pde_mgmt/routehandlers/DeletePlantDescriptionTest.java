@@ -1,20 +1,21 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -33,7 +34,7 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(entryId)))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         // Make sure that the entry is there before we delete it.
         assertNotNull(pdTracker.get(entryId));
@@ -62,7 +63,7 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(invalidEntryId))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -73,11 +74,9 @@ public class DeletePlantDescriptionTest {
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -92,7 +91,7 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(nonExistentId)))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -106,8 +105,38 @@ public class DeletePlantDescriptionTest {
                     assertNull(e);
                 });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
+
+    @Test
+    public void shouldHandleBackingStoreFailure() throws PdStoreException {
+
+        final var backingStore = new MockPdStore();
+        final var pdTracker = new PlantDescriptionTracker(backingStore);
+        final var handler = new DeletePlantDescription(pdTracker);
+        final int entryId = 87;
+        pdTracker.put(TestUtils.createEntry(entryId));
+
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .build();
+
+        HttpServiceResponse response = new MockServiceResponse();
+
+        backingStore.setFailOnNextRemove();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
+                })
+                .onFailure(e -> {
+                    assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
 }

@@ -111,7 +111,7 @@ public interface PlantDescriptionEntry {
     }
 
     /**
-     * @param oldEntry Target plant description entry to update.
+     * @param oldEntry  Target plant description entry to update.
      * @param newFields A plant description update.
      * @return A copy of the target plant description updated with the fields
      *         specified in newFields.
@@ -158,7 +158,7 @@ public interface PlantDescriptionEntry {
                 comparator = UPDATED_AT_COMPARATOR;
                 break;
             default:
-                assert false : sortField + " is not a valid sort field for Plant Description Entries.";
+                throw new IllegalArgumentException("'" + sortField + "' is not a valid sort field for Plant Description Entries.");
         }
 
         if (sortAscending) {
@@ -187,8 +187,8 @@ public interface PlantDescriptionEntry {
      *
      * @param connectionIndex Index of a connection within this instance's
      *                        connection list.
-     * @return Service definition name corresponding to the specified
-     *         connection.
+     * @return Service definition name of the *producer* service of the
+     *         specified connection.
      */
     public default String serviceDefinitionName(int connectionIndex) {
         final SystemPort producerPort = connections().get(connectionIndex).producer();

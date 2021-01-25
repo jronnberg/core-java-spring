@@ -49,7 +49,7 @@ public class FilePdStore implements PdStore {
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
         final File directory = new File(descriptionDirectory);
-        
+
         if (!directory.exists()){
             directory.mkdirs();
         }

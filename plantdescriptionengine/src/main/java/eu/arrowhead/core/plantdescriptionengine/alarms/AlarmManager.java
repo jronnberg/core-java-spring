@@ -49,7 +49,9 @@ public class AlarmManager {
      * @return A list containing the raw alarm data stored by this instance.
      */
     public List<Alarm> getActiveAlarmData(List<AlarmCause> causes) {
-        return activeAlarms.stream().filter(alarm -> causes.contains(alarm.cause)).collect(Collectors.toList());
+        return activeAlarms.stream()
+            .filter(alarm -> causes.contains(alarm.cause))
+            .collect(Collectors.toList());
     }
 
     /**

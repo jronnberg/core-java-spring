@@ -1,14 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import java.io.File;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
@@ -17,7 +17,7 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
  * {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore}
  * class.
  */
-public class FileStoreTest {
+public class FilePdStoreTest {
 
     private String entryDirectory = "test-temp-data";
 
@@ -31,11 +31,17 @@ public class FileStoreTest {
         dir.delete();
     }
 
-    @After
+    @AfterEach
     public void removeTestDirectory() {
         deleteDirectory(new File(entryDirectory));
     }
 
+    @Test
+    public void ShouldReadWithoutEntries() throws PdStoreException {
+        final PdStore store = new FilePdStore(entryDirectory);
+        var storedEntries =  store.readEntries();
+        assertTrue(storedEntries.isEmpty());
+    }
 
     @Test
     public void ShouldWriteEntries() throws PdStoreException {
@@ -74,5 +80,4 @@ public class FileStoreTest {
             assertNotEquals(entry.id(), id0);
         }
     }
-
 }

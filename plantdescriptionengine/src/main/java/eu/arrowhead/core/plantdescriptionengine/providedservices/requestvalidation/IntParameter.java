@@ -7,9 +7,9 @@ import se.arkalix.net.http.service.HttpServiceRequest;
 
 /**
  * An instance of this class embodies a set of requirements placed on a single
- * HttpServiceRequest query parameter, where the value is expected to be an
- * integer. Used in conjunction with QueryParamParser for validating and parsing
- * query parameters.
+ * HttpServiceRequest query parameter, where the value is expected to be a
+ * positive integer. Used in conjunction with QueryParamParser for validating
+ * and parsing query parameters.
  */
 public class IntParameter extends QueryParameter {
 
@@ -46,7 +46,7 @@ public class IntParameter extends QueryParameter {
 
         if (possibleValue.isEmpty()) {
             if (required) {
-                parser.report(new ParseError("Missing parameter: " + name + "."));
+                parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             return;
         }
@@ -59,7 +59,7 @@ public class IntParameter extends QueryParameter {
 
         if (!isInteger(value)) {
             parser.report(new ParseError("Query parameter '" + name +
-                "' must be a valid string, got " + value + "."));
+                "' must be a valid integer, got '" + value + "'."));
             return;
         }
 
@@ -77,7 +77,7 @@ public class IntParameter extends QueryParameter {
     }
 
     /**
-     * @param The minimum allowed value for this parameter.
+     * @param i The minimum allowed value for this parameter.
      * @return This instance.
      */
 	public QueryParameter min(int i) {

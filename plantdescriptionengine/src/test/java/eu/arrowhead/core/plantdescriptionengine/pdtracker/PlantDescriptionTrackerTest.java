@@ -1,17 +1,17 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
@@ -27,6 +27,36 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
  * class.
  */
 public class PlantDescriptionTrackerTest {
+
+    final class Listener implements PlantDescriptionUpdateListener {
+
+        int numAdded = 0;
+        int numUpdated = 0;
+        int numRemoved = 0;
+
+        // Store the IDs of entries:
+        PlantDescriptionEntry lastAdded = null;
+        PlantDescriptionEntry lastUpdated = null;
+        PlantDescriptionEntry lastRemoved = null;
+
+        @Override
+        public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {
+            lastAdded = entry;
+            numAdded++;
+        }
+
+        @Override
+        public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
+            lastUpdated = entry;
+            numUpdated++;
+        }
+
+        @Override
+        public void onPlantDescriptionRemoved(PlantDescriptionEntry entry) {
+            lastRemoved = entry;
+            numRemoved++;
+        }
+    }
 
     @Test
     public void shouldReadEntriesFromBackingStore() throws PdStoreException {
@@ -199,29 +229,7 @@ public class PlantDescriptionTrackerTest {
     }
 
     @Test
-    public void shouldNotifyListeners() throws PdStoreException {
-
-        final class Listener implements PlantDescriptionUpdateListener {
-
-            int lastAdded = -1;
-            int lastUpdated = -1;
-            int lastRemoved = -1;
-
-            @Override
-            public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {
-                lastAdded = entry.id();
-            }
-
-            @Override
-            public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
-                lastUpdated = entry.id();
-            }
-
-            @Override
-            public void onPlantDescriptionRemoved(PlantDescriptionEntry entry) {
-                lastRemoved = entry.id();
-            }
-        }
+    public void shouldNotifyOnAdd() throws PdStoreException {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
@@ -231,14 +239,71 @@ public class PlantDescriptionTrackerTest {
 
         pdTracker.addListener(listener);
         pdTracker.put(TestUtils.createEntry(idA));
-        pdTracker.put(TestUtils.createEntry(idA));
+        pdTracker.put(TestUtils.createEntry(idB));
 
-        // "Update" this entry by putting a new one with the same ID in the map:
+        assertEquals(idB, listener.lastAdded.id());
+        assertEquals(2, listener.numAdded);
+    }
+
+    @Test
+    public void shouldNotifyOnDelete() throws PdStoreException {
+
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var listener = new Listener();
+
+        final int idA = 5;
+        final int idB = 12;
+
+        pdTracker.addListener(listener);
+        pdTracker.put(TestUtils.createEntry(idA));
         pdTracker.put(TestUtils.createEntry(idB));
         pdTracker.remove(idA);
 
-        assertEquals(idB, listener.lastAdded, 0);
-        assertEquals(idA, listener.lastRemoved, 0);
-        assertEquals(idA, listener.lastUpdated, 0);
+        assertEquals(idA, listener.lastRemoved.id());
+        assertEquals(1, listener.numRemoved);
+    }
+
+
+    @Test
+    public void shouldNotifyOnUpdate() throws PdStoreException {
+
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var listener = new Listener();
+
+        final int idA = 93;
+
+        pdTracker.addListener(listener);
+        pdTracker.put(TestUtils.createEntry(idA));
+        // "Update" the entry by putting an identical copy in the tracker.
+        pdTracker.put(TestUtils.createEntry(idA));
+
+        assertEquals(idA, listener.lastUpdated.id());
+        assertEquals(1, listener.numUpdated);
+    }
+
+    @Test
+    public void shouldNotifyWhenActiveEntryChanges() throws PdStoreException {
+
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var listener = new Listener();
+
+        final int idA = 2;
+        final int idB = 8;
+
+        pdTracker.addListener(listener);
+
+        // Add an active entry.
+        pdTracker.put(TestUtils.createEntry(idA, true));
+        assertEquals(idA, listener.lastAdded.id());
+        assertTrue(listener.lastAdded.active());
+
+        // Add another active entry.
+        pdTracker.put(TestUtils.createEntry(idB, true));
+
+        // Listeners should have been notified that the old one was deactivated.
+        assertEquals(idA, listener.lastUpdated.id());
+        assertFalse(listener.lastUpdated.active());
+
+        assertEquals(1, listener.numUpdated);
     }
 }

@@ -1,18 +1,19 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
@@ -37,11 +38,10 @@ public class ReplacePlantDescriptionTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(pdTracker);
-        final int entryId = 87;
         final PlantDescription description = TestUtils.createDescription();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
+            .pathParameters(List.of("35"))
             .body(description)
             .build();
 
@@ -82,7 +82,7 @@ public class ReplacePlantDescriptionTest {
             .systems(new ArrayList<>())
             .connections(new ArrayList<>())
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
             .body(description)
@@ -119,7 +119,7 @@ public class ReplacePlantDescriptionTest {
             .pathParameters(List.of(invalidEntryId))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -174,7 +174,7 @@ public class ReplacePlantDescriptionTest {
             .connections(new ArrayList<>())
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
             .body(description)
@@ -188,6 +188,34 @@ public class ReplacePlantDescriptionTest {
                         portName + "' in system '" + systemId + "'>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(e -> {
+                    assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldHandleBackingStoreFailure() throws PdStoreException {
+
+        final var backingStore = new MockPdStore();
+        final var pdTracker = new PlantDescriptionTracker(backingStore);
+        final var handler = new ReplacePlantDescription(pdTracker);
+        final PlantDescription description = TestUtils.createDescription();
+        final HttpServiceResponse response = new MockServiceResponse();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of("87"))
+            .body(description)
+            .build();
+
+        backingStore.setFailOnNextWrite();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
                 })
                 .onFailure(e -> {
                     assertNull(e);

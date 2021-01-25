@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLException;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
@@ -32,7 +32,6 @@ public class PdeMonitorServiceTest {
                 assertNotNull(result);
             })
             .onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
     }

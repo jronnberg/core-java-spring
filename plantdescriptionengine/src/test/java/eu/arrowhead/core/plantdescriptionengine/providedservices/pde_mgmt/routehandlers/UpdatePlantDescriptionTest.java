@@ -1,15 +1,16 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
@@ -41,7 +42,7 @@ public class UpdatePlantDescriptionTest {
         final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
             .plantDescription(newName)
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
             .body(update)
@@ -77,7 +78,7 @@ public class UpdatePlantDescriptionTest {
             .pathParameters(List.of(invalidEntryId))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -106,7 +107,7 @@ public class UpdatePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(nonExistentId)))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -118,11 +119,9 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -164,7 +163,7 @@ public class UpdatePlantDescriptionTest {
             .connections(new ArrayList<>())
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(entryId)))
             .body(update)
@@ -181,6 +180,42 @@ public class UpdatePlantDescriptionTest {
                 })
                 .onFailure(e -> {
                     assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldHandleBackingStoreFailure() throws PdStoreException {
+
+        final var backingStore = new MockPdStore();
+        final var pdTracker = new PlantDescriptionTracker(backingStore);
+        final var handler = new UpdatePlantDescription(pdTracker);
+        final int entryId = 87;
+
+        final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
+        final String newName = entry.plantDescription() + " modified";
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
+            .plantDescription(newName)
+            .build();
+        final HttpServiceResponse response = new MockServiceResponse();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(update)
+            .build();
+
+        pdTracker.put(entry);
+
+        backingStore.setFailOnNextWrite();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
+                })
+                .onFailure(throwable -> {
+                    assertNull(throwable);
                 });
         } catch (Exception e) {
             assertNull(e);

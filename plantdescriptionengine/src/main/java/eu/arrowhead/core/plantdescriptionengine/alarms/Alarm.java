@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.alarms;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmBuilder;
@@ -15,20 +16,10 @@ public class Alarm {
     // Integer for storing the next alarm ID to be used:
     private static AtomicInteger nextId = new AtomicInteger();
 
-    private static Map<AlarmCause, AlarmSeverity> severityByCause = Map.of(
-        AlarmCause.systemInactive, AlarmSeverity.warning,
-        AlarmCause.systemNotRegistered, AlarmSeverity.warning,
-        AlarmCause.systemNotInDescription, AlarmSeverity.warning
-    );
-
-    static {
-        for (final var cause : AlarmCause.values()) {
-            assert severityByCause.containsKey(cause) :
-                "AlarmManager's severityByCause map not populated with all possible causes.";
-        }
-    }
-
     Alarm(String systemId, String systemName, AlarmCause cause) {
+
+        Objects.requireNonNull(cause, "Expected an alarm cause.");
+
         this.id = nextId.getAndIncrement();
         this.systemId = systemId;
         this.systemName = systemName;
@@ -51,7 +42,7 @@ public class Alarm {
     Instant clearedAt;
     Instant acknowledgedAt = null;
 
-    private String description() {
+    protected String description() {
         String identifier = (systemId == null)
             ? "named '" + systemName + "'"
             : "with ID '" + systemId + "'";
@@ -62,13 +53,14 @@ public class Alarm {
             case systemNotRegistered:
                 return "System " + identifier + " cannot be found in the Service Registry.";
             case systemNotInDescription:
-                return "System " + identifier + " is not present in the active Plant Description";
+                return "System " + identifier + " is not present in the active Plant Description.";
             default:
                 throw new RuntimeException("Invalid alarm cause.");
         }
     }
 
     public boolean matches(String systemId, String systemName, AlarmCause cause) {
+
         if (systemName == null && systemId == null) {
             return false;
         }
@@ -89,7 +81,7 @@ public class Alarm {
      * @return A PdeAlarm DTO based on this alarm data.
      */
     public PdeAlarmDto toPdeAlarm() {
-        AlarmSeverity severity = (clearedAt == null) ? severityByCause.get(cause) : AlarmSeverity.cleared;
+        AlarmSeverity severity = (clearedAt == null) ? AlarmSeverity.warning : AlarmSeverity.cleared;
         return new PdeAlarmBuilder()
             .id(id)
             .systemId(systemId)

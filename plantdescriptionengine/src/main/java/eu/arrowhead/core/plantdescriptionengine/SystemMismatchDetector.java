@@ -75,16 +75,23 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
     /**
      *
-     * @param entrySystem A Plant Description Entry system.
+     * @param entrySystem A system in a Plant Description Entry.
      * @param registeredSystem A system retrieved from the Service registry.
      * @return True if the two objects represent the same real-world system,
      *         false otherwise.
      */
     private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
         final Optional<String> name = entrySystem.systemName();
-        if (name.isPresent() && name.get().equals(registeredSystem.systemName())) {
-            return true;
+        if (name.isPresent()) {
+            if (name.get().equals(registeredSystem.systemName())) {
+                return true;
+            }
+        } else {
+            assert false;
+            // TODO: This part of the code is never reached, since nameless
+            // systems are not yet supported.
         }
+
         // TODO: Look for a match using metadata as well
         return false;
     }
@@ -92,23 +99,28 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     /**
      *
      * @param alarm An alarm.
-     * @param entrySystem A system retrieved from the Service registry.
+     * @param system A system retrieved from the Service registry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
-    private boolean alarmMatchesSystem(Alarm alarm, SrSystem entrySystem) {
+    private boolean alarmMatchesSystem(Alarm alarm, SrSystem system) {
         // TODO: Look for a match using metadata as well
-        return entrySystem.systemName().equals(alarm.systemName);
+        return system.systemName().equals(alarm.systemName);
     }
 
     /**
      *
      * @param alarm An alarm.
-     * @param entrySystem A Plant Description Entry system.
+     * @param entrySystem A system in a Plant Description Entry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
     private boolean alarmMatchesSystem(Alarm alarm, PdeSystem entrySystem) {
         Optional<String> systemName = entrySystem.systemName();
-        boolean systemNamesMatch = systemName.isPresent() && systemName.get().equals(alarm.systemName);
+        if (!systemName.isPresent()) {
+            assert false;
+            // TODO: This part of the code is never reached, since nameless
+            // systems are not yet supported.
+        }
+        boolean systemNamesMatch = systemName.get().equals(alarm.systemName);
         boolean systemIdsMatch = alarm.systemId != null && entrySystem.systemId().equals(alarm.systemId);
         // TODO: Look for a match using metadata as well
         return systemIdsMatch || systemNamesMatch;
@@ -193,12 +205,23 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
                 }
             }
 
-            if (alarm.cause == AlarmCause.systemNotInDescription && (presentInPd || !isRegistered)) {
-                alarmManager.clearAlarm(alarm);
+            if (alarm.cause == AlarmCause.systemNotInDescription) {
+
+                if (presentInPd) {
+                    alarmManager.clearAlarm(alarm);
+                }
+                if (!isRegistered) {
+                    alarmManager.clearAlarm(alarm);
+                }
             }
-            else if (alarm.cause == AlarmCause.systemNotRegistered && (!presentInPd || isRegistered)) {
-                alarmManager.clearAlarm(alarm);
-                // alarmManager.clearAlarmBySystemId(alarm.systemId, AlarmManager.Cause.systemNotRegistered);
+            if (alarm.cause == AlarmCause.systemNotRegistered) {
+
+                if (!presentInPd) {
+                    alarmManager.clearAlarm(alarm);
+                }
+                if (isRegistered) {
+                    alarmManager.clearAlarm(alarm);
+                }
             }
         }
     }

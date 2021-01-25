@@ -1,16 +1,16 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
@@ -38,7 +38,7 @@ public class UpdatePdeAlarmTest {
                 .acknowledged(true)
                 .build())
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(alarmManager);
 
         try {
@@ -48,11 +48,9 @@ public class UpdatePdeAlarmTest {
                     final var updatedAlarm = (PdeAlarm)response.body().get();
                     assertTrue(updatedAlarm.acknowledged());
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }
@@ -67,7 +65,7 @@ public class UpdatePdeAlarmTest {
                 .acknowledged(true)
                 .build())
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(new AlarmManager());
 
         try {
@@ -78,11 +76,9 @@ public class UpdatePdeAlarmTest {
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }
@@ -97,7 +93,7 @@ public class UpdatePdeAlarmTest {
                 .acknowledged(true)
                 .build())
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(new AlarmManager());
 
         try {
@@ -108,11 +104,9 @@ public class UpdatePdeAlarmTest {
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }
@@ -131,7 +125,7 @@ public class UpdatePdeAlarmTest {
             .body(new PdeAlarmUpdateBuilder()
                 .build())
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(alarmManager);
 
         try {
@@ -141,11 +135,9 @@ public class UpdatePdeAlarmTest {
                     final var updatedAlarm = (PdeAlarm)response.body().get();
                     assertFalse(updatedAlarm.acknowledged());
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }

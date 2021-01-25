@@ -42,7 +42,7 @@ public class BooleanParameter extends QueryParameter {
 
         if (possibleValue.isEmpty()) {
             if (required) {
-                parser.report(new ParseError("Missing parameter: " + name + "."));
+                parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
                 parser.putBoolean(name, defaultValue);
@@ -56,7 +56,7 @@ public class BooleanParameter extends QueryParameter {
 
         String value = possibleValue.get();
         if (!(value.equals("true") || value.equals("false"))) {
-            parser.report(new ParseError("'" + name + "' must be true or false, not '" + value + "'."));
+            parser.report(new ParseError("Query parameter '" + name + "' must be true or false, got '" + value + "'."));
         }
 
         parser.putBoolean(name, value.equals("true"));

@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +33,6 @@ public class StringParameter extends QueryParameter {
     }
 
     /**
-     * @param value Sets the only legal value for this parameter.
-     * @return This instance.
-     */
-    public StringParameter legalValue(String value) {
-        this.legalValues = new ArrayList<String>();
-        this.legalValues.add(value);
-        return this;
-    }
-
-    /**
      * @param s A default value to use for this parameter.
      * @return This instance.
      */
@@ -62,7 +51,7 @@ public class StringParameter extends QueryParameter {
 
         if (possibleValue.isEmpty()) {
             if (required) {
-                parser.report(new ParseError("Missing parameter: " + name + "."));
+                parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
                 parser.putString(name, defaultValue);

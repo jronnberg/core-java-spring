@@ -1,14 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
@@ -29,7 +29,7 @@ public class GetPdeAlarmTest {
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(alarm.id())))
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(alarmManager);
 
         try {
@@ -41,11 +41,9 @@ public class GetPdeAlarmTest {
                     assertEquals(alarm.severity(), retrievedAlarm.severity());
                     assertEquals(alarm.acknowledged(), retrievedAlarm.acknowledged());
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }
@@ -57,7 +55,7 @@ public class GetPdeAlarmTest {
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(invalidEntryId)))
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
@@ -68,11 +66,9 @@ public class GetPdeAlarmTest {
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }
@@ -84,7 +80,7 @@ public class GetPdeAlarmTest {
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(nonexistentId)))
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
@@ -95,11 +91,9 @@ public class GetPdeAlarmTest {
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    e.printStackTrace();
                     assertNull(e);
                 });
             } catch (final Exception e) {
-                e.printStackTrace();
                 assertNull(e);
             }
     }

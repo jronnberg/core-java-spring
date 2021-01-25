@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.arkalix.dto.binary.BinaryWriter;
 
 public class DtoWriter implements BinaryWriter {
+
+    private static final Logger logger = LoggerFactory.getLogger(DtoWriter.class);
 
     private final OutputStream writer;
 
@@ -27,7 +32,7 @@ public class DtoWriter implements BinaryWriter {
         try {
             writer.write(b);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("DTO write failure", e);
         }
     }
 
@@ -35,7 +40,7 @@ public class DtoWriter implements BinaryWriter {
         try {
             writer.write(bytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("DTO write failure", e);
         }
     }
 

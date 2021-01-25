@@ -44,7 +44,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final CloudDto cloud;
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
     private PlantDescriptionEntry activeEntry = null;
-    private final Set<Integer> activeRules = new HashSet<>(); // TODO: Concurrency handling?
+    private final Set<Integer> activeRules = new HashSet<>(); // TODO: Do we need this? Why not use the backing store?
     private final RuleStore backingStore;
     private SystemTracker systemTracker;
 
@@ -88,6 +88,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
+        // TODO: Mustn't we first read the active rules from backing store?
         return deleteActiveRules().flatMap(deletionResult -> {
 
             if (activeEntry == null) {
@@ -95,9 +96,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             }
 
             return postRules(activeEntry).flatMap(postResult -> {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
-                }
+                logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                 return Future.done();
             });
         });
@@ -136,6 +135,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null || providerSystemSrEntry == null) {
+            // TODO: Warn when a system is not present?
             return null;
         }
 
@@ -243,9 +243,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         return Futures.serialize(deletions).flatMap(result -> {
             activeRules.clear();
             backingStore.removeAll();
-            if (logger.isInfoEnabled()) {
-                logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
-            }
+            logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
             return Future.done();
         });
     }
@@ -272,20 +270,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 logger.info(msg);
             }
         } else {
-            if (logger.isWarnEnabled()) {
-                logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should something be done in this case?
-            }
-        }
-    }
-
-    /**
-     * Logs the fact that the specified entry has been deactivated.
-     *
-     * @param entry The deactivated Plant Description Entry.
-     */
-    private void logEntryDeactivated(PlantDescriptionEntry entry) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
+            logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should something be done in this case?
         }
     }
 
@@ -321,7 +306,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
                 } else if (entryWasDeactivated) {
                     activeEntry = null;
-                    logEntryDeactivated(entry);
+                    logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
                 }
             })
             .onFailure(throwable -> {

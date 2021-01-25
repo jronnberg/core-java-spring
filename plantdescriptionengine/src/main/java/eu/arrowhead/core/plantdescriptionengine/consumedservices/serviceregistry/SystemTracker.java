@@ -58,7 +58,7 @@ public class SystemTracker {
      * @return A Future which will complete with a list of registered systems.
      *
      * The retrieved systems are stored locally, and can be accessed using
-     * {@link #getComponentAt(String) getSystem}.
+     * {@link #getSystems()} or {@link #getSystemByName(String) }.
      */
     private Future<Void> pollForSystems() {
         return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
@@ -145,10 +145,11 @@ public class SystemTracker {
 
     /**
      * Starts polling the Service Registry for registered systems.
+     *
      * @return A Future that completes on the first reply from the Service
      *         Registry.
      */
-    public Future<Void> startPollingForSystems() {
+    public Future<Void> start() {
         final var timer = new Timer();
         return pollForSystems().flatMap(result -> {
 

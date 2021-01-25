@@ -10,18 +10,22 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 
 public class TestUtils {
 
-    public static PlantDescriptionEntryDto createEntry(int id) {
+    public static PlantDescriptionEntryDto createEntry(int id, boolean active) {
         final Instant now = Instant.now();
         return new PlantDescriptionEntryBuilder()
             .id(id)
             .plantDescription("Plant Description 1A")
-            .active(false)
+            .active(active)
             .include(new ArrayList<>())
             .systems(new ArrayList<>())
             .connections(new ArrayList<>())
             .createdAt(now)
             .updatedAt(now)
             .build();
+    }
+
+    public static PlantDescriptionEntryDto createEntry(int id) {
+        return createEntry(id, true);
     }
 
     public static PlantDescriptionDto createDescription() {

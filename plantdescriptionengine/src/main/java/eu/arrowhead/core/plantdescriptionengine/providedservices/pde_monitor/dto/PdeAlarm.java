@@ -46,15 +46,15 @@ public interface PdeAlarm {
         public int compare(PdeAlarm a1, PdeAlarm a2) {
             Optional<Instant> cleared1 = a1.clearedAt();
             Optional<Instant> cleared2 = a2.clearedAt();
-            if (cleared1.isEmpty() && cleared2.isEmpty()) {
-                return 0;
+
+            if (cleared1.isEmpty()) {
+                return cleared2.isEmpty() ? 0 : 1;
             }
-            if (cleared1.isPresent() && cleared2.isEmpty()) {
+
+            if (cleared2.isEmpty()) {
                 return -1;
             }
-            if (a1.clearedAt().isEmpty() && a2.clearedAt().isPresent()) {
-                return 1;
-            }
+
             return cleared1.get().compareTo(cleared2.get());
         }
     };
@@ -70,20 +70,6 @@ public interface PdeAlarm {
     Instant updatedAt();
     Optional<Instant> clearedAt();
     Optional<Instant> acknowledgedAt();
-
-    /**
-     * Filters out cleared/uncleared alarms from the given list.
-     * @param alarms  A list of PDE alarms.
-     * @param cleared If true, uncleared alarms are removed. If false, cleared
-     *                alarms are removed.
-     */
-    static void filterCleared(List<? extends PdeAlarm> alarms, boolean cleared) {
-        if (cleared) {
-            alarms.removeIf(alarm -> alarm.clearedAt().isEmpty());
-        } else {
-            alarms.removeIf(alarm -> alarm.clearedAt().isPresent());
-        }
-    }
 
     /**
      * Filters out cleared/uncleared alarms from the given list.
@@ -137,7 +123,8 @@ public interface PdeAlarm {
                 comparator = CLEARED_AT_COMPARATOR;
                 break;
             default:
-                assert false : sortField + " is not a valid sort field for PDE Alarms.";
+                throw new IllegalArgumentException("'" + sortField + "' is not a valid sort field for PDE Alarms.");
+
         }
 
         if (sortAscending) {

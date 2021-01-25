@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 
 /**
- * Backing store that only stores data in memory.
+ * Plant Description backing store that only stores data in memory.
  *
  * Created for development purposes, not to be used in production.
  */

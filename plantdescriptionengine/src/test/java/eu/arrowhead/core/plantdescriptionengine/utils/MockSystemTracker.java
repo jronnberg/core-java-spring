@@ -27,13 +27,24 @@ public class MockSystemTracker extends SystemTracker {
     /**
      * Adds a new system to the system tracker.
      *
-     * @param systemId ID of the system to add.
      * @param system The system to add.
      */
-    public void addSystem(String systemName, SrSystem system) {
-        systems.put(systemName, system);
+    public void addSystem(SrSystem system) {
+        systems.put(system.systemName(), system);
         for (var listener: listeners) {
             listener.onSystemAdded(system);
+        }
+    }
+
+    /**
+     * Removes a system from the system tracker.
+     *
+     * @param systemName name of the system to remove.
+     */
+    public void remove(String systemName) {
+        SrSystem system = systems.remove(systemName);
+        for (var listener: listeners) {
+            listener.onSystemRemoved(system);
         }
     }
 

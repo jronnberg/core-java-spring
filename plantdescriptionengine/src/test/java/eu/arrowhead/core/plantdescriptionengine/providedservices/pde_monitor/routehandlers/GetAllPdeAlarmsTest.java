@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
@@ -46,8 +46,8 @@ public class GetAllPdeAlarmsTest {
             ))
             .build();
 
-        final HttpServiceResponse ascResponse = new MockResponse();
-        final HttpServiceResponse descResponse = new MockResponse();
+        final HttpServiceResponse ascResponse = new MockServiceResponse();
+        final HttpServiceResponse descResponse = new MockServiceResponse();
 
         try {
             handler.handle(ascRequest, ascResponse)
@@ -79,11 +79,9 @@ public class GetAllPdeAlarmsTest {
                     previousId = alarm.id();
                 }
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (final Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -115,8 +113,8 @@ public class GetAllPdeAlarmsTest {
             ))
             .build();
 
-        final HttpServiceResponse ascResponse = new MockResponse();
-        final HttpServiceResponse descResponse = new MockResponse();
+        final HttpServiceResponse ascResponse = new MockServiceResponse();
+        final HttpServiceResponse descResponse = new MockServiceResponse();
 
         try {
             handler.handle(ascRequest, ascResponse)
@@ -149,11 +147,9 @@ public class GetAllPdeAlarmsTest {
                     previousId = alarm.id();
                 }
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (final Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -168,21 +164,20 @@ public class GetAllPdeAlarmsTest {
                 "acknowledged", List.of(nonBoolean) // Should be 'true' or 'false'
             ))
             .build();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<'acknowledged' must be true or false, not '" + nonBoolean + "'.>";
+                String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
+                    + nonBoolean + "'.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -224,9 +219,9 @@ public class GetAllPdeAlarmsTest {
                 "severity", List.of("cleared")))
             .build();
 
-        HttpServiceResponse nameResponse = new MockResponse();
-        HttpServiceResponse ackResponse = new MockResponse();
-        HttpServiceResponse severityResponse = new MockResponse();
+        HttpServiceResponse nameResponse = new MockServiceResponse();
+        HttpServiceResponse ackResponse = new MockServiceResponse();
+        HttpServiceResponse severityResponse = new MockServiceResponse();
 
         try {
             handler.handle(nameRequest, nameResponse)
@@ -250,11 +245,9 @@ public class GetAllPdeAlarmsTest {
                 assertEquals(systemNameC, alarms.data().get(0).systemName().get());
             })
             .onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -274,7 +267,7 @@ public class GetAllPdeAlarmsTest {
         }
 
         final var handler = new GetAllPdeAlarms(alarmManager);
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final int page = 0;
         final int itemsPerPage = 3;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -299,11 +292,9 @@ public class GetAllPdeAlarmsTest {
                 }
 
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -312,7 +303,7 @@ public class GetAllPdeAlarmsTest {
     public void shouldRejectNegativePage() throws PdStoreException {
         final var handler = new GetAllPdeAlarms(new AlarmManager());
         int page = -3;
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
                 "page", List.of(String.valueOf(page)),
@@ -328,11 +319,9 @@ public class GetAllPdeAlarmsTest {
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }

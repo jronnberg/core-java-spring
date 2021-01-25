@@ -38,7 +38,7 @@ public class MonitorInfo {
         }
 
         /**
-         * Returns true if the given parameters matches this instances metadata.
+         * Returns true if the given arguments match this instances metadata.
          *
          * More specifically, returns true if {@code portMetadata} is present,
          * and the union of {@code systemMetadata} and {@code portMetadata} is a
@@ -63,7 +63,7 @@ public class MonitorInfo {
         }
 
         /**
-         * Returns true if the given parameters matches this instances metadata.
+         * Returns true if the given arguments match this instances metadata.
          *
          * More specifically, returns true if {@code systemMetadata} is
          * not present, or is a superset of this instance's metadata.
@@ -74,7 +74,7 @@ public class MonitorInfo {
          */
 		public boolean matchesSystemMetadata(Optional<Map<String, String>> systemMetadata) {
             if (!systemMetadata.isPresent()) {
-                    return true;
+                return true;
             }
 			return Metadata.isSubset(metadata, systemMetadata.get());
         }
@@ -83,10 +83,22 @@ public class MonitorInfo {
 
     private final Map<String, Bundle> infoBundles = new ConcurrentHashMap<>();
 
+    /**
+     * @param service An Arrowhead Framework service, as provided by a local or
+     *                remote system.
+     * @return A unique identifier for the given service.
+     */
     private String getKey(ServiceDescription service) {
         return service.provider().name() + service.uri();
     }
 
+    /**
+     * Store the inventory ID of a given service.
+     * Any inventory ID previously stored for this system will be overwritten.
+     *
+     * @param service     An Arrowhead Framework service.
+     * @param inventoryId An inventory ID.
+     */
     public void putInventoryId(ServiceDescription service, String inventoryId) {
         String systemName = service.provider().name();
         Map<String, String> metadata = service.metadata();
@@ -101,6 +113,13 @@ public class MonitorInfo {
         infoBundles.put(key, newBundle);
     }
 
+    /**
+     * Store system data for the given service.
+     * Any system data previously stored for this system will be overwritten.
+     *
+     * @param service An Arrowhead Framework service.
+     * @param data    System data to be stored.
+     */
     public void putSystemData(ServiceDescription service, JsonObject data) {
         String key = getKey(service);
         String systemName = service.provider().name();
@@ -116,6 +135,13 @@ public class MonitorInfo {
         infoBundles.put(key, newBundle);
     }
 
+    /**
+     * @param systemName Name of an Arrowhead Framework system, or null.
+     * @param metadata   Metadata describing an Arrowhead Framework system, or
+     *                   null.
+     * @return A list containing all stored monitor data for the system that
+     *         corresponds to the given arguments.
+     */
     public List<Bundle> getSystemInfo(String systemName, Map<String, String> metadata) {
         List<Bundle> result = new ArrayList<>();
         for (var bundle : infoBundles.values()) {

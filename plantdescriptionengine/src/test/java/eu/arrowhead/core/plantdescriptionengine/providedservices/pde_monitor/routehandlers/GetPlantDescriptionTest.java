@@ -1,14 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
@@ -33,7 +33,7 @@ public class GetPlantDescriptionTest {
         HttpServiceRequest request = new MockRequest.Builder()
                 .pathParameters(List.of(String.valueOf(nonExistentEntryId))).build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
@@ -45,7 +45,6 @@ public class GetPlantDescriptionTest {
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -65,7 +64,7 @@ public class GetPlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(entryId)))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -98,7 +97,7 @@ public class GetPlantDescriptionTest {
             .pathParameters(List.of(invalidId))
             .build();
 
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)

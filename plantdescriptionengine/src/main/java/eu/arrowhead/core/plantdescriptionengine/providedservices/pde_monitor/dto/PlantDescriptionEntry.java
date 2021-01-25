@@ -63,23 +63,13 @@ public interface PlantDescriptionEntry {
                 comparator = UPDATED_AT_COMPARATOR;
                 break;
             default:
-                assert false : sortField + " is not a valid sort field for Plant Description Entries.";
+                throw new IllegalArgumentException("'" + sortField + "' is not a valid sort field for Plant Description Entries.");
         }
 
         if (sortAscending) {
             Collections.sort(entries, comparator);
         } else {
             Collections.sort(entries, comparator.reversed());
-        }
-    }
-
-    static void filterOnActive(
-        List<? extends PlantDescriptionEntry> entries, boolean active
-    ) {
-        if (active) {
-            entries.removeIf(entry -> !entry.active());
-        } else {
-            entries.removeIf(entry -> entry.active());
         }
     }
 

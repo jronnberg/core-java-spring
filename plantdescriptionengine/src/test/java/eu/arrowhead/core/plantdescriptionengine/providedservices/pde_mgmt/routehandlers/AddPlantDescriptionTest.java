@@ -1,16 +1,16 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
@@ -26,8 +26,9 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -40,7 +41,7 @@ public class AddPlantDescriptionTest {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new AddPlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -125,7 +126,7 @@ public class AddPlantDescriptionTest {
             .connections(connections)
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -205,7 +206,7 @@ public class AddPlantDescriptionTest {
             .connections(connections)
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -285,7 +286,7 @@ public class AddPlantDescriptionTest {
             .connections(connections)
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -366,7 +367,7 @@ public class AddPlantDescriptionTest {
             .connections(connections)
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -457,7 +458,7 @@ public class AddPlantDescriptionTest {
             .connections(connections)
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -533,7 +534,7 @@ public class AddPlantDescriptionTest {
             .systems(List.of(consumerSystem, producerSystem))
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -593,7 +594,7 @@ public class AddPlantDescriptionTest {
             .systems(List.of(consumerSystem))
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -645,7 +646,7 @@ public class AddPlantDescriptionTest {
             .connections(new ArrayList<>())
             .build();
 
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -665,6 +666,35 @@ public class AddPlantDescriptionTest {
         } catch (Exception e) {
             assertNull(e);
         }
+    }
+
+    @Test
+    public void shouldHandleBackingStoreFailure() throws PdStoreException {
+
+        final var backingStore = new MockPdStore();
+        final var pdTracker = new PlantDescriptionTracker(backingStore);
+        final var handler = new AddPlantDescription(pdTracker);
+
+        final PlantDescription description = TestUtils.createDescription();
+        final HttpServiceResponse response = new MockServiceResponse();
+        final MockRequest request = new MockRequest.Builder()
+            .body(description)
+            .build();
+
+        backingStore.setFailOnNextWrite();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
+                })
+                .onFailure(e -> {
+                    assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+
     }
 
 }

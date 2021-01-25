@@ -86,7 +86,7 @@ public class MonitorablesClient {
                 }
             })
             .onFailure(e -> {
-                logger.error("Failed to poll monitorable systems.", e);
+                logger.error("Failed to ping monitorable systems.", e);
             });
     }
 
@@ -102,7 +102,7 @@ public class MonitorablesClient {
                 }
             })
             .onFailure(e -> {
-                logger.error("Failed to poll monitorable systems.", e);
+                logger.error("Failed to fetch monitor info from monitorable systems.", e);
             });
     }
 
@@ -116,11 +116,11 @@ public class MonitorablesClient {
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
-                System.out.println("Successful ping");
+                logger.info("Successfully pinged system '" + providerName + "'.");
                 alarmManager.clearSystemInactive(providerName);
             })
             .onFailure(e -> {
-                System.out.println("Failed ping");
+                logger.warn("Failed to ping system '" + providerName + "'.", e);
                 alarmManager.raiseSystemInactive(providerName);
             });
     }
@@ -138,8 +138,11 @@ public class MonitorablesClient {
                 monitorInfo.putInventoryId(service, inventoryId.id());
             })
             .onFailure(e -> {
-                e.printStackTrace();
-                // TODO: Error handling, raise an alarm?
+                String errorMessage = "Failed to retrieve inventory ID for system '" +
+                    service.provider().name() + "', service '" + service.name() + "'.";
+                logger.warn(errorMessage, e);
+
+                // TODO: Raise an alarm?
             });
     }
 
@@ -156,8 +159,10 @@ public class MonitorablesClient {
                 monitorInfo.putSystemData(service, systemData.data());
             })
             .onFailure(e -> {
-                e.printStackTrace();
-                // TODO: Error handling, raise an alarm?
+                String errorMessage = "Failed to retrieve system data for system '" +
+                    service.provider().name() + "', service '" + service.name() + "'.";
+                logger.error(errorMessage, e);
+                // TODO: Raise an alarm?
             });
     }
 

@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
@@ -41,7 +41,7 @@ public class GetAllPlantDescriptionsTest {
 
         GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
         HttpServiceRequest request = new MockRequest();
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -126,9 +126,9 @@ public class GetAllPlantDescriptionsTest {
                 "direction", List.of("DESC")
             ))
             .build();
-        final HttpServiceResponse response1 = new MockResponse();
-        final HttpServiceResponse response2 = new MockResponse();
-        final HttpServiceResponse response3 = new MockResponse();
+        final HttpServiceResponse response1 = new MockServiceResponse();
+        final HttpServiceResponse response2 = new MockServiceResponse();
+        final HttpServiceResponse response3 = new MockServiceResponse();
 
         try {
             handler.handle(idDescendingRequest, response1)
@@ -181,11 +181,9 @@ public class GetAllPlantDescriptionsTest {
                     previousTimestamp = entry.updatedAt();
                 }
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (final Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -218,21 +216,20 @@ public class GetAllPlantDescriptionsTest {
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of("active", List.of(nonBoolean)))
             .build();
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
             .ifSuccess(result -> {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<'active' must be true or false, not '" + nonBoolean + "'.>";
+                String expectedErrorMessage = "<Query parameter 'active' must be true or false, got '"
+                    + nonBoolean + "'.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -264,7 +261,7 @@ public class GetAllPlantDescriptionsTest {
         HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of("active", List.of("true")))
             .build();
-        HttpServiceResponse response = new MockResponse();
+        HttpServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -275,11 +272,9 @@ public class GetAllPlantDescriptionsTest {
                 assertEquals(1, entries.count());
                 assertEquals(entries.data().get(0).id(), activeEntryId, 0);
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -295,7 +290,7 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final var handler = new GetAllPlantDescriptions(pdTracker);
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final int page = 1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -324,11 +319,9 @@ public class GetAllPlantDescriptionsTest {
                 }
 
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertNull(e);
             });
         } catch (Exception e) {
-            e.printStackTrace();
             assertNull(e);
         }
     }
@@ -338,7 +331,7 @@ public class GetAllPlantDescriptionsTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new GetAllPlantDescriptions(pdTracker);
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final int page = -1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -370,7 +363,7 @@ public class GetAllPlantDescriptionsTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new GetAllPlantDescriptions(pdTracker);
-        final HttpServiceResponse response = new MockResponse();
+        final HttpServiceResponse response = new MockServiceResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -382,7 +375,7 @@ public class GetAllPlantDescriptionsTest {
             handler.handle(request, response)
             .ifSuccess(result -> {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<Missing parameter: item_per_page.>";
+                String expectedErrorMessage = "<Missing parameter 'item_per_page'.>";
                 String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
 
