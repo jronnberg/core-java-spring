@@ -60,7 +60,7 @@ public class SystemTracker {
      * The retrieved systems are stored locally, and can be accessed using
      * {@link #getSystems()} or {@link #getSystemByName(String) }.
      */
-    private Future<Void> pollForSystems() {
+    private Future<Void> fetchSystems() {
         return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri("/serviceregistry/mgmt/systems")
@@ -114,9 +114,19 @@ public class SystemTracker {
     }
 
     /**
+     * Registers another object to be notified whenever a system is added or
+     * removed.
+     *
+     * @param listener
+     */
+    public void addListener(SystemUpdateListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
      * Retrieves the specified system. Note that the returned data will be stale
      * if the system in question has changed state since the last call to
-     * {@link #pollForSystems()}.
+     * {@link #fetchSystems()}.
      *
      *
      * @param systemName Name of a system.
@@ -127,16 +137,6 @@ public class SystemTracker {
             throw new IllegalStateException("SystemTracker has not been initialized.");
         }
         return systems.get(systemName);
-    }
-
-    /**
-     * Registers another object to be notified whenever a system is added or
-     * removed.
-     *
-     * @param listener
-     */
-    public void addListener(SystemUpdateListener listener) {
-        listeners.add(listener);
     }
 
     public List<SrSystem> getSystems() {
@@ -150,14 +150,12 @@ public class SystemTracker {
      *         Registry.
      */
     public Future<Void> start() {
-        final var timer = new Timer();
-        return pollForSystems().flatMap(result -> {
-
+        return fetchSystems().flatMap(result -> {
             // Periodically poll the Service Registry for systems.
-            timer.schedule(new TimerTask() {
+            new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    pollForSystems()
+                    fetchSystems()
                     .onFailure(error -> {
                         logger.error("Failed to retrieve registered systems", error);
                     });
