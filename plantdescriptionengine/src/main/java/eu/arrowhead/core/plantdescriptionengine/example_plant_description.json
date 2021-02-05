@@ -24,7 +24,7 @@
                     "consumer": false,
                     "metadata": {
                         "name": "echo",
-											  "serviceUri": "/monitor-1-1"
+                        "serviceUri": "/monitor-1-1"
                     }
                 },
 							  {
@@ -44,7 +44,7 @@
                     "consumer": false,
                     "metadata": {
                         "name": "echo2",
-											  "serviceUri": "/monitor-2-1"
+                        "serviceUri": "/monitor-2-1"
                     }
                 },
 							  {
