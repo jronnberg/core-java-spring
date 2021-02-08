@@ -28,6 +28,7 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
+import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
@@ -80,7 +81,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return
      */
     public Future<Void> initialize(PlantDescriptionTracker pdTracker) {
-
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
@@ -88,8 +88,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return (activeEntry == null)
                 ? Future.done()
                 : postRules(activeEntry).flatMap(createdRules -> {
-                    System.out.println("CREATED!!!!");
-                    System.out.println(createdRules);
                     ruleStore.setRules(createdRules.getIds());
                     logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                     return Future.done();
@@ -178,13 +176,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         for (int i = 0; i < numConnections; i++) {
             var rule = createRule(entry, i);
-            if (rule != null) { // TODO: Remove this check when createRule() has been fixed (no longer returns null)
+            if (rule != null) {
                 rules.add(rule);
             }
         }
 
         if (rules.size() == 0) {
-            return Future.success(emptyRuleList());
+            return Future.success(emptyRuleList()); // TODO How do we handle this?
         }
 
         return client.send(orchestratorAddress, new HttpClientRequest()
@@ -213,6 +211,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .method(HttpMethod.DELETE)
             .uri("/orchestrator/mgmt/store/" + id))
         .flatMap(response -> {
+            if (response.status() != HttpStatus.OK) {
+                // TODO: Throw some other type of Exception.
+                return Future.failure(new RuntimeException("Failed to delete store rule with ID " + id));
+            }
             return Future.done();
         });
     }
@@ -275,7 +277,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Handles an update to a Plant Description Entry.
+     * Handles an update of a Plant Description Entry.
      *
      * Deletes and/or creates rules in the Orchestrator as appropriate.
      *
@@ -284,9 +286,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
 
-        boolean entryWasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
+        boolean wasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
         boolean shouldPostRules = entry.active() && entry.connections().size() > 0;
-        boolean shouldDeleteCurrentRules = entry.active() || entryWasDeactivated;
+        boolean shouldDeleteCurrentRules = entry.active() || wasDeactivated;
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteActiveRules() : Future.done();
 
@@ -302,7 +304,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     ruleStore.setRules(createdRules.getIds());
                     logEntryActivated(entry, createdRules);
 
-                } else if (entryWasDeactivated) {
+                } else if (wasDeactivated) {
                     activeEntry = null;
                     logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
                 }
@@ -310,7 +312,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .onFailure(throwable -> {
                 logger.error("Encountered an error while handling the new Plant Description '"
                     + entry.plantDescription() + "'", throwable);
-
             });
     }
 
