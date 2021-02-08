@@ -2,11 +2,9 @@ package eu.arrowhead.core.plantdescriptionengine.orchestratorclient;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pd
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.ProviderSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntry;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
@@ -44,8 +41,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final CloudDto cloud;
     private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
     private PlantDescriptionEntry activeEntry = null;
-    private final Set<Integer> activeRules = new HashSet<>(); // TODO: Do we need this? Why not use the backing store?
-    private final RuleStore backingStore;
+    private final RuleStore ruleStore;
     private SystemTracker systemTracker;
 
 
@@ -68,8 +64,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         this.client = httpClient;
         this.cloud = cloud;
-        this.backingStore = ruleStore;
         this.systemTracker = systemTracker;
+        this.ruleStore = ruleStore;
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -88,17 +84,16 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
-        // TODO: Mustn't we first read the active rules from backing store?
         return deleteActiveRules().flatMap(deletionResult -> {
-
-            if (activeEntry == null) {
-                return Future.done();
-            }
-
-            return postRules(activeEntry).flatMap(postResult -> {
-                logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
-                return Future.done();
-            });
+            return (activeEntry == null)
+                ? Future.done()
+                : postRules(activeEntry).flatMap(createdRules -> {
+                    System.out.println("CREATED!!!!");
+                    System.out.println(createdRules);
+                    ruleStore.setRules(createdRules.getIds());
+                    logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
+                    return Future.done();
+                });
         });
     }
 
@@ -230,19 +225,26 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      */
     private Future<Void> deleteActiveRules() {
 
-        if (activeRules.isEmpty()) {
+        Set<Integer> rules;
+        try {
+            rules = ruleStore.readRules();
+        } catch (RuleStoreException e) {
+            return Future.failure(e);
+        }
+
+        if (rules.isEmpty()) {
             return Future.done();
         }
 
         // Delete any rules previously created by the Orchestrator client:
         var deletions = new ArrayList<Future<Void>>();
-        for (var ruleId : activeRules) {
-            deletions.add(deleteRule(ruleId));
+
+        for (int rule : rules) {
+            deletions.add(deleteRule(rule));
         }
 
         return Futures.serialize(deletions).flatMap(result -> {
-            activeRules.clear();
-            backingStore.removeAll();
+            ruleStore.removeAll();
             logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
             return Future.done();
         });
@@ -260,15 +262,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         String entryName = entry.plantDescription();
 
         if (ruleList.count() > 0) {
-            if (logger.isInfoEnabled()) {
-                String msg = "Orchestrator rules created for Plant Description '" + entryName + "': [";
-                List<String> ids = new ArrayList<>();
-                for (var rule : ruleList.data()) {
-                    ids.add(rule.id().toString());
-                }
-                msg += String.join(", ", ids) + "]";
-                logger.info(msg);
+            String msg = "Orchestrator rules created for Plant Description '" + entryName + "': [";
+            List<String> ids = new ArrayList<>();
+            for (var rule : ruleList.data()) {
+                ids.add(rule.id().toString());
             }
+            msg += String.join(", ", ids) + "]";
+            logger.info(msg);
         } else {
             logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should something be done in this case?
         }
@@ -299,9 +299,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .ifSuccess(createdRules -> {
                 if (entry.active()) {
                     activeEntry = entry;
-                    final var ruleIds = createdRules.data().stream().map(StoreEntry::id).collect(Collectors.toSet());
-                    backingStore.setRules(ruleIds);
-                    activeRules.addAll(ruleIds);
+                    ruleStore.setRules(createdRules.getIds());
                     logEntryActivated(entry, createdRules);
 
                 } else if (entryWasDeactivated) {
@@ -343,10 +341,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         // Otherwise, all of its Orchestration rules should be deleted:
         deleteActiveRules()
             .ifSuccess(result -> {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
-                        + entry.plantDescription() + "'");
-                }
+                logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
+                    + entry.plantDescription() + "'");
             })
             .onFailure(throwable -> {
                 logger.error("Encountered an error while attempting to delete Plant Description '"

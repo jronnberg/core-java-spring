@@ -1,6 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
@@ -18,4 +20,8 @@ public interface StoreEntryList {
 
     List<StoreEntry> data();
     int count();
+
+    public default Set<Integer> getIds() {
+        return data().stream().map(StoreEntry::id).collect(Collectors.toSet());
+    }
 }
