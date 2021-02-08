@@ -24,8 +24,8 @@ import se.arkalix.query.ServiceQuery;
 public class MonitorablesClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
-    private final static int infoPollInterval = 6000; // Milliseconds
-    private final static int pingPollInterval = 10000; // Milliseconds
+    private final static int fetchInfoInterval = 6000; // Milliseconds
+    private final static int pingInterval = 10000; // Milliseconds
     private ServiceQuery serviceQuery;
     private final HttpClient httpClient;
     private final MonitorInfo monitorInfo;
@@ -62,23 +62,23 @@ public class MonitorablesClient {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                pingPoll();
+                ping();
             }
-        }, 0, pingPollInterval);
+        }, 0, pingInterval);
 
         // Periodically request data from all monitorable services
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                infoPoll();
+                retrieveMonitorInfo();
             }
-        }, 0, infoPollInterval);
+        }, 0, fetchInfoInterval);
     }
 
     /**
      * Check if each monitorable service is active.
      */
-    private void pingPoll() {
+    private void ping() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
                 for (var service : services) {
@@ -93,7 +93,7 @@ public class MonitorablesClient {
     /**
      * Retrieve new data from each monitorable service.
      */
-    private void infoPoll() {
+    private void retrieveMonitorInfo() {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
                 for (var service : services) {
