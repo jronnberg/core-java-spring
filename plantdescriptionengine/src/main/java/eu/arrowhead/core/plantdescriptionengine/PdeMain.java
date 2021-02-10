@@ -274,15 +274,14 @@ public class PdeMain {
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = getProp(appProps, "orchestration_rules");
-            final var orchestratorClient = new OrchestratorClient(
-                sysopClient, cloud, new FileRuleStore(ruleDirectory), systemTracker
-            );
             final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
-
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
+            final var orchestratorClient = new OrchestratorClient(
+                sysopClient, cloud, new FileRuleStore(ruleDirectory), systemTracker, pdTracker
+            );
+
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
             final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
-
             final AlarmManager alarmManager = new AlarmManager();
 
              logger.info("Initializing the Orchestrator client...");

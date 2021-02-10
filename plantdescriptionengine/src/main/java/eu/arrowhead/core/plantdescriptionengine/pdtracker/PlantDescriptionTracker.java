@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
@@ -165,5 +167,103 @@ public class PlantDescriptionTracker {
         }
         return null;
     }
+
+    /**
+     * @param entry A Plant Description Entry.
+     * @param systemId The ID of a system.
+     * @return The system with the given ID, if it exists in the specified Plant
+     *         Description entry, or its chain of included entries. Otherwise
+     *         null.
+     */
+    public PdeSystem getSystem(PlantDescriptionEntry entry, String systemId) {
+
+        PdeSystem result = entry.systems()
+            .stream()
+            .filter(system -> system.systemId().equals(systemId))
+            .findAny()
+            .orElse(null);
+
+        if (result != null) {
+            return result;
+        }
+
+        // TODO: In what order do we want entries to be investigated? If we
+        // don't allow duplicate systems, which we probably shouldn't, the order
+        // doesn't matter.
+        for (int i : entry.include()) {
+            final var includedEntry = get(i);
+            result = getSystem(includedEntry, systemId);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return null;
+	}
+
+    /**
+     *
+     * @param entryId ID of a Plant Description Entry.
+     * @return A list of all systems in the specified entry, as well as all
+     *         systems in its chain of included entries.
+     */
+    public List<PdeSystem> getAllSystems(int entryId) {
+        List<PdeSystem> systems = new ArrayList<>();
+        final var entry = get(entryId);
+
+        if (entry == null) {
+            // TODO: What should be done here? Throw exception?
+            return systems;
+        }
+
+        systems = entry.systems();
+
+        for (int i : entry.include()) {
+            systems.addAll(getAllSystems(i));
+        }
+
+        return systems;
+    }
+
+    /**
+     * @param entryId ID of a Plant Description Entry.
+     * @return All connections in the specified Plant Description Entry and its
+     *         chain of included entries.
+     */
+	public List<Connection> getAllConnections(int entryId) {
+		List<Connection> connections = new ArrayList<>();
+        final var entry = get(entryId);
+
+        if (entry == null) {
+            // TODO: What should be done here? Throw exception?
+            return connections;
+        }
+
+        connections = entry.connections();
+
+        for (int i : entry.include()) {
+            connections.addAll(getAllConnections(i));
+        }
+
+        return connections;
+	}
+
+    /**
+     * @param entryId  ID of a Plant Description Entry.
+     * @param portName The name of a system port.
+     * @return The service definition of the specified port, if it is present
+     *         among the systems of the entry or its chain of included systems.
+     */
+	public String getServiceDefinition(int entryId, String portName) {
+        List<PdeSystem> systems = getAllSystems(entryId);
+        for (var system : systems) {
+            for (var port : system.ports()) {
+                if (portName.equals(port.portName())) {
+                    return port.serviceDefinition();
+                }
+            }
+        }
+		return null;
+	}
 
 }

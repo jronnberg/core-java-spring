@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -305,5 +307,153 @@ public class PlantDescriptionTrackerTest {
         assertFalse(listener.lastUpdated.active());
 
         assertEquals(1, listener.numUpdated);
+    }
+
+    @Test
+    public void shouldReturnTheCorrectSystem() throws PdStoreException {
+        final String idA = "Sys-A";
+        final String idB = "Sys-B";
+        final String idC = "Sys-C";
+
+        final PdeSystemDto systemA = new PdeSystemBuilder()
+            .systemId(idA)
+            .build();
+
+        final PdeSystemDto systemB = new PdeSystemBuilder()
+            .systemId(idB)
+            .build();
+
+        final PdeSystemDto systemC = new PdeSystemBuilder()
+            .systemId(idC)
+            .build();
+
+        final Instant now = Instant.now();
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("ABC")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .systems(List.of(systemA, systemB, systemC))
+            .build();
+
+        final PdStore store = new InMemoryPdStore();
+        final var pdTracker = new PlantDescriptionTracker(store);
+        pdTracker.put(entry);
+
+        assertEquals(idA, pdTracker.getSystem(entry, idA).systemId());
+        assertEquals(idB, pdTracker.getSystem(entry, idB).systemId());
+        assertEquals(idC, pdTracker.getSystem(entry, idC).systemId());
+    }
+
+    @Test
+    public void shouldReturnNullWhenSystemIsMissing() throws PdStoreException {
+
+        int entryIdA = 0;
+        int entryIdB = 1;
+
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final PdeSystemDto systemA = new PdeSystemBuilder()
+            .systemId(systemIdA)
+            .build();
+
+        final PdeSystemDto systemB = new PdeSystemBuilder()
+            .systemId(systemIdB)
+            .build();
+
+        final PdeSystemDto systemC = new PdeSystemBuilder()
+            .systemId(systemIdC)
+            .build();
+
+        final Instant now = Instant.now();
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .systems(List.of(systemA))
+            .build();
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdA))
+            .systems(List.of(systemB, systemC))
+            .build();
+
+        final PdStore store = new InMemoryPdStore();
+        final var pdTracker = new PlantDescriptionTracker(store);
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+        assertNull(pdTracker.getSystem(entryB, "Nonexistent"));
+    }
+
+    @Test
+    public void shouldReturnSystemFromIncludedEntry() throws PdStoreException {
+
+        int entryIdA = 32;
+        int entryIdB = 8;
+        int entryIdC = 58;
+
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final PdeSystemDto systemA = new PdeSystemBuilder()
+            .systemId(systemIdA)
+            .build();
+
+        final PdeSystemDto systemB = new PdeSystemBuilder()
+            .systemId(systemIdB)
+            .build();
+
+        final PdeSystemDto systemC = new PdeSystemBuilder()
+            .systemId(systemIdC)
+            .build();
+
+        final Instant now = Instant.now();
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .systems(List.of(systemA, systemB))
+            .build();
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdA))
+            .build();
+
+        final var entryC = new PlantDescriptionEntryBuilder()
+            .id(entryIdC)
+            .plantDescription("C")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdB))
+            .systems(List.of(systemC))
+            .build();
+
+        final PdStore store = new InMemoryPdStore();
+        final var pdTracker = new PlantDescriptionTracker(store);
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+        pdTracker.put(entryC);
+
+        assertEquals(systemIdA, pdTracker.getSystem(entryC, systemIdA).systemId());
     }
 }

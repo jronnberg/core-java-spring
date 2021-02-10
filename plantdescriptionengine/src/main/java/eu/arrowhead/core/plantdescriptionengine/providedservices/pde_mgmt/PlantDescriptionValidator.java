@@ -26,7 +26,7 @@ public class PlantDescriptionValidator {
 
         validateConnections(entry);
 
-        for (var system : entry.systems()) {
+        for (var system : entry.systems()) { // TODO: Validate inclusions
             ensureUniquePorts(system);
         }
     }
@@ -40,14 +40,14 @@ public class PlantDescriptionValidator {
         boolean producerFound = false;
         boolean consumerFound = false;
 
-        for (var connection : entry.connections()) {
+        for (var connection : entry.connections()) { // TODO: Validate inclusions
             final var producer = connection.producer();
             final var consumer = connection.consumer();
 
             final String producerId = producer.systemId();
             final String consumerId = consumer.systemId();
 
-            for (var system : entry.systems()) {
+            for (var system : entry.systems()) { // TODO: Validate inclusions
 
                 if (producerId.equals(system.systemId())) {
                     producerFound = true;

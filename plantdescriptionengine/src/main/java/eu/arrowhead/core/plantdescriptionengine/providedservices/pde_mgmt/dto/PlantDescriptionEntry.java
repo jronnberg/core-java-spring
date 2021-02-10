@@ -190,7 +190,7 @@ public interface PlantDescriptionEntry {
      * @return Service definition name of the *producer* service of the
      *         specified connection.
      */
-    public default String serviceDefinitionName(int connectionIndex) {
+    public default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
         final SystemPort producerPort = connections().get(connectionIndex).producer();
 
         String serviceDefinitionName = null;
@@ -210,19 +210,6 @@ public interface PlantDescriptionEntry {
         Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex +
             " in Plant Description Entry '" + plantDescription() + "'");
         return serviceDefinitionName;
-    }
-
-    /**
-     * @param systemId Internal (to the PDE) identifier of a system.
-     * @return The system with the given ID.
-     */
-    default PdeSystem getSystem(String systemId) {
-        for (var system : systems()) {
-            if (system.systemId().equals(systemId)) {
-                return system;
-            }
-        }
-        return null;
     }
 
     /**

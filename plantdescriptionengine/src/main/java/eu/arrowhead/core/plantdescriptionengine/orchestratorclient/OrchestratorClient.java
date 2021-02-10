@@ -45,28 +45,32 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final RuleStore ruleStore;
     private SystemTracker systemTracker;
 
+    final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor.
      *
-     * @param httpClient Object for sending HTTP messages to the
-     *                      Orchestrator.
-     * @param cloud DTO describing a Arrowhead Cloud.
-     * @param ruleStore Object providing permanent storage for Orchestration
-     *                  rule data.
+     * @param httpClient    Object for sending HTTP messages to the Orchestrator.
+     * @param cloud         DTO describing a Arrowhead Cloud.
+     * @param ruleStore     Object providing permanent storage for Orchestration
+     *                      rule data.
      * @param systemTracker Object used to track registered Arrowhead systems.
      * @throws RuleStoreException
      */
-    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker) throws RuleStoreException {
+    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker,
+            PlantDescriptionTracker pdTracker) throws RuleStoreException {
+
         Objects.requireNonNull(httpClient, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(ruleStore, "Expected backing store");
         Objects.requireNonNull(systemTracker, "Expected System Tracker");
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
 
         this.client = httpClient;
         this.cloud = cloud;
         this.systemTracker = systemTracker;
         this.ruleStore = ruleStore;
+        this.pdTracker = pdTracker;
 
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
@@ -80,7 +84,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param pdTracker A Plant Description tracker.
      * @return
      */
-    public Future<Void> initialize(PlantDescriptionTracker pdTracker) {
+    public Future<Void> initialize(PlantDescriptionTracker pdTracker) { // TODO: Remove argument
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
@@ -104,14 +108,14 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      *
      * @return An Orchestrator rule that embodies the specified connection.
      */
-    StoreRuleDto createRule(PlantDescriptionEntry entry, int connectionIndex) {
+    StoreRuleDto createRule(PlantDescriptionEntry entry, Connection connection) {
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
-        final Connection connection = entry.connections().get(connectionIndex);
         final String consumerId = connection.consumer().systemId();
         final String providerId = connection.producer().systemId();
-        final PdeSystem consumer = entry.getSystem(consumerId);
-        final PdeSystem provider = entry.getSystem(providerId);
+
+        final PdeSystem consumer = pdTracker.getSystem(entry, consumerId); // ;entry.getSystem(consumerId);
+        final PdeSystem provider = pdTracker.getSystem(entry, providerId); // entry.getSystem(providerId);
 
         // TODO: In the future, we will be able to create Orchestration rules
         // using system name *or* metadata. For now, we assume that systemName
@@ -133,10 +137,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         String portName = connection.producer().portName();
+        String serviceDefinition = pdTracker.getServiceDefinition(entry.id(), portName);
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)
-            .serviceDefinitionName(entry.serviceDefinitionName(connectionIndex))
+            .serviceDefinitionName(serviceDefinition)
             .consumerSystemId(consumerSystemSrEntry.id())
             .attribute(provider.portMetadata(portName))
             .providerSystem(new ProviderSystemBuilder()
@@ -165,17 +170,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return A Future which will contain a list of the created rules.
      */
     private Future<StoreEntryListDto> postRules(PlantDescriptionEntry entry) {
-        int numConnections = entry.connections().size();
+        var connections = pdTracker.getAllConnections(entry.id());
 
-        if (numConnections == 0) {
+        if (connections.isEmpty()) {
             // Return immediately with an empty rule list:
             return Future.success(emptyRuleList());
         }
 
         List<DtoWritable> rules = new ArrayList<>();
 
-        for (int i = 0; i < numConnections; i++) {
-            var rule = createRule(entry, i);
+        for (var connection : connections) {
+            var rule = createRule(entry, connection);
             if (rule != null) {
                 rules.add(rule);
             }
@@ -286,8 +291,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
 
+        int numConnections = pdTracker.getAllConnections(entry.id()).size();
         boolean wasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
-        boolean shouldPostRules = entry.active() && entry.connections().size() > 0;
+        boolean shouldPostRules = entry.active() && numConnections > 0;
         boolean shouldDeleteCurrentRules = entry.active() || wasDeactivated;
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteActiveRules() : Future.done();

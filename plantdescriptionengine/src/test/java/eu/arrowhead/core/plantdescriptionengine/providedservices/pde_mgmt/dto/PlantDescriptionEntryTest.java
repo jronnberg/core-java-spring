@@ -376,54 +376,6 @@ public class PlantDescriptionEntryTest {
     }
 
     @Test
-    public void shouldReturnTheCorrectSystem() {
-        final String idA = "Sys-A";
-        final String idB = "Sys-B";
-        final String idC = "Sys-C";
-
-        final PdeSystemDto systemA = new PdeSystemBuilder()
-            .systemId(idA)
-            .build();
-
-        final PdeSystemDto systemB = new PdeSystemBuilder()
-            .systemId(idB)
-            .build();
-
-        final PdeSystemDto systemC = new PdeSystemBuilder()
-            .systemId(idC)
-            .build();
-
-        final var entry = new PlantDescriptionEntryBuilder()
-            .id(1)
-            .plantDescription("ABC")
-            .createdAt(now)
-            .updatedAt(now)
-            .active(true)
-            .systems(List.of(systemA, systemB, systemC))
-            .build();
-
-        assertEquals(idA, entry.getSystem(idA).systemId());
-        assertEquals(idB, entry.getSystem(idB).systemId());
-        assertEquals(idC, entry.getSystem(idC).systemId());
-    }
-
-
-    @Test
-    public void shouldReturnNullForMissingSystem() {
-
-        final var entry = new PlantDescriptionEntryBuilder()
-            .id(1)
-            .plantDescription("ABC")
-            .createdAt(now)
-            .updatedAt(now)
-            .active(true)
-            .build();
-
-        final var system = entry.getSystem("Nonexistent");
-        assertNull(system);
-    }
-
-    @Test
     public void shouldSortCorrectly() {
         int idA = 24;
         int idB = 65;

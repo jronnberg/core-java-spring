@@ -211,13 +211,14 @@ public class OrchestratorClientTest {
         systemTracker.addSystem(orchestratorSrSystem);
 
         ruleStore = new InMemoryRuleStore();
-        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker);
+        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
     }
 
     @Test
-    public void shouldCreateInsecureRule() throws SSLException, RuleStoreException {
-        final PlantDescriptionEntry entry = createEntry();
-        var rule = orchestratorClient.createRule(entry, 0);
+    public void shouldCreateInsecureRule() throws SSLException, RuleStoreException, PdStoreException {
+        final PlantDescriptionEntryDto entry = createEntry();
+        pdTracker.put(entry);
+        var rule = orchestratorClient.createRule(entry, entry.connections().get(0));
         assertEquals(cloud.name(), rule.cloud().name());
         assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
@@ -229,12 +230,15 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldCreateSecureRule() throws SSLException, RuleStoreException {
-        final PlantDescriptionEntry entry = createEntry();
+    public void shouldCreateSecureRule() throws SSLException, RuleStoreException, PdStoreException {
+        final PlantDescriptionEntryDto entry = createEntry();
+        final var connection = entry.connections().get(0);
+
+        pdTracker.put(entry);
 
         when(httpClient.isSecure()).thenReturn(true);
 
-        var rule = orchestratorClient.createRule(entry, 0);
+        var rule = orchestratorClient.createRule(entry, connection);
         assertEquals(cloud.name(), rule.cloud().name());
         assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
@@ -248,19 +252,24 @@ public class OrchestratorClientTest {
     @Test
     public void shouldNotCreateRuleWithMissingConsumer() throws SSLException, RuleStoreException {
         systemTracker.remove(consumerName);
-        assertNull(orchestratorClient.createRule(createEntry(), 0));
+        final var entry = createEntry();
+        final var connection = entry.connections().get(0);
+        assertNull(orchestratorClient.createRule(entry, connection));
     }
 
     @Test
     public void shouldNotCreateRuleWithMissingProvider() throws SSLException, RuleStoreException {
         systemTracker.remove(producerName);
-        assertNull(orchestratorClient.createRule(createEntry(), 0));
+        final var entry = createEntry();
+        final var connection = entry.connections().get(0);
+        assertNull(orchestratorClient.createRule(createEntry(), connection));
     }
 
     @Test
-    public void shouldStoreRulesWhenAddingPd() throws SSLException, RuleStoreException {
+    public void shouldStoreRulesWhenAddingPd() throws SSLException, RuleStoreException, PdStoreException {
 
-        final PlantDescriptionEntry entry = createEntry();
+        final PlantDescriptionEntryDto entry = createEntry();
+        pdTracker.put(entry);
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse response = new MockClientResponse();
@@ -327,10 +336,8 @@ public class OrchestratorClientTest {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                e.printStackTrace();
                 assertTrue(false); // We should never get here.
             });
-
     }
 
     @Test
@@ -393,7 +400,7 @@ public class OrchestratorClientTest {
         doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules();
 
         // We need to reinstantiate this with the mock rule store.
-        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker);
+        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
 
         pdTracker.put(activeEntry);
         ruleStore.setRules(Set.of(12));
@@ -412,17 +419,9 @@ public class OrchestratorClientTest {
     @Test
     public void shouldRemoveRulesWhenRemovingConnections() throws SSLException, RuleStoreException, PdStoreException {
         final PlantDescriptionEntryDto entry = createEntry();
-        final PlantDescriptionEntryDto entryWithoutConnections = new PlantDescriptionEntryBuilder()
-            .id(entry.id())
-            .plantDescription(entry.plantDescription())
-            .createdAt(entry.createdAt())
-            .updatedAt(now)
-            .active(true)
-            .build();
 
         pdTracker.put(entry);
         int ruleId = 65;
-
         ruleStore.setRules(Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
@@ -432,7 +431,6 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         int newRuleId = 82;
         creationResponse.status(HttpStatus.CREATED);
-
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
@@ -445,6 +443,15 @@ public class OrchestratorClientTest {
         orchestratorClient.initialize(pdTracker)
             .ifSuccess(result -> {
                 assertEquals(1, ruleStore.readRules().size());
+
+                final PlantDescriptionEntryDto entryWithoutConnections = new PlantDescriptionEntryBuilder()
+                    .id(entry.id())
+                    .plantDescription(entry.plantDescription())
+                    .createdAt(entry.createdAt())
+                    .updatedAt(now)
+                    .active(true)
+                    .build();
+                pdTracker.put(entryWithoutConnections);
                 orchestratorClient.onPlantDescriptionUpdated(entryWithoutConnections);
 
                 // Verify that the HTTP client was passed correct data:
@@ -486,7 +493,7 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -519,7 +526,7 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto inactiveEntry = PlantDescriptionEntry.deactivated(createEntry());
         pdTracker.put(inactiveEntry);
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
         orchestratorClient.initialize(pdTracker)
             .ifSuccess(result -> {
                 assertTrue(ruleStore.readRules().isEmpty());
@@ -610,7 +617,7 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
