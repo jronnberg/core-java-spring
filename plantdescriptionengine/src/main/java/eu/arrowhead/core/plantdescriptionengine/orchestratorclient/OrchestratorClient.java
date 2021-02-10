@@ -80,11 +80,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     /**
      * Initializes the Orchestrator client.
-     *
-     * @param pdTracker A Plant Description tracker.
-     * @return
+     * @return A {@code Future} which will complete once Orchestrator rules have
+     *         been created for the connections in the active Plant Description
+     *         entry (if any).
      */
-    public Future<Void> initialize(PlantDescriptionTracker pdTracker) { // TODO: Remove argument
+    public Future<Void> initialize() {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 

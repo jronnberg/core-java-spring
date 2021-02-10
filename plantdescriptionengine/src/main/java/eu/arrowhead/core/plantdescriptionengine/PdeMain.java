@@ -286,7 +286,7 @@ public class PdeMain {
 
              logger.info("Initializing the Orchestrator client...");
 
-            return orchestratorClient.initialize(pdTracker)
+            return orchestratorClient.initialize()
                 .flatMap(orchstratorInitializationResult -> {
                     logger.info("Orchestrator client initialized.");
                     final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);

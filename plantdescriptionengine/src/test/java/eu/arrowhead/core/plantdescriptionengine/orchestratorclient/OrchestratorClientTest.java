@@ -331,7 +331,7 @@ public class OrchestratorClientTest {
 
         pdTracker.put(entry);
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
@@ -365,7 +365,7 @@ public class OrchestratorClientTest {
                 Future.success(deletionResponse)
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 assertEquals(1, ruleStore.readRules().size());
                 orchestratorClient.onPlantDescriptionRemoved(activeEntry);
@@ -405,7 +405,7 @@ public class OrchestratorClientTest {
         pdTracker.put(activeEntry);
         ruleStore.setRules(Set.of(12));
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 assertTrue(false); // We should never get here.
             }).onFailure(e -> {
@@ -440,7 +440,7 @@ public class OrchestratorClientTest {
                 Future.success(deletionResponse)
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 assertEquals(1, ruleStore.readRules().size());
 
@@ -510,7 +510,7 @@ public class OrchestratorClientTest {
                 Future.success(creationResponse)
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionRemoved(entryB);
                 assertEquals(1, ruleStore.readRules().size());
@@ -527,7 +527,7 @@ public class OrchestratorClientTest {
         pdTracker.put(inactiveEntry);
 
         final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 assertTrue(ruleStore.readRules().isEmpty());
                 orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
@@ -561,7 +561,7 @@ public class OrchestratorClientTest {
                 Future.success(deletionResponse)
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 var deactivatedEntry = PlantDescriptionEntry.deactivated(activeEntry);
                 orchestratorClient.onPlantDescriptionUpdated(deactivatedEntry);
@@ -596,7 +596,7 @@ public class OrchestratorClientTest {
         final MockClientResponse deletionResponse = new MockClientResponse();
         deletionResponse.status(HttpStatus.OK);
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionUpdated(entryB);
                 verify(httpClient, never()).send(any(), any());
@@ -640,7 +640,7 @@ public class OrchestratorClientTest {
                 Future.failure(new RuntimeException("Some error"))
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionUpdated(entry);
                 assertTrue(ruleStore.readRules().isEmpty());
@@ -677,7 +677,7 @@ public class OrchestratorClientTest {
                 Future.success(failedDeletionResponse)
             );
 
-        orchestratorClient.initialize(pdTracker)
+        orchestratorClient.initialize()
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionRemoved(activeEntry);
                 // The rule should not have been removed.
