@@ -5,22 +5,29 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
 /**
@@ -29,6 +36,11 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
  * class.
  */
 public class PlantDescriptionTrackerTest {
+
+    final Instant now = Instant.now();
+
+    PdStore store;
+    PlantDescriptionTracker pdTracker;
 
     final class Listener implements PlantDescriptionUpdateListener {
 
@@ -60,37 +72,30 @@ public class PlantDescriptionTrackerTest {
         }
     }
 
+    @BeforeEach
+    public void initEach() throws PdStoreException {
+        store = new InMemoryPdStore();
+        pdTracker = new PlantDescriptionTracker(store);
+    }
+
     @Test
     public void shouldReadEntriesFromBackingStore() throws PdStoreException {
-        final PdStore store = new InMemoryPdStore();
         final List<Integer> entryIds = List.of(1, 2, 3);
 
         for (int id : entryIds) {
             store.write(TestUtils.createEntry(id));
         }
 
-        final var pdTracker = new PlantDescriptionTracker(store);
-        var storedEntries = pdTracker.getEntries();
-
-        assertEquals(entryIds.size(), storedEntries.size());
-        for (final var entry : storedEntries) {
-            assertTrue(entryIds.contains(entry.id()));
-        }
-
-        int id0 = entryIds.get(0);
-        pdTracker.remove(id0);
-
         final var newPdTracker = new PlantDescriptionTracker(store);
-        storedEntries = newPdTracker.getEntries();
+        var storedEntries = newPdTracker.getEntries();
 
-        assertEquals(entryIds.size() - 1, storedEntries.size());
+        assertEquals(3, storedEntries.size());
     }
 
     @Test
     public void shouldReturnEntryById() throws PdStoreException {
         int entryId = 16;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         pdTracker.put(entry);
 
         final var storedEntry = pdTracker.get(entryId);
@@ -102,7 +107,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldReturnAllEntries() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
 
         for (int id : entryIds) {
@@ -121,7 +125,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldReturnListDto() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<Integer> entryIds = List.of(16, 39, 244);
         for (int id : entryIds) {
             pdTracker.put(TestUtils.createEntry(id));
@@ -140,7 +143,6 @@ public class PlantDescriptionTrackerTest {
     public void shouldRemoveEntries() throws PdStoreException {
         int entryId = 24;
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         pdTracker.put(entry);
         pdTracker.remove(entryId);
         final var storedEntry = pdTracker.get(entryId);
@@ -150,7 +152,6 @@ public class PlantDescriptionTrackerTest {
 
     @Test
     public void shouldTrackActiveEntry() throws PdStoreException {
-        final Instant now = Instant.now();
         final var builder = new PlantDescriptionEntryBuilder()
             .include(new ArrayList<>())
             .systems(new ArrayList<>())
@@ -167,7 +168,6 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("Plant Description B")
             .active(false)
             .build();
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         pdTracker.put(activeEntry);
         pdTracker.put(inactiveEntry);
@@ -184,7 +184,6 @@ public class PlantDescriptionTrackerTest {
     public void shouldDeactivateEntry() throws PdStoreException {
         final int idA = 1;
         final int idB = 2;
-        final Instant now = Instant.now();
         final var builder = new PlantDescriptionEntryBuilder()
             .include(new ArrayList<>())
             .systems(new ArrayList<>())
@@ -200,7 +199,6 @@ public class PlantDescriptionTrackerTest {
             .id(idB)
             .plantDescription("Plant Description B")
             .build();
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         pdTracker.put(entryA);
 
@@ -212,7 +210,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldGenerateUniqueIds() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final List<PlantDescriptionEntryDto> entries = List.of(
             TestUtils.createEntry(pdTracker.getUniqueId()),
             TestUtils.createEntry(pdTracker.getUniqueId()),
@@ -233,7 +230,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldNotifyOnAdd() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 16;
@@ -250,7 +246,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldNotifyOnDelete() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 5;
@@ -269,7 +264,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldNotifyOnUpdate() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 93;
@@ -286,7 +280,6 @@ public class PlantDescriptionTrackerTest {
     @Test
     public void shouldNotifyWhenActiveEntryChanges() throws PdStoreException {
 
-        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var listener = new Listener();
 
         final int idA = 2;
@@ -327,7 +320,6 @@ public class PlantDescriptionTrackerTest {
             .systemId(idC)
             .build();
 
-        final Instant now = Instant.now();
         final var entry = new PlantDescriptionEntryBuilder()
             .id(1)
             .plantDescription("ABC")
@@ -337,8 +329,6 @@ public class PlantDescriptionTrackerTest {
             .systems(List.of(systemA, systemB, systemC))
             .build();
 
-        final PdStore store = new InMemoryPdStore();
-        final var pdTracker = new PlantDescriptionTracker(store);
         pdTracker.put(entry);
 
         assertEquals(idA, pdTracker.getSystem(entry, idA).systemId());
@@ -368,7 +358,6 @@ public class PlantDescriptionTrackerTest {
             .systemId(systemIdC)
             .build();
 
-        final Instant now = Instant.now();
         final var entryA = new PlantDescriptionEntryBuilder()
             .id(entryIdA)
             .plantDescription("A")
@@ -388,8 +377,6 @@ public class PlantDescriptionTrackerTest {
             .systems(List.of(systemB, systemC))
             .build();
 
-        final PdStore store = new InMemoryPdStore();
-        final var pdTracker = new PlantDescriptionTracker(store);
         pdTracker.put(entryA);
         pdTracker.put(entryB);
         assertNull(pdTracker.getSystem(entryB, "Nonexistent"));
@@ -417,8 +404,6 @@ public class PlantDescriptionTrackerTest {
         final PdeSystemDto systemC = new PdeSystemBuilder()
             .systemId(systemIdC)
             .build();
-
-        final Instant now = Instant.now();
 
         final var entryA = new PlantDescriptionEntryBuilder()
             .id(entryIdA)
@@ -448,12 +433,350 @@ public class PlantDescriptionTrackerTest {
             .systems(List.of(systemC))
             .build();
 
-        final PdStore store = new InMemoryPdStore();
-        final var pdTracker = new PlantDescriptionTracker(store);
         pdTracker.put(entryA);
         pdTracker.put(entryB);
         pdTracker.put(entryC);
 
         assertEquals(systemIdA, pdTracker.getSystem(entryC, systemIdA).systemId());
     }
+
+    @Test
+    public void shouldReturnAllSystems() throws PdStoreException {
+
+        int entryIdA = 32;
+        int entryIdB = 8;
+        int entryIdC = 58;
+
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final PdeSystemDto systemA = new PdeSystemBuilder()
+            .systemId(systemIdA)
+            .build();
+
+        final PdeSystemDto systemB = new PdeSystemBuilder()
+            .systemId(systemIdB)
+            .build();
+
+        final PdeSystemDto systemC = new PdeSystemBuilder()
+            .systemId(systemIdC)
+            .build();
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .systems(List.of(systemA, systemB))
+            .build();
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdA))
+            .build();
+
+        final var entryC = new PlantDescriptionEntryBuilder()
+            .id(entryIdC)
+            .plantDescription("C")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdB))
+            .systems(List.of(systemC))
+            .build();
+
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+        pdTracker.put(entryC);
+
+        final var systems = pdTracker.getAllSystems(entryIdC);
+
+        assertEquals(3, systems.size());
+
+        var retrievedA = systems.stream()
+            .filter(system -> system.systemId().equals(systemIdA))
+            .findFirst()
+            .get();
+        var retrievedB = systems.stream()
+            .filter(system -> system.systemId().equals(systemIdB))
+            .findFirst()
+            .get();
+        var retrievedC = systems.stream()
+            .filter(system -> system.systemId().equals(systemIdC))
+            .findFirst()
+            .orElse(null);
+
+        assertNotNull(retrievedA);
+        assertNotNull(retrievedB);
+        assertNotNull(retrievedC);
+    }
+
+    @Test
+    public void shouldThrowWhenGettingSystemsFromNullEntry() throws PdStoreException {
+        int nonexistentId = 32;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pdTracker.getAllSystems(nonexistentId);
+        });
+        assertEquals(
+            "Plant Description with ID " + nonexistentId + " is not present in the Plant Description Tracker.",
+            exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldReturnAllConnections() throws PdStoreException {
+
+        // First entry
+        int entryIdA = 0;
+        String consumerIdA  = "Cons-A";
+        String consumerNameA  = "Consumer A";
+        String producerNameA  = "Producer A";
+        String consumerPortA = "Cons-Port-A";
+        String producerPortA = "Prod-Port-A";
+        String producerIdA  = "Prod-A";
+
+        final List<PortDto> consumerPortsA = List.of(
+            new PortBuilder()
+                .portName(consumerPortA)
+                .serviceDefinition("Monitorable")
+                .consumer(true)
+                .build());
+
+        final List<PortDto> producerPortsA = List.of(
+            new PortBuilder()
+                .portName(producerPortA)
+                .serviceDefinition("Monitorable")
+                .consumer(false)
+                .build());
+
+        final PdeSystemDto consumerSystemA = new PdeSystemBuilder()
+            .systemId(consumerIdA)
+            .systemName(consumerNameA)
+            .ports(consumerPortsA)
+            .build();
+
+        final PdeSystemDto producerSystemA = new PdeSystemBuilder()
+            .systemId(producerIdA)
+            .systemName(producerNameA)
+            .ports(producerPortsA)
+            .build();
+
+        final List<ConnectionDto> connectionsA = List.of(new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .systemId(consumerIdA)
+                    .portName(consumerPortA)
+                    .build())
+                .producer(new SystemPortBuilder()
+                    .systemId(producerIdA)
+                    .portName(producerPortA)
+                    .build())
+                .build());
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(consumerSystemA, producerSystemA))
+            .connections(connectionsA)
+            .build();
+
+        // Second entry
+        int entryIdB = 1;
+        String consumerIdB  = "Cons-B";
+        String consumerNameB  = "Consumer B";
+        String consumerPortB = "Cons-Port-B";
+
+        final List<PortDto> consumerPortsB = List.of(
+            new PortBuilder()
+                .portName(consumerPortB)
+                .serviceDefinition("Monitorable")
+                .consumer(true)
+                .build());
+
+        final PdeSystemDto consumerSystemB = new PdeSystemBuilder()
+            .systemId(consumerIdB)
+            .systemName(consumerNameB)
+            .ports(consumerPortsB)
+            .build();
+
+        final List<ConnectionDto> connectionsB = List.of(new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .systemId(consumerIdB)
+                    .portName(consumerPortB)
+                    .build())
+                .producer(new SystemPortBuilder()
+                    .systemId(producerIdA)
+                    .portName(producerPortA)
+                    .build())
+                .build());
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("Plant Description B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdA))
+            .systems(List.of(consumerSystemB))
+            .connections(connectionsB)
+            .build();
+
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+
+        final var retrievedConnections = pdTracker.getAllConnections(entryIdB);
+        assertEquals(2, retrievedConnections.size());
+
+        final var connectionA = retrievedConnections.get(1);
+        final var connectionB = retrievedConnections.get(0);
+
+        assertEquals(consumerIdA, connectionA.consumer().systemId());
+        assertEquals(consumerIdB, connectionB.consumer().systemId());
+    }
+
+    @Test
+    public void shouldThrowWhenGettingConnectionsFromNullEntry() throws PdStoreException {
+        int nonexistentId = 2;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pdTracker.getAllConnections(nonexistentId);
+        });
+        assertEquals(
+            "Plant Description with ID " + nonexistentId + " is not present in the Plant Description Tracker.",
+            exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldReturnServiceDefinition() throws PdStoreException {
+
+        // First entry
+        int entryIdA = 0;
+        String consumerIdA  = "Cons-A";
+        String consumerNameA  = "Consumer A";
+        String producerNameA  = "Producer A";
+        String consumerPortA = "Cons-Port-A";
+        String producerPortA = "Prod-Port-A";
+        String producerIdA  = "Prod-A";
+        String serviceDefinitionA = "SD-A";
+
+        final List<PortDto> consumerPortsA = List.of(
+            new PortBuilder()
+                .portName(consumerPortA)
+                .serviceDefinition("Service-XYZ")
+                .consumer(true)
+                .build());
+
+        final List<PortDto> producerPortsA = List.of(
+            new PortBuilder()
+                .portName(producerPortA)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(false)
+                .build());
+
+        final PdeSystemDto consumerSystemA = new PdeSystemBuilder()
+            .systemId(consumerIdA)
+            .systemName(consumerNameA)
+            .ports(consumerPortsA)
+            .build();
+
+        final PdeSystemDto producerSystemA = new PdeSystemBuilder()
+            .systemId(producerIdA)
+            .systemName(producerNameA)
+            .ports(producerPortsA)
+            .build();
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(consumerSystemA, producerSystemA))
+            .build();
+
+        // Second entry
+        int entryIdB = 1;
+        String consumerIdB  = "Cons-B";
+        String consumerNameB  = "Consumer B";
+        String consumerPortB = "Cons-Port-B";
+
+        final List<PortDto> consumerPortsB = List.of(
+            new PortBuilder()
+                .portName(consumerPortB)
+                .serviceDefinition("Service-ABC")
+                .consumer(true)
+                .build());
+
+        final PdeSystemDto consumerSystemB = new PdeSystemBuilder()
+            .systemId(consumerIdB)
+            .systemName(consumerNameB)
+            .ports(consumerPortsB)
+            .build();
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("Plant Description B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(List.of(entryIdA))
+            .systems(List.of(consumerSystemB))
+            .build();
+
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+
+        String serviceDefinition = pdTracker.getServiceDefinition(entryIdB, producerPortA);
+        assertEquals(serviceDefinitionA, serviceDefinition);
+
+    }
+
+    @Test
+    public void shouldThrowWhenGettingSdFromNullEntry() throws PdStoreException {
+        int nonexistentId = 67;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pdTracker.getServiceDefinition(nonexistentId, "monitorable");
+        });
+        assertEquals(
+            "Plant Description with ID " + nonexistentId + " is not present in the Plant Description Tracker.",
+            exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldThrowWhenGettingSdFromNonexistentPort() throws PdStoreException {
+        int entryId = 98;
+        String nonexistentPort = "qwerty";
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(entryId)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .build();
+
+        pdTracker.put(entry);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pdTracker.getServiceDefinition(entryId, nonexistentPort);
+        });
+        assertEquals(
+            "No port named '" + nonexistentPort + "' could be found in the Plant Description Tracker.",
+            exception.getMessage()
+        );
+    }
+
+
 }

@@ -212,11 +212,11 @@ public class PlantDescriptionTracker {
         final var entry = get(entryId);
 
         if (entry == null) {
-            // TODO: What should be done here? Throw exception?
-            return systems;
+            throw new IllegalArgumentException("Plant Description with ID "
+                + entryId + " is not present in the Plant Description Tracker.");
         }
 
-        systems = entry.systems();
+        systems.addAll(entry.systems());
 
         for (int i : entry.include()) {
             systems.addAll(getAllSystems(i));
@@ -235,11 +235,11 @@ public class PlantDescriptionTracker {
         final var entry = get(entryId);
 
         if (entry == null) {
-            // TODO: What should be done here? Throw exception?
-            return connections;
+            throw new IllegalArgumentException("Plant Description with ID "
+                + entryId + " is not present in the Plant Description Tracker.");
         }
 
-        connections = entry.connections();
+        connections.addAll(entry.connections());
 
         for (int i : entry.include()) {
             connections.addAll(getAllConnections(i));
@@ -263,7 +263,8 @@ public class PlantDescriptionTracker {
                 }
             }
         }
-		return null;
+        throw new IllegalArgumentException("No port named '" + portName
+            + "' could be found in the Plant Description Tracker.");
 	}
 
 }
