@@ -137,7 +137,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         String portName = connection.producer().portName();
-        String serviceDefinition = pdTracker.getServiceDefinition(entry.id(), portName);
+        String serviceDefinition = pdTracker.getServiceDefinition(entry, portName);
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)

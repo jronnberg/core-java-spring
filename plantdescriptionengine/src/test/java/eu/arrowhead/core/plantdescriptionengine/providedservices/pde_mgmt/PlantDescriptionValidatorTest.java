@@ -527,6 +527,66 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
+    public void shouldReportNonuniqueMetadata() throws PdStoreException {
+
+        final String consumerId = "system_1";
+        final String producerId = "system_2";
+        final String consumerPortA = "consumerPortA";
+        final String producerPort = "port_2";
+        final String serviceDefinition = "service_a";
+        final Map<String, String> sharedMetadata = Map.of("x", "y");
+
+        final List<PortDto> consumerPorts = List.of(
+            new PortBuilder()
+                .portName(consumerPortA)
+                .serviceDefinition(serviceDefinition)
+                .metadata(sharedMetadata)
+                .consumer(true)
+                .build(),
+            new PortBuilder()
+                .portName("port_b")
+                .serviceDefinition(serviceDefinition)
+                .metadata(sharedMetadata)
+                .consumer(true)
+                .build()
+        );
+
+        final List<PortDto> producerPorts = List.of(
+            new PortBuilder()
+                .portName(producerPort)
+                .serviceDefinition(serviceDefinition)
+                .consumer(false)
+                .build()
+        );
+
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .ports(consumerPorts)
+            .build();
+
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .ports(producerPorts)
+            .build();
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(23)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(consumerSystem, producerSystem))
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        assertTrue(validator.hasError());
+
+        String expectedErrorMessage = "<" + consumerId +
+            " has duplicate metadata for ports with service definition '" + serviceDefinition + "'>";
+    assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
     public void shouldReportDuplicateInclusions() throws PdStoreException {
 
         int entryIdA = 0;
@@ -569,5 +629,49 @@ public class PlantDescriptionValidatorTest {
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
+
+    @Test
+    public void shouldReportSelfInclusion() throws PdStoreException {
+
+        int entryId = 344;
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(entryId)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(entryId))
+            .build();
+
+        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+
+        assertTrue(validator.hasError());
+        assertEquals("<Entry includes itself.>", validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldReportNonexistentInclusions() throws PdStoreException {
+
+        int nonExistentA = 23;
+        int nonExistentB = 34;
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(0)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(nonExistentA, nonExistentB))
+            .build();
+
+        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+
+        assertTrue(validator.hasError());
+        String expectedErrorMessage = "<Included entry '" + nonExistentA +
+            "' does not exist.>, "
+            + "<Included entry '" + nonExistentB + "' does not exist.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
 
 }

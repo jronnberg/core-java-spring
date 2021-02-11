@@ -129,18 +129,4 @@ public class PdeMainTest {
         final var client = PdeMain.createSysopHttpClient(appProps);
         assertTrue(client.isSecure());
     }
-
-    // @Test
-    // public void shouldRunWithoutExceptions() {
-    //     ClassLoader classLoader = getClass().getClassLoader();
-
-    //     String propsPath = new File(
-    //         classLoader.getResource("application.properties")
-    //         .getFile()
-    //     )
-    //     .getAbsolutePath();
-
-    //     String[] args = { propsPath };
-    //     PdeMain.main(args);
-    // }
 }

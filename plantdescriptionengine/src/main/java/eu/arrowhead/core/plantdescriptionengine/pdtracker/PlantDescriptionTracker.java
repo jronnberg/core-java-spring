@@ -246,14 +246,15 @@ public class PlantDescriptionTracker {
 	}
 
     /**
-     * @param entryId  ID of a Plant Description Entry.
+     * @param entry A Plant Description Entry.
      * @param portName The name of a system port.
      * @return The service definition of the specified port, if it is present
      *         among the systems of the entry or its chain of included systems.
      */
-	public String getServiceDefinition(int entryId, String portName) {
-        // TODO: Accept entry instead of ID.
-        final var entry = get(entryId);
+	public String getServiceDefinition(PlantDescriptionEntry entry, String portName) {
+
+        Objects.requireNonNull(backingStore, "Expected Plant Description Entry.");
+
         List<PdeSystem> systems = getAllSystems(entry);
         for (var system : systems) {
             for (var port : system.ports()) {

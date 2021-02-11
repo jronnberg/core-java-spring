@@ -517,18 +517,6 @@ public class PlantDescriptionTrackerTest {
         assertNotNull(retrievedC);
     }
 
-    // @Test
-    // public void shouldThrowWhenGettingSystemsFromNullEntry() throws PdStoreException {
-
-    //     Exception exception = assertThrows(AssertionFailedError.class, () -> {
-    //         pdTracker.getAllSystems(null);
-    //     });
-    //     assertEquals(
-    //         "Plant Description with ID   is not present in the Plant Description Tracker.",
-    //         exception.getMessage()
-    //     );
-    // }
-
     @Test
     public void shouldReturnAllConnections() throws PdStoreException {
 
@@ -735,23 +723,10 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entryA);
         pdTracker.put(entryB);
 
-        String serviceDefinition = pdTracker.getServiceDefinition(entryIdB, producerPortA);
+        String serviceDefinition = pdTracker.getServiceDefinition(entryB, producerPortA);
         assertEquals(serviceDefinitionA, serviceDefinition);
 
     }
-
-    // @Test
-    // public void shouldThrowWhenGettingSdFromNullEntry() throws PdStoreException {
-    //     int nonexistentId = 67;
-
-    //     Exception exception = assertThrows(NullPointerException.class, () -> {
-    //         pdTracker.getServiceDefinition(nonexistentId, "monitorable");
-    //     });
-    //     assertEquals(
-    //         "Plant Description with ID " + nonexistentId + " is not present in the Plant Description Tracker.",
-    //         exception.getMessage()
-    //     );
-    // }
 
     @Test
     public void shouldThrowWhenGettingSdFromNonexistentPort() throws PdStoreException {
@@ -769,7 +744,7 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entry);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            pdTracker.getServiceDefinition(entryId, nonexistentPort);
+            pdTracker.getServiceDefinition(entry, nonexistentPort);
         });
         assertEquals(
             "No port named '" + nonexistentPort + "' could be found in the Plant Description Tracker.",

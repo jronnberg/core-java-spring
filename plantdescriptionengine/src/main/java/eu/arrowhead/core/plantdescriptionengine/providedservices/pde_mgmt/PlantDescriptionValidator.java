@@ -34,18 +34,27 @@ public class PlantDescriptionValidator {
         this.entry = entry;
         this.pdTracker = pdTracker;
 
-        validateInclusions();
+        checkSelfReferencing();
+        if (hasError()) {
+            return;
+        }
+
+        ensureInclusionsExist();
+
+        if (hasError()) {
+            return;
+        }
+
+        checkForDuplicateInclusions();
+        if (hasError()) {
+            return;
+        }
+
         validateConnections();
 
         for (var system : entry.systems()) { // TODO: Validate inclusions
             ensureUniquePorts(system);
         }
-    }
-
-    private void validateInclusions() {
-        checkSelfReferencing();
-        ensureInclusionsExist();
-        checkForDuplicateInclusions();
     }
 
     /**
@@ -55,7 +64,7 @@ public class PlantDescriptionValidator {
     private void checkSelfReferencing() {
         for (int id : entry.include()) {
             if (id == entry.id()) {
-                errors.add("Entry includes itself");
+                errors.add("Entry includes itself.");
                 return;
             }
         }
