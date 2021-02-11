@@ -203,23 +203,20 @@ public class PlantDescriptionTracker {
 
     /**
      *
-     * @param entryId ID of a Plant Description Entry.
+     * @param entry A Plant Description Entry.
      * @return A list of all systems in the specified entry, as well as all
      *         systems in its chain of included entries.
      */
-    public List<PdeSystem> getAllSystems(int entryId) {
-        List<PdeSystem> systems = new ArrayList<>();
-        final var entry = get(entryId);
+    public List<PdeSystem> getAllSystems(PlantDescriptionEntry entry) {
+        Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
-        if (entry == null) {
-            throw new IllegalArgumentException("Plant Description with ID "
-                + entryId + " is not present in the Plant Description Tracker.");
-        }
+        List<PdeSystem> systems = new ArrayList<>();
 
         systems.addAll(entry.systems());
 
         for (int i : entry.include()) {
-            systems.addAll(getAllSystems(i));
+            final var includedEntry = get(i);
+            systems.addAll(getAllSystems(includedEntry));
         }
 
         return systems;
@@ -255,7 +252,9 @@ public class PlantDescriptionTracker {
      *         among the systems of the entry or its chain of included systems.
      */
 	public String getServiceDefinition(int entryId, String portName) {
-        List<PdeSystem> systems = getAllSystems(entryId);
+        // TODO: Accept entry instead of ID.
+        final var entry = get(entryId);
+        List<PdeSystem> systems = getAllSystems(entry);
         for (var system : systems) {
             for (var port : system.ports()) {
                 if (portName.equals(port.portName())) {

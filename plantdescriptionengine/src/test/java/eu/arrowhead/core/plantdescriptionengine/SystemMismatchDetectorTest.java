@@ -53,7 +53,6 @@ public class SystemMismatchDetectorTest {
         return new PdeSystemBuilder()
             .systemId(id)
             .systemName(name)
-            .ports(new ArrayList<>())
             .build();
     }
 
@@ -64,9 +63,7 @@ public class SystemMismatchDetectorTest {
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
-            .include(new ArrayList<>())
             .systems(List.of(system))
-            .connections(new ArrayList<>())
             .createdAt(Instant.now())
             .updatedAt(Instant.now())
             .build();
@@ -170,9 +167,7 @@ public class SystemMismatchDetectorTest {
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
-            .include(new ArrayList<>())
             .systems(List.of(systemA, systemB))
-            .connections(new ArrayList<>())
             .createdAt(Instant.now())
             .updatedAt(Instant.now())
             .build();
@@ -288,9 +283,7 @@ public class SystemMismatchDetectorTest {
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
-            .include(new ArrayList<>())
             .systems(List.of(getSystem(systemNameA, "a"), getSystem(systemNameB, "b")))
-            .connections(new ArrayList<>())
             .createdAt(Instant.now())
             .updatedAt(Instant.now())
             .build();

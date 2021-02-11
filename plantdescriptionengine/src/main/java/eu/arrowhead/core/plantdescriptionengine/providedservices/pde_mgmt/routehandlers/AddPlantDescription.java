@@ -24,7 +24,7 @@ import se.arkalix.util.concurrent.Future;
 public class AddPlantDescription implements HttpRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(AddPlantDescription.class);
 
-    private final PlantDescriptionTracker PdTracker;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Class constructor
@@ -33,7 +33,7 @@ public class AddPlantDescription implements HttpRouteHandler {
      */
     public AddPlantDescription(PlantDescriptionTracker pdTracker) {
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
-        this.PdTracker = pdTracker;
+        this.pdTracker = pdTracker;
     }
 
     /**
@@ -47,8 +47,8 @@ public class AddPlantDescription implements HttpRouteHandler {
     public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
-            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, PdTracker.getUniqueId());
-            final var validator = new PlantDescriptionValidator(entry);
+            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());
+            final var validator = new PlantDescriptionValidator(entry, pdTracker);
             if (validator.hasError()) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
@@ -56,7 +56,7 @@ public class AddPlantDescription implements HttpRouteHandler {
             }
 
             try {
-                PdTracker.put(entry);
+                pdTracker.put(entry);
             } catch (final PdStoreException e) {
                 logger.error("Failure when communicating with backing store.", e);
                 return response.status(HttpStatus.INTERNAL_SERVER_ERROR);

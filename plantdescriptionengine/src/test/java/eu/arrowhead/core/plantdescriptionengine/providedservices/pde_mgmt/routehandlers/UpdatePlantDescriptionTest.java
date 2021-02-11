@@ -127,7 +127,7 @@ public class UpdatePlantDescriptionTest {
     }
 
     @Test
-    public void shouldRequireUniquePortnames() throws PdStoreException {
+    public void shouldReportInvalidDescription() throws PdStoreException {
         final int entryId = 1;
         final String systemId = "system_a";
         final String portName = "port_a";

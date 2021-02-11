@@ -134,7 +134,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
         if (activeEntry == null) {
             pdSystems = new ArrayList<>();
         } else {
-            pdSystems = pdTracker.getAllSystems(activeEntry.id());
+            pdSystems = pdTracker.getAllSystems(activeEntry);
         }
 
         clearAlarms(registeredSystems, pdSystems);

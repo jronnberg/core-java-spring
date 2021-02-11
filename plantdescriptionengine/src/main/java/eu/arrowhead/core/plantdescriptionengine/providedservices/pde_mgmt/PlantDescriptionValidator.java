@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 
@@ -16,29 +18,90 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 public class PlantDescriptionValidator {
 
     private final List<String> errors = new ArrayList<>();
+    private final PlantDescriptionEntry entry;
+    private final PlantDescriptionTracker pdTracker;
 
     /**
      * Constructor.
      *
      * @param entry A Plant Description Entry to be validated.
      */
-    public PlantDescriptionValidator(PlantDescriptionEntry entry) {
+    public PlantDescriptionValidator(PlantDescriptionEntry entry, PlantDescriptionTracker pdTracker) {
 
-        validateConnections(entry);
+        Objects.requireNonNull(entry, "Expected Plant Description Entry");
+        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
+
+        this.entry = entry;
+        this.pdTracker = pdTracker;
+
+        validateInclusions();
+        validateConnections();
 
         for (var system : entry.systems()) { // TODO: Validate inclusions
             ensureUniquePorts(system);
         }
     }
 
+    private void validateInclusions() {
+        checkSelfReferencing();
+        ensureInclusionsExist();
+        checkForDuplicateInclusions();
+    }
+
+    /**
+     * If the entry lists its own ID in its include list, this is reported as an
+     * error.
+     */
+    private void checkSelfReferencing() {
+        for (int id : entry.include()) {
+            if (id == entry.id()) {
+                errors.add("Entry includes itself");
+                return;
+            }
+        }
+    }
+
+    /**
+     * If any of the Plant Description ID:s in the entry's include list is not
+     * present in the Plant Description Tracker, this is reported as an error.
+     */
+    private void ensureInclusionsExist() {
+        for (int id : entry.include()) {
+            if (pdTracker.get(id) == null) {
+                errors.add("Included entry '" + id + "' does not exist.");
+            }
+        }
+    }
+
+    private void checkForDuplicateInclusions() {
+
+        final List<Integer> includes = entry.include();
+
+        // Check for duplicates
+        HashSet<Integer> uniqueIds = new HashSet<>();
+        HashSet<Integer> duplicates = new HashSet<>();
+
+        for (int id : includes) {
+            if (uniqueIds.add(id) == false) {
+                duplicates.add(id);
+            }
+       }
+
+       for (int id : duplicates) {
+            errors.add("Entry with ID '" + id + "' is included more than once.");
+       }
+
+    }
+
     /**
      * Validates the connections of a Plant Description Entry.
-     * @param entry Entry whose connections are to be validated.
      */
-    private void validateConnections(PlantDescriptionEntry entry) {
+    private void validateConnections() {
 
         boolean producerFound = false;
         boolean consumerFound = false;
+
+        final var systems = pdTracker.getAllSystems(entry);
 
         for (var connection : entry.connections()) { // TODO: Validate inclusions
             final var producer = connection.producer();
@@ -47,7 +110,7 @@ public class PlantDescriptionValidator {
             final String producerId = producer.systemId();
             final String consumerId = consumer.systemId();
 
-            for (var system : entry.systems()) { // TODO: Validate inclusions
+            for (var system : systems) {
 
                 if (producerId.equals(system.systemId())) {
                     producerFound = true;

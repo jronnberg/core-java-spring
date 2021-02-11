@@ -60,7 +60,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 }
 
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
-                final var validator = new PlantDescriptionValidator(entry);
+                final var validator = new PlantDescriptionValidator(entry, pdTracker);
                 if (validator.hasError()) {
                     return response
                         .status(HttpStatus.BAD_REQUEST)
