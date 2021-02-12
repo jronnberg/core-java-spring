@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -611,7 +612,7 @@ public class PlantDescriptionValidatorTest {
 
         final var entryC = new PlantDescriptionEntryBuilder()
             .id(entryIdC)
-            .plantDescription("Plant Description B")
+            .plantDescription("Plant Description C")
             .createdAt(now)
             .updatedAt(now)
             .active(false)
@@ -671,6 +672,59 @@ public class PlantDescriptionValidatorTest {
         String expectedErrorMessage = "<Included entry '" + nonExistentA +
             "' does not exist.>, "
             + "<Included entry '" + nonExistentB + "' does not exist.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldReportIncludeCycles() throws PdStoreException {
+
+        int entryIdA = 0;
+        int entryIdB = 1;
+        int entryIdC = 2;
+        int entryIdD = 3;
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .build();
+
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("Plant Description B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .build();
+
+        final var entryC = new PlantDescriptionEntryBuilder()
+            .id(entryIdC)
+            .plantDescription("Plant Description C")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(entryIdA, entryIdB))
+            .build();
+
+        final var entryD = new PlantDescriptionEntryBuilder()
+            .id(entryIdD)
+            .plantDescription("Plant Description C")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(entryIdB, entryIdC))
+            .build();
+
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+        pdTracker.put(entryC);
+
+        final var validator = new PlantDescriptionValidator(entryD, pdTracker);
+        assertTrue(validator.hasError());
+
+        String expectedErrorMessage = "<Include cycle.>";
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 

@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,10 +51,37 @@ public class PlantDescriptionValidator {
             return;
         }
 
+        checkInclusionCycles(entry);
+        if (hasError()) {
+            return;
+        }
+
         validateConnections();
 
         for (var system : entry.systems()) { // TODO: Validate inclusions
             ensureUniquePorts(system);
+        }
+    }
+
+    /**
+     * Any inclusion cycles originating from the given entry is reported.
+     *
+     * @param entry A Plant Description Entry.
+     */
+    private void checkInclusionCycles(PlantDescriptionEntry entry) {
+        var visitedEntries = new HashSet<Integer>();
+        var queue = new LinkedList<PlantDescriptionEntry>();
+
+        queue.add(entry);
+        while (queue.size() > 0) {
+            entry = queue.pop();
+            if (visitedEntries.add(entry.id()) == false) {
+                // This entry has already been visited.
+                errors.add("Include cycle.");
+            }
+            for (var included : entry.include()) {
+                queue.add(pdTracker.get(included));
+            }
         }
     }
 
