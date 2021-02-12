@@ -1,16 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
@@ -21,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,15 +25,6 @@ import java.util.Map;
 public class PlantDescriptionValidatorTest {
 
     final Instant now = Instant.now();
-
-    PdStore store;
-    PlantDescriptionTracker pdTracker;
-
-    @BeforeEach
-    public void initEach() throws PdStoreException {
-        store = new InMemoryPdStore();
-        pdTracker = new PlantDescriptionTracker(store);
-    }
 
     @Test
     public void shouldNotReportErrors() throws PdStoreException {
@@ -139,10 +126,11 @@ public class PlantDescriptionValidatorTest {
             .connections(connectionsB)
             .build();
 
-        pdTracker.put(entryA);
-        pdTracker.put(entryB);
-
-        final var validator = new PlantDescriptionValidator(entryB, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entryIdA, entryA,
+            entryIdB, entryB
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         System.out.println(validator.getErrorMessage());
         assertFalse(validator.hasError());
     }
@@ -181,7 +169,10 @@ public class PlantDescriptionValidatorTest {
             .systems(List.of(consumerSystem))
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<Duplicate port name '" +
@@ -257,7 +248,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<" + consumerId + " has multiple ports with service definition '" +
@@ -323,7 +317,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<Connection refers to the missing producer port '" +
@@ -379,6 +376,7 @@ public class PlantDescriptionValidatorTest {
                     .build())
                 .build()
         );
+
         final var entry = new PlantDescriptionEntryBuilder()
             .id(89)
             .plantDescription("Plant Description 1A")
@@ -389,7 +387,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<Connection refers to the missing consumer port '" +
@@ -455,7 +456,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<A connection refers to the missing system '" + missingId + "'>";
@@ -520,7 +524,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<A connection refers to the missing system '" + missingId + "'>";
@@ -579,7 +586,10 @@ public class PlantDescriptionValidatorTest {
             .updatedAt(now)
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<" + consumerId +
@@ -619,10 +629,13 @@ public class PlantDescriptionValidatorTest {
             .include(List.of(entryIdA, entryIdA, entryIdB, entryIdB))
             .build();
 
-        pdTracker.put(entryA);
-        pdTracker.put(entryB);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entryIdA, entryA,
+            entryIdB, entryB,
+            entryIdC, entryC
+        );
+        final var validator = new PlantDescriptionValidator(entries);
 
-        final var validator = new PlantDescriptionValidator(entryC, pdTracker);
         assertTrue(validator.hasError());
 
         String expectedErrorMessage = "<Entry with ID '" + entryIdA + "' is included more than once.>, "
@@ -645,7 +658,10 @@ public class PlantDescriptionValidatorTest {
             .include(List.of(entryId))
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entryId, entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
 
         assertTrue(validator.hasError());
         assertEquals("<Entry includes itself.>", validator.getErrorMessage());
@@ -666,7 +682,10 @@ public class PlantDescriptionValidatorTest {
             .include(List.of(nonExistentA, nonExistentB))
             .build();
 
-        final var validator = new PlantDescriptionValidator(entry, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entry.id(), entry
+        );
+        final var validator = new PlantDescriptionValidator(entries);
 
         assertTrue(validator.hasError());
         String expectedErrorMessage = "<Included entry '" + nonExistentA +
@@ -717,14 +736,16 @@ public class PlantDescriptionValidatorTest {
             .include(List.of(entryIdB, entryIdC))
             .build();
 
-        pdTracker.put(entryA);
-        pdTracker.put(entryB);
-        pdTracker.put(entryC);
-
-        final var validator = new PlantDescriptionValidator(entryD, pdTracker);
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(
+            entryIdA, entryA,
+            entryIdB, entryB,
+            entryIdC, entryC,
+            entryIdD, entryD
+        );
+        final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
 
-        String expectedErrorMessage = "<Include cycle.>";
+        String expectedErrorMessage = "<Contains cycle.>";
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 

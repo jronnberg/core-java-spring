@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -132,6 +133,13 @@ public class PlantDescriptionTracker {
      */
     public List<PlantDescriptionEntryDto> getEntries() {
         return new ArrayList<>(entries.values());
+    }
+
+    /**
+     * @return An object mapping entry ID:s to entries.
+     */
+    public Map<Integer, PlantDescriptionEntry> getEntryMap() {
+        return new HashMap<Integer, PlantDescriptionEntry>(entries);
     }
 
     /**

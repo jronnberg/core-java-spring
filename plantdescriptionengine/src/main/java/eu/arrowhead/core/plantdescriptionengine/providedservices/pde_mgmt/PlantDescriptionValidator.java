@@ -6,10 +6,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 
@@ -19,21 +18,16 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 public class PlantDescriptionValidator {
 
     private final List<String> errors = new ArrayList<>();
-    private final PlantDescriptionEntry entry;
-    private final PlantDescriptionTracker pdTracker;
+    final Map<Integer, PlantDescriptionEntry> entries;
 
     /**
      * Constructor.
      *
-     * @param entry A Plant Description Entry to be validated.
+     * @param entries Object mapping ID:s to Plant Description Entries.
      */
-    public PlantDescriptionValidator(PlantDescriptionEntry entry, PlantDescriptionTracker pdTracker) {
+    public PlantDescriptionValidator(Map<Integer, PlantDescriptionEntry> entries) {
 
-        Objects.requireNonNull(entry, "Expected Plant Description Entry");
-        Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
-
-        this.entry = entry;
-        this.pdTracker = pdTracker;
+        this.entries = entries;
 
         checkSelfReferencing();
         if (hasError()) {
@@ -51,16 +45,14 @@ public class PlantDescriptionValidator {
             return;
         }
 
-        checkInclusionCycles(entry);
+        checkInclusionCycles();
         if (hasError()) {
             return;
         }
 
         validateConnections();
 
-        for (var system : entry.systems()) { // TODO: Validate inclusions
-            ensureUniquePorts(system);
-        }
+       ensureUniquePorts();
     }
 
     /**
@@ -68,7 +60,17 @@ public class PlantDescriptionValidator {
      *
      * @param entry A Plant Description Entry.
      */
-    private void checkInclusionCycles(PlantDescriptionEntry entry) {
+    private void checkInclusionCycles() {
+        for (var entry : entries.values()) {
+            if (cycleOriginatesAtEntry(entry)) {
+                errors.add("Contains cycle.");
+                return;
+            }
+        }
+    }
+
+    private boolean cycleOriginatesAtEntry(PlantDescriptionEntry entry) {
+
         var visitedEntries = new HashSet<Integer>();
         var queue = new LinkedList<PlantDescriptionEntry>();
 
@@ -76,58 +78,62 @@ public class PlantDescriptionValidator {
         while (queue.size() > 0) {
             entry = queue.pop();
             if (visitedEntries.add(entry.id()) == false) {
-                // This entry has already been visited.
-                errors.add("Include cycle.");
+                return true;
             }
             for (var included : entry.include()) {
-                queue.add(pdTracker.get(included));
+                queue.add(entries.get(included));
             }
         }
+        return false;
     }
 
     /**
-     * If the entry lists its own ID in its include list, this is reported as an
+     * If any entry lists its own ID in its include list, this is reported as an
      * error.
      */
     private void checkSelfReferencing() {
-        for (int id : entry.include()) {
-            if (id == entry.id()) {
-                errors.add("Entry includes itself.");
-                return;
+        for (var entry : entries.values()) {
+            for (int id : entry.include()) {
+                if (id == entry.id()) {
+                    errors.add("Entry includes itself.");
+                    return;
+                }
             }
         }
     }
 
     /**
-     * If any of the Plant Description ID:s in the entry's include list is not
+     * If any of the Plant Description ID:s in the entries' include lists is not
      * present in the Plant Description Tracker, this is reported as an error.
      */
     private void ensureInclusionsExist() {
-        for (int id : entry.include()) {
-            if (pdTracker.get(id) == null) {
-                errors.add("Included entry '" + id + "' does not exist.");
+        for (var entry : entries.values()) {
+            for (int id : entry.include()) {
+                if (!entries.containsKey(id)) {
+                    errors.add("Included entry '" + id + "' does not exist.");
+                }
             }
         }
     }
 
     private void checkForDuplicateInclusions() {
+        for (var entry : entries.values()) {
+            final List<Integer> includes = entry.include();
 
-        final List<Integer> includes = entry.include();
+            // Check for duplicates
+            HashSet<Integer> uniqueIds = new HashSet<>();
+            HashSet<Integer> duplicates = new HashSet<>();
 
-        // Check for duplicates
-        HashSet<Integer> uniqueIds = new HashSet<>();
-        HashSet<Integer> duplicates = new HashSet<>();
-
-        for (int id : includes) {
-            if (uniqueIds.add(id) == false) {
-                duplicates.add(id);
+            for (int id : includes) {
+                if (uniqueIds.add(id) == false) {
+                    duplicates.add(id);
+                }
             }
-       }
 
-       for (int id : duplicates) {
-            errors.add("Entry with ID '" + id + "' is included more than once.");
-       }
-
+            for (int id : duplicates) {
+                    errors.add("Entry with ID '" + id + "' is included more than once.");
+            }
+        }
     }
 
     /**
@@ -138,9 +144,15 @@ public class PlantDescriptionValidator {
         boolean producerFound = false;
         boolean consumerFound = false;
 
-        final var systems = pdTracker.getAllSystems(entry);
+        final var systems = new ArrayList<PdeSystem>();
+        final var connections = new ArrayList<Connection>();
 
-        for (var connection : entry.connections()) { // TODO: Validate inclusions
+        for (var entry : entries.values()) {
+            systems.addAll(entry.systems());
+            connections.addAll(entry.connections());
+        }
+
+        for (var connection : connections) {
             final var producer = connection.producer();
             final var consumer = connection.consumer();
 
@@ -172,11 +184,22 @@ public class PlantDescriptionValidator {
     }
 
     /**
+     * Ensures that all entries' systems ports are unique.
+     */
+    private void ensureUniquePorts() {
+        for (var entry : entries.values()) {
+            for (var system : entry.systems()) {
+                ensureUniquePorts(system);
+            }
+        }
+    }
+
+    /**
      * Ensures that the given system's ports are all unique.
      *
      * The PDE must be able to differentiate between the ports of a system. When
-     * multiple ports share the same serviceDefinition, they must have different
-     * metadata. This method ensures that this property holds.
+     * multiple ports share the same service definition, they must have
+     * different metadata. This method ensures that this property holds.
      *
      * TODO: Check that metadata is unique
      *

@@ -69,8 +69,9 @@ public class UpdatePlantDescription implements HttpRouteHandler {
                 }
 
                 final PlantDescriptionEntryDto updatedEntry = PlantDescriptionEntry.update(entry, newFields);
-
-                final var validator = new PlantDescriptionValidator(updatedEntry, pdTracker);
+                final var entries = pdTracker.getEntryMap();
+                entries.put(id, updatedEntry);
+                final var validator = new PlantDescriptionValidator(entries);
                 if (validator.hasError()) {
                     return response
                         .status(HttpStatus.BAD_REQUEST)

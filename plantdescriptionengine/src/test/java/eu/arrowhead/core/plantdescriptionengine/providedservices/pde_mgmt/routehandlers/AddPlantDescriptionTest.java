@@ -132,7 +132,7 @@ public class AddPlantDescriptionTest {
                 .consumer(true)
                 .build(),
             new PortBuilder()
-                .portName(portName)
+                .portName(portName) // Duplicate port name, should be reported!
                 .serviceDefinition("service_b")
                 .consumer(true)
                 .build()
