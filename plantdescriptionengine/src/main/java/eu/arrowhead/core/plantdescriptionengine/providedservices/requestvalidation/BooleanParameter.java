@@ -23,7 +23,6 @@ public class BooleanParameter extends QueryParameter {
     }
 
     /**
-     *
      * @param value A default value for the parameter.
      * @return This instance.
      */

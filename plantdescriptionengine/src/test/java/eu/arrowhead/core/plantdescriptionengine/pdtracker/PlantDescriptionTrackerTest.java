@@ -476,12 +476,12 @@ public class PlantDescriptionTrackerTest {
 
         // First entry
         int entryIdA = 0;
-        String consumerIdA  = "Cons-A";
-        String consumerNameA  = "Consumer A";
-        String producerNameA  = "Producer A";
+        String consumerIdA = "Cons-A";
+        String consumerNameA = "Consumer A";
+        String producerNameA = "Producer A";
         String consumerPortA = "Cons-Port-A";
         String producerPortA = "Prod-Port-A";
-        String producerIdA  = "Prod-A";
+        String producerIdA = "Prod-A";
 
         final List<PortDto> consumerPortsA = List.of(
             new PortBuilder()
@@ -510,15 +510,15 @@ public class PlantDescriptionTrackerTest {
             .build();
 
         final List<ConnectionDto> connectionsA = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder()
-                    .systemId(consumerIdA)
-                    .portName(consumerPortA)
-                    .build())
-                .producer(new SystemPortBuilder()
-                    .systemId(producerIdA)
-                    .portName(producerPortA)
-                    .build())
-                .build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerIdA)
+                .portName(consumerPortA)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerIdA)
+                .portName(producerPortA)
+                .build())
+            .build());
 
         final var entryA = new PlantDescriptionEntryBuilder()
             .id(entryIdA)
@@ -532,8 +532,8 @@ public class PlantDescriptionTrackerTest {
 
         // Second entry
         int entryIdB = 1;
-        String consumerIdB  = "Cons-B";
-        String consumerNameB  = "Consumer B";
+        String consumerIdB = "Cons-B";
+        String consumerNameB = "Consumer B";
         String consumerPortB = "Cons-Port-B";
 
         final List<PortDto> consumerPortsB = List.of(
@@ -550,15 +550,15 @@ public class PlantDescriptionTrackerTest {
             .build();
 
         final List<ConnectionDto> connectionsB = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder()
-                    .systemId(consumerIdB)
-                    .portName(consumerPortB)
-                    .build())
-                .producer(new SystemPortBuilder()
-                    .systemId(producerIdA)
-                    .portName(producerPortA)
-                    .build())
-                .build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerIdB)
+                .portName(consumerPortB)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerIdA)
+                .portName(producerPortA)
+                .build())
+            .build());
 
         final var entryB = new PlantDescriptionEntryBuilder()
             .id(entryIdB)
@@ -595,12 +595,12 @@ public class PlantDescriptionTrackerTest {
 
         // First entry
         int entryIdA = 0;
-        String consumerIdA  = "Cons-A";
-        String consumerNameA  = "Consumer A";
-        String producerNameA  = "Producer A";
+        String consumerIdA = "Cons-A";
+        String consumerNameA = "Consumer A";
+        String producerNameA = "Producer A";
         String consumerPortA = "Cons-Port-A";
         String producerPortA = "Prod-Port-A";
-        String producerIdA  = "Prod-A";
+        String producerIdA = "Prod-A";
         String serviceDefinitionA = "SD-A";
 
         final List<PortDto> consumerPortsA = List.of(
@@ -640,8 +640,8 @@ public class PlantDescriptionTrackerTest {
 
         // Second entry
         int entryIdB = 1;
-        String consumerIdB  = "Cons-B";
-        String consumerNameB  = "Consumer B";
+        String consumerIdB = "Cons-B";
+        String consumerNameB = "Consumer B";
         String consumerPortB = "Cons-Port-B";
 
         final List<PortDto> consumerPortsB = List.of(

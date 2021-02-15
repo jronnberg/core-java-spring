@@ -17,12 +17,18 @@ import java.util.Optional;
 @DtoToString
 public interface SrSystem {
 
-	Integer id(); // TODO: Should this be Optional?
+    Integer id(); // TODO: Should this be Optional?
+
     String systemName();
+
     String address();
+
     Integer port();
+
     Optional<String> authenticationInfo(); // TODO: Should this be Optional?
+
     Optional<String> createdAt();
+
     Optional<String> updatedAt();
 
 }

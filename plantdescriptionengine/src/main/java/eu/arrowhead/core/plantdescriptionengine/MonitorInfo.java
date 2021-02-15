@@ -39,7 +39,7 @@ public class MonitorInfo {
 
         /**
          * Returns true if the given arguments match this instances metadata.
-         *
+         * <p>
          * More specifically, returns true if {@code portMetadata} is present,
          * and the union of {@code systemMetadata} and {@code portMetadata} is a
          * superset of this instance's metadata.
@@ -47,11 +47,11 @@ public class MonitorInfo {
          * @param systemMetadata Metadata relating to a particular system
          *                       (read from a system in a Plant Description
          *                       Entry).
-         * @param portMetadata Metadata relating to a particular service
-         *                        (read from one of the ports of a system in a
-         *                        Plant Description Entry).
+         * @param portMetadata   Metadata relating to a particular service
+         *                       (read from one of the ports of a system in a
+         *                       Plant Description Entry).
          */
-		public boolean matchesPortMetadata(
+        public boolean matchesPortMetadata(
             Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> portMetadata
         ) {
             if (!portMetadata.isPresent() || portMetadata.get().size() == 0) {
@@ -64,7 +64,7 @@ public class MonitorInfo {
 
         /**
          * Returns true if the given arguments match this instances metadata.
-         *
+         * <p>
          * More specifically, returns true if {@code systemMetadata} is
          * not present, or is a superset of this instance's metadata.
          *
@@ -72,11 +72,11 @@ public class MonitorInfo {
          *                       (read from a system in a Plant Description
          *                       Entry).
          */
-		public boolean matchesSystemMetadata(Optional<Map<String, String>> systemMetadata) {
+        public boolean matchesSystemMetadata(Optional<Map<String, String>> systemMetadata) {
             if (!systemMetadata.isPresent()) {
                 return true;
             }
-			return Metadata.isSubset(metadata, systemMetadata.get());
+            return Metadata.isSubset(metadata, systemMetadata.get());
         }
 
     }
@@ -140,7 +140,7 @@ public class MonitorInfo {
      * @param metadata   Metadata describing an Arrowhead Framework system, or
      *                   null.
      * @return A list containing all stored monitor data for the system that
-     *         corresponds to the given arguments.
+     * corresponds to the given arguments.
      */
     public List<Bundle> getSystemInfo(String systemName, Map<String, String> metadata) {
         List<Bundle> result = new ArrayList<>();

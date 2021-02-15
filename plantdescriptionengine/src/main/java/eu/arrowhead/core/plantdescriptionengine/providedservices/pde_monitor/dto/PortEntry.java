@@ -19,11 +19,15 @@ import java.util.Optional;
 public interface PortEntry {
 
     String portName();
+
     String serviceDefinition();
+
     Optional<Map<String, String>> metadata();
 
     Optional<JsonObject> systemData();
+
     Optional<String> inventoryId();
+
     Optional<Map<String, String>> inventoryData();
 
     /**

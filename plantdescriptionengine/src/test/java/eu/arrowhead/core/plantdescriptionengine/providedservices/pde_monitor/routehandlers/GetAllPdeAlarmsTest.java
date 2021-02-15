@@ -51,34 +51,34 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(ascRequest, ascResponse)
-            .map(ascendingResult -> {
-                assertEquals(HttpStatus.OK, ascResponse.status().get());
+                .map(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, ascResponse.status().get());
 
-                final var alarms = (PdeAlarmList)ascResponse.body().get();
-                assertEquals(3, alarms.count());
+                    final var alarms = (PdeAlarmList) ascResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() >= previousId);
-                    previousId = alarm.id();
-                }
-                return handler.handle(descRequest, descResponse);
-            })
-            .ifSuccess(descendingResult -> {
-                assertEquals(HttpStatus.OK, descResponse.status().get());
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() >= previousId);
+                        previousId = alarm.id();
+                    }
+                    return handler.handle(descRequest, descResponse);
+                })
+                .ifSuccess(descendingResult -> {
+                    assertEquals(HttpStatus.OK, descResponse.status().get());
 
-                final var alarms = (PdeAlarmList)descResponse.body().get();
-                assertEquals(3, alarms.count());
+                    final var alarms = (PdeAlarmList) descResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() <= previousId);
-                    previousId = alarm.id();
-                }
-            }).onFailure(e -> {
+                    int previousId = alarms.data().get(0).id();
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() <= previousId);
+                        previousId = alarm.id();
+                    }
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -118,35 +118,35 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(ascRequest, ascResponse)
-            .map(ascendingResult -> {
-                assertEquals(HttpStatus.OK, ascResponse.status().get());
+                .map(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, ascResponse.status().get());
 
-                final var alarms = (PdeAlarmList)ascResponse.body().get();
-                assertEquals(3, alarms.count());
+                    final var alarms = (PdeAlarmList) ascResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() >= previousId);
-                    previousId = alarm.id();
-                }
-                return handler.handle(descRequest, descResponse);
-            })
-            .ifSuccess(descendingResult -> {
-                assertEquals(HttpStatus.OK, descResponse.status().get());
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() >= previousId);
+                        previousId = alarm.id();
+                    }
+                    return handler.handle(descRequest, descResponse);
+                })
+                .ifSuccess(descendingResult -> {
+                    assertEquals(HttpStatus.OK, descResponse.status().get());
 
-                final var alarms = (PdeAlarmList)descResponse.body().get();
-                assertEquals(3, alarms.count());
+                    final var alarms = (PdeAlarmList) descResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() <= previousId);
-                    previousId = alarm.id();
-                }
-            }).onFailure(e -> {
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() <= previousId);
+                        previousId = alarm.id();
+                    }
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -168,13 +168,13 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
-                    + nonBoolean + "'.>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(e -> {
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
+                        + nonBoolean + "'.>";
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {
@@ -225,28 +225,28 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(nameRequest, nameResponse)
-            .flatMap(nameResult -> {
-                assertEquals(HttpStatus.OK, nameResponse.status().get());
-                var alarms = (PdeAlarmList)nameResponse.body().get();
-                assertEquals(1, alarms.count());
-                assertEquals(systemNameA, alarms.data().get(0).systemName().get());
-                return handler.handle(ackRequest, ackResponse);
-            })
-            .flatMap(ackResult -> {
-                assertEquals(HttpStatus.OK, ackResponse.status().get());
-                var alarms = (PdeAlarmList)ackResponse.body().get();
-                assertEquals(1, alarms.count());
-                assertEquals(systemNameB, alarms.data().get(0).systemName().get());
-                return handler.handle(severityRequest, severityResponse);
-            }).ifSuccess(severityResult -> {
+                .flatMap(nameResult -> {
+                    assertEquals(HttpStatus.OK, nameResponse.status().get());
+                    var alarms = (PdeAlarmList) nameResponse.body().get();
+                    assertEquals(1, alarms.count());
+                    assertEquals(systemNameA, alarms.data().get(0).systemName().get());
+                    return handler.handle(ackRequest, ackResponse);
+                })
+                .flatMap(ackResult -> {
+                    assertEquals(HttpStatus.OK, ackResponse.status().get());
+                    var alarms = (PdeAlarmList) ackResponse.body().get();
+                    assertEquals(1, alarms.count());
+                    assertEquals(systemNameB, alarms.data().get(0).systemName().get());
+                    return handler.handle(severityRequest, severityResponse);
+                }).ifSuccess(severityResult -> {
                 assertEquals(HttpStatus.OK, severityResponse.status().get());
-                var alarms = (PdeAlarmList)severityResponse.body().get();
+                var alarms = (PdeAlarmList) severityResponse.body().get();
                 assertEquals(1, alarms.count());
                 assertEquals(systemNameC, alarms.data().get(0).systemName().get());
             })
-            .onFailure(e -> {
-                assertNull(e);
-            });
+                .onFailure(e -> {
+                    assertNull(e);
+                });
         } catch (Exception e) {
             assertNull(e);
         }
@@ -280,18 +280,18 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().get());
-                final var alarms = (PdeAlarmList)response.body().get();
-                assertEquals(itemsPerPage, alarms.count());
-                for (int i = 0; i < itemsPerPage; i++) {
-                    int index = page * itemsPerPage + i;
-                    int alarmId = alarms.data().get(i).id();
-                    int expectedId = ids.get(index);
-                    assertEquals(expectedId, alarmId);
-                }
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().get());
+                    final var alarms = (PdeAlarmList) response.body().get();
+                    assertEquals(itemsPerPage, alarms.count());
+                    for (int i = 0; i < itemsPerPage; i++) {
+                        int index = page * itemsPerPage + i;
+                        int alarmId = alarms.data().get(i).id();
+                        int expectedId = ids.get(index);
+                        assertEquals(expectedId, alarmId);
+                    }
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {
@@ -313,12 +313,12 @@ public class GetAllPdeAlarmsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(e -> {
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {

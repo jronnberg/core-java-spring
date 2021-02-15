@@ -43,10 +43,10 @@ public class DtoUtilsTest {
         final List<PortDto> ports = List.of(
             // Port B and C will *not* be complemented by monitor info:
             new PortBuilder()
-            .metadata(Map.of("i", "j")) // Differs from service A
-            .portName("Port-C")
-            .serviceDefinition(serviceDefinition) // Same as service A
-            .build(),
+                .metadata(Map.of("i", "j")) // Differs from service A
+                .portName("Port-C")
+                .serviceDefinition(serviceDefinition) // Same as service A
+                .build(),
             new PortBuilder()
                 .metadata(Map.of("x", "y")) // Differs from service A
                 .portName("Port-B")

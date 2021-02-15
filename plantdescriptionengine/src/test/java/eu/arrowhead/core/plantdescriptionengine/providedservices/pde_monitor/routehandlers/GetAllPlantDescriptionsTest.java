@@ -64,12 +64,12 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().get());
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().get());
 
-                final var entries = (PlantDescriptionEntryList)response.body().get();
-                assertEquals(entryIds.size(), entries.count());
-            }).onFailure(e -> {
+                    final var entries = (PlantDescriptionEntryList) response.body().get();
+                    assertEquals(entryIds.size(), entries.count());
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -122,23 +122,23 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                final var entries = (PlantDescriptionEntryList)response.body().get();
-                final var retrievedEntry = entries.data().get(0);
-                assertEquals(1, retrievedEntry.connections().size());
+                .ifSuccess(result -> {
+                    final var entries = (PlantDescriptionEntryList) response.body().get();
+                    final var retrievedEntry = entries.data().get(0);
+                    assertEquals(1, retrievedEntry.connections().size());
 
-                Connection connection = retrievedEntry.connections().get(0);
+                    Connection connection = retrievedEntry.connections().get(0);
 
-                var consumer = connection.consumer();
-                var producer = connection.producer();
+                    var consumer = connection.consumer();
+                    var producer = connection.producer();
 
-                assertEquals(consumer.systemId(), consumerSystemId);
-                assertEquals(producer.systemId(), producerSystemId);
+                    assertEquals(consumer.systemId(), consumerSystemId);
+                    assertEquals(producer.systemId(), producerSystemId);
 
-                assertEquals(consumer.portName(), consumerPortName);
-                assertEquals(producer.portName(), producerPortName);
+                    assertEquals(consumer.portName(), consumerPortName);
+                    assertEquals(producer.portName(), producerPortName);
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -192,19 +192,19 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                final var entries = (PlantDescriptionEntryList)response.body().get();
-                final var retrievedEntry = entries.data().get(0);
-                final var retrievedSystem = retrievedEntry.systems().get(0);
-                assertEquals(1, retrievedSystem.ports().size());
+                .ifSuccess(result -> {
+                    final var entries = (PlantDescriptionEntryList) response.body().get();
+                    final var retrievedEntry = entries.data().get(0);
+                    final var retrievedSystem = retrievedEntry.systems().get(0);
+                    assertEquals(1, retrievedSystem.ports().size());
 
-                final var retrievedPort = retrievedSystem.ports().get(0);
-                assertEquals(isConsumer, retrievedPort.consumer().get());
-                assertEquals(metadata, retrievedPort.metadata().get());
-                assertEquals(portName, retrievedPort.portName());
-                assertEquals(serviceDefinition, retrievedPort.serviceDefinition());
+                    final var retrievedPort = retrievedSystem.ports().get(0);
+                    assertEquals(isConsumer, retrievedPort.consumer().get());
+                    assertEquals(metadata, retrievedPort.metadata().get());
+                    assertEquals(portName, retrievedPort.portName());
+                    assertEquals(serviceDefinition, retrievedPort.serviceDefinition());
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -258,15 +258,15 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                final var returnedEntries = (PlantDescriptionEntryList)response.body().get();
-                final var returnedEntry = returnedEntries.data().get(0);
-                final var returnedSystem = returnedEntry.systems().get(0);
-                assertTrue(returnedSystem.inventoryId().isPresent());
-                assertTrue(returnedSystem.systemData().isPresent());
-                assertEquals(returnedSystem.inventoryId().get(), inventoryId);
-                assertEquals(returnedSystem.systemData().get(), systemData);
-            }).onFailure(e -> {
+                .ifSuccess(result -> {
+                    final var returnedEntries = (PlantDescriptionEntryList) response.body().get();
+                    final var returnedEntry = returnedEntries.data().get(0);
+                    final var returnedSystem = returnedEntry.systems().get(0);
+                    assertTrue(returnedSystem.inventoryId().isPresent());
+                    assertTrue(returnedSystem.systemData().isPresent());
+                    assertEquals(returnedSystem.inventoryId().get(), inventoryId);
+                    assertEquals(returnedSystem.systemData().get(), systemData);
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -350,55 +350,55 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(idDescendingRequest, response1)
-            .flatMap(result -> {
-                assertTrue(response1.status().isPresent());
-                assertEquals(HttpStatus.OK, response1.status().get());
+                .flatMap(result -> {
+                    assertTrue(response1.status().isPresent());
+                    assertEquals(HttpStatus.OK, response1.status().get());
 
-                assertTrue(response1.body().isPresent());
-                final var entries = (PlantDescriptionEntryList)response1.body().get();
-                assertEquals(numEntries, entries.count());
+                    assertTrue(response1.body().isPresent());
+                    final var entries = (PlantDescriptionEntryList) response1.body().get();
+                    assertEquals(numEntries, entries.count());
 
-                int previousId = entries.data().get(0).id();
-                for (int i = 1; i < entries.count(); i++) {
-                    final var entry = entries.data().get(i);
-                    assertTrue(entry.id() <= previousId);
-                    previousId = entry.id();
-                }
+                    int previousId = entries.data().get(0).id();
+                    for (int i = 1; i < entries.count(); i++) {
+                        final var entry = entries.data().get(i);
+                        assertTrue(entry.id() <= previousId);
+                        previousId = entry.id();
+                    }
 
-                return handler.handle(creationAscendingRequest, response2);
-            })
-            .flatMap(result -> {
-                assertTrue(response2.status().isPresent());
-                assertEquals(HttpStatus.OK, response2.status().get());
+                    return handler.handle(creationAscendingRequest, response2);
+                })
+                .flatMap(result -> {
+                    assertTrue(response2.status().isPresent());
+                    assertEquals(HttpStatus.OK, response2.status().get());
 
-                assertTrue(response2.body().isPresent());
-                final var entries = (PlantDescriptionEntryList)response2.body().get();
-                assertEquals(numEntries, entries.count());
+                    assertTrue(response2.body().isPresent());
+                    final var entries = (PlantDescriptionEntryList) response2.body().get();
+                    assertEquals(numEntries, entries.count());
 
-                Instant previousTimestamp = entries.data().get(0).createdAt();
-                for (int i = 1; i < entries.count(); i++) {
-                    final var entry = entries.data().get(i);
-                    assertTrue(entry.createdAt().compareTo(previousTimestamp) >= 0);
-                    previousTimestamp = entry.createdAt();
-                }
+                    Instant previousTimestamp = entries.data().get(0).createdAt();
+                    for (int i = 1; i < entries.count(); i++) {
+                        final var entry = entries.data().get(i);
+                        assertTrue(entry.createdAt().compareTo(previousTimestamp) >= 0);
+                        previousTimestamp = entry.createdAt();
+                    }
 
-                return handler.handle(updatesDescendingRequest, response3);
-            })
-            .ifSuccess(result -> {
-                assertTrue(response3.status().isPresent());
-                assertEquals(HttpStatus.OK, response3.status().get());
+                    return handler.handle(updatesDescendingRequest, response3);
+                })
+                .ifSuccess(result -> {
+                    assertTrue(response3.status().isPresent());
+                    assertEquals(HttpStatus.OK, response3.status().get());
 
-                assertTrue(response3.body().isPresent());
-                final var entries = (PlantDescriptionEntryList)response3.body().get();
-                assertEquals(numEntries, entries.count());
+                    assertTrue(response3.body().isPresent());
+                    final var entries = (PlantDescriptionEntryList) response3.body().get();
+                    assertEquals(numEntries, entries.count());
 
-                Instant previousTimestamp = entries.data().get(0).updatedAt();
-                for (int i = 1; i < entries.count(); i++) {
-                    final var entry = entries.data().get(i);
-                    assertTrue(entry.updatedAt().compareTo(previousTimestamp) < 0);
-                    previousTimestamp = entry.updatedAt();
-                }
-            }).onFailure(e -> {
+                    Instant previousTimestamp = entries.data().get(0).updatedAt();
+                    for (int i = 1; i < entries.count(); i++) {
+                        final var entry = entries.data().get(i);
+                        assertTrue(entry.updatedAt().compareTo(previousTimestamp) < 0);
+                        previousTimestamp = entry.updatedAt();
+                    }
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -438,13 +438,13 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().get());
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().get());
 
-                final var entries = (PlantDescriptionEntryList)response.body().get();
-                assertEquals(1, entries.count());
-                assertEquals(entries.data().get(0).id(), activeEntryId, 0);
-            }).onFailure(e -> {
+                    final var entries = (PlantDescriptionEntryList) response.body().get();
+                    assertEquals(1, entries.count());
+                    assertEquals(entries.data().get(0).id(), activeEntryId, 0);
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (final Exception e) {
@@ -476,22 +476,22 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().get());
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().get());
 
-                var entries = (PlantDescriptionEntryList)response.body().get();
-                assertEquals(itemsPerPage, entries.count());
+                    var entries = (PlantDescriptionEntryList) response.body().get();
+                    assertEquals(itemsPerPage, entries.count());
 
-                // Sort the entry ID:s, so that their order will match that of
-                // the response data.
-                Collections.sort(entryIds);
+                    // Sort the entry ID:s, so that their order will match that of
+                    // the response data.
+                    Collections.sort(entryIds);
 
-                for (int i = 0; i < itemsPerPage; i++) {
-                    int index = page * itemsPerPage + i;
-                    assertEquals((int)entryIds.get(index), entries.data().get(i).id());
-                }
+                    for (int i = 0; i < itemsPerPage; i++) {
+                        int index = page * itemsPerPage + i;
+                        assertEquals((int) entryIds.get(index), entries.data().get(i).id());
+                    }
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {
@@ -516,14 +516,14 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
 
-                String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
+                    String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {
@@ -547,14 +547,14 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response)
-            .ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
 
-                String expectedErrorMessage = "<Missing parameter 'item_per_page'.>";
-                String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
+                    String expectedErrorMessage = "<Missing parameter 'item_per_page'.>";
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
 
-            }).onFailure(e -> {
+                }).onFailure(e -> {
                 assertNull(e);
             });
         } catch (Exception e) {

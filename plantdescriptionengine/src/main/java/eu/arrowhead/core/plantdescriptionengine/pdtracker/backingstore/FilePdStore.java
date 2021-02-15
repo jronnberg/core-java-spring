@@ -37,7 +37,7 @@ public class FilePdStore implements PdStore {
 
     /**
      * @return The file path to use for reading or writing a Plant Description
-     *         Entry to disk.
+     * Entry to disk.
      */
     private Path getFilePath(final int entryId) {
         return Paths.get(descriptionDirectory, entryId + ".json");
@@ -50,7 +50,7 @@ public class FilePdStore implements PdStore {
     public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
         final File directory = new File(descriptionDirectory);
 
-        if (!directory.exists()){
+        if (!directory.exists()) {
             directory.mkdirs();
         }
 

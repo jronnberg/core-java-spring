@@ -13,6 +13,7 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface Cloud {
-	String operator();
-	String name();
+    String operator();
+
+    String name();
 }

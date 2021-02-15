@@ -14,9 +14,12 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoToString
 public interface ServiceInterface {
 
-	Integer id();
-	String interfaceName();
-	String createdAt();
-	String updatedAt();
+    Integer id();
+
+    String interfaceName();
+
+    String createdAt();
+
+    String updatedAt();
 
 }

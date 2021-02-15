@@ -56,7 +56,7 @@ public class UpdatePlantDescriptionTest {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.OK, response.status().get());
-                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
+                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
                     assertEquals(returnedEntry.plantDescription(), newName);
                     assertEquals(sizeBeforePut, pdTracker.getEntries().size());
                 })
@@ -86,7 +86,7 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
 
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
@@ -115,7 +115,7 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
 
                     String expectedErrorMessage = "Plant Description with ID '" + nonExistentId + "' not found.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
@@ -175,7 +175,7 @@ public class UpdatePlantDescriptionTest {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     String expectedErrorMessage = "<Duplicate port name '" +
                         portName + "' in system '" + systemId + "'>";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {

@@ -30,15 +30,15 @@ public class IntParameter extends QueryParameter {
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
     public IntParameter(String name) {
         super(name);
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
     @Override
     public void parse(HttpServiceRequest request, QueryParamParser parser, boolean required) {
 
@@ -80,8 +80,8 @@ public class IntParameter extends QueryParameter {
      * @param i The minimum allowed value for this parameter.
      * @return This instance.
      */
-	public QueryParameter min(int i) {
+    public QueryParameter min(int i) {
         minValue = i;
-		return this;
-	}
+        return this;
+    }
 }

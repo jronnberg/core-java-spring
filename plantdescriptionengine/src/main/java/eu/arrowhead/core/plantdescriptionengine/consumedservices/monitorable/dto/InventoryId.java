@@ -13,5 +13,5 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface InventoryId {
-	String id();
+    String id();
 }

@@ -17,8 +17,12 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface PlantDescription {
     String plantDescription();
+
     Optional<Boolean> active();
+
     Optional<List<Integer>> include();
+
     List<PdeSystem> systems();
+
     List<Connection> connections();
 }

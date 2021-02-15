@@ -17,11 +17,17 @@ import se.arkalix.dto.json.value.JsonObject;
 public interface SystemEntry {
 
     String systemId();
+
     Optional<String> systemName();
+
     Optional<Map<String, String>> metadata();
+
     List<PortEntry> ports();
+
     Optional<JsonObject> systemData();
+
     Optional<String> inventoryId();
+
     Optional<JsonObject> inventoryData();
 
 }

@@ -41,9 +41,8 @@ public class SystemTracker {
     /**
      * Class constructor
      *
-     * @param httpClient Object for communicating with the Service Registry.
+     * @param httpClient             Object for communicating with the Service Registry.
      * @param serviceRegistryAddress Address of the Service Registry.
-     *
      */
     public SystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
 
@@ -56,7 +55,7 @@ public class SystemTracker {
 
     /**
      * @return A Future which will complete with a list of registered systems.
-     *
+     * <p>
      * The retrieved systems are stored locally, and can be accessed using
      * {@link #getSystems()} or {@link #getSystemByName(String) }.
      */
@@ -89,12 +88,12 @@ public class SystemTracker {
      */
     private void notifyListeners(List<SrSystem> oldSystems, List<SrSystem> newSystems) {
         // Report removed systems
-        for (var oldSystem: oldSystems) {
+        for (var oldSystem : oldSystems) {
             boolean stillPresent = newSystems
                 .stream()
                 .anyMatch(newSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!stillPresent) {
-                for (var listener: listeners) {
+                for (var listener : listeners) {
                     listener.onSystemRemoved(oldSystem);
                 }
             }
@@ -106,7 +105,7 @@ public class SystemTracker {
                 .stream()
                 .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!wasPresent) {
-                for (var listener: listeners) {
+                for (var listener : listeners) {
                     listener.onSystemAdded(newSystem);
                 }
             }
@@ -128,7 +127,6 @@ public class SystemTracker {
      * if the system in question has changed state since the last call to
      * {@link #fetchSystems()}.
      *
-     *
      * @param systemName Name of a system.
      * @return The desired system, if it is present in the local cache.
      */
@@ -147,7 +145,7 @@ public class SystemTracker {
      * Starts polling the Service Registry for registered systems.
      *
      * @return A Future that completes on the first reply from the Service
-     *         Registry.
+     * Registry.
      */
     public Future<Void> start() {
         return fetchSystems().flatMap(result -> {
@@ -156,9 +154,9 @@ public class SystemTracker {
                 @Override
                 public void run() {
                     fetchSystems()
-                    .onFailure(error -> {
-                        logger.error("Failed to retrieve registered systems", error);
-                    });
+                        .onFailure(error -> {
+                            logger.error("Failed to retrieve registered systems", error);
+                        });
                 }
             }, 0, pollInterval);
 

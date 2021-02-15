@@ -14,6 +14,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface ProviderSystem {
     String systemName();
+
     String address();
+
     Integer port();
 }

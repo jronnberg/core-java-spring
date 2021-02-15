@@ -16,9 +16,13 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PlantDescriptionUpdate {
 
     Optional<String> plantDescription();
+
     Optional<Boolean> active();
+
     Optional<List<PdeSystem>> systems();
+
     Optional<List<Connection>> connections();
+
     Optional<List<Integer>> include();
 
 }

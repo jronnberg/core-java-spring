@@ -20,8 +20,11 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PdeSystem {
 
     String systemId();
+
     Optional<String> systemName();
+
     Optional<Map<String, String>> metadata();
+
     List<Port> ports();
 
     /**
@@ -39,8 +42,8 @@ public interface PdeSystem {
 
     /**
      * @return The union of service and port metadata.
-     *         In case of overlaps between the two sets, service metadata has
-     *         precedence.
+     * In case of overlaps between the two sets, service metadata has
+     * precedence.
      */
     default Map<String, String> portMetadata(String portName) {
         Port port = getPort(portName);

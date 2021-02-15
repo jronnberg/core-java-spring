@@ -27,16 +27,16 @@ public class QueryParamParser {
      * The query parameters of the provided request are immediately parsed and
      * validated according to the query parameter requirements specified by the
      * two first arguments.
-     *
+     * <p>
      * All of the parameters specified in {@code required} must be present, and
      * all of their requirements fulfilled, for the request to be considered
      * valid.
-     *
+     * <p>
      * The parameters in {@code accepted} may be left out of the request, but if
      * present, must fulfill their requirements.
-     *
+     * <p>
      * If the parameters are invalid, a {@link #ParseError} is thrown.
-     *
+     * <p>
      * If the parameters are valid, their values will be accessible via the
      * methods {@code getInt}, {@code getBoolean} and {@code getString}.
      *
@@ -73,6 +73,7 @@ public class QueryParamParser {
 
     /**
      * Stores information about a single query parameter requirement violation.
+     *
      * @param error The error to report.
      */
     void report(ParseError error) {
@@ -81,6 +82,7 @@ public class QueryParamParser {
 
     /**
      * Validates and parses the query parameters of the given request.
+     *
      * @param request The request to parse.
      */
     private void parse(HttpServiceRequest request) {
@@ -92,7 +94,7 @@ public class QueryParamParser {
         }
     }
 
-	void putInt(String key, Integer value) {
+    void putInt(String key, Integer value) {
         intValues.put(key, value);
     }
 
@@ -121,14 +123,14 @@ public class QueryParamParser {
 
     /**
      * @return A compound error describing all individual errors that occured
-     *         during parsing.
+     * during parsing.
      */
-	public ParseError getCompoundError() {
+    public ParseError getCompoundError() {
         List<String> errorMessages = new ArrayList<>();
         for (ParseError error : errors) {
             errorMessages.add("<" + error.getMessage() + ">");
         }
         return new ParseError(String.join(", ", errorMessages));
-	}
+    }
 
 }

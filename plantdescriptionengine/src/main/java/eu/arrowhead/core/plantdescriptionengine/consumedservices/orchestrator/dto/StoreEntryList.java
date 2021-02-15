@@ -19,6 +19,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface StoreEntryList {
 
     List<StoreEntry> data();
+
     int count();
 
     public default Set<Integer> getIds() {

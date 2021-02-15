@@ -51,8 +51,8 @@ public class GetPlantDescription implements HttpRouteHandler {
             return Future.success(response
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorMessage.of(idString + " is not a valid Plant Description Entry ID."))
-                );
-            }
+            );
+        }
 
         final PlantDescriptionEntryDto entry = pdTracker.get(id);
 

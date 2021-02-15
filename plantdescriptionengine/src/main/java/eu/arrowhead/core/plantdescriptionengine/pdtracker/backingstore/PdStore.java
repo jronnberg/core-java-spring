@@ -17,12 +17,14 @@ public interface PdStore {
 
     /**
      * Writes a single entry to backing store.
+     *
      * @param entry An entry to store.
      */
     void write(final PlantDescriptionEntryDto entry) throws PdStoreException;
 
     /**
      * Delete the specified entry from the backing store.
+     *
      * @param id ID of the entry to delete.
      */
     void remove(int id) throws PdStoreException;

@@ -15,9 +15,12 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface ServiceDefinition {
-	Optional<Integer> id();
-	String serviceDefinition();
+    Optional<Integer> id();
+
+    String serviceDefinition();
+
     Optional<String> createdAt();
+
     Optional<String> updatedAt();
 
 }

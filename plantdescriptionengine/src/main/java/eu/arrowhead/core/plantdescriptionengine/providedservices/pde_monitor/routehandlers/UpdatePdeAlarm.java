@@ -21,6 +21,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
 
     /**
      * Constructor.
+     *
      * @param alarmManager Object used for managing PDE alarms.
      */
     public UpdatePdeAlarm(AlarmManager alarmManager) {

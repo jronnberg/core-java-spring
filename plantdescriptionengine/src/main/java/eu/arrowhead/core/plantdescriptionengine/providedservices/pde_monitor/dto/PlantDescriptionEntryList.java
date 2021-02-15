@@ -17,5 +17,6 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface PlantDescriptionEntryList {
 
     List<PlantDescriptionEntry> data();
+
     int count();
 }

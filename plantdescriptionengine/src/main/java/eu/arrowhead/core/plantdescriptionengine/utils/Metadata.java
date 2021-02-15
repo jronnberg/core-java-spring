@@ -5,13 +5,14 @@ import java.util.Map;
 
 public class Metadata {
 
-    private Metadata() {}
+    private Metadata() {
+    }
 
     /**
      * Returns
+     *
      * @param a A metadata object.
      * @param b A metadata object.
-     *
      * @return True if a is a subset of b.
      */
     public static boolean isSubset(Map<String, String> a, Map<String, String> b) {
@@ -26,9 +27,8 @@ public class Metadata {
     /**
      * @param a A String to String map (system or port metadata).
      * @param b A String to String map (system or port metadata).
-     *
      * @return The union of maps a and b, where the values in b override the
-     *         values of a in case of collisions.
+     * values of a in case of collisions.
      */
     public static Map<String, String> merge(Map<String, String> a, Map<String, String> b) {
         Map<String, String> result = new HashMap<>();

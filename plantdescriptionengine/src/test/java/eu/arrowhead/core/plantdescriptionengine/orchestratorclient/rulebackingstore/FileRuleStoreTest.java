@@ -35,7 +35,7 @@ public class FileRuleStoreTest {
 
         store.setRules(rules);
 
-        var storedRules =  store.readRules();
+        var storedRules = store.readRules();
         assertEquals(rules, storedRules);
     }
 
@@ -48,7 +48,7 @@ public class FileRuleStoreTest {
         store.setRules(rules);
         store.removeAll();
 
-        var storedRules =  store.readRules();
+        var storedRules = store.readRules();
         assertTrue(storedRules.isEmpty());
     }
 

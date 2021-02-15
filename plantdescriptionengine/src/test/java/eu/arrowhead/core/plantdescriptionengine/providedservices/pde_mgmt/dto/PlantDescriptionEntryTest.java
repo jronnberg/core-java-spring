@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,14 +52,14 @@ public class PlantDescriptionEntryTest {
                 .build()
         );
 
-        final var listA = new ArrayList<PlantDescriptionEntry>(original);
+        final var listA = new ArrayList<>(original);
 
         PlantDescriptionEntry.filterByActive(listA, true);
         assertEquals(2, listA.size());
         assertEquals(2, listA.get(0).id());
         assertEquals(4, listA.get(1).id());
 
-        final var listB = new ArrayList<PlantDescriptionEntry>(original);
+        final var listB = new ArrayList<>(original);
 
         PlantDescriptionEntry.filterByActive(listB, false);
         assertEquals(2, listB.size());
@@ -274,17 +273,17 @@ public class PlantDescriptionEntryTest {
             .build();
 
         final List<ConnectionDto> newConnections = List.of(
-                new ConnectionBuilder()
-                    .consumer(new SystemPortBuilder()
-                        .systemId(consumerId)
-                        .portName(portNameB)
-                        .build())
-                    .producer(new SystemPortBuilder()
-                        .systemId(producerId)
-                        .portName(portNameA)
-                        .build())
-                    .build(),
-                new ConnectionBuilder()
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .systemId(consumerId)
+                    .portName(portNameB)
+                    .build())
+                .producer(new SystemPortBuilder()
+                    .systemId(producerId)
+                    .portName(portNameA)
+                    .build())
+                .build(),
+            new ConnectionBuilder()
                 .consumer(new SystemPortBuilder()
                     .systemId(consumerId)
                     .portName(portNameC)
@@ -294,7 +293,7 @@ public class PlantDescriptionEntryTest {
                     .portName(portNameA)
                     .build())
                 .build()
-            );
+        );
 
         final var newFields = new PlantDescriptionUpdateBuilder()
             .connections(newConnections)
@@ -441,11 +440,12 @@ public class PlantDescriptionEntryTest {
             .updatedAt(now)
             .active(true)
             .build();
+
         List<PlantDescriptionEntry> entries = Arrays.asList(entry);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            PlantDescriptionEntry.sort(entries, "Nonexistent", true);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+            PlantDescriptionEntry.sort(entries, "Nonexistent", true)
+        );
         assertEquals(
             "'Nonexistent' is not a valid sort field for Plant Description Entries.",
             exception.getMessage()

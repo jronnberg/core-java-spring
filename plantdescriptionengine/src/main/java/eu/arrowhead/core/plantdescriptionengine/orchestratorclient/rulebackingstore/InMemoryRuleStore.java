@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Backing store that only stores data in memory.
- *
+ * <p>
  * Created for development purposes, not to be used in production.
  */
 public class InMemoryRuleStore implements RuleStore {

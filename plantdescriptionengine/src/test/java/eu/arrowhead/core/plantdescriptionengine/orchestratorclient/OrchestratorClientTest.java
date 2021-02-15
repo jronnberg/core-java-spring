@@ -94,10 +94,10 @@ public class OrchestratorClientTest {
 
     final List<PortDto> producerPorts = List.of(
         new PortBuilder()
-        .portName(producerPort)
-        .serviceDefinition(serviceDefinitionA)
-        .consumer(false)
-        .build());
+            .portName(producerPort)
+            .serviceDefinition(serviceDefinitionA)
+            .consumer(false)
+            .build());
 
     final PdeSystemDto consumerSystem = new PdeSystemBuilder()
         .systemId(consumerId)
@@ -179,15 +179,15 @@ public class OrchestratorClientTest {
     private PlantDescriptionEntryDto createEntry() {
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder()
-                    .systemId(consumerId)
-                    .portName(consumerPort)
-                    .build())
-                .producer(new SystemPortBuilder()
-                    .systemId(producerId)
-                    .portName(producerPort)
-                    .build())
-                .build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerId)
+                .portName(consumerPort)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerId)
+                .portName(producerPort)
+                .build())
+            .build());
 
         return new PlantDescriptionEntryBuilder()
             .id(0).plantDescription("Plant Description 1A")
@@ -265,10 +265,10 @@ public class OrchestratorClientTest {
 
         final List<PortDto> producerPortsB = List.of(
             new PortBuilder()
-            .portName(producerPortB)
-            .serviceDefinition(serviceDefinitionA)
-            .consumer(false)
-            .build());
+                .portName(producerPortB)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(false)
+                .build());
 
         final PdeSystemDto producerSystemB = new PdeSystemBuilder()
             .systemId(producerIdB)
@@ -358,7 +358,7 @@ public class OrchestratorClientTest {
             .build());
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
-                .thenReturn(Future.success(response));
+            .thenReturn(Future.success(response));
 
         orchestratorClient.onPlantDescriptionAdded(entry);
 
@@ -408,7 +408,7 @@ public class OrchestratorClientTest {
 
     @Test
     public void shouldNotCreateRulesForPdWithoutConnections() throws SSLException, RuleStoreException,
-            PdStoreException {
+        PdStoreException {
 
         final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
             .id(0).plantDescription("Plant Description 1A")
@@ -426,8 +426,8 @@ public class OrchestratorClientTest {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -475,8 +475,8 @@ public class OrchestratorClientTest {
                 assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().get());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -499,11 +499,11 @@ public class OrchestratorClientTest {
             .ifSuccess(result -> {
                 assertTrue(false); // We should never get here.
             }).onFailure(e -> {
-                assertEquals(
-                    errorMessage,
-                    e.getMessage()
-                );
-            });
+            assertEquals(
+                errorMessage,
+                e.getMessage()
+            );
+        });
     }
 
     @Test
@@ -559,8 +559,8 @@ public class OrchestratorClientTest {
                 assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().get());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -606,8 +606,8 @@ public class OrchestratorClientTest {
                 assertEquals(1, ruleStore.readRules().size());
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -623,8 +623,8 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -657,8 +657,8 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionUpdated(deactivatedEntry);
                 assertEquals(0, ruleStore.readRules().size());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -692,8 +692,8 @@ public class OrchestratorClientTest {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -735,8 +735,8 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionUpdated(entry);
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 
     @Test
@@ -757,7 +757,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
-        final MockClientResponse failedDeletionResponse  = new MockClientResponse();
+        final MockClientResponse failedDeletionResponse = new MockClientResponse();
         failedDeletionResponse.status(HttpStatus.INTERNAL_SERVER_ERROR);
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
@@ -773,7 +773,7 @@ public class OrchestratorClientTest {
                 // The rule should not have been removed.
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             }).onFailure(e -> {
-                assertTrue(false); // We should never get here.
-            });
+            assertTrue(false); // We should never get here.
+        });
     }
 }

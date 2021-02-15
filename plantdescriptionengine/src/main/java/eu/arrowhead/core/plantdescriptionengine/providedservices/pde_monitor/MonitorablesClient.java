@@ -33,6 +33,7 @@ public class MonitorablesClient {
 
     /**
      * Constructor.
+     *
      * @param arSystem     An Arrowhead Framework system used interact with the
      *                     orchestrator.
      * @param httpClient   Object for communicating with the other systems.

@@ -16,12 +16,16 @@ import java.util.Optional;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface StoreRule {
-	String serviceDefinitionName();
-	Integer consumerSystemId();
+    String serviceDefinitionName();
+
+    Integer consumerSystemId();
+
     Optional<Map<String, String>> attribute();
 
     ProviderSystem providerSystem();
+
     Cloud cloud();
+
     String serviceInterfaceName();
 
     Integer priority();

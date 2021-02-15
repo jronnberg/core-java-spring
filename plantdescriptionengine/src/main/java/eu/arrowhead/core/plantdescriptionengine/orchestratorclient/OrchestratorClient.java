@@ -58,7 +58,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @throws RuleStoreException
      */
     public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker,
-            PlantDescriptionTracker pdTracker) throws RuleStoreException {
+                              PlantDescriptionTracker pdTracker) throws RuleStoreException {
 
         Objects.requireNonNull(httpClient, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
@@ -80,9 +80,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     /**
      * Initializes the Orchestrator client.
+     *
      * @return A {@code Future} which will complete once Orchestrator rules have
-     *         been created for the connections in the active Plant Description
-     *         entry (if any).
+     * been created for the connections in the active Plant Description
+     * entry (if any).
      */
     public Future<Void> initialize() {
         pdTracker.addListener(this);
@@ -92,10 +93,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return (activeEntry == null)
                 ? Future.done()
                 : postRules().flatMap(createdRules -> {
-                    ruleStore.setRules(createdRules.getIds());
-                    logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
-                    return Future.done();
-                });
+                ruleStore.setRules(createdRules.getIds());
+                logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
+                return Future.done();
+            });
         });
     }
 
@@ -158,7 +159,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     /**
      * Posts Orchestrator rules for the given Plant Description Entry.
-     *
+     * <p>
      * For each connection in the given entry, a corresponding rule is posted to the
      * Orchestrator.
      *
@@ -210,13 +211,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         return client.send(orchestratorAddress, new HttpClientRequest()
             .method(HttpMethod.DELETE)
             .uri("/orchestrator/mgmt/store/" + id))
-        .flatMap(response -> {
-            if (response.status() != HttpStatus.OK) {
-                // TODO: Throw some other type of Exception.
-                return Future.failure(new RuntimeException("Failed to delete store rule with ID " + id));
-            }
-            return Future.done();
-        });
+            .flatMap(response -> {
+                if (response.status() != HttpStatus.OK) {
+                    // TODO: Throw some other type of Exception.
+                    return Future.failure(new RuntimeException("Failed to delete store rule with ID " + id));
+                }
+                return Future.done();
+            });
     }
 
     /**
@@ -255,7 +256,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Logs the fact that the specified entry has been activated.
      *
-     * @param entry A Plant Description Entry.
+     * @param entry    A Plant Description Entry.
      * @param ruleList The list of Orchestrator rules connected to the entry.
      */
     private void logEntryActivated(PlantDescriptionEntry entry, StoreEntryList ruleList) {
@@ -278,7 +279,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     /**
      * Handles an update of a Plant Description Entry.
-     *
+     * <p>
      * Deletes and/or creates rules in the Orchestrator as appropriate.
      *
      * @param entry The updated entry.

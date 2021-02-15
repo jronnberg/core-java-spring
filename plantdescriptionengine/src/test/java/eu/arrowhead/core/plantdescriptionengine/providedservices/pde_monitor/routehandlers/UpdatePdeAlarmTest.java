@@ -45,14 +45,14 @@ public class UpdatePdeAlarmTest {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.OK, response.status().get());
-                    final var updatedAlarm = (PdeAlarm)response.body().get();
+                    final var updatedAlarm = (PdeAlarm) response.body().get();
                     assertTrue(updatedAlarm.acknowledged());
                 }).onFailure(e -> {
-                    assertNull(e);
-                });
-            } catch (final Exception e) {
                 assertNull(e);
-            }
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
     }
 
     @Test
@@ -73,14 +73,14 @@ public class UpdatePdeAlarmTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid PDE Alarm ID.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    assertNull(e);
-                });
-            } catch (final Exception e) {
                 assertNull(e);
-            }
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
     }
 
     @Test
@@ -101,14 +101,14 @@ public class UpdatePdeAlarmTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
                     String expectedErrorMessage = "PDE Alarm with ID '" + nonexistentId + "' not found.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 }).onFailure(e -> {
-                    assertNull(e);
-                });
-            } catch (final Exception e) {
                 assertNull(e);
-            }
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
     }
 
     @Test
@@ -132,13 +132,13 @@ public class UpdatePdeAlarmTest {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.OK, response.status().get());
-                    final var updatedAlarm = (PdeAlarm)response.body().get();
+                    final var updatedAlarm = (PdeAlarm) response.body().get();
                     assertFalse(updatedAlarm.acknowledged());
                 }).onFailure(e -> {
-                    assertNull(e);
-                });
-            } catch (final Exception e) {
                 assertNull(e);
-            }
+            });
+        } catch (final Exception e) {
+            assertNull(e);
+        }
     }
 }

@@ -72,7 +72,7 @@ public class DeletePlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
@@ -100,7 +100,7 @@ public class DeletePlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
                     String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {
@@ -148,9 +148,9 @@ public class DeletePlantDescriptionTest {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                    String expectedErrorMessage = "<Error in include list: Entry '"+ entryIdA
+                    String expectedErrorMessage = "<Error in include list: Entry '" + entryIdA
                         + "' is required by entry '" + entryIdB + "'.>";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {

@@ -13,13 +13,21 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface ProviderCloud {
-	Integer id();
-	String operator();
-	String name();
-	String authenticationInfo();
-	Boolean secure();
-	Boolean neighour();
-	Boolean ownCloud();
+    Integer id();
+
+    String operator();
+
+    String name();
+
+    String authenticationInfo();
+
+    Boolean secure();
+
+    Boolean neighour();
+
+    Boolean ownCloud();
+
     String createdAt();
+
     String updatedAt();
 }

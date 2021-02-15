@@ -16,7 +16,6 @@ public abstract class QueryParameter {
     protected List<QueryParameter> requiredParameters = new ArrayList<>();
 
     /**
-     *
      * @param param A query parameter that must be present if this one is.
      * @return This instance.
      */
@@ -27,6 +26,7 @@ public abstract class QueryParameter {
 
     /**
      * Constructs an instance of this class.
+     *
      * @param name The field name of the query parameter that this instance
      *             refers to.
      */

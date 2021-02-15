@@ -43,17 +43,24 @@ public interface PlantDescriptionEntry {
     };
 
     int id();
+
     String plantDescription();
+
     boolean active();
+
     List<Integer> include();
+
     List<PdeSystem> systems();
+
     List<Connection> connections();
+
     Instant createdAt();
+
     Instant updatedAt();
 
     /**
      * @param description The plant description to base this entry on.
-     * @param id Identifier to be used for the new entry.
+     * @param id          Identifier to be used for the new entry.
      * @return A new plant entry based on the given description.
      */
     static PlantDescriptionEntryDto from(PlantDescriptionDto description, int id) {
@@ -61,11 +68,11 @@ public interface PlantDescriptionEntry {
         List<ConnectionDto> connections = new ArrayList<>();
 
         for (PdeSystem system : description.systems()) {
-            systems.add((PdeSystemDto)system);
+            systems.add((PdeSystemDto) system);
         }
 
         for (Connection connection : description.connections()) {
-            connections.add((ConnectionDto)connection);
+            connections.add((ConnectionDto) connection);
         }
 
         final Instant now = Instant.now();
@@ -91,11 +98,11 @@ public interface PlantDescriptionEntry {
         List<ConnectionDto> connections = new ArrayList<>();
 
         for (PdeSystem system : entry.systems()) {
-            systems.add((PdeSystemDto)system);
+            systems.add((PdeSystemDto) system);
         }
 
         for (Connection connection : entry.connections()) {
-            connections.add((ConnectionDto)connection);
+            connections.add((ConnectionDto) connection);
         }
 
         return new PlantDescriptionEntryBuilder()
@@ -114,7 +121,7 @@ public interface PlantDescriptionEntry {
      * @param oldEntry  Target plant description entry to update.
      * @param newFields A plant description update.
      * @return A copy of the target plant description updated with the fields
-     *         specified in newFields.
+     * specified in newFields.
      */
     static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
 
@@ -131,13 +138,13 @@ public interface PlantDescriptionEntry {
         // before they can be added to the old entry:
         List<PdeSystemDto> systems = new ArrayList<>();
         for (PdeSystem system : newFields.systems().orElse(oldEntry.systems())) {
-            systems.add((PdeSystemDto)system);
+            systems.add((PdeSystemDto) system);
         }
         builder.systems(systems);
 
         List<ConnectionDto> connections = new ArrayList<>();
         for (Connection connection : newFields.connections().orElse(oldEntry.connections())) {
-            connections.add((ConnectionDto)connection);
+            connections.add((ConnectionDto) connection);
         }
         builder.connections(connections);
 
@@ -170,9 +177,10 @@ public interface PlantDescriptionEntry {
 
     /**
      * Filters the given list based on the elements' 'active' values.
-     * @param alarms  A list of Plant Description entries.
-     * @param active  If true, active entries are removed. If false, inactive
-     *                entries are removed.
+     *
+     * @param alarms A list of Plant Description entries.
+     * @param active If true, active entries are removed. If false, inactive
+     *               entries are removed.
      */
     static void filterByActive(List<? extends PlantDescriptionEntry> entries, boolean active) {
         if (active) {
@@ -188,7 +196,7 @@ public interface PlantDescriptionEntry {
      * @param connectionIndex Index of a connection within this instance's
      *                        connection list.
      * @return Service definition name of the *producer* service of the
-     *         specified connection.
+     * specified connection.
      */
     public default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
         final SystemPort producerPort = connections().get(connectionIndex).producer();
@@ -215,12 +223,12 @@ public interface PlantDescriptionEntry {
     /**
      * @param description A Plant Description.
      * @return True if the fields of the given description match those of this
-     *         instance.
+     * instance.
      */
     default boolean matchesDescription(PlantDescription description) {
         return (
             description.plantDescription().equals(plantDescription()) &&
-            (description.active().orElse(false) == active())
+                (description.active().orElse(false) == active())
             // TODO: Check 'include', 'systems' and 'connections' as well.
         );
     }

@@ -39,14 +39,14 @@ public class SystemMismatchDetectorTest {
 
     private SrSystem getSrSystem(String systemName) {
         return new SrSystemBuilder()
-        .id(0)
-        .systemName(systemName)
-        .address("0.0.0.0")
-        .port(5000)
-        .authenticationInfo(null)
-        .createdAt(Instant.now().toString())
-        .updatedAt(Instant.now().toString())
-        .build();
+            .id(0)
+            .systemName(systemName)
+            .address("0.0.0.0")
+            .port(5000)
+            .authenticationInfo(null)
+            .createdAt(Instant.now().toString())
+            .updatedAt(Instant.now().toString())
+            .build();
     }
 
     private PdeSystemDto getSystem(String name, String id) {
@@ -106,7 +106,7 @@ public class SystemMismatchDetectorTest {
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
         assertEquals(
-            "System named '" + systemName +  "' cannot be found in the Service Registry.",
+            "System named '" + systemName + "' cannot be found in the Service Registry.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -147,7 +147,7 @@ public class SystemMismatchDetectorTest {
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
         assertEquals(
-            "System named '" + systemNameB +  "' is not present in the active Plant Description.",
+            "System named '" + systemNameB + "' is not present in the active Plant Description.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -189,7 +189,7 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals(
-            "System named '" + systemNameB +  "' cannot be found in the Service Registry.",
+            "System named '" + systemNameB + "' cannot be found in the Service Registry.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -212,7 +212,7 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals(
-            "System named '" + systemName +  "' cannot be found in the Service Registry.",
+            "System named '" + systemName + "' cannot be found in the Service Registry.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -235,7 +235,7 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals(
-            "System named '" + systemName +  "' is not present in the active Plant Description.",
+            "System named '" + systemName + "' is not present in the active Plant Description.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -258,7 +258,7 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals(
-            "System named '" + systemName +  "' is not present in the active Plant Description.",
+            "System named '" + systemName + "' is not present in the active Plant Description.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());
@@ -298,7 +298,7 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals(
-            "System named '" + systemNameA +  "' is not present in the active Plant Description.",
+            "System named '" + systemNameA + "' is not present in the active Plant Description.",
             alarm.description()
         );
         assertEquals(false, alarm.acknowledged());

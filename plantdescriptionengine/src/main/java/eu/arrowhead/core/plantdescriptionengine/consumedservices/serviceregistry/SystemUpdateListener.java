@@ -4,5 +4,6 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry
 
 public interface SystemUpdateListener {
     void onSystemAdded(SrSystem system);
+
     void onSystemRemoved(SrSystem system);
 }

@@ -39,7 +39,7 @@ public class FilePdStoreTest {
     @Test
     public void ShouldReadWithoutEntries() throws PdStoreException {
         final PdStore store = new FilePdStore(entryDirectory);
-        var storedEntries =  store.readEntries();
+        var storedEntries = store.readEntries();
         assertTrue(storedEntries.isEmpty());
     }
 
@@ -52,7 +52,7 @@ public class FilePdStoreTest {
             store.write(TestUtils.createEntry(id));
         }
 
-        var storedEntries =  store.readEntries();
+        var storedEntries = store.readEntries();
         assertEquals(storedEntries.size(), entryIds.size());
 
         for (final var entry : storedEntries) {

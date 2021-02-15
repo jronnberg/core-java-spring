@@ -14,6 +14,8 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoWritableAs(JSON)
 public interface AutoCompleteData {
     List<ServiceInterface> interfaceList();
+
     List<ServiceDefinition> serviceList();
+
     List<SrSystem> systemList();
 }

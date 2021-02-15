@@ -31,7 +31,7 @@ public class MockSystemTracker extends SystemTracker {
      */
     public void addSystem(SrSystem system) {
         systems.put(system.systemName(), system);
-        for (var listener: listeners) {
+        for (var listener : listeners) {
             listener.onSystemAdded(system);
         }
     }
@@ -46,7 +46,7 @@ public class MockSystemTracker extends SystemTracker {
         if (system == null) {
             throw new IllegalArgumentException("System '" + systemName + "' is not present in the System Tracker.");
         }
-        for (var listener: listeners) {
+        for (var listener : listeners) {
             listener.onSystemRemoved(system);
         }
     }

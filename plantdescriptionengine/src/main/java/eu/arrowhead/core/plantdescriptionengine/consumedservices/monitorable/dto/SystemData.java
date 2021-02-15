@@ -14,5 +14,5 @@ import se.arkalix.dto.json.value.JsonObject;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface SystemData {
-	JsonObject data();
+    JsonObject data();
 }

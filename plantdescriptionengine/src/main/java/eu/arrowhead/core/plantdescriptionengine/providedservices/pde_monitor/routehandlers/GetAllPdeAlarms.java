@@ -36,6 +36,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
 
     /**
      * Constructor.
+     *
      * @param alarmManager Object used for managing PDE alarms.
      */
     public GetAllPdeAlarms(AlarmManager alarmManager) {
@@ -46,7 +47,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
     /**
      * Handles an HTTP call to acquire a list of PDE alarms raised by the PDE.
      *
-     * @param request HTTP request object.
+     * @param request  HTTP request object.
      * @param response HTTP response containing an alarm list.
      */
     @Override
@@ -76,15 +77,15 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             new StringParameter("severity")
                 .legalValues(severityValues),
             new BooleanParameter("acknowledged")
-       );
+        );
 
-       QueryParamParser parser;
+        QueryParamParser parser;
 
         try {
             parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
-        } catch(ParseError error) {
+        } catch (ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
-                 error.getMessage());
+                error.getMessage());
             return Future.success(response
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorMessage.of(error.getMessage()))

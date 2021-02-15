@@ -17,6 +17,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface ServiceRegistryEntryList {
 
     List<ServiceRegistryEntry> data();
+
     int count();
 
 }

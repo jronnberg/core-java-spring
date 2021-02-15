@@ -16,5 +16,6 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface Connection {
 
     SystemPort consumer();
+
     SystemPort producer();
 }

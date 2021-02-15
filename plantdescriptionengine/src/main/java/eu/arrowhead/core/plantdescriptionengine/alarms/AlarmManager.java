@@ -17,21 +17,21 @@ public class AlarmManager {
     /**
      * @param id The ID of a PDE Alarm.
      * @return Data describing the alarm with the given ID if it exists, null
-     *         otherwise.
+     * otherwise.
      */
     private Alarm getAlarmData(int id) {
-		for (final var alarm : activeAlarms) {
+        for (final var alarm : activeAlarms) {
             if (alarm.id == id) {
                 return alarm;
             }
         }
         return null;
-	}
+    }
 
     /**
      * @return A list containing all PDE alarms.
      */
-	public List<PdeAlarmDto> getAlarms() {
+    public List<PdeAlarmDto> getAlarms() {
         final List<PdeAlarmDto> result = new ArrayList<>();
 
         final List<Alarm> allAlarms = new ArrayList<>();
@@ -67,17 +67,17 @@ public class AlarmManager {
     }
 
     /**
-     * @param id ID of an alarm.
+     * @param id           ID of an alarm.
      * @param acknowledged The new value to assign to the alarm's acknowledged
      *                     field.
      */
-	public void setAcknowledged(int id, boolean acknowledged) throws IllegalArgumentException {
+    public void setAcknowledged(int id, boolean acknowledged) throws IllegalArgumentException {
         final Alarm alarm = getAlarmData(id);
         if (alarm == null) {
             throw new IllegalArgumentException("There is no alarm with ID " + id);
         }
         alarm.acknowledged = acknowledged;
-	}
+    }
 
     private void raiseAlarm(String systemId, String systemName, AlarmCause cause) {
         // TODO: Concurrency handling
@@ -108,9 +108,9 @@ public class AlarmManager {
 
     public void clearAlarm(Alarm alarm) {
         clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
-	}
+    }
 
-	public void raiseSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
+    public void raiseSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
         // TODO: Make use of the metadata.
         if (systemName.isEmpty()) {
             throw new RuntimeException("This version of the PDE cannot handle unnamed systems.");
@@ -118,20 +118,20 @@ public class AlarmManager {
         raiseAlarm(null, systemName.get(), AlarmCause.systemNotRegistered);
     }
 
-	public void raiseSystemInactive(String systemName) {
+    public void raiseSystemInactive(String systemName) {
         raiseAlarm(null, systemName, AlarmCause.systemInactive);
     }
 
     public void clearSystemInactive(String systemName) {
         clearAlarm(null, systemName, AlarmCause.systemInactive);
-	}
+    }
 
-	public void raiseSystemNotInDescription(String systemName) {
+    public void raiseSystemNotInDescription(String systemName) {
         raiseAlarm(null, systemName, AlarmCause.systemNotInDescription);
     }
 
     public void clearSystemNotInDescription(String systemName) {
         clearAlarm(null, systemName, AlarmCause.systemNotInDescription);
-	}
+    }
 
 }

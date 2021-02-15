@@ -19,13 +19,20 @@ import java.util.Optional;
 @DtoToString
 public interface ServiceRegistryInput {
 
-	String serviceDefinition();
+    String serviceDefinition();
+
     SrSystem provider();
+
     String serviceUri();
+
     String endOfValidity();
+
     String secure();
+
     Optional<Map<String, String>> metadata();
+
     Integer version();
+
     List<String> interfaces();
 
 }

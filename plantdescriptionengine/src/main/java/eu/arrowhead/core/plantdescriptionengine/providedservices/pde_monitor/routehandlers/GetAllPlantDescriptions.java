@@ -42,7 +42,6 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * @param monitorInfo Object that stores information on monitorable systems.
      * @param pdTracker   Object that stores information on Plant Description
      *                    entries.
-     *
      */
     public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
     ) {
@@ -57,7 +56,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * Handles an HTTP request to acquire a list of Plant Description Entries
      * present in the PDE.
      *
-     * @param request HTTP request object.
+     * @param request  HTTP request object.
      * @param response HTTP response whose body contains a list of Plant
      *                 Description entries.
      */
@@ -84,9 +83,9 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         try {
             parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
-        } catch(ParseError error) {
+        } catch (ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
-                 error.getMessage());
+                error.getMessage());
 
             return Future.success(response
                 .status(HttpStatus.BAD_REQUEST)

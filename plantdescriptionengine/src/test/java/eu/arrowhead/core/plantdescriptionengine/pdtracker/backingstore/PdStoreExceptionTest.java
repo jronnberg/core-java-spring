@@ -25,7 +25,7 @@ public class PdStoreExceptionTest {
     @Test
     public void shouldCreateExceptionFromMessageAndThrowable() {
         String errorMessage = "Lorem Ipsum";
-        String causeMessage  ="ABC";
+        String causeMessage = "ABC";
         var cause = new RuntimeException(causeMessage);
         final var e = new PdStoreException(errorMessage, cause);
         assertEquals(errorMessage, e.getMessage());

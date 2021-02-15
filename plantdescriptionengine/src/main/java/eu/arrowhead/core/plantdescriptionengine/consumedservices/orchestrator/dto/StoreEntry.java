@@ -20,17 +20,25 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry
 @DtoWritableAs(JSON)
 @DtoToString
 public interface StoreEntry {
-	Integer id();
-	ServiceDefinition serviceDefinition();
+    Integer id();
+
+    ServiceDefinition serviceDefinition();
+
     SrSystem consumerSystem();
+
     Boolean foreign();
 
     SrSystem providerSystem();
+
     Optional<ProviderCloud> providerCloud(); // TODO: Should this be Optional?
+
     ServiceInterface serviceInterface();
 
     Integer priority();
+
     Optional<Map<String, String>> attribute();
+
     String createdAt();
+
     String updatedAt();
 }

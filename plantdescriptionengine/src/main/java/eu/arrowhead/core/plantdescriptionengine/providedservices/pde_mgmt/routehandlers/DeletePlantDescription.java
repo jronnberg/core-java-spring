@@ -38,7 +38,8 @@ public class DeletePlantDescription implements HttpRouteHandler {
     /**
      * Handles an HTTP request to delete an existing Plant Description from the
      * PDE.
-     * @param request HTTP request containing a PlantDescription.
+     *
+     * @param request  HTTP request containing a PlantDescription.
      * @param response HTTP response object.
      */
     @Override

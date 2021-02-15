@@ -9,7 +9,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 
 /**
  * Mock Plant Description backing store used for testing.
- *
+ * <p>
  * Created for development purposes, not to be used in production.
  */
 public class MockPdStore implements PdStore {
@@ -36,6 +36,7 @@ public class MockPdStore implements PdStore {
 
     /**
      * Writes a single entry to backing store.
+     *
      * @param entry An entry to store.
      * @throws PdStoreException If {@link setFailOnNextWrite} has been called
      *                          since the last time this method was called.
@@ -51,6 +52,7 @@ public class MockPdStore implements PdStore {
 
     /**
      * Delete the specified entry from the backing store.
+     *
      * @param id ID of the entry to delete.
      * @throws PdStoreException If {@link setFailOnNextRemove} has been called
      *                          since the last time this method was called.

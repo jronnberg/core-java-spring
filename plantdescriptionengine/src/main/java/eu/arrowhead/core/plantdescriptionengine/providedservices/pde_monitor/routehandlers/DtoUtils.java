@@ -42,14 +42,14 @@ public final class DtoUtils {
         for (var connection : connections) {
             var consumerPort = new SystemPortBuilder()
                 .portName(connection.consumer()
-                .portName())
+                    .portName())
                 .systemId(connection.consumer().systemId())
                 .build();
             var producerPort = new SystemPortBuilder()
                 .portName(connection.producer()
-                .portName())
+                    .portName())
                 .systemId(connection.producer()
-                .systemId())
+                    .systemId())
                 .build();
 
             var connectionCopy = new ConnectionBuilder().consumer(consumerPort).producer(producerPort).build();
@@ -66,9 +66,8 @@ public final class DtoUtils {
      * @param monitorInfo Object used for keeping track of inventory data of
      *                    monitorable systems.
      * @return A Plant Description Entry System with all the information
-     *         contained in the {@code system} argument, supplemented with any
-     *         relevant info in the {@code monitorInfo} argument.
-     *
+     * contained in the {@code system} argument, supplemented with any
+     * relevant info in the {@code monitorInfo} argument.
      */
     private static SystemEntryDto extend(PdeSystem system, MonitorInfo monitorInfo) {
 
@@ -123,7 +122,7 @@ public final class DtoUtils {
         }
 
         var systemBuilder = new SystemEntryBuilder().systemId(system.systemId())
-                .metadata(system.metadata().orElse(null)).ports(ports);
+            .metadata(system.metadata().orElse(null)).ports(ports);
 
         // If there is any monitor info left, it may belong to the system
         // itself, not a specific port.
@@ -144,7 +143,7 @@ public final class DtoUtils {
 
     /**
      * Returns a Plant Description Entry supplemented with monitor info.
-     *
+     * <p>
      * Note that the resulting copy will be an instance of
      * {@link eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto},
      * while the source entry is a
@@ -156,13 +155,12 @@ public final class DtoUtils {
      * @param monitorInfo Object used for keeping track of inventory data of
      *                    monitorable systems.
      * @return A PlantDescriptionEntry with all the information contained in the
-     *         {@code entry} argument, supplemented with any relevant info in the
-     *         {@code monitorInfo} argument.
-     *
+     * {@code entry} argument, supplemented with any relevant info in the
+     * {@code monitorInfo} argument.
      */
     public static PlantDescriptionEntryDto extend(
-            eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry entry,
-            MonitorInfo monitorInfo) {
+        eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry entry,
+        MonitorInfo monitorInfo) {
         List<SystemEntryDto> systems = new ArrayList<>();
 
         for (var system : entry.systems()) {

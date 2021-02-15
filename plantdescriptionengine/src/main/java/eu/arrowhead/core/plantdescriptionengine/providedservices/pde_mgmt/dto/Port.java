@@ -18,7 +18,9 @@ import java.util.Optional;
 public interface Port {
 
     String portName();
+
     String serviceDefinition();
+
     Optional<Map<String, String>> metadata();
 
     /**

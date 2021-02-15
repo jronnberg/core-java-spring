@@ -20,6 +20,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
 
     /**
      * Constructor.
+     *
      * @param alarmManager Object used for managing PDE alarms.
      */
     public GetPdeAlarm(AlarmManager alarmManager) {

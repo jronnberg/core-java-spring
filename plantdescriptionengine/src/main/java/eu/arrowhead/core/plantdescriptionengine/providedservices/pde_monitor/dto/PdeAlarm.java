@@ -61,18 +61,28 @@ public interface PdeAlarm {
 
 
     int id();
+
     Optional<String> systemName();
+
     Optional<String> systemId();
+
     boolean acknowledged();
+
     String severity();
+
     String description();
+
     Instant raisedAt();
+
     Instant updatedAt();
+
     Optional<Instant> clearedAt();
+
     Optional<Instant> acknowledgedAt();
 
     /**
      * Filters out cleared/uncleared alarms from the given list.
+     *
      * @param alarms       A list of PDE alarms.
      * @param acknowledged If true, unacknowledged alarms are removed. If false,
      *                     acknowledged alarms are removed.
@@ -87,25 +97,27 @@ public interface PdeAlarm {
 
     /**
      * Filters the given list of alarms by system name.
+     *
      * @param alarms     A list of PDE alarms.
      * @param systemName Only alarms with this system name are kept in the list.
      */
-	static void filterBySystemName(List<? extends PdeAlarm> alarms, String systemName) {
+    static void filterBySystemName(List<? extends PdeAlarm> alarms, String systemName) {
         alarms.removeIf(alarm -> alarm.systemName().isEmpty() || !alarm.systemName().get().equals(systemName));
     }
 
     /**
      * Filters the given list of alarms based on their severity.
+     *
      * @param alarms   A list of PDE alarms.
      * @param severity Only alarms with this severity are kept in the list.
      */
-	static void filterBySeverity(List<? extends PdeAlarm> alarms, String severity) {
+    static void filterBySeverity(List<? extends PdeAlarm> alarms, String severity) {
         if (severity.equals("not_cleared")) {
             alarms.removeIf(alarm -> alarm.severity().equals("cleared"));
             return;
         }
         alarms.removeIf(alarm -> !alarm.severity().equals(severity));
-	}
+    }
 
     static void sort(List<? extends PdeAlarm> alarms, String sortField, boolean sortAscending) {
         Comparator<PdeAlarm> comparator = null;

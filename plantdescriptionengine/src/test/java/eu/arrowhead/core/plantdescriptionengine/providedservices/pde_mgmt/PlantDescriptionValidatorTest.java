@@ -31,12 +31,12 @@ public class PlantDescriptionValidatorTest {
 
         // First entry
         int entryIdA = 0;
-        String consumerIdA  = "Cons-A";
-        String consumerNameA  = "Consumer A";
-        String producerNameA  = "Producer A";
+        String consumerIdA = "Cons-A";
+        String consumerNameA = "Consumer A";
+        String producerNameA = "Producer A";
         String consumerPortA = "Cons-Port-A";
         String producerPortA = "Prod-Port-A";
-        String producerIdA  = "Prod-A";
+        String producerIdA = "Prod-A";
 
         final List<PortDto> consumerPortsA = List.of(
             new PortBuilder()
@@ -65,15 +65,15 @@ public class PlantDescriptionValidatorTest {
             .build();
 
         final List<ConnectionDto> connectionsA = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder()
-                    .systemId(consumerIdA)
-                    .portName(consumerPortA)
-                    .build())
-                .producer(new SystemPortBuilder()
-                    .systemId(producerIdA)
-                    .portName(producerPortA)
-                    .build())
-                .build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerIdA)
+                .portName(consumerPortA)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerIdA)
+                .portName(producerPortA)
+                .build())
+            .build());
 
         final var entryA = new PlantDescriptionEntryBuilder()
             .id(entryIdA)
@@ -87,8 +87,8 @@ public class PlantDescriptionValidatorTest {
 
         // Second entry
         int entryIdB = 1;
-        String consumerIdB  = "Cons-B";
-        String consumerNameB  = "Consumer B";
+        String consumerIdB = "Cons-B";
+        String consumerNameB = "Consumer B";
         String consumerPortB = "Cons-Port-B";
 
         final List<PortDto> consumerPortsB = List.of(
@@ -105,15 +105,15 @@ public class PlantDescriptionValidatorTest {
             .build();
 
         final List<ConnectionDto> connectionsB = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder()
-                    .systemId(consumerIdB)
-                    .portName(consumerPortB)
-                    .build())
-                .producer(new SystemPortBuilder()
-                    .systemId(producerIdA)
-                    .portName(producerPortA)
-                    .build())
-                .build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerIdB)
+                .portName(consumerPortB)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerIdA)
+                .portName(producerPortA)
+                .build())
+            .build());
 
         final var entryB = new PlantDescriptionEntryBuilder()
             .id(entryIdB)
@@ -401,7 +401,7 @@ public class PlantDescriptionValidatorTest {
     @Test
     public void shouldReportMissingConsumer() throws PdStoreException {
 
-      final String consumerId = "system_1";
+        final String consumerId = "system_1";
         final String producerId = "system_2";
         final String missingId = "garbage_string";
         final String consumerPort = "port_1";
@@ -469,7 +469,7 @@ public class PlantDescriptionValidatorTest {
     @Test
     public void shouldReportMissingProvider() throws PdStoreException {
 
-      final String consumerId = "system_1";
+        final String consumerId = "system_1";
         final String producerId = "system_2";
         final String missingId = "garbage_string";
         final String consumerPort = "port_1";
@@ -594,7 +594,7 @@ public class PlantDescriptionValidatorTest {
 
         String expectedErrorMessage = "<" + consumerId +
             " has duplicate metadata for ports with service definition '" + serviceDefinition + "'>";
-    assertEquals(expectedErrorMessage, validator.getErrorMessage());
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
     @Test
@@ -692,7 +692,7 @@ public class PlantDescriptionValidatorTest {
         String expectedErrorMessage = "<Error in include list: Entry '" + nonExistentA +
             "' is required by entry '" + entryId + "'.>, "
             + "<Error in include list: Entry '" + nonExistentB + "' is required by entry '" + entryId + "'.>";
-            System.out.println(validator.getErrorMessage());
+        System.out.println(validator.getErrorMessage());
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 

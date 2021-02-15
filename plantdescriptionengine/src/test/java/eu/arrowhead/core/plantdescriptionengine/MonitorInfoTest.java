@@ -156,7 +156,7 @@ public class MonitorInfoTest {
     public void shouldStoreSystemData() {
 
         Map<String, String> metadata = Map.of("name", "abc");
-        ServiceDescription  serviceDescription = createServiceDescription(metadata);
+        ServiceDescription serviceDescription = createServiceDescription(metadata);
 
         JsonObject jsonObject = new JsonObject(List.of(
             new JsonPair("a", JsonBoolean.TRUE)
@@ -216,7 +216,7 @@ public class MonitorInfoTest {
     public void shouldRetrieveBySystemName() {
 
         Map<String, String> metadata = Map.of("x", "y");
-        ServiceDescription  serviceDescription = createServiceDescription(metadata);
+        ServiceDescription serviceDescription = createServiceDescription(metadata);
 
         String inventoryId = "id-4567";
         var monitorInfo = new MonitorInfo();
@@ -231,7 +231,7 @@ public class MonitorInfoTest {
     @Test
     public void shouldOverwriteData() {
 
-        ServiceDescription  service = createServiceDescription();
+        ServiceDescription service = createServiceDescription();
         var monitorInfo = new MonitorInfo();
 
         String oldInventoryId = "id-1234";
@@ -249,7 +249,7 @@ public class MonitorInfoTest {
 
     @Test
     public void shouldMergeData() {
-        ServiceDescription  service = createServiceDescription();
+        ServiceDescription service = createServiceDescription();
         var monitorInfo = new MonitorInfo();
 
         String inventoryId = "xyz";

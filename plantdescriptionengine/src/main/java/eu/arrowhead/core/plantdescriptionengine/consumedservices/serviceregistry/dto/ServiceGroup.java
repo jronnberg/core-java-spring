@@ -16,8 +16,10 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoToString
 public interface ServiceGroup {
 
-	Integer serviceDefinitionId();
-	String serviceDefinition();
+    Integer serviceDefinitionId();
+
+    String serviceDefinition();
+
     List<ServiceDefinition> providerServices();
 
 }

@@ -28,7 +28,7 @@ public class PdeManagementService {
      * Class constructor.
      *
      * @param pdTracker An object that keeps track of Plant Description Entries.
-     * @param secure   Indicates whether the service should run in secure mode.
+     * @param secure    Indicates whether the service should run in secure mode.
      */
     public PdeManagementService(PlantDescriptionTracker pdTracker, boolean secure) {
 

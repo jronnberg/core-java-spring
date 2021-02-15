@@ -24,9 +24,8 @@ public class GetPlantDescription implements HttpRouteHandler {
      * Class constructor
      *
      * @param monitorInfo Object that stores information on monitorable systems.
-     * @param pdTracker Object that stores information on Plant Description
-     *                  entries.
-     *
+     * @param pdTracker   Object that stores information on Plant Description
+     *                    entries.
      */
     public GetPlantDescription(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
     ) {

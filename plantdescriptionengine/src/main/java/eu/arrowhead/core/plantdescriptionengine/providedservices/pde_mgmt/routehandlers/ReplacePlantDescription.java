@@ -39,9 +39,9 @@ public class ReplacePlantDescription implements HttpRouteHandler {
     /**
      * Handles an HTTP request to update or create the Plant Description Entry.
      *
-     * @param request HTTP request containing the ID of the entry to
-     *                create/update, and a {@link PlantDescriptionUpdate}
-     *                describing its new state.
+     * @param request  HTTP request containing the ID of the entry to
+     *                 create/update, and a {@link PlantDescriptionUpdate}
+     *                 describing its new state.
      * @param response HTTP response containing the created/updated entry.
      */
     @Override

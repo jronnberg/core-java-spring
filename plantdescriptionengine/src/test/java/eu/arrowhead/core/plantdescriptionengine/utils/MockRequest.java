@@ -71,7 +71,7 @@ public class MockRequest implements HttpServiceRequest {
     @Override
     public <R extends DtoReadable> FutureProgress<R> bodyAs(Class<R> class_) {
         @SuppressWarnings("unchecked")
-        R castBody = (R)body;
+        R castBody = (R) body;
         return new MockFutureProgress<R>(castBody);
     }
 

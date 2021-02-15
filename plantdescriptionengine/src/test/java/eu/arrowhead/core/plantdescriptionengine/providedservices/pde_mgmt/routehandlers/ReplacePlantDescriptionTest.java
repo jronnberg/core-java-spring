@@ -51,7 +51,7 @@ public class ReplacePlantDescriptionTest {
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
 
-                    PlantDescriptionEntry entry = (PlantDescriptionEntry)response.body().get();
+                    PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
                     assertTrue(entry.matchesDescription(description));
 
                     var entryInMap = pdTracker.get(entry.id());
@@ -97,7 +97,7 @@ public class ReplacePlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
-                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry)response.body().get();
+                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
                     assertEquals(returnedEntry.plantDescription(), newName);
                     assertEquals(sizeBeforePut, pdTracker.getEntries().size());
                 })
@@ -186,7 +186,7 @@ public class ReplacePlantDescriptionTest {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     String expectedErrorMessage = "<Duplicate port name '" +
                         portName + "' in system '" + systemId + "'>";
-                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(e -> {

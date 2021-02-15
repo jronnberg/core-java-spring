@@ -74,11 +74,10 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     /**
-     *
-     * @param entrySystem A system in a Plant Description Entry.
+     * @param entrySystem      A system in a Plant Description Entry.
      * @param registeredSystem A system retrieved from the Service registry.
      * @return True if the two objects represent the same real-world system,
-     *         false otherwise.
+     * false otherwise.
      */
     private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
         final Optional<String> name = entrySystem.systemName();
@@ -97,8 +96,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     /**
-     *
-     * @param alarm An alarm.
+     * @param alarm  An alarm.
      * @param system A system retrieved from the Service registry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
@@ -108,8 +106,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     /**
-     *
-     * @param alarm An alarm.
+     * @param alarm       An alarm.
      * @param entrySystem A system in a Plant Description Entry.
      * @return True if the alarm refers to the given system, false otherwise.
      */

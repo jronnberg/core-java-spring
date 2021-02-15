@@ -13,7 +13,9 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface ServiceRegistryGrouped {
-	AutoCompleteData autoCompleteData();
-	List<ServiceGroup> servicesGroupedByServiceDefinition();
-	List<SystemGroup> servicesGroupedBySystems();
+    AutoCompleteData autoCompleteData();
+
+    List<ServiceGroup> servicesGroupedByServiceDefinition();
+
+    List<SystemGroup> servicesGroupedBySystems();
 }

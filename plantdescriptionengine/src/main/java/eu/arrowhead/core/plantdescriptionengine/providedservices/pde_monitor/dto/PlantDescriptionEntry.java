@@ -41,12 +41,19 @@ public interface PlantDescriptionEntry {
     };
 
     int id();
+
     String plantDescription();
+
     boolean active();
+
     List<Integer> include();
+
     List<SystemEntry> systems();
+
     List<Connection> connections();
+
     Instant createdAt();
+
     Instant updatedAt();
 
     static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {

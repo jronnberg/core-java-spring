@@ -13,8 +13,10 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 public interface ConsumerRule {
-	String consumerSystemId();
-	String serviceDefinitionName();
-	Optional<String> serviceInterfaceName();
+    String consumerSystemId();
+
+    String serviceDefinitionName();
+
+    Optional<String> serviceInterfaceName();
 
 }

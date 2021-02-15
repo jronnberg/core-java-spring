@@ -35,13 +35,13 @@ public class PdeMonitorService {
     /**
      * Class constructor.
      *
-     * @param pdTracker An object that maps ID:s to Plant Description
-     *                 Entries.
-     * @param arSystem An Arrowhead Framework system used to provide this
-     *                 service.
-     * @param httpClient  Object for communicating with monitorable services.
+     * @param pdTracker    An object that maps ID:s to Plant Description
+     *                     Entries.
+     * @param arSystem     An Arrowhead Framework system used to provide this
+     *                     service.
+     * @param httpClient   Object for communicating with monitorable services.
      * @param alarmManager Object used for managing PDE alarms.
-     * @param insecure Indicates whether the service should run in secure mode.
+     * @param insecure     Indicates whether the service should run in secure mode.
      */
     public PdeMonitorService(
         ArSystem arSystem,
@@ -68,8 +68,7 @@ public class PdeMonitorService {
      * accessible to remote Arrowhead systems.
      *
      * @return A HTTP Service used to monitor alarms raised by the Plant
-     *         Description Engine core system.
-     *
+     * Description Engine core system.
      */
     public Future<ArServiceHandle> provide() {
         final var service = new HttpService()
@@ -81,7 +80,7 @@ public class PdeMonitorService {
             .get("/alarm/#id", new GetPdeAlarm(alarmManager))
             .get("/alarm", new GetAllPdeAlarms(alarmManager))
             .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager));
-            // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add this line?
+        // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add this line?
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

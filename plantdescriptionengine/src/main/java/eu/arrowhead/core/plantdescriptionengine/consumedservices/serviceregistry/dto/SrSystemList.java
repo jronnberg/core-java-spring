@@ -17,6 +17,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface SrSystemList {
 
     List<SrSystem> data();
+
     int count();
 
 }

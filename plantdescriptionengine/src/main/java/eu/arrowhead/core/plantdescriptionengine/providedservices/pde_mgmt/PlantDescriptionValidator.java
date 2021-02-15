@@ -52,7 +52,7 @@ public class PlantDescriptionValidator {
 
         validateConnections();
 
-       ensureUniquePorts();
+        ensureUniquePorts();
     }
 
     /**
@@ -132,7 +132,7 @@ public class PlantDescriptionValidator {
             }
 
             for (int id : duplicates) {
-                    errors.add("Entry with ID '" + id + "' is included more than once.");
+                errors.add("Entry with ID '" + id + "' is included more than once.");
             }
         }
     }
@@ -197,11 +197,11 @@ public class PlantDescriptionValidator {
 
     /**
      * Ensures that the given system's ports are all unique.
-     *
+     * <p>
      * The PDE must be able to differentiate between the ports of a system. When
      * multiple ports share the same service definition, they must have
      * different metadata. This method ensures that this property holds.
-     *
+     * <p>
      * TODO: Check that metadata is unique
      *
      * @param system The system whose ports will be validated.
@@ -263,7 +263,7 @@ public class PlantDescriptionValidator {
     /**
      * @return A human-readable description of any errors in the Plant Description.
      */
-	public String getErrorMessage() {
+    public String getErrorMessage() {
         List<String> errorMessages = new ArrayList<>();
         for (String error : errors) {
             errorMessages.add("<" + error + ">");

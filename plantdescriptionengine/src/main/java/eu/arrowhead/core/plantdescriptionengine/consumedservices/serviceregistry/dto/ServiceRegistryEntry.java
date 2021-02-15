@@ -18,16 +18,26 @@ import java.util.Optional;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface ServiceRegistryEntry {
-	Integer id();
-	ServiceDefinition serviceDefinition();
+    Integer id();
+
+    ServiceDefinition serviceDefinition();
+
     SrSystem provider();
+
     String serviceUri();
+
     Optional<String> endOfValidity(); // TODO: Should this be Optional?
+
     String secure();
+
     Optional<Map<String, String>> metadata();
+
     Integer version();
+
     List<ServiceInterface> interfaces();
+
     String createdAt();
+
     String updatedAt();
 
 }

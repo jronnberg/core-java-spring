@@ -57,7 +57,7 @@ public class PdeMain {
      * @param appProps Configurations used for this instance of the Plant
      *                 Description Engine.
      * @return HTTP client useful for consuming Arrowhead services as a
-     *         privileged system.
+     * privileged system.
      */
     static HttpClient createSysopHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
@@ -93,7 +93,7 @@ public class PdeMain {
      * @param appProps Configurations used for this instance of the Plant
      *                 Description Engine.
      * @return HTTP client useful for consuming Arrowhead services as a
-     *         non-privileged system.
+     * non-privileged system.
      */
     static HttpClient createPdeHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
@@ -126,8 +126,8 @@ public class PdeMain {
     }
 
     /**
-     * @param appProps Configurations used for this instance of the Plant
-     *                 Description Engine.
+     * @param appProps               Configurations used for this instance of the Plant
+     *                               Description Engine.
      * @param serviceRegistryAddress Address of the Service Registry.
      * @return An Arrowhead Framework System.
      */
@@ -157,7 +157,7 @@ public class PdeMain {
         } else {
             final String trustStorePath = getProp(appProps, "server.ssl.pde.trust-store");
             final char[] trustStorePassword = getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray();
-            final String keyStorePath =  getProp(appProps, "server.ssl.pde.key-store");
+            final String keyStorePath = getProp(appProps, "server.ssl.pde.key-store");
             final char[] keyPassword = getProp(appProps, "server.ssl.pde.key-password").toCharArray();
             final char[] keyStorePassword = getProp(appProps, "server.ssl.pde.key-store-password").toCharArray();
             systemBuilder
@@ -172,19 +172,18 @@ public class PdeMain {
     /**
      * Loads the Arrowhead certificate chain and private key required to manage
      * an <i>owned</i> system or operator identity.
-     *
+     * <p>
      * The provided arguments {@code keyPassword} and {@code keyStorePassword}
      * are cleared for security reasons.
      * If this function fails, the entire application is terminated.
      *
-     * @param keyStorePath Sets path to file containing JVM-compatible key
-     *                     store.
-     * @param keyPassword  Password of private key associated with
-     *                     designated certificate in key store.
+     * @param keyStorePath     Sets path to file containing JVM-compatible key
+     *                         store.
+     * @param keyPassword      Password of private key associated with
+     *                         designated certificate in key store.
      * @param keyStorePassword Password of provided key store.
-     *
      * @return An object holding the Arrowhead certificate chain and private key
-     *         required to manage an owned system or operator identity.
+     * required to manage an owned system or operator identity.
      */
     private static OwnedIdentity loadIdentity(String keyStorePath, char[] keyPassword, char[] keyStorePassword) {
         OwnedIdentity identity = null;
@@ -207,15 +206,14 @@ public class PdeMain {
 
     /**
      * Loads certificates associated with a <i>trusted</i> Arrowhead systems.
-     *
+     * <p>
      * The provided argument {@code password} is cleared for security reasons.
      * If this function fails, the entire application is terminated.
      *
-     * @param path Filesystem path to key store to load.
+     * @param path     Filesystem path to key store to load.
      * @param password Key store password.
-     *
      * @return Object holding certificates associated with trusted Arrowhead
-     *         systems, operators, clouds, companies and other authorities.
+     * systems, operators, clouds, companies and other authorities.
      */
     private static TrustStore loadTrustStore(String path, char[] password) {
         TrustStore trustStore = null;
@@ -233,7 +231,7 @@ public class PdeMain {
 
     /**
      * Main method of the Plant Description Engine.
-     *
+     * <p>
      * Provides Plant Description management and monitoring services to the
      * Arrowhead system.
      */
@@ -284,7 +282,7 @@ public class PdeMain {
             final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
             final AlarmManager alarmManager = new AlarmManager();
 
-             logger.info("Initializing the Orchestrator client...");
+            logger.info("Initializing the Orchestrator client...");
 
             return orchestratorClient.initialize()
                 .flatMap(orchstratorInitializationResult -> {
@@ -302,13 +300,13 @@ public class PdeMain {
                         .provide();
                 });
         })
-        .ifSuccess(consumer -> {
-            logger.info("The PDE Monitor service is up and running.");
-        })
-        .onFailure(throwable -> {
-            logger.error("Failed to launch Plant Description Engine", throwable);
-            System.exit(1);
-        });
+            .ifSuccess(consumer -> {
+                logger.info("The PDE Monitor service is up and running.");
+            })
+            .onFailure(throwable -> {
+                logger.error("Failed to launch Plant Description Engine", throwable);
+                System.exit(1);
+            });
 
     }
 }

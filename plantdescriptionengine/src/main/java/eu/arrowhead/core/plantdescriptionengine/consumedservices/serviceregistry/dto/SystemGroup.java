@@ -16,10 +16,14 @@ import se.arkalix.dto.DtoWritableAs;
 @DtoToString
 public interface SystemGroup {
 
-	Integer systemId();
-	String systemName();
-	String address();
-	Integer port();
-	List<ServiceDefinition> providerServices();
+    Integer systemId();
+
+    String systemName();
+
+    String address();
+
+    Integer port();
+
+    List<ServiceDefinition> providerServices();
 
 }

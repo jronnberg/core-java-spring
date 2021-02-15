@@ -99,10 +99,10 @@ public class StringParameterTest {
         final List<QueryParameter> acceptedParameters = null;
         final List<QueryParameter> requiredParameters = List.of(
             new StringParameter("episode")
-            .legalValues(List.of(
-                "A New Hope",
-                "The Empire Strikes Back",
-                "Return of the Jedi")));
+                .legalValues(List.of(
+                    "A New Hope",
+                    "The Empire Strikes Back",
+                    "Return of the Jedi")));
 
 
         Exception exception = assertThrows(ParseError.class, () -> {

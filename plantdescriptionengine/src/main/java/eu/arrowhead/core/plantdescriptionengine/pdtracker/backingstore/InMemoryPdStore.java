@@ -9,7 +9,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 
 /**
  * Plant Description backing store that only stores data in memory.
- *
+ * <p>
  * Created for development purposes, not to be used in production.
  */
 public class InMemoryPdStore implements PdStore {
