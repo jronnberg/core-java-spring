@@ -214,40 +214,40 @@ public class OrchestratorClientTest {
         orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
     }
 
-    // @Test
-    // public void shouldCreateInsecureRule() throws SSLException, RuleStoreException, PdStoreException {
-    //     final PlantDescriptionEntryDto entry = createEntry();
-    //     pdTracker.put(entry);
-    //     var rule = orchestratorClient.createRule(entry, entry.connections().get(0));
-    //     assertEquals(cloud.name(), rule.cloud().name());
-    //     assertEquals(cloud.operator(), rule.cloud().operator());
-    //     assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
-    //     assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
-    //     assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-    //     assertEquals(cloud.name(), rule.cloud().name());
-    //     assertEquals(cloud.operator(), rule.cloud().operator());
-    //     assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
-    // }
+    @Test
+    public void shouldCreateInsecureRule() throws SSLException, RuleStoreException, PdStoreException {
+        final PlantDescriptionEntryDto entry = createEntry();
+        pdTracker.put(entry);
+        var rule = orchestratorClient.createRule(entry.connections().get(0));
+        assertEquals(cloud.name(), rule.cloud().name());
+        assertEquals(cloud.operator(), rule.cloud().operator());
+        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
+        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
+        assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
+        assertEquals(cloud.name(), rule.cloud().name());
+        assertEquals(cloud.operator(), rule.cloud().operator());
+        assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
+    }
 
-    // @Test
-    // public void shouldCreateSecureRule() throws SSLException, RuleStoreException, PdStoreException {
-    //     final PlantDescriptionEntryDto entry = createEntry();
-    //     final var connection = entry.connections().get(0);
+    @Test
+    public void shouldCreateSecureRule() throws SSLException, RuleStoreException, PdStoreException {
+        final PlantDescriptionEntryDto entry = createEntry();
+        final var connection = entry.connections().get(0);
 
-    //     pdTracker.put(entry);
+        pdTracker.put(entry);
 
-    //     when(httpClient.isSecure()).thenReturn(true);
+        when(httpClient.isSecure()).thenReturn(true);
 
-    //     var rule = orchestratorClient.createRule(entry, connection);
-    //     assertEquals(cloud.name(), rule.cloud().name());
-    //     assertEquals(cloud.operator(), rule.cloud().operator());
-    //     assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
-    //     assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
-    //     assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-    //     assertEquals(cloud.name(), rule.cloud().name());
-    //     assertEquals(cloud.operator(), rule.cloud().operator());
-    //     assertEquals("HTTP-SECURE-JSON", rule.serviceInterfaceName());
-    // }
+        var rule = orchestratorClient.createRule(connection);
+        assertEquals(cloud.name(), rule.cloud().name());
+        assertEquals(cloud.operator(), rule.cloud().operator());
+        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
+        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
+        assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
+        assertEquals(cloud.name(), rule.cloud().name());
+        assertEquals(cloud.operator(), rule.cloud().operator());
+        assertEquals("HTTP-SECURE-JSON", rule.serviceInterfaceName());
+    }
 
     /**
      * Two plant descriptions are created, one including the other. The active
@@ -313,7 +313,7 @@ public class OrchestratorClientTest {
         pdTracker.put(entryA);
         pdTracker.put(entryB);
 
-        var rule = orchestratorClient.createRule(entryB, connection);
+        var rule = orchestratorClient.createRule(connection);
         assertEquals(cloud.name(), rule.cloud().name());
         assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
@@ -324,21 +324,23 @@ public class OrchestratorClientTest {
         assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
     }
 
-    // @Test
-    // public void shouldNotCreateRuleWithMissingConsumer() throws SSLException, RuleStoreException {
-    //     systemTracker.remove(consumerName);
-    //     final var entry = createEntry();
-    //     final var connection = entry.connections().get(0);
-    //     assertNull(orchestratorClient.createRule(entry, connection));
-    // }
+    @Test
+    public void shouldNotCreateRuleWithMissingConsumer() throws SSLException, RuleStoreException, PdStoreException {
+        systemTracker.remove(consumerName);
+        final var entry = createEntry();
+        final var connection = entry.connections().get(0);
+        pdTracker.put(entry);
+        assertNull(orchestratorClient.createRule(connection));
+    }
 
-    // @Test
-    // public void shouldNotCreateRuleWithMissingProvider() throws SSLException, RuleStoreException {
-    //     systemTracker.remove(producerName);
-    //     final var entry = createEntry();
-    //     final var connection = entry.connections().get(0);
-    //     assertNull(orchestratorClient.createRule(createEntry(), connection));
-    // }
+    @Test
+    public void shouldNotCreateRuleWithMissingProvider() throws SSLException, RuleStoreException, PdStoreException {
+        systemTracker.remove(producerName);
+        final var entry = createEntry();
+        final var connection = entry.connections().get(0);
+        pdTracker.put(entry);
+        assertNull(orchestratorClient.createRule(connection));
+    }
 
     @Test
     public void shouldStoreRulesWhenAddingPd() throws SSLException, RuleStoreException, PdStoreException {
@@ -389,6 +391,19 @@ public class OrchestratorClientTest {
         assertEquals(consumerSrSystem.id(), ruleSent.consumerSystemId());
         assertEquals(cloud.name(), ruleSent.cloud().name());
         assertEquals(cloud.operator(), ruleSent.cloud().operator());
+    }
+
+    @Test
+    public void shouldNotCreateRulesWhenSystemIsMissing() throws SSLException, RuleStoreException, PdStoreException {
+
+        final PlantDescriptionEntryDto entry = createEntry();
+        pdTracker.put(entry);
+
+        systemTracker.remove(consumerName); // A system is now missing
+        orchestratorClient.onPlantDescriptionAdded(entry);
+
+        assertTrue(ruleStore.readRules().isEmpty());
+
     }
 
     @Test

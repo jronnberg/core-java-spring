@@ -331,55 +331,9 @@ public class PlantDescriptionTrackerTest {
 
         pdTracker.put(entry);
 
-        assertEquals(idA, pdTracker.getSystem(entry, idA).systemId());
-        assertEquals(idB, pdTracker.getSystem(entry, idB).systemId());
-        assertEquals(idC, pdTracker.getSystem(entry, idC).systemId());
-    }
-
-    @Test
-    public void shouldReturnNullWhenSystemIsMissing() throws PdStoreException {
-
-        int entryIdA = 0;
-        int entryIdB = 1;
-
-        final String systemIdA = "Sys-A";
-        final String systemIdB = "Sys-B";
-        final String systemIdC = "Sys-C";
-
-        final PdeSystemDto systemA = new PdeSystemBuilder()
-            .systemId(systemIdA)
-            .build();
-
-        final PdeSystemDto systemB = new PdeSystemBuilder()
-            .systemId(systemIdB)
-            .build();
-
-        final PdeSystemDto systemC = new PdeSystemBuilder()
-            .systemId(systemIdC)
-            .build();
-
-        final var entryA = new PlantDescriptionEntryBuilder()
-            .id(entryIdA)
-            .plantDescription("A")
-            .createdAt(now)
-            .updatedAt(now)
-            .active(true)
-            .systems(List.of(systemA))
-            .build();
-
-        final var entryB = new PlantDescriptionEntryBuilder()
-            .id(entryIdB)
-            .plantDescription("B")
-            .createdAt(now)
-            .updatedAt(now)
-            .active(true)
-            .include(List.of(entryIdA))
-            .systems(List.of(systemB, systemC))
-            .build();
-
-        pdTracker.put(entryA);
-        pdTracker.put(entryB);
-        assertNull(pdTracker.getSystem(entryB, "Nonexistent"));
+        assertEquals(idA, pdTracker.getSystem(idA).systemId());
+        assertEquals(idB, pdTracker.getSystem(idB).systemId());
+        assertEquals(idC, pdTracker.getSystem(idC).systemId());
     }
 
     @Test
@@ -410,7 +364,7 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("A")
             .createdAt(now)
             .updatedAt(now)
-            .active(true)
+            .active(false)
             .systems(List.of(systemA, systemB))
             .build();
 
@@ -419,7 +373,7 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("B")
             .createdAt(now)
             .updatedAt(now)
-            .active(true)
+            .active(false)
             .include(List.of(entryIdA))
             .build();
 
@@ -437,7 +391,7 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entryB);
         pdTracker.put(entryC);
 
-        assertEquals(systemIdA, pdTracker.getSystem(entryC, systemIdA).systemId());
+        assertEquals(systemIdA, pdTracker.getSystem(systemIdA).systemId());
     }
 
     @Test
@@ -468,7 +422,7 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("A")
             .createdAt(now)
             .updatedAt(now)
-            .active(true)
+            .active(false)
             .systems(List.of(systemA, systemB))
             .build();
 
@@ -477,7 +431,7 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("B")
             .createdAt(now)
             .updatedAt(now)
-            .active(true)
+            .active(false)
             .include(List.of(entryIdA))
             .build();
 
@@ -495,7 +449,7 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entryB);
         pdTracker.put(entryC);
 
-        final var systems = pdTracker.getAllSystems(entryC);
+        final var systems = pdTracker.getActiveSystems();
 
         assertEquals(3, systems.size());
 
@@ -620,7 +574,7 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entryA);
         pdTracker.put(entryB);
 
-        final var retrievedConnections = pdTracker.getAllConnections(entryIdB);
+        final var retrievedConnections = pdTracker.getActiveConnections();
         assertEquals(2, retrievedConnections.size());
 
         final var connectionA = retrievedConnections.get(1);
@@ -631,16 +585,9 @@ public class PlantDescriptionTrackerTest {
     }
 
     @Test
-    public void shouldThrowWhenGettingConnectionsFromNullEntry() throws PdStoreException {
-        int nonexistentId = 2;
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            pdTracker.getAllConnections(nonexistentId);
-        });
-        assertEquals(
-            "Plant Description with ID " + nonexistentId + " is not present in the Plant Description Tracker.",
-            exception.getMessage()
-        );
+    public void shouldReturnEmptyListWhenNoEntryIsActive() throws PdStoreException {
+        final var connections = pdTracker.getActiveConnections();
+        assertEquals(0, connections.size());
     }
 
     @Test
@@ -723,9 +670,8 @@ public class PlantDescriptionTrackerTest {
         pdTracker.put(entryA);
         pdTracker.put(entryB);
 
-        String serviceDefinition = pdTracker.getServiceDefinition(entryB, producerPortA);
+        String serviceDefinition = pdTracker.getServiceDefinition(producerPortA);
         assertEquals(serviceDefinitionA, serviceDefinition);
-
     }
 
     @Test
@@ -738,16 +684,51 @@ public class PlantDescriptionTrackerTest {
             .plantDescription("Plant Description A")
             .createdAt(now)
             .updatedAt(now)
-            .active(false)
+            .active(true)
             .build();
 
         pdTracker.put(entry);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            pdTracker.getServiceDefinition(entry, nonexistentPort);
+            pdTracker.getServiceDefinition(nonexistentPort);
         });
         assertEquals(
             "No port named '" + nonexistentPort + "' could be found in the Plant Description Tracker.",
+            exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldThrowWhenGettingSdNoActiveEntry() throws PdStoreException {
+        String nonexistentPort = "qwerty";
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            pdTracker.getServiceDefinition(nonexistentPort);
+        });
+
+        assertEquals(
+            "No entry is currently active.",
+            exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldThrowWhenRetrievingMissingSystem() throws PdStoreException {
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(123)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .build();
+        final var systemId = "Nonexistent";
+
+        pdTracker.put(entry);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pdTracker.getSystem(systemId);
+        });
+
+        assertEquals(
+            "Could not find system with ID '" + systemId + "'.",
             exception.getMessage()
         );
     }

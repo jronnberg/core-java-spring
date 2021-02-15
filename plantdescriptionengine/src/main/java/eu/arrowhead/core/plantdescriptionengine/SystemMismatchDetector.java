@@ -129,12 +129,10 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private void checkSystems() {
         final List<SrSystem> registeredSystems = systemTracker.getSystems();
         final PlantDescriptionEntry activeEntry = pdTracker.activeEntry();
-        List<PdeSystem> pdSystems;
+        List<PdeSystem> pdSystems = new ArrayList<>();
 
-        if (activeEntry == null) {
-            pdSystems = new ArrayList<>();
-        } else {
-            pdSystems = pdTracker.getAllSystems(activeEntry);
+        if (activeEntry != null) {
+            pdSystems.addAll(pdTracker.getActiveSystems());
         }
 
         clearAlarms(registeredSystems, pdSystems);

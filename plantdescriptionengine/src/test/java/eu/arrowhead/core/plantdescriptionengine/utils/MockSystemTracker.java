@@ -43,6 +43,9 @@ public class MockSystemTracker extends SystemTracker {
      */
     public void remove(String systemName) {
         SrSystem system = systems.remove(systemName);
+        if (system == null) {
+            throw new IllegalArgumentException("System '" + systemName + "' is not present in the System Tracker.");
+        }
         for (var listener: listeners) {
             listener.onSystemRemoved(system);
         }

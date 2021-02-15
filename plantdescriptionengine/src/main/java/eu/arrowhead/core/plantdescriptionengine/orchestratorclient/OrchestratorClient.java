@@ -91,7 +91,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         return deleteActiveRules().flatMap(deletionResult -> {
             return (activeEntry == null)
                 ? Future.done()
-                : postRules(activeEntry).flatMap(createdRules -> {
+                : postRules().flatMap(createdRules -> {
                     ruleStore.setRules(createdRules.getIds());
                     logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                     return Future.done();
@@ -102,27 +102,26 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Create an Orchestrator rule to be passed to the Orchestrator.
      *
+     * @param connection A connection between a producer and consumer system
+     *                   present in a Plant Description Entry.
      * @return An Orchestrator rule that embodies the specified connection.
      */
-    StoreRuleDto createRule(PlantDescriptionEntry entry, Connection connection) {
+    StoreRuleDto createRule(Connection connection) {
 
-        Objects.requireNonNull(entry, "Expected Plant Description Entry");
         Objects.requireNonNull(connection, "Expected a connection");
 
         final String consumerId = connection.consumer().systemId();
         final String providerId = connection.producer().systemId();
 
-        final PdeSystem consumer = pdTracker.getSystem(entry, consumerId);
-        final PdeSystem provider = pdTracker.getSystem(entry, providerId);
+        final PdeSystem consumer = pdTracker.getSystem(consumerId);
+        final PdeSystem provider = pdTracker.getSystem(providerId);
 
         // TODO: In the future, we will be able to create Orchestration rules
         // using system name *or* metadata. For now, we assume that systemName
         // is present.
 
         if (!consumer.systemName().isPresent() || !provider.systemName().isPresent()) {
-            logger.error("Cannot create rules for Plant Description '" +
-                entry.plantDescription() +
-                "'. The current version of the PDE requires all Plant Description systems to specify a system name.");
+            logger.error("Failed to create Orchestrator rule. The current version of the PDE requires all Plant Description systems to specify a system name.");
             return null;
         }
 
@@ -130,12 +129,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
 
         if (consumerSystemSrEntry == null || providerSystemSrEntry == null) {
-            // TODO: Warn when a system is not present?
             return null;
         }
 
         String portName = connection.producer().portName();
-        String serviceDefinition = pdTracker.getServiceDefinition(entry, portName);
+        String serviceDefinition = pdTracker.getServiceDefinition(portName);
 
         var builder = new StoreRuleBuilder()
             .cloud(cloud)
@@ -164,11 +162,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * For each connection in the given entry, a corresponding rule is posted to the
      * Orchestrator.
      *
-     * @param entry A Plant Description Entry.
      * @return A Future which will contain a list of the created rules.
      */
-    private Future<StoreEntryListDto> postRules(PlantDescriptionEntry entry) {
-        var connections = pdTracker.getAllConnections(entry.id());
+    private Future<StoreEntryListDto> postRules() {
+        var connections = pdTracker.getActiveConnections();
 
         if (connections.isEmpty()) {
             // Return immediately with an empty rule list:
@@ -178,14 +175,14 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         List<DtoWritable> rules = new ArrayList<>();
 
         for (var connection : connections) {
-            var rule = createRule(entry, connection);
+            var rule = createRule(connection);
             if (rule != null) {
                 rules.add(rule);
             }
         }
 
         if (rules.size() == 0) {
-            return Future.success(emptyRuleList()); // TODO How do we handle this?
+            return Future.success(emptyRuleList());
         }
 
         return client.send(orchestratorAddress, new HttpClientRequest()
@@ -289,7 +286,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
 
-        int numConnections = pdTracker.getAllConnections(entry.id()).size();
+        int numConnections = pdTracker.getActiveConnections().size();
         boolean wasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
         boolean shouldPostRules = entry.active() && numConnections > 0;
         boolean shouldDeleteCurrentRules = entry.active() || wasDeactivated;
@@ -297,7 +294,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteActiveRules() : Future.done();
 
         final Future<StoreEntryListDto> postRulesTask = shouldPostRules
-            ? postRules(entry)
+            ? postRules()
             : Future.success(emptyRuleList());
 
         deleteRulesTask

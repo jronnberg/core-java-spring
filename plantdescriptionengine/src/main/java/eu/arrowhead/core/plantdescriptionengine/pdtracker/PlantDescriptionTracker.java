@@ -180,10 +180,11 @@ public class PlantDescriptionTracker {
      * @param entry A Plant Description Entry.
      * @param systemId The ID of a system.
      * @return The system with the given ID, if it exists in the specified Plant
-     *         Description entry, or its chain of included entries. Otherwise
-     *         null.
+     *         Description entry, or its chain of included entries. If the
+     *         system is not present, an {@code IllegalArgumentException} is
+     *         thrown.
      */
-    public PdeSystem getSystem(PlantDescriptionEntry entry, String systemId) {
+    private PdeSystem getSystem(PlantDescriptionEntry entry, String systemId) {
 
         PdeSystem result = entry.systems()
             .stream()
@@ -206,8 +207,24 @@ public class PlantDescriptionTracker {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("Could not find system with ID '" + systemId + "'.");
 	}
+
+    /**
+     * @param systemId The ID of a system.
+     * @return The system with the given ID, if it exists in the active Plant
+     *         Description entry, or its chain of included entries. If the
+     *         system is not present, an {@code IllegalArgumentException} is
+     *         thrown.
+     */
+    public PdeSystem getSystem(String systemId) {
+        final var activeEntry = activeEntry();
+        if (activeEntry == null) {
+            throw new IllegalStateException("No active Plant Description.");
+        }
+
+        return getSystem(activeEntry, systemId);
+    }
 
     /**
      *
@@ -215,7 +232,7 @@ public class PlantDescriptionTracker {
      * @return A list of all systems in the specified entry, as well as all
      *         systems in its chain of included entries.
      */
-    public List<PdeSystem> getAllSystems(PlantDescriptionEntry entry) {
+    private List<PdeSystem> getSystems(PlantDescriptionEntry entry) {
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
 
         List<PdeSystem> systems = new ArrayList<>();
@@ -224,10 +241,18 @@ public class PlantDescriptionTracker {
 
         for (int i : entry.include()) {
             final var includedEntry = get(i);
-            systems.addAll(getAllSystems(includedEntry));
+            systems.addAll(getSystems(includedEntry));
         }
 
         return systems;
+    }
+
+    /**
+     * @return A list of all systems in the active entry, as well as all
+     *         systems in its chain of included entries.
+     */
+    public List<PdeSystem> getActiveSystems() {
+        return getSystems(activeEntry());
     }
 
     /**
@@ -235,7 +260,7 @@ public class PlantDescriptionTracker {
      * @return All connections in the specified Plant Description Entry and its
      *         chain of included entries.
      */
-	public List<Connection> getAllConnections(int entryId) {
+	private List<Connection> getAllConnections(int entryId) {
 		List<Connection> connections = new ArrayList<>();
         final var entry = get(entryId);
 
@@ -254,16 +279,31 @@ public class PlantDescriptionTracker {
 	}
 
     /**
-     * @param entry A Plant Description Entry.
+     * @return All connections in the active Plant Description Entry and its
+     *         chain of included entries.
+     */
+	public List<Connection> getActiveConnections() {
+        final var activeEntry = activeEntry();
+        if (activeEntry == null) {
+            return new ArrayList<>();
+        }
+        return getAllConnections(activeEntry().id());
+    }
+
+    /**
      * @param portName The name of a system port.
      * @return The service definition of the specified port, if it is present
-     *         among the systems of the entry or its chain of included systems.
+     *         among the systems of the active entry or its chain of included
+     *         entries.
      */
-	public String getServiceDefinition(PlantDescriptionEntry entry, String portName) {
+	public String getServiceDefinition(String portName) {
+        final var activeEntry = activeEntry();
 
-        Objects.requireNonNull(backingStore, "Expected Plant Description Entry.");
+        if (activeEntry == null) {
+            throw new IllegalStateException("No entry is currently active.");
+        }
 
-        List<PdeSystem> systems = getAllSystems(entry);
+        List<PdeSystem> systems = getActiveSystems();
         for (var system : systems) {
             for (var port : system.ports()) {
                 if (portName.equals(port.portName())) {
