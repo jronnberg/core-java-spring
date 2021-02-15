@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.route
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -9,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
@@ -98,6 +100,56 @@ public class DeletePlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().get());
                     String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
+                    String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(e -> {
+                    assertNull(e);
+                });
+        } catch (Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldRejectDeletionOfIncludedEntry() throws PdStoreException {
+        final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
+        final var handler = new DeletePlantDescription(pdTracker);
+        final Instant now = Instant.now();
+        final int entryIdA = 23;
+        final int entryIdB = 24;
+
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .build();
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(entryIdA))
+            .build();
+
+        pdTracker.put(entryA);
+        pdTracker.put(entryB);
+
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryIdA)))
+            .build();
+
+        HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    String expectedErrorMessage = "<Error in include list: Entry '"+ entryIdA
+                        + "' is required by entry '" + entryIdB + "'.>";
                     String actualErrorMessage = ((ErrorMessage)response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })

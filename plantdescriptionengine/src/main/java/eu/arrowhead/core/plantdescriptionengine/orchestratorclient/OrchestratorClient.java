@@ -102,20 +102,18 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Create an Orchestrator rule to be passed to the Orchestrator.
      *
-     * @param entry           Plant Description Entry to which the rule will belong.
-     * @param connectionIndex The index of the related connection within the entry's
-     *                        connection list.
-     *
      * @return An Orchestrator rule that embodies the specified connection.
      */
     StoreRuleDto createRule(PlantDescriptionEntry entry, Connection connection) {
+
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
+        Objects.requireNonNull(connection, "Expected a connection");
 
         final String consumerId = connection.consumer().systemId();
         final String providerId = connection.producer().systemId();
 
-        final PdeSystem consumer = pdTracker.getSystem(entry, consumerId); // ;entry.getSystem(consumerId);
-        final PdeSystem provider = pdTracker.getSystem(entry, providerId); // entry.getSystem(providerId);
+        final PdeSystem consumer = pdTracker.getSystem(entry, consumerId);
+        final PdeSystem provider = pdTracker.getSystem(entry, providerId);
 
         // TODO: In the future, we will be able to create Orchestration rules
         // using system name *or* metadata. For now, we assume that systemName

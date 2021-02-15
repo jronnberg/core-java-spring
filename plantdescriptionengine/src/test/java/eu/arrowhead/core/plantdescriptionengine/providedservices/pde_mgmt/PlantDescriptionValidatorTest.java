@@ -672,9 +672,10 @@ public class PlantDescriptionValidatorTest {
 
         int nonExistentA = 23;
         int nonExistentB = 34;
+        int entryId = 44;
 
         final var entry = new PlantDescriptionEntryBuilder()
-            .id(0)
+            .id(entryId)
             .plantDescription("Plant Description A")
             .createdAt(now)
             .updatedAt(now)
@@ -688,9 +689,10 @@ public class PlantDescriptionValidatorTest {
         final var validator = new PlantDescriptionValidator(entries);
 
         assertTrue(validator.hasError());
-        String expectedErrorMessage = "<Included entry '" + nonExistentA +
-            "' does not exist.>, "
-            + "<Included entry '" + nonExistentB + "' does not exist.>";
+        String expectedErrorMessage = "<Error in include list: Entry '" + nonExistentA +
+            "' is required by entry '" + entryId + "'.>, "
+            + "<Error in include list: Entry '" + nonExistentB + "' is required by entry '" + entryId + "'.>";
+            System.out.println(validator.getErrorMessage());
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 

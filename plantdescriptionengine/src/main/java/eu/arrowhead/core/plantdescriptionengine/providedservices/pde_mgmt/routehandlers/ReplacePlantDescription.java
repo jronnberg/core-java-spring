@@ -45,7 +45,10 @@ public class ReplacePlantDescription implements HttpRouteHandler {
      * @param response HTTP response containing the created/updated entry.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
         return request
             .bodyAs(PlantDescriptionDto.class)
             .map(description -> {
@@ -60,6 +63,9 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 }
 
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
+
+                // Check if introducing this entry leads to inconsistencies
+                // (e.g. include cycles):
                 final var entries = pdTracker.getEntryMap();
                 entries.put(id, entry);
                 final var validator = new PlantDescriptionValidator(entries);

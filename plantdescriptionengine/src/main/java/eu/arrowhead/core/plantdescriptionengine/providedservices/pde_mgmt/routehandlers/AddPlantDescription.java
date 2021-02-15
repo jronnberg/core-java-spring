@@ -44,10 +44,16 @@ public class AddPlantDescription implements HttpRouteHandler {
      *                 entry.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
             final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());
+
+            // Check if adding this entry leads to inconsistencies
+            // (e.g. include cycles):
             final var entries = pdTracker.getEntryMap();
             entries.put(entry.id(), entry);
             final var validator = new PlantDescriptionValidator(entries);

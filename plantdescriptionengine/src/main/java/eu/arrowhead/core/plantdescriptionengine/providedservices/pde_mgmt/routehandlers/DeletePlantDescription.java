@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import se.arkalix.dto.DtoEncoding;
@@ -41,7 +42,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
      * @param response HTTP response object.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
 
         int id;
 
@@ -49,27 +50,43 @@ public class DeletePlantDescription implements HttpRouteHandler {
             id = Integer.parseInt(request.pathParameter(0));
         } catch (NumberFormatException e) {
             final String errMsg = "'" + request.pathParameter(0) + "' is not a valid Plant Description Entry ID.";
-            response.body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
-            response.status(HttpStatus.BAD_REQUEST);
-            return Future.done();
+            response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
+            return Future.success(response);
         }
 
         if (pdTracker.get(id) == null) {
-            response.status(HttpStatus.NOT_FOUND);
-            response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
-            return Future.done();
+            response
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
+            return Future.success(response);
         }
+
+        // Check if the removal of this entry leads to inconsistencies (e.g.
+        // dangling include references):
+        final var entries = pdTracker.getEntryMap();
+        entries.remove(id);
+        final var validator = new PlantDescriptionValidator(entries);
+        if (validator.hasError()) {
+            response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(validator.getErrorMessage()));
+            return Future.success(response);
+        }
+
 
         try {
             pdTracker.remove(id);
         } catch (PdStoreException e) {
             logger.error("Failed to remove Plant Description Entry from backing store", e);
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.body(ErrorMessage.of("Encountered an error while deleting entry file."));
-            return Future.done();
+            response
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorMessage.of("Encountered an error while deleting entry file."));
+            return Future.success(response);
         }
 
         response.status(HttpStatus.OK);
-        return Future.done();
+        return Future.success(response);
     }
 }

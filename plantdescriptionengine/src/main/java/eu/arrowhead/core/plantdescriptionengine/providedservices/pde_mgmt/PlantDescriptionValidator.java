@@ -108,9 +108,10 @@ public class PlantDescriptionValidator {
      */
     private void ensureInclusionsExist() {
         for (var entry : entries.values()) {
-            for (int id : entry.include()) {
-                if (!entries.containsKey(id)) {
-                    errors.add("Included entry '" + id + "' does not exist.");
+            for (int includedId : entry.include()) {
+                if (!entries.containsKey(includedId)) {
+                    errors.add("Error in include list: Entry '" + includedId
+                        + "' is required by entry '" + entry.id() + "'.");
                 }
             }
         }

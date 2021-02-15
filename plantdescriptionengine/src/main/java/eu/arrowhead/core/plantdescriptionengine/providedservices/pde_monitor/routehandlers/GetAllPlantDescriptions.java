@@ -62,7 +62,10 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      *                 Description entries.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
         final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
@@ -82,11 +85,13 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         try {
             parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
         } catch(ParseError error) {
-            response.status(HttpStatus.BAD_REQUEST);
-            response.body(ErrorMessage.of(error.getMessage()));
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                  error.getMessage());
-            return Future.done();
+
+            return Future.success(response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(error.getMessage()))
+            );
         }
 
         var entries = pdTracker.getEntries();
@@ -125,7 +130,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
                 .count(extendedEntries.size())
                 .build());
 
-        return Future.done();
+        return Future.success(response);
     }
 
 }

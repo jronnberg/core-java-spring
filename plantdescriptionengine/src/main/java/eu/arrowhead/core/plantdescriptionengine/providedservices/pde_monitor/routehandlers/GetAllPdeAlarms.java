@@ -50,7 +50,10 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
      * @param response HTTP response containing an alarm list.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
 
         final List<QueryParameter> requiredParameters = null;
         List<String> severityValues = new ArrayList<>();
@@ -80,11 +83,12 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         try {
             parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
         } catch(ParseError error) {
-            response.status(HttpStatus.BAD_REQUEST);
-            response.body(ErrorMessage.of(error.getMessage()));
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                  error.getMessage());
-            return Future.done();
+            return Future.success(response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(error.getMessage()))
+            );
         }
 
         List<PdeAlarmDto> alarms = alarmManager.getAlarms();
@@ -126,6 +130,6 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             .count(alarms.size())
             .build());
         response.status(HttpStatus.OK);
-        return Future.done();
+        return Future.success(response);
     }
 }

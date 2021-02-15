@@ -36,7 +36,10 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
      * @param response HTTP response containing the updated entry.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
         return request
             .bodyAs(PdeAlarmUpdateDto.class)
             .map(newFields -> {

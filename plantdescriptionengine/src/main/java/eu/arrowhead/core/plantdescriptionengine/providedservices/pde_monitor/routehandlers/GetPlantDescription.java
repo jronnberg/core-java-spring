@@ -46,7 +46,10 @@ public class GetPlantDescription implements HttpRouteHandler {
      *                 PlantDescriptionEntryList.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
 
         String idString = request.pathParameter(0);
         int id;
@@ -56,8 +59,7 @@ public class GetPlantDescription implements HttpRouteHandler {
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(ErrorMessage.of(idString + " is not a valid Plant Description Entry ID."));
-            response.status(HttpStatus.BAD_REQUEST);
-            return Future.done();
+            return Future.success(response);
         }
 
         final PlantDescriptionEntryDto entry = pdTracker.get(id);
@@ -65,11 +67,11 @@ public class GetPlantDescription implements HttpRouteHandler {
         if (entry == null) {
             response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
             response.status(HttpStatus.NOT_FOUND);
-            return Future.done();
+            return Future.success(response);
         }
 
         final var extendedEntry = DtoUtils.extend(entry, monitorInfo);
         response.status(HttpStatus.OK).body(extendedEntry);
-        return Future.done();
+        return Future.success(response);
     }
 }

@@ -36,7 +36,10 @@ public class GetPdeAlarm implements HttpRouteHandler {
      *                 PlantDescriptionEntryList.
      */
     @Override
-    public Future<?> handle(final HttpServiceRequest request, final HttpServiceResponse response) throws Exception {
+    public Future<HttpServiceResponse> handle(
+        final HttpServiceRequest request,
+        final HttpServiceResponse response
+    ) throws Exception {
 
         String idString = request.pathParameter(0);
         int id;
@@ -46,19 +49,18 @@ public class GetPdeAlarm implements HttpRouteHandler {
         } catch (NumberFormatException e) {
             response.status(HttpStatus.BAD_REQUEST);
             response.body(ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
-            response.status(HttpStatus.BAD_REQUEST);
-            return Future.done();
+            return Future.success(response);
         }
 
         final PdeAlarmDto alarm = alarmManager.getAlarmDto(id);
 
         if (alarm == null) {
-            response.body(ErrorMessage.of("PDE Alarm with ID '" + id + "' not found."));
             response.status(HttpStatus.NOT_FOUND);
-            return Future.done();
+            response.body(ErrorMessage.of("PDE Alarm with ID '" + id + "' not found."));
+            return Future.success(response);
         }
 
         response.status(HttpStatus.OK).body(alarm);
-        return Future.done();
+        return Future.success(response);
     }
 }
