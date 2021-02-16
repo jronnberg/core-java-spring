@@ -1,13 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.alarms;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 
 public class AlarmManager {
 
@@ -110,12 +109,10 @@ public class AlarmManager {
         clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
     }
 
-    public void raiseSystemNotRegistered(Optional<String> systemName, Optional<Map<String, String>> metadata) {
+    public void raiseSystemNotRegistered(String systemName, Map<String, String> metadata) {
+        assert systemName != null || metadata != null : "Both system name and metadata cannot be null.";
         // TODO: Make use of the metadata.
-        if (systemName.isEmpty()) {
-            throw new RuntimeException("This version of the PDE cannot handle unnamed systems.");
-        }
-        raiseAlarm(null, systemName.get(), AlarmCause.systemNotRegistered);
+        raiseAlarm(null, systemName, AlarmCause.systemNotRegistered);
     }
 
     public void raiseSystemInactive(String systemName) {

@@ -1,9 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.List;
-
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoReadable;
 import se.arkalix.net.http.HttpHeaders;
@@ -12,6 +8,10 @@ import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.net.http.client.HttpClientResponse;
 import se.arkalix.util.concurrent.FutureProgress;
+
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Mock HttpClientResponse implementation used for testing.
@@ -25,7 +25,7 @@ public class MockClientResponse implements HttpClientResponse {
     public <R extends DtoReadable> FutureProgress<R> bodyAs(DtoEncoding encoding, Class<R> class_) {
         @SuppressWarnings("unchecked")
         R castBody = (R) _body;
-        return new MockFutureProgress<R>(castBody);
+        return new MockFutureProgress<>(castBody);
     }
 
     @Override
@@ -76,12 +76,12 @@ public class MockClientResponse implements HttpClientResponse {
         return null;
     }
 
-    public HttpClientResponse status(HttpStatus status) {
+    public MockClientResponse status(HttpStatus status) {
         _status = status;
         return this;
     }
 
-    public HttpClientResponse body(Object data) {
+    public MockClientResponse body(Object data) {
         _body = data;
         return this;
     }

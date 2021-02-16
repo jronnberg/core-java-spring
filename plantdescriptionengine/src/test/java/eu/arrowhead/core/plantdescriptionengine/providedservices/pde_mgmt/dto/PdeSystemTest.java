@@ -2,17 +2,14 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 public class PdeSystemTest {
-
-    final Instant now = Instant.now();
 
     @Test
     public void shouldReturnDeactivatedCopy() {
@@ -29,28 +26,24 @@ public class PdeSystemTest {
         final var metadataB = Map.of("y", "2");
         final var metadataC = Map.of("z", "3");
 
-        boolean isConsumerA = true;
-        boolean isConsumerB = false;
-        boolean isConsumerC = true;
-
         final List<PortDto> ports = List.of(
             new PortBuilder()
                 .portName(portNameA)
                 .serviceDefinition(serviceA)
-                .consumer(isConsumerA)
+                .consumer(true)
                 .metadata(metadataA)
                 .build(),
             new PortBuilder()
                 .portName(portNameB)
                 .serviceDefinition(serviceB)
                 .metadata(metadataB)
-                .consumer(isConsumerB)
+                .consumer(false)
                 .build(),
             new PortBuilder()
                 .portName(portNameC)
                 .serviceDefinition(serviceC)
                 .metadata(metadataC)
-                .consumer(isConsumerC)
+                .consumer(true)
                 .build()
         );
 
@@ -66,8 +59,8 @@ public class PdeSystemTest {
         assertEquals(portNameA, portA.portName());
         assertEquals(portNameB, portB.portName());
 
-        assertEquals(isConsumerA, portA.consumer().get());
-        assertEquals(isConsumerB, portB.consumer().get());
+        assertEquals(true, portA.consumer().get());
+        assertEquals(false, portB.consumer().get());
 
         assertEquals(metadataA, portA.metadata().get());
         assertEquals(metadataB, portB.metadata().get());

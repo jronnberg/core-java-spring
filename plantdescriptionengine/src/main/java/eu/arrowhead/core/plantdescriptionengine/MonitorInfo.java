@@ -1,15 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.json.value.JsonObject;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Object used for keeping track of inventory data of monitorable systems.
@@ -38,11 +34,11 @@ public class MonitorInfo {
         }
 
         /**
-         * Returns true if the given arguments match this instances metadata.
+         * Returns true if the given arguments match this instance's metadata.
          * <p>
          * More specifically, returns true if {@code portMetadata} is present,
          * and the union of {@code systemMetadata} and {@code portMetadata} is a
-         * superset of this instance's metadata.
+         * subset of this instance's metadata.
          *
          * @param systemMetadata Metadata relating to a particular system
          *                       (read from a system in a Plant Description
@@ -52,13 +48,13 @@ public class MonitorInfo {
          *                       Plant Description Entry).
          */
         public boolean matchesPortMetadata(
-            Optional<Map<String, String>> systemMetadata, Optional<Map<String, String>> portMetadata
+            Map<String, String> systemMetadata, Map<String, String> portMetadata
         ) {
-            if (!portMetadata.isPresent() || portMetadata.get().size() == 0) {
+            if (portMetadata == null || portMetadata.size() == 0) {
                 return false;
             }
 
-            var mergedMetadata = Metadata.merge(systemMetadata.orElse(new HashMap<>()), portMetadata.get());
+            var mergedMetadata = Metadata.merge(systemMetadata, portMetadata);
             return Metadata.isSubset(mergedMetadata, metadata);
         }
 
@@ -72,11 +68,11 @@ public class MonitorInfo {
          *                       (read from a system in a Plant Description
          *                       Entry).
          */
-        public boolean matchesSystemMetadata(Optional<Map<String, String>> systemMetadata) {
-            if (!systemMetadata.isPresent()) {
+        public boolean matchesSystemMetadata(Map<String, String> systemMetadata) {
+            if (systemMetadata == null) {
                 return true;
             }
-            return Metadata.isSubset(metadata, systemMetadata.get());
+            return Metadata.isSubset(metadata, systemMetadata);
         }
 
     }

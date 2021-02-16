@@ -1,16 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
+
+import java.util.*;
 
 /**
  * Class for validating the Plant Descriptions.
@@ -53,12 +47,13 @@ public class PlantDescriptionValidator {
         validateConnections();
 
         ensureUniquePorts();
+
+        // TODO: Check that every system has a name (Future versions will accept
+        // systems with only metadata as well).
     }
 
     /**
      * Any inclusion cycles originating from the given entry is reported.
-     *
-     * @param entry A Plant Description Entry.
      */
     private void checkInclusionCycles() {
         for (var entry : entries.values()) {
@@ -77,7 +72,7 @@ public class PlantDescriptionValidator {
         queue.add(entry);
         while (queue.size() > 0) {
             entry = queue.pop();
-            if (visitedEntries.add(entry.id()) == false) {
+            if (!visitedEntries.add(entry.id())) {
                 return true;
             }
             for (var included : entry.include()) {
@@ -126,7 +121,7 @@ public class PlantDescriptionValidator {
             HashSet<Integer> duplicates = new HashSet<>();
 
             for (int id : includes) {
-                if (uniqueIds.add(id) == false) {
+                if (!uniqueIds.add(id)) {
                     duplicates.add(id);
                 }
             }
@@ -238,8 +233,8 @@ public class PlantDescriptionValidator {
 
         for (String serviceDefinition : portsPerService.keySet()) {
 
-            Integer numPorts = portsPerService.getOrDefault(serviceDefinition, 0);
-            Integer numMetadata = metadataPerService.get(serviceDefinition).size();
+            int numPorts = portsPerService.getOrDefault(serviceDefinition, 0);
+            int numMetadata = metadataPerService.get(serviceDefinition).size();
 
             // Ensure that there is metadata to differentiate between ports when
             // multiple ports share service definition:
@@ -251,7 +246,7 @@ public class PlantDescriptionValidator {
             // Ensure that the metadata is unique within each serviceDefinition:
             List<Map<String, String>> serviceMetadata = metadataPerService.get(serviceDefinition);
             if (serviceMetadata.size() > 1) {
-                var uniqueMetadata = new HashSet<Map<String, String>>(serviceMetadata);
+                var uniqueMetadata = new HashSet<>(serviceMetadata);
                 if (uniqueMetadata.size() < serviceMetadata.size()) {
                     errors.add(system.systemId() + " has duplicate metadata for ports with service definition '" +
                         serviceDefinition + "'");

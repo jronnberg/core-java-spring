@@ -1,24 +1,24 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-
+import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntry;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GetPlantDescriptionTest {
 
@@ -41,9 +41,7 @@ public class GetPlantDescriptionTest {
                 String expectedErrorMessage = "Plant Description with ID " + nonExistentEntryId + " not found.";
                 String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(e -> {
-                assertNull(e);
-            });
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -73,9 +71,7 @@ public class GetPlantDescriptionTest {
 
                     var returnedEntry = (PlantDescriptionEntry) response.body().get();
                     assertEquals(returnedEntry.id(), entryId, 0); // TODO: Add 'equals' method to entries and do a proper comparison?
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -101,12 +97,8 @@ public class GetPlantDescriptionTest {
 
         try {
             handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .ifSuccess(result -> assertEquals(HttpStatus.BAD_REQUEST, response.status().get()))
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

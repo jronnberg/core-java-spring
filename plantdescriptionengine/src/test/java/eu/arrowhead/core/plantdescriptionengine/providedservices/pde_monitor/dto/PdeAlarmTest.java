@@ -2,14 +2,15 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dt
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class PdeAlarmTest {
@@ -97,8 +98,6 @@ public class PdeAlarmTest {
         assertEquals(idD, alarms.get(1).id());
         assertEquals(idB, alarms.get(2).id());
         assertEquals(idA, alarms.get(3).id());
-
-        alarms = Arrays.asList(alarmC, alarmD);
     }
 
     @Test
@@ -112,11 +111,9 @@ public class PdeAlarmTest {
             .updatedAt(now)
             .build();
 
-        List<PdeAlarm> alarms = Arrays.asList(alarm);
+        List<PdeAlarm> alarms = Collections.singletonList(alarm);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            PdeAlarm.sort(alarms, "Illegal", true);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> PdeAlarm.sort(alarms, "Illegal", true));
         assertEquals(
             "'Illegal' is not a valid sort field for PDE Alarms.",
             exception.getMessage()

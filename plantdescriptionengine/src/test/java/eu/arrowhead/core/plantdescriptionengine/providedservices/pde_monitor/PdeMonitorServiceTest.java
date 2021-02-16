@@ -1,18 +1,15 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import org.junit.jupiter.api.Test;
-
-import javax.net.ssl.SSLException;
-
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
 
 public class PdeMonitorServiceTest {
 
@@ -28,12 +25,8 @@ public class PdeMonitorServiceTest {
         final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), false);
 
         service.provide()
-            .ifSuccess(result -> {
-                assertNotNull(result);
-            })
-            .onFailure(e -> {
-                assertNull(e);
-            });
+            .ifSuccess(Assertions::assertNotNull)
+            .onFailure(Assertions::assertNull);
     }
 
     @Test
@@ -48,11 +41,7 @@ public class PdeMonitorServiceTest {
         final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), true);
 
         service.provide()
-            .ifSuccess(result -> {
-                assertNull(result);
-            })
-            .onFailure(e -> {
-                assertNotNull(e);
-            });
+            .ifSuccess(Assertions::assertNull)
+            .onFailure(Assertions::assertNotNull);
     }
 }

@@ -1,26 +1,22 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import se.arkalix.net.http.service.HttpServiceRequest;
+
+import java.util.*;
 
 /**
  * Class for parsing and validating the query parameters of HttpServiceRequests.
  */
 public class QueryParamParser {
 
-    private List<QueryParameter> required = new ArrayList<>();
-    private List<QueryParameter> accepted = new ArrayList<>();
+    private List<QueryParameter> required;
+    private List<QueryParameter> accepted;
 
-    private Map<String, Integer> intValues = new HashMap<>();
-    private Map<String, Boolean> boolValues = new HashMap<>();
-    private Map<String, String> stringValues = new HashMap<>();
+    private final Map<String, Integer> intValues = new HashMap<>();
+    private final Map<String, Boolean> boolValues = new HashMap<>();
+    private final Map<String, String> stringValues = new HashMap<>();
 
-    private List<ParseError> errors = new ArrayList<ParseError>();
+    private final List<ParseError> errors = new ArrayList<>();
 
     /**
      * Constructs an instance of this class.
@@ -35,7 +31,7 @@ public class QueryParamParser {
      * The parameters in {@code accepted} may be left out of the request, but if
      * present, must fulfill their requirements.
      * <p>
-     * If the parameters are invalid, a {@link #ParseError} is thrown.
+     * If the parameters are invalid, a {@code #ParseError} is thrown.
      * <p>
      * If the parameters are valid, their values will be accessible via the
      * methods {@code getInt}, {@code getBoolean} and {@code getString}.
@@ -44,7 +40,7 @@ public class QueryParamParser {
      *                 request to be considered valid, with specific constraints
      *                 for each one.
      * @param accepted A list of accepted query parameters
-     * @param request
+     * @param request  The head and body of an incoming HTTP request.
      */
     public QueryParamParser(
         List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request
@@ -122,7 +118,7 @@ public class QueryParamParser {
     }
 
     /**
-     * @return A compound error describing all individual errors that occured
+     * @return A compound error describing all individual errors that occurred
      * during parsing.
      */
     public ParseError getCompoundError() {

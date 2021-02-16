@@ -18,7 +18,6 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class MonitorInfoTest {
 
@@ -47,15 +46,13 @@ public class MonitorInfoTest {
             "a", "1",
             "b", "2"
         );
-        JsonObject systemData = null;
-        String inventoryId = null;
 
-        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, systemData, inventoryId);
+        var info = new MonitorInfo.Bundle(systemName, serviceDefinition, metadata, null, null);
 
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(systemMetadata, serviceMetadata));
     }
 
     @Test
@@ -72,11 +69,11 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "x");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(systemMetadata, serviceMetadata));
     }
 
     @Test
-    public void supersetShouldMatch() {
+    public void subsetShouldMatch() {
 
         String systemName = "System A";
         String serviceDefinition = "Service A";
@@ -91,11 +88,11 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = Map.of("b", "2");
 
-        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(systemMetadata, serviceMetadata));
     }
 
     @Test
-    public void subsetsShouldNotMatch() {
+    public void supersetShouldNotMatch() {
 
         String systemName = "System A";
         String serviceDefinition = "Service A";
@@ -112,7 +109,7 @@ public class MonitorInfoTest {
             "c", "3"
         );
 
-        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(systemMetadata, serviceMetadata));
     }
 
     @Test
@@ -127,8 +124,8 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "1");
         Map<String, String> serviceMetadata = new HashMap<>();
 
-        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
-        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.empty()));
+        assertFalse(info.matchesPortMetadata(systemMetadata, serviceMetadata));
+        assertFalse(info.matchesPortMetadata(systemMetadata, null));
     }
 
     @Test
@@ -143,12 +140,12 @@ public class MonitorInfoTest {
         Map<String, String> systemMetadata = Map.of("a", "2");
         Map<String, String> serviceMetadata = Map.of("a", "1");
 
-        assertTrue(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertTrue(info.matchesPortMetadata(systemMetadata, serviceMetadata));
 
         systemMetadata = Map.of("a", "1");
         serviceMetadata = Map.of("a", "2");
 
-        assertFalse(info.matchesPortMetadata(Optional.of(systemMetadata), Optional.of(serviceMetadata)));
+        assertFalse(info.matchesPortMetadata(systemMetadata, serviceMetadata));
 
     }
 

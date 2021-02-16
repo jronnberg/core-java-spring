@@ -1,5 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+import eu.arrowhead.core.plantdescriptionengine.utils.DtoWriter;
+import se.arkalix.dto.DtoReadException;
+import se.arkalix.dto.DtoWriteException;
+import se.arkalix.dto.binary.ByteArrayReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,12 +16,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.utils.DtoWriter;
-import se.arkalix.dto.DtoReadException;
-import se.arkalix.dto.DtoWriteException;
-import se.arkalix.dto.binary.ByteArrayReader;
 
 public class FilePdStore implements PdStore {
 
@@ -28,7 +28,6 @@ public class FilePdStore implements PdStore {
      *
      * @param descriptionDirectory File path to the directory for storing Plant
      *                             Description.
-     * @throws PdStoreException
      */
     public FilePdStore(final String descriptionDirectory) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
@@ -64,7 +63,7 @@ public class FilePdStore implements PdStore {
 
         final var result = new ArrayList<PlantDescriptionEntryDto>();
         for (final File child : directoryListing) {
-            byte[] bytes = null;
+            byte[] bytes;
             try {
                 bytes = Files.readAllBytes(child.toPath());
                 result.add(PlantDescriptionEntryDto.readJson(new ByteArrayReader(bytes)));

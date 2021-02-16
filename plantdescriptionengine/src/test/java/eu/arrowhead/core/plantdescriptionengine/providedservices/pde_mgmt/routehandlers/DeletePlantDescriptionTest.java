@@ -1,26 +1,24 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
 
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import se.arkalix.net.http.HttpStatus;
-import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeletePlantDescriptionTest {
 
@@ -44,12 +42,10 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
                     assertNull(pdTracker.get(entryId));
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -70,14 +66,14 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.status().isPresent());
+                    assertTrue(response.body().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -98,14 +94,13 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.NOT_FOUND, response.status().get());
+                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
                     String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -147,15 +142,14 @@ public class DeletePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     String expectedErrorMessage = "<Error in include list: Entry '" + entryIdA
                         + "' is required by entry '" + entryIdB + "'.>";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -180,12 +174,8 @@ public class DeletePlantDescriptionTest {
 
         try {
             handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
-                })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .ifSuccess(result -> assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().orElse(null)))
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

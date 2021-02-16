@@ -11,8 +11,7 @@ import se.arkalix.util.concurrent.Future;
 public class DtoReadExceptionCatcher implements HttpCatcherHandler<DtoReadException> {
 
     @Override
-    public Future<?> handle(DtoReadException throwable, HttpServiceRequest request, HttpServiceResponse response)
-        throws Exception {
+    public Future<?> handle(DtoReadException throwable, HttpServiceRequest request, HttpServiceResponse response) {
         response.status(HttpStatus.BAD_REQUEST)
             .body(ErrorMessage.of(throwable.getMessage()));
         return Future.done();

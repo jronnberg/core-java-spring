@@ -1,31 +1,25 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryList;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
+
+import java.time.Instant;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GetAllPlantDescriptionsTest {
 
@@ -50,9 +44,7 @@ public class GetAllPlantDescriptionsTest {
 
                     var entries = (PlantDescriptionEntryList) response.body().get();
                     assertEquals(entryIds.size(), entries.count());
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -180,9 +172,7 @@ public class GetAllPlantDescriptionsTest {
                         assertTrue(entry.updatedAt().compareTo(previousTimestamp) < 0);
                         previousTimestamp = entry.updatedAt();
                     }
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -226,9 +216,7 @@ public class GetAllPlantDescriptionsTest {
                         + nonBoolean + "'.>";
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -271,9 +259,7 @@ public class GetAllPlantDescriptionsTest {
                     var entries = (PlantDescriptionEntryList) response.body().get();
                     assertEquals(1, entries.count());
                     assertEquals(entries.data().get(0).id(), activeEntryId, 0);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -318,9 +304,7 @@ public class GetAllPlantDescriptionsTest {
                         assertEquals((int) entryIds.get(index), entries.data().get(i).id());
                     }
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -350,9 +334,7 @@ public class GetAllPlantDescriptionsTest {
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -379,9 +361,7 @@ public class GetAllPlantDescriptionsTest {
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

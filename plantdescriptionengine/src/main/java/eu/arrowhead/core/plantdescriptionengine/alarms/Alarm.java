@@ -1,12 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.alarms;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
+
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 
 /**
  * Internal representation of a PDE Alarm.
@@ -14,7 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 public class Alarm {
 
     // Integer for storing the next alarm ID to be used:
-    private static AtomicInteger nextId = new AtomicInteger();
+    private final static AtomicInteger nextId = new AtomicInteger();
 
     Alarm(String systemId, String systemName, AlarmCause cause) {
 
@@ -31,16 +31,15 @@ public class Alarm {
         clearedAt = null;
     }
 
-    final int id;
     public final String systemName;
     public final String systemId;
     public final AlarmCause cause;
     public final Map<String, String> metadata = null; // TODO: Make use of this.
+    final int id;
+    final Instant raisedAt;
     boolean acknowledged;
-    Instant raisedAt;
     Instant updatedAt;
     Instant clearedAt;
-    Instant acknowledgedAt = null;
 
     protected String description() {
         String identifier = (systemId == null)
@@ -71,10 +70,7 @@ public class Alarm {
         if (systemId != null && !systemId.equals(this.systemId)) {
             return false;
         }
-        if (this.cause != cause) {
-            return false;
-        }
-        return true;
+        return this.cause == cause;
     }
 
     /**
@@ -92,7 +88,7 @@ public class Alarm {
             .raisedAt(raisedAt)
             .updatedAt(updatedAt)
             .clearedAt(clearedAt)
-            .acknowledgedAt(acknowledgedAt)
+            .acknowledgedAt(null) // TODO: Implement
             .build();
     }
 }

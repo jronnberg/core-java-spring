@@ -1,15 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
+
+import java.time.Instant;
+import java.util.*;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
@@ -21,26 +17,11 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface PlantDescriptionEntry {
 
-    final static Comparator<PlantDescriptionEntry> ID_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return e1.id() - e2.id();
-        }
-    };
+    Comparator<PlantDescriptionEntry> ID_COMPARATOR = Comparator.comparingInt(PlantDescriptionEntry::id);
 
-    final static Comparator<PlantDescriptionEntry> CREATED_AT_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return e1.createdAt().compareTo(e2.createdAt());
-        }
-    };
+    Comparator<PlantDescriptionEntry> CREATED_AT_COMPARATOR = Comparator.comparing(PlantDescriptionEntry::createdAt);
 
-    final static Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PlantDescriptionEntry e1, PlantDescriptionEntry e2) {
-            return e1.updatedAt().compareTo(e2.updatedAt());
-        }
-    };
+    Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = Comparator.comparing(PlantDescriptionEntry::updatedAt);
 
     int id();
 
@@ -153,7 +134,7 @@ public interface PlantDescriptionEntry {
 
     static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
 
-        Comparator<PlantDescriptionEntry> comparator = null;
+        Comparator<PlantDescriptionEntry> comparator;
         switch (sortField) {
             case "id":
                 comparator = ID_COMPARATOR;
@@ -169,24 +150,24 @@ public interface PlantDescriptionEntry {
         }
 
         if (sortAscending) {
-            Collections.sort(entries, comparator);
+            entries.sort(comparator);
         } else {
-            Collections.sort(entries, comparator.reversed());
+            entries.sort(comparator.reversed());
         }
     }
 
     /**
      * Filters the given list based on the elements' 'active' values.
      *
-     * @param alarms A list of Plant Description entries.
-     * @param active If true, active entries are removed. If false, inactive
-     *               entries are removed.
+     * @param entries A list of Plant Description entries.
+     * @param active  If true, active entries are removed. If false, inactive
+     *                entries are removed.
      */
     static void filterByActive(List<? extends PlantDescriptionEntry> entries, boolean active) {
         if (active) {
             entries.removeIf(entry -> !entry.active());
         } else {
-            entries.removeIf(entry -> entry.active());
+            entries.removeIf(PlantDescriptionEntry::active);
         }
     }
 
@@ -198,7 +179,7 @@ public interface PlantDescriptionEntry {
      * @return Service definition name of the *producer* service of the
      * specified connection.
      */
-    public default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
+    default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
         final SystemPort producerPort = connections().get(connectionIndex).producer();
 
         String serviceDefinitionName = null;

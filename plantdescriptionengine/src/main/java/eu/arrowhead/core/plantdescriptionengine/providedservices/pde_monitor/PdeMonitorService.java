@@ -1,15 +1,9 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import java.util.Objects;
-
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPdeAlarms;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetPdeAlarm;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetPlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.UpdatePdeAlarm;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPlantDescriptions;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.*;
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -17,6 +11,8 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.Objects;
 
 /**
  * This service enables monitoring of a plant and related alarms raised by Plant
@@ -41,7 +37,7 @@ public class PdeMonitorService {
      *                     service.
      * @param httpClient   Object for communicating with monitorable services.
      * @param alarmManager Object used for managing PDE alarms.
-     * @param insecure     Indicates whether the service should run in secure mode.
+     * @param secure       Indicates whether the service should run in secure mode.
      */
     public PdeMonitorService(
         ArSystem arSystem,

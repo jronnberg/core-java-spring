@@ -1,10 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Scanner;
@@ -29,7 +25,6 @@ public class FileRuleStore implements RuleStore {
      * Class constructor.
      *
      * @param ruleStoreDirectory File path to the directory for storing rules.
-     * @throws RuleStoreException
      */
     public FileRuleStore(final String ruleStoreDirectory) {
         Objects.requireNonNull(ruleStoreDirectory, "Expected path to Orchestrator Rule directory");
@@ -92,7 +87,7 @@ public class FileRuleStore implements RuleStore {
      * {@inheritDoc}
      */
     @Override
-    public void removeAll() throws RuleStoreException {
+    public void removeAll() {
         new File(ruleStoreFile).delete();
     }
 }

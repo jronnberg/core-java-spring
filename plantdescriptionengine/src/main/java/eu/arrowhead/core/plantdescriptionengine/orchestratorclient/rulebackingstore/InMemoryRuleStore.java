@@ -17,7 +17,7 @@ public class InMemoryRuleStore implements RuleStore {
      */
     @Override
     public Set<Integer> readRules() throws RuleStoreException {
-        return new HashSet<Integer>(rules);
+        return new HashSet<>(rules);
     }
 
     /**

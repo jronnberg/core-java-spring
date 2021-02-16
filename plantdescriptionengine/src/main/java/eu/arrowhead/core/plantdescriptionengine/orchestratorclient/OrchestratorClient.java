@@ -1,30 +1,17 @@
 package eu.arrowhead.core.plantdescriptionengine.orchestratorclient;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.*;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStore;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.ProviderSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleDto;
-import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStore;
-import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpMethod;
@@ -34,18 +21,22 @@ import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Futures;
 
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorClient.class);
 
     private final HttpClient client;
     private final InetSocketAddress orchestratorAddress;
     private final CloudDto cloud;
-    private final String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
-    private PlantDescriptionEntry activeEntry = null;
     private final RuleStore ruleStore;
-    private SystemTracker systemTracker;
-
-    final PlantDescriptionTracker pdTracker;
+    private final SystemTracker systemTracker;
+    private final PlantDescriptionTracker pdTracker;
+    private PlantDescriptionEntry activeEntry = null;
 
     /**
      * Class constructor.
@@ -55,10 +46,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @param ruleStore     Object providing permanent storage for Orchestration
      *                      rule data.
      * @param systemTracker Object used to track registered Arrowhead systems.
-     * @throws RuleStoreException
      */
     public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker,
-                              PlantDescriptionTracker pdTracker) throws RuleStoreException {
+                              PlantDescriptionTracker pdTracker) {
 
         Objects.requireNonNull(httpClient, "Expected HttpClient");
         Objects.requireNonNull(cloud, "Expected cloud");
@@ -72,6 +62,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.ruleStore = ruleStore;
         this.pdTracker = pdTracker;
 
+        String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
         SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
@@ -89,15 +80,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
-        return deleteActiveRules().flatMap(deletionResult -> {
-            return (activeEntry == null)
-                ? Future.done()
-                : postRules().flatMap(createdRules -> {
-                ruleStore.setRules(createdRules.getIds());
-                logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
-                return Future.done();
-            });
-        });
+        return deleteActiveRules().flatMap(deletionResult -> (activeEntry == null)
+            ? Future.done()
+            : postRules().flatMap(createdRules -> {
+            ruleStore.setRules(createdRules.getIds());
+            logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
+            return Future.done();
+        }));
     }
 
     /**
@@ -121,13 +110,13 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         // using system name *or* metadata. For now, we assume that systemName
         // is present.
 
-        if (!consumer.systemName().isPresent() || !provider.systemName().isPresent()) {
+        if (consumer.systemName().isEmpty() || provider.systemName().isEmpty()) {
             logger.error("Failed to create Orchestrator rule. The current version of the PDE requires all Plant Description systems to specify a system name.");
             return null;
         }
 
-        final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().get());
-        final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().get());
+        final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().orElse(null));
+        final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().orElse(null));
 
         if (consumerSystemSrEntry == null || providerSystemSrEntry == null) {
             return null;
@@ -223,7 +212,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     /**
      * Deletes all orchestrator rules created by the Orchestrator client.
      *
-     * @param entry The entry whose rules are to be deleted.
      * @return A Future that performs the deletions.
      */
     private Future<Void> deleteActiveRules() {
@@ -311,10 +299,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
                 }
             })
-            .onFailure(throwable -> {
-                logger.error("Encountered an error while handling the new Plant Description '"
-                    + entry.plantDescription() + "'", throwable);
-            });
+            .onFailure(throwable -> logger.error("Encountered an error while handling the new Plant Description '"
+                + entry.plantDescription() + "'", throwable));
     }
 
     /**
@@ -343,14 +329,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         // Otherwise, all of its Orchestration rules should be deleted:
         deleteActiveRules()
-            .ifSuccess(result -> {
-                logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
-                    + entry.plantDescription() + "'");
-            })
-            .onFailure(throwable -> {
-                logger.error("Encountered an error while attempting to delete Plant Description '"
-                    + entry.plantDescription() + "'", throwable);
-            });
+            .ifSuccess(result -> logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
+                + entry.plantDescription() + "'"))
+            .onFailure(throwable -> logger.error("Encountered an error while attempting to delete Plant Description '"
+                + entry.plantDescription() + "'", throwable));
     }
 
 }

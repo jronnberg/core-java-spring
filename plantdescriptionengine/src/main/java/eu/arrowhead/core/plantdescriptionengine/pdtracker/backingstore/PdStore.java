@@ -1,8 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
-import java.util.List;
-
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+
+import java.util.List;
 
 /**
  * Interface for objects that read and write Plant Description Entries to

@@ -1,23 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.InetSocketAddress;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
+import org.junit.jupiter.api.Test;
 import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
@@ -26,10 +11,15 @@ import se.arkalix.dto.json.value.JsonBoolean;
 import se.arkalix.dto.json.value.JsonObject;
 import se.arkalix.dto.json.value.JsonPair;
 
-/**
- * Unit tests for the
- * {@link eu.arrowhead.core.plantdescriptionengine.utils.DtoUtils} class.
- */
+import java.net.InetSocketAddress;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class DtoUtilsTest {
 
     @Test
@@ -104,8 +94,8 @@ public class DtoUtilsTest {
         var extendedPortB = extendedSystem.ports().get(1);
         var extendedPortC = extendedSystem.ports().get(0);
 
-        assertEquals(inventoryId, extendedPortA.inventoryId().get());
-        assertEquals(systemData, extendedPortA.systemData().get());
+        assertEquals(inventoryId, extendedPortA.inventoryId().orElse(null));
+        assertEquals(systemData, extendedPortA.systemData().orElse(null));
 
         assertTrue(extendedPortB.inventoryId().isEmpty());
         assertTrue(extendedPortB.inventoryId().isEmpty());

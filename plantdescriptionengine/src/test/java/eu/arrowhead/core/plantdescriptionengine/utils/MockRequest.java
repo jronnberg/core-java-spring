@@ -1,12 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import se.arkalix.description.ConsumerDescription;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoReadable;
@@ -15,6 +8,13 @@ import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.util.concurrent.FutureProgress;
+
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Mock HttpServiceRequest implementation used for testing.
@@ -72,7 +72,7 @@ public class MockRequest implements HttpServiceRequest {
     public <R extends DtoReadable> FutureProgress<R> bodyAs(Class<R> class_) {
         @SuppressWarnings("unchecked")
         R castBody = (R) body;
-        return new MockFutureProgress<R>(castBody);
+        return new MockFutureProgress<>(castBody);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class MockRequest implements HttpServiceRequest {
     }
 
     public static class Builder {
-        private List<String> pathParameters = new ArrayList<String>();
+        private List<String> pathParameters = new ArrayList<>();
         private Object body;
         private Map<String, List<String>> queryParameters;
 

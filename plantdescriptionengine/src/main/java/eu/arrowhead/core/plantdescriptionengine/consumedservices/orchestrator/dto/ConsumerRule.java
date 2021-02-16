@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
+import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoWritableAs;
 
 import java.util.Optional;
 
-import se.arkalix.dto.DtoReadableAs;
-import se.arkalix.dto.DtoWritableAs;
+import static se.arkalix.dto.DtoEncoding.JSON;
 
 /**
  * Data Transfer Object (DTO) interface for consumer rule.

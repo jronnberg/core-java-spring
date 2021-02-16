@@ -5,10 +5,10 @@ import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 import se.arkalix.dto.json.value.JsonObject;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
-
 import java.util.Map;
 import java.util.Optional;
+
+import static se.arkalix.dto.DtoEncoding.JSON;
 
 /**
  * Data Transfer Object (DTO) interface for plant description port entries.

@@ -1,25 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
 import org.junit.jupiter.api.Test;
-
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class PlantDescriptionValidatorTest {
@@ -27,7 +15,7 @@ public class PlantDescriptionValidatorTest {
     final Instant now = Instant.now();
 
     @Test
-    public void shouldNotReportErrors() throws PdStoreException {
+    public void shouldNotReportErrors() {
 
         // First entry
         int entryIdA = 0;
@@ -137,7 +125,7 @@ public class PlantDescriptionValidatorTest {
 
 
     @Test
-    public void shouldReportDuplicatePorts() throws PdStoreException {
+    public void shouldReportDuplicatePorts() {
 
         final String systemId = "system_a";
         final String portName = "port_a";
@@ -181,7 +169,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldRequireMetadataToDifferentiateBetweenPorts() throws PdStoreException {
+    public void shouldRequireMetadataToDifferentiateBetweenPorts() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -260,7 +248,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportInvalidProducerPort() throws PdStoreException {
+    public void shouldReportInvalidProducerPort() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -329,7 +317,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportInvalidConsumerPort() throws PdStoreException {
+    public void shouldReportInvalidConsumerPort() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -399,7 +387,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportMissingConsumer() throws PdStoreException {
+    public void shouldReportMissingConsumer() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -467,7 +455,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportMissingProvider() throws PdStoreException {
+    public void shouldReportMissingProvider() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -535,7 +523,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportNonuniqueMetadata() throws PdStoreException {
+    public void shouldReportNonUniqueMetadata() {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -598,7 +586,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportDuplicateInclusions() throws PdStoreException {
+    public void shouldReportDuplicateInclusions() {
 
         int entryIdA = 0;
         int entryIdB = 1;
@@ -645,7 +633,7 @@ public class PlantDescriptionValidatorTest {
 
 
     @Test
-    public void shouldReportSelfInclusion() throws PdStoreException {
+    public void shouldReportSelfInclusion() {
 
         int entryId = 344;
 
@@ -668,7 +656,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportNonexistentInclusions() throws PdStoreException {
+    public void shouldReportNonexistentInclusions() {
 
         int nonExistentA = 23;
         int nonExistentB = 34;
@@ -697,7 +685,7 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
-    public void shouldReportIncludeCycles() throws PdStoreException {
+    public void shouldReportIncludeCycles() {
 
         int entryIdA = 0;
         int entryIdB = 1;

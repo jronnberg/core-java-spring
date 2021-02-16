@@ -1,16 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for the
@@ -19,7 +16,7 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
  */
 public class FilePdStoreTest {
 
-    private String entryDirectory = "test-temp-data";
+    private final String entryDirectory = "test-temp-data";
 
     private void deleteDirectory(File dir) {
         File[] allContents = dir.listFiles();

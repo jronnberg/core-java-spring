@@ -1,15 +1,15 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceResponse;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Mock HttpServiceResponse implementation used for testing.

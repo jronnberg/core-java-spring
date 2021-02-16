@@ -2,13 +2,14 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dt
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class PlantDescriptionEntryTest {
@@ -81,11 +82,9 @@ public class PlantDescriptionEntryTest {
             .updatedAt(now)
             .active(true)
             .build();
-        List<PlantDescriptionEntry> entries = Arrays.asList(entry);
+        List<PlantDescriptionEntry> entries = Collections.singletonList(entry);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            PlantDescriptionEntry.sort(entries, "Nonexistent", true);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> PlantDescriptionEntry.sort(entries, "Nonexistent", true));
         assertEquals(
             "'Nonexistent' is not a valid sort field for Plant Description Entries.",
             exception.getMessage()

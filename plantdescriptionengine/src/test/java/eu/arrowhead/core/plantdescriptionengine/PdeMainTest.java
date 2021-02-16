@@ -1,18 +1,15 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import se.arkalix.ArSystem;
+import se.arkalix.net.http.client.HttpClient;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.Properties;
 
-import se.arkalix.ArSystem;
-import se.arkalix.net.http.client.HttpClient;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class PdeMainTest {
@@ -57,9 +54,7 @@ public class PdeMainTest {
         Properties appProps = new Properties();
         appProps.setProperty("server.port", Integer.toString(localPort));
         appProps.setProperty("server.ssl.enabled", "true");
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            PdeMain.createArSystem(appProps, new InetSocketAddress("0.0.0.0", 5000));
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> PdeMain.createArSystem(appProps, new InetSocketAddress("0.0.0.0", 5000)));
         assertEquals(
             "Missing field 'server.ssl.pde.trust-store' in application properties.",
             exception.getMessage()
@@ -72,7 +67,7 @@ public class PdeMainTest {
 
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File keyStoreFile = new File(classLoader.getResource("crypto/keystore.p12").getFile());
+        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
         String keyStorePath = keyStoreFile.getAbsolutePath();
 
         int localPort = 8000;
@@ -93,7 +88,7 @@ public class PdeMainTest {
 
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File keyStoreFile = new File(classLoader.getResource("crypto/keystore.p12").getFile());
+        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
         String keyStorePath = keyStoreFile.getAbsolutePath();
 
         int localPort = 8000;
@@ -114,7 +109,7 @@ public class PdeMainTest {
 
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File keyStoreFile = new File(classLoader.getResource("crypto/keystore.p12").getFile());
+        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
         String keyStorePath = keyStoreFile.getAbsolutePath();
 
         int localPort = 8000;

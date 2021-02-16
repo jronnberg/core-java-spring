@@ -1,28 +1,17 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.GeneralSecurityException;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Properties;
-
-import javax.net.ssl.SSLException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PdeManagementService;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.PdeMonitorService;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PdeManagementService;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.PdeMonitorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.ArServiceCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -32,6 +21,15 @@ import se.arkalix.core.plugin.or.OrchestrationStrategy;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
+
+import javax.net.ssl.SSLException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.GeneralSecurityException;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Properties;
 
 public class PdeMain {
 
@@ -43,7 +41,7 @@ public class PdeMain {
      *
      * @param appProps A set of properties.
      * @param propName Name of the property to retrieve.
-     * @return
+     * @return The property with the given name.
      */
     static private String getProp(Properties appProps, String propName) {
         String result = appProps.getProperty(propName);
@@ -285,7 +283,7 @@ public class PdeMain {
             logger.info("Initializing the Orchestrator client...");
 
             return orchestratorClient.initialize()
-                .flatMap(orchstratorInitializationResult -> {
+                .flatMap(orchestratorInitializationResult -> {
                     logger.info("Orchestrator client initialized.");
                     final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
                     mismatchDetector.run();
@@ -300,9 +298,7 @@ public class PdeMain {
                         .provide();
                 });
         })
-            .ifSuccess(consumer -> {
-                logger.info("The PDE Monitor service is up and running.");
-            })
+            .ifSuccess(consumer -> logger.info("The PDE Monitor service is up and running."))
             .onFailure(throwable -> {
                 logger.error("Failed to launch Plant Description Engine", throwable);
                 System.exit(1);

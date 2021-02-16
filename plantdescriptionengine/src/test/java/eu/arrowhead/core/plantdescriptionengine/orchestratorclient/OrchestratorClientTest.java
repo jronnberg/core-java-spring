@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.net.ssl.SSLException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -66,7 +62,7 @@ public class OrchestratorClientTest {
 
     final String serviceDefinitionA = "service_a";
 
-    Instant now = Instant.now();
+    final Instant now = Instant.now();
 
     final String consumerId = "system_1";
     final String producerId = "system_2";
@@ -81,7 +77,6 @@ public class OrchestratorClientTest {
     private PlantDescriptionTracker pdTracker;
     private HttpClient httpClient;
     private MockSystemTracker systemTracker;
-    private PdStore pdStore;
     private RuleStore ruleStore;
     private OrchestratorClient orchestratorClient;
 
@@ -111,7 +106,7 @@ public class OrchestratorClientTest {
         .ports(producerPorts)
         .build();
 
-    private SrSystemDto consumerSrSystem = new SrSystemBuilder()
+    private final SrSystemDto consumerSrSystem = new SrSystemBuilder()
         .id(1)
         .systemName(consumerName)
         .address("0.0.0.6")
@@ -121,7 +116,7 @@ public class OrchestratorClientTest {
         .updatedAt(now.toString())
         .build();
 
-    private SrSystemDto producerSrSystem = new SrSystemBuilder()
+    private final SrSystemDto producerSrSystem = new SrSystemBuilder()
         .id(2)
         .systemName(producerName)
         .address("0.0.0.7")
@@ -131,7 +126,7 @@ public class OrchestratorClientTest {
         .updatedAt(now.toString())
         .build();
 
-    private SrSystemDto orchestratorSrSystem = new SrSystemBuilder()
+    private final SrSystemDto orchestratorSrSystem = new SrSystemBuilder()
         .id(0)
         .systemName("orchestrator")
         .address("0.0.0.5")
@@ -141,7 +136,7 @@ public class OrchestratorClientTest {
         .updatedAt(now.toString())
         .build();
 
-    private CloudDto cloud = new CloudBuilder()
+    private final CloudDto cloud = new CloudBuilder()
         .name("Cloud_a")
         .operator("Operator_a")
         .build();
@@ -200,9 +195,9 @@ public class OrchestratorClientTest {
     }
 
     @BeforeEach
-    public void initEach() throws PdStoreException, SSLException, RuleStoreException {
+    public void initEach() throws PdStoreException {
+        PdStore pdStore = new InMemoryPdStore();
         httpClient = Mockito.mock(HttpClient.class);
-        pdStore = new InMemoryPdStore();
         pdTracker = new PlantDescriptionTracker(pdStore);
         systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
 
@@ -215,7 +210,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldCreateInsecureRule() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldCreateInsecureRule() throws PdStoreException {
         final PlantDescriptionEntryDto entry = createEntry();
         pdTracker.put(entry);
         var rule = orchestratorClient.createRule(entry.connections().get(0));
@@ -230,7 +225,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldCreateSecureRule() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldCreateSecureRule() throws PdStoreException {
         final PlantDescriptionEntryDto entry = createEntry();
         final var connection = entry.connections().get(0);
 
@@ -255,7 +250,7 @@ public class OrchestratorClientTest {
      * system in the included Plant Description.
      */
     @Test
-    public void shouldAllowConnectionsToSystemInIncludedEntry() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldAllowConnectionsToSystemInIncludedEntry() throws PdStoreException {
         int entryIdB = 442;
         String producerIdB = "system_3";
         String producerNameB = "System 3";
@@ -325,7 +320,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRuleWithMissingConsumer() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotCreateRuleWithMissingConsumer() throws PdStoreException {
         systemTracker.remove(consumerName);
         final var entry = createEntry();
         final var connection = entry.connections().get(0);
@@ -334,7 +329,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRuleWithMissingProvider() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotCreateRuleWithMissingProvider() throws PdStoreException {
         systemTracker.remove(producerName);
         final var entry = createEntry();
         final var connection = entry.connections().get(0);
@@ -343,7 +338,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldStoreRulesWhenAddingPd() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldStoreRulesWhenAddingPd() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entry = createEntry();
         pdTracker.put(entry);
@@ -351,11 +346,12 @@ public class OrchestratorClientTest {
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse response = new MockClientResponse();
         int ruleId = 39;
-        response.status(HttpStatus.CREATED);
-        response.body(new StoreEntryListBuilder()
-            .count(1)
-            .data(List.of(createStoreEntryRule(ruleId, producerSrSystem, consumerSrSystem)))
-            .build());
+        response
+            .status(HttpStatus.CREATED)
+            .body(new StoreEntryListBuilder()
+                .count(1)
+                .data(List.of(createStoreEntryRule(ruleId, producerSrSystem, consumerSrSystem)))
+                .build());
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(Future.success(response));
@@ -394,7 +390,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRulesWhenSystemIsMissing() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotCreateRulesWhenSystemIsMissing() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entry = createEntry();
         pdTracker.put(entry);
@@ -407,7 +403,7 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRulesForPdWithoutConnections() throws SSLException, RuleStoreException,
+    public void shouldNotCreateRulesForPdWithoutConnections() throws
         PdStoreException {
 
         final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
@@ -426,12 +422,12 @@ public class OrchestratorClientTest {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldRemoveRulesWhenRemovingActiveEntry() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldRemoveRulesWhenRemovingActiveEntry() throws RuleStoreException, PdStoreException {
         final PlantDescriptionEntryDto activeEntry = createEntry();
         pdTracker.put(activeEntry);
 
@@ -448,6 +444,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -475,12 +472,12 @@ public class OrchestratorClientTest {
                 assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().get());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldHandleStoreRemovalFailure() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldHandleStoreRemovalFailure() throws RuleStoreException, PdStoreException {
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
         // Use a mock rule store in order to make it throw exceptions.
@@ -497,17 +494,15 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                assertTrue(false); // We should never get here.
-            }).onFailure(e -> {
-            assertEquals(
-                errorMessage,
-                e.getMessage()
-            );
-        });
+                fail(); // We should never get here.
+            }).onFailure(e -> assertEquals(
+            errorMessage,
+            e.getMessage()
+        ));
     }
 
     @Test
-    public void shouldRemoveRulesWhenRemovingConnections() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldRemoveRulesWhenRemovingConnections() throws RuleStoreException, PdStoreException {
         final PlantDescriptionEntryDto entry = createEntry();
 
         pdTracker.put(entry);
@@ -523,6 +518,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -559,12 +555,12 @@ public class OrchestratorClientTest {
                 assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().get());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldNotChangeRulesWhenRemovingInactiveEntry() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotChangeRulesWhenRemovingInactiveEntry() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entryA = createEntry();
         final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryBuilder()
@@ -594,6 +590,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -606,12 +603,12 @@ public class OrchestratorClientTest {
                 assertEquals(1, ruleStore.readRules().size());
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldHandleRemovalOfInactivePd() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldHandleRemovalOfInactivePd() throws PdStoreException {
 
         final PlantDescriptionEntryDto inactiveEntry = PlantDescriptionEntry.deactivated(createEntry());
         pdTracker.put(inactiveEntry);
@@ -623,12 +620,12 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldRemoveRulesWhenSettingInactive() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldRemoveRulesWhenSettingInactive() throws RuleStoreException, PdStoreException {
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
         pdTracker.put(activeEntry);
@@ -644,6 +641,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -657,12 +655,12 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionUpdated(deactivatedEntry);
                 assertEquals(0, ruleStore.readRules().size());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldNotTouchRulesWhenUpdatingInactiveToInactive() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotTouchRulesWhenUpdatingInactiveToInactive() throws PdStoreException {
 
         final PlantDescriptionEntryDto entryA = new PlantDescriptionEntryBuilder()
             .id(0)
@@ -692,12 +690,12 @@ public class OrchestratorClientTest {
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void rulesShouldBeEmptyAfterFailedPost() throws SSLException, RuleStoreException, PdStoreException {
+    public void rulesShouldBeEmptyAfterFailedPost() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entry = createEntry();
 
@@ -721,6 +719,7 @@ public class OrchestratorClientTest {
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -735,12 +734,12 @@ public class OrchestratorClientTest {
                 orchestratorClient.onPlantDescriptionUpdated(entry);
                 assertTrue(ruleStore.readRules().isEmpty());
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 
     @Test
-    public void shouldHandleFailedDeleteRequest() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldHandleFailedDeleteRequest() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
@@ -754,12 +753,14 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         int newRuleId = 82;
 
-        creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse
+            .status(HttpStatus.CREATED)
+            .body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
         final MockClientResponse failedDeletionResponse = new MockClientResponse();
         failedDeletionResponse.status(HttpStatus.INTERNAL_SERVER_ERROR);
 
+        //noinspection unchecked
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(
                 Future.success(deletionResponse),
@@ -773,7 +774,7 @@ public class OrchestratorClientTest {
                 // The rule should not have been removed.
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             }).onFailure(e -> {
-            assertTrue(false); // We should never get here.
+            fail(); // We should never get here.
         });
     }
 }

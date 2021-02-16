@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.util.List;
-
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+
+import java.util.List;
 
 /**
  * Mock Plant Description backing store used for testing.
@@ -14,7 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
  */
 public class MockPdStore implements PdStore {
 
-    private InMemoryPdStore store = new InMemoryPdStore();
+    private final InMemoryPdStore store = new InMemoryPdStore();
 
     private boolean failOnNextRead = false;
     private boolean failOnNextWrite = false;
@@ -22,7 +22,7 @@ public class MockPdStore implements PdStore {
 
     /**
      * @return A list of all entries currently in the backing store.
-     * @throws PdStoreException If {@link setFailOnNextRead} has been called
+     * @throws PdStoreException If {@code setFailOnNextRead} has been called
      *                          since the last time this method was called.
      */
     @Override
@@ -38,7 +38,7 @@ public class MockPdStore implements PdStore {
      * Writes a single entry to backing store.
      *
      * @param entry An entry to store.
-     * @throws PdStoreException If {@link setFailOnNextWrite} has been called
+     * @throws PdStoreException If {@code setFailOnNextWrite} has been called
      *                          since the last time this method was called.
      */
     @Override
@@ -54,7 +54,7 @@ public class MockPdStore implements PdStore {
      * Delete the specified entry from the backing store.
      *
      * @param id ID of the entry to delete.
-     * @throws PdStoreException If {@link setFailOnNextRemove} has been called
+     * @throws PdStoreException If {@code setFailOnNextRemove} has been called
      *                          since the last time this method was called.
      */
     @Override
@@ -67,21 +67,21 @@ public class MockPdStore implements PdStore {
     }
 
     /**
-     * If called, an exception will be thrown next time {@link read} is called.
+     * If called, an exception will be thrown next time {@code read} is called.
      */
     public void setFailOnNextRead() {
         failOnNextRead = true;
     }
 
     /**
-     * If called, an exception will be thrown next time {@link write} is called.
+     * If called, an exception will be thrown next time {@code write} is called.
      */
     public void setFailOnNextWrite() {
         failOnNextWrite = true;
     }
 
     /**
-     * If called, an exception will be thrown next time {@link remove} is
+     * If called, an exception will be thrown next time {@code remove} is
      * called.
      */
     public void setFailOnNextRemove() {

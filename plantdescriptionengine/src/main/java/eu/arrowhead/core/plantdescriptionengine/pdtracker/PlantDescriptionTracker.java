@@ -1,21 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryListBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryListDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Object used to keep track of Plant Description entries.
@@ -28,7 +19,7 @@ public class PlantDescriptionTracker {
 
     // List of instances that need to be informed of any changes to Plant
     // Description Entries.
-    List<PlantDescriptionUpdateListener> listeners = new ArrayList<>();
+    final List<PlantDescriptionUpdateListener> listeners = new ArrayList<>();
 
     // ID-to-entry mapping
     private final Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();

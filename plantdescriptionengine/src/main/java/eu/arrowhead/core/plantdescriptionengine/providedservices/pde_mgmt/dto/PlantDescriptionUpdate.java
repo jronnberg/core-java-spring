@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto;
 
-import java.util.List;
-import java.util.Optional;
-
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoWritableAs;
+
+import java.util.List;
+import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 

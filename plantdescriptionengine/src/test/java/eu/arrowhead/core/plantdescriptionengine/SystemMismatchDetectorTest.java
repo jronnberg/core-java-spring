@@ -8,18 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.InetSocketAddress;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
@@ -32,7 +29,6 @@ import se.arkalix.net.http.client.HttpClient;
 public class SystemMismatchDetectorTest {
 
     private PlantDescriptionTracker pdTracker;
-    private HttpClient httpClient;
     private MockSystemTracker systemTracker;
     private AlarmManager alarmManager;
     private SystemMismatchDetector detector;
@@ -56,7 +52,7 @@ public class SystemMismatchDetectorTest {
             .build();
     }
 
-    private PlantDescriptionEntryDto getPdEntry(String systemName, boolean active) {
+    private PlantDescriptionEntryDto getPdEntry(String systemName) {
         final String systemId = "1234";
         final var system = getSystem(systemName, systemId);
         return new PlantDescriptionEntryBuilder()
@@ -69,21 +65,17 @@ public class SystemMismatchDetectorTest {
             .build();
     }
 
-    private PlantDescriptionEntryDto getPdEntry(String systemName) {
-        return getPdEntry(systemName, true);
-    }
-
     @BeforeEach
     public void initEach() throws PdStoreException, SSLException {
         pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
-        httpClient = new HttpClient.Builder().insecure().build();
+        HttpClient httpClient = new HttpClient.Builder().insecure().build();
         systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
         alarmManager = new AlarmManager();
         detector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
     }
 
     @Test
-    public void shouldNotReportErrors() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldNotReportErrors() throws PdStoreException {
         final String systemName = "System Z";
 
         pdTracker.put(getPdEntry(systemName));
@@ -95,13 +87,14 @@ public class SystemMismatchDetectorTest {
     }
 
     @Test
-    public void shouldReportNotRegistered() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldReportNotRegistered() throws PdStoreException {
         detector.run();
 
         final String systemName = "System A";
         pdTracker.put(getPdEntry(systemName));
         final var alarms = alarmManager.getAlarms();
         final var alarm = alarms.get(0);
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
@@ -109,25 +102,12 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemName + "' cannot be found in the Service Registry.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
     }
 
     @Test
-    public void shouldThrowException() throws SSLException, RuleStoreException, PdStoreException {
-        detector.run();
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            // Create a PD with an unnamed system:
-            pdTracker.put(getPdEntry(null));
-        });
-        assertEquals(
-            "This version of the PDE cannot handle unnamed systems.",
-            exception.getMessage()
-        );
-    }
-
-    @Test
-    public void shouldReportSystemNotInPd() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldReportSystemNotInPd() throws PdStoreException {
 
         final String systemNameA = "System A";
         final String systemNameB = "System B";
@@ -143,6 +123,7 @@ public class SystemMismatchDetectorTest {
         assertEquals(1, alarms.size());
         final var alarm = alarms.get(0);
 
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameB, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
@@ -150,12 +131,12 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemNameB + "' is not present in the active Plant Description.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
     }
 
     @Test
-    public void shouldClearWhenSystemIsRegistered() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldClearWhenSystemIsRegistered() throws PdStoreException {
 
         final String systemNameA = "System A";
         final String systemNameB = "System B";
@@ -185,6 +166,7 @@ public class SystemMismatchDetectorTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameB, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
@@ -192,11 +174,11 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemNameB + "' cannot be found in the Service Registry.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
     }
 
     @Test
-    public void shouldClearWhenPdIsRemoved() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldClearWhenPdIsRemoved() throws PdStoreException {
         detector.run();
 
         final String systemName = "System C";
@@ -208,6 +190,7 @@ public class SystemMismatchDetectorTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
@@ -215,11 +198,11 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemName + "' cannot be found in the Service Registry.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
     }
 
     @Test
-    public void shouldClearWhenPdIsAdded() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldClearWhenPdIsAdded() throws PdStoreException {
         detector.run();
 
         final String systemName = "System D";
@@ -231,6 +214,7 @@ public class SystemMismatchDetectorTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
@@ -238,11 +222,11 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemName + "' is not present in the active Plant Description.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
     }
 
     @Test
-    public void shouldClearWhenSystemIsRemoved() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldClearWhenSystemIsRemoved() {
         detector.run();
 
         final String systemName = "System D";
@@ -254,6 +238,7 @@ public class SystemMismatchDetectorTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
@@ -261,11 +246,11 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemName + "' is not present in the active Plant Description.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
     }
 
     @Test
-    public void shouldClearWhenPdIsUpdated() throws SSLException, RuleStoreException, PdStoreException {
+    public void shouldClearWhenPdIsUpdated() throws PdStoreException {
 
         final String systemNameA = "Sys-A";
         final String systemNameB = "Sys-B";
@@ -294,6 +279,7 @@ public class SystemMismatchDetectorTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameA, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
@@ -301,7 +287,7 @@ public class SystemMismatchDetectorTest {
             "System named '" + systemNameA + "' is not present in the active Plant Description.",
             alarm.description()
         );
-        assertEquals(false, alarm.acknowledged());
+        assertFalse(alarm.acknowledged());
     }
 
 }
