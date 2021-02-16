@@ -37,14 +37,14 @@ public class IntParameterTest {
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
 
-        assertEquals(0, parser.getInt("a").get());
-        assertEquals(1, parser.getInt("b").get());
-        assertEquals(126, parser.getInt("c").get());
-        assertEquals(99999, parser.getInt("d").get());
+        assertEquals(0, parser.getInt("a").orElse(null));
+        assertEquals(1, parser.getInt("b").orElse(null));
+        assertEquals(126, parser.getInt("c").orElse(null));
+        assertEquals(99999, parser.getInt("d").orElse(null));
     }
 
     @Test
-    public void shouldRejectNoninteger() throws ParseError {
+    public void shouldRejectNonInteger() {
         final List<QueryParameter> requiredParameters = List.of(
             new IntParameter("weight")
         );
@@ -53,9 +53,7 @@ public class IntParameterTest {
             .queryParameters(Map.of("weight", List.of("heavy")))
             .build();
 
-        Exception exception = assertThrows(ParseError.class, () -> {
-            new QueryParamParser(requiredParameters, null, request);
-        });
+        Exception exception = assertThrows(ParseError.class, () -> new QueryParamParser(requiredParameters, null, request));
 
         assertEquals(
             "<Query parameter 'weight' must be a valid integer, got 'heavy'.>",
@@ -64,7 +62,7 @@ public class IntParameterTest {
     }
 
     @Test
-    public void shouldRejectInvalidInteger() throws ParseError {
+    public void shouldRejectInvalidInteger() {
         final List<QueryParameter> requiredParameters = List.of(
             new IntParameter("weight")
         );
@@ -73,9 +71,7 @@ public class IntParameterTest {
             .queryParameters(Map.of("weight", List.of("123 test")))
             .build();
 
-        Exception exception = assertThrows(ParseError.class, () -> {
-            new QueryParamParser(requiredParameters, null, request);
-        });
+        Exception exception = assertThrows(ParseError.class, () -> new QueryParamParser(requiredParameters, null, request));
 
         assertEquals(
             "<Query parameter 'weight' must be a valid integer, got '123 test'.>",
@@ -84,7 +80,7 @@ public class IntParameterTest {
     }
 
     @Test
-    public void shouldRejectTooSmallValues() throws ParseError {
+    public void shouldRejectTooSmallValues() {
         final List<QueryParameter> requiredParameters = List.of(
             new IntParameter("a").min(38),
             new IntParameter("b").min(38),
@@ -101,9 +97,7 @@ public class IntParameterTest {
             )
             .build();
 
-        Exception exception = assertThrows(ParseError.class, () -> {
-            new QueryParamParser(requiredParameters, null, request);
-        });
+        Exception exception = assertThrows(ParseError.class, () -> new QueryParamParser(requiredParameters, null, request));
 
         assertEquals(
             "<Query parameter 'c' must be greater than 38, got 37.>",
@@ -114,7 +108,6 @@ public class IntParameterTest {
     @Test
     public void shouldReportMissingParameter() {
 
-        final List<QueryParameter> acceptedParameters = null;
         final List<QueryParameter> requiredParameters = List.of(
             new IntParameter("height")
         );
@@ -123,7 +116,7 @@ public class IntParameterTest {
             final HttpServiceRequest request = new MockRequest.Builder()
                 .queryParameters(Map.of())
                 .build();
-            new QueryParamParser(requiredParameters, acceptedParameters, request);
+            new QueryParamParser(requiredParameters, null, request);
         });
         assertEquals(
             "<Missing parameter 'height'.>",
@@ -138,13 +131,11 @@ public class IntParameterTest {
             new IntParameter("a")
                 .requires(new IntParameter("b"))
         );
-        final List<QueryParameter> requiredParameters = null;
-
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()
                 .queryParameters(Map.of("a", List.of("95")))
                 .build();
-            new QueryParamParser(requiredParameters, acceptedParameters, request);
+            new QueryParamParser(null, acceptedParameters, request);
         });
         assertEquals(
             "<Missing parameter 'b'.>",

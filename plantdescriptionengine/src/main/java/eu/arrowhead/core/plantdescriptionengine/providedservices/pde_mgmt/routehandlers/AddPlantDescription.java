@@ -1,22 +1,21 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PlantDescriptionValidator;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.Objects;
 
 /**
  * Handles HTTP requests to create Plant Description Entries.
@@ -47,7 +46,7 @@ public class AddPlantDescription implements HttpRouteHandler {
     public Future<HttpServiceResponse> handle(
         final HttpServiceRequest request,
         final HttpServiceResponse response
-    ) throws Exception {
+    ) {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
             final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());

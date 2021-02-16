@@ -1,25 +1,21 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmList;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmList;
-import se.arkalix.net.http.HttpStatus;
-import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GetAllPdeAlarmsTest {
 
@@ -52,8 +48,9 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(ascRequest, ascResponse)
                 .map(ascendingResult -> {
-                    assertEquals(HttpStatus.OK, ascResponse.status().get());
+                    assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
+                    assertTrue(ascResponse.body().isPresent());
                     final var alarms = (PdeAlarmList) ascResponse.body().get();
                     assertEquals(3, alarms.count());
 
@@ -67,8 +64,9 @@ public class GetAllPdeAlarmsTest {
                     return handler.handle(descRequest, descResponse);
                 })
                 .ifSuccess(descendingResult -> {
-                    assertEquals(HttpStatus.OK, descResponse.status().get());
+                    assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
+                    assertTrue(descResponse.body().isPresent());
                     final var alarms = (PdeAlarmList) descResponse.body().get();
                     assertEquals(3, alarms.count());
 
@@ -78,9 +76,7 @@ public class GetAllPdeAlarmsTest {
                         assertTrue(alarm.id() <= previousId);
                         previousId = alarm.id();
                     }
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -89,15 +85,19 @@ public class GetAllPdeAlarmsTest {
     @Test
     public void shouldSortByCreatedAt() {
 
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
         final String systemNameA = "System A";
         final String systemNameB = "System B";
         final String systemNameC = "System C";
 
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameA), null);
-        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameB), null);
-        alarmManager.raiseSystemNotRegistered(Optional.of(systemNameC), null);
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA);
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB);
+        alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC);
         final var handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
@@ -119,8 +119,9 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(ascRequest, ascResponse)
                 .map(ascendingResult -> {
-                    assertEquals(HttpStatus.OK, ascResponse.status().get());
+                    assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
+                    assertTrue(ascResponse.body().isPresent());
                     final var alarms = (PdeAlarmList) ascResponse.body().get();
                     assertEquals(3, alarms.count());
 
@@ -134,9 +135,12 @@ public class GetAllPdeAlarmsTest {
                     return handler.handle(descRequest, descResponse);
                 })
                 .ifSuccess(descendingResult -> {
-                    assertEquals(HttpStatus.OK, descResponse.status().get());
+                    assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
-                    final var alarms = (PdeAlarmList) descResponse.body().get();
+                    assertTrue(descResponse.body().isPresent());
+                    final var body = descResponse.body();
+                    assertTrue(body.isPresent());
+                    final var alarms = (PdeAlarmList) body.get();
                     assertEquals(3, alarms.count());
 
                     int previousId = alarms.data().get(0).id();
@@ -146,16 +150,14 @@ public class GetAllPdeAlarmsTest {
                         assertTrue(alarm.id() <= previousId);
                         previousId = alarm.id();
                     }
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
     }
 
     @Test
-    public void shouldRejectNonBooleans() throws PdStoreException {
+    public void shouldRejectNonBooleans() {
 
         final var handler = new GetAllPdeAlarms(new AlarmManager());
         final String nonBoolean = "Not a boolean";
@@ -169,21 +171,21 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
                         + nonBoolean + "'.>";
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    final var body = response.body();
+                    assertTrue(body.isPresent());
+                    String actualErrorMessage = ((ErrorMessage) body.get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
     }
 
     @Test
-    public void shouldFilterEntries() throws PdStoreException {
+    public void shouldFilterEntries() {
 
         final String systemNameA = "System A";
         final String systemNameB = "System B";
@@ -197,6 +199,7 @@ public class GetAllPdeAlarmsTest {
 
         int alarmId = 0;
         for (final var alarm : alarmManager.getAlarms()) {
+            assertTrue(alarm.systemName().isPresent());
             if (alarm.systemName().get().equals(systemNameB)) {
                 alarmId = alarm.id();
             }
@@ -226,34 +229,35 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(nameRequest, nameResponse)
                 .flatMap(nameResult -> {
-                    assertEquals(HttpStatus.OK, nameResponse.status().get());
+                    assertEquals(HttpStatus.OK, nameResponse.status().orElse(null));
+                    assertTrue(nameResponse.body().isPresent());
                     var alarms = (PdeAlarmList) nameResponse.body().get();
                     assertEquals(1, alarms.count());
-                    assertEquals(systemNameA, alarms.data().get(0).systemName().get());
+                    assertEquals(systemNameA, alarms.data().get(0).systemName().orElse(null));
                     return handler.handle(ackRequest, ackResponse);
                 })
                 .flatMap(ackResult -> {
-                    assertEquals(HttpStatus.OK, ackResponse.status().get());
+                    assertEquals(HttpStatus.OK, ackResponse.status().orElse(null));
+                    assertTrue(ackResponse.body().isPresent());
                     var alarms = (PdeAlarmList) ackResponse.body().get();
                     assertEquals(1, alarms.count());
-                    assertEquals(systemNameB, alarms.data().get(0).systemName().get());
+                    assertEquals(systemNameB, alarms.data().get(0).systemName().orElse(null));
                     return handler.handle(severityRequest, severityResponse);
                 }).ifSuccess(severityResult -> {
-                assertEquals(HttpStatus.OK, severityResponse.status().get());
+                assertEquals(HttpStatus.OK, severityResponse.status().orElse(null));
+                assertTrue(severityResponse.body().isPresent());
                 var alarms = (PdeAlarmList) severityResponse.body().get();
                 assertEquals(1, alarms.count());
-                assertEquals(systemNameC, alarms.data().get(0).systemName().get());
+                assertEquals(systemNameC, alarms.data().get(0).systemName().orElse(null));
             })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
     }
 
     @Test
-    public void shouldPaginate() throws PdStoreException {
+    public void shouldPaginate() {
 
         final var alarmManager = new AlarmManager();
 
@@ -268,7 +272,7 @@ public class GetAllPdeAlarmsTest {
 
         final var handler = new GetAllPdeAlarms(alarmManager);
         final HttpServiceResponse response = new MockServiceResponse();
-        final int page = 0;
+        final int page = 2;
         final int itemsPerPage = 3;
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of(
@@ -281,7 +285,8 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     final var alarms = (PdeAlarmList) response.body().get();
                     assertEquals(itemsPerPage, alarms.count());
                     for (int i = 0; i < itemsPerPage; i++) {
@@ -291,16 +296,14 @@ public class GetAllPdeAlarmsTest {
                         assertEquals(expectedId, alarmId);
                     }
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
     }
 
     @Test
-    public void shouldRejectNegativePage() throws PdStoreException {
+    public void shouldRejectNegativePage() {
         final var handler = new GetAllPdeAlarms(new AlarmManager());
         int page = -3;
         final HttpServiceResponse response = new MockServiceResponse();
@@ -314,13 +317,12 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

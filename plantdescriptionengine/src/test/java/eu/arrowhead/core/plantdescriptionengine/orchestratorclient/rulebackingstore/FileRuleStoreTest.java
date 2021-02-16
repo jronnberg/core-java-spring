@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 public class FileRuleStoreTest {
 
-    private String entryDirectory = "test-temp-data";
+    private final String entryDirectory = "test-temp-data";
 
     private void deleteDirectory(File dir) {
         File[] allContents = dir.listFiles();

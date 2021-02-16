@@ -1,22 +1,27 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
+import eu.arrowhead.core.plantdescriptionengine.alarms.Alarm;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmCause;
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemUpdateListener;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.alarms.Alarm;
-import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmCause;
-import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-
 public class SystemMismatchDetector implements PlantDescriptionUpdateListener, SystemUpdateListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(SystemMismatchDetector.class);
+
     private final PlantDescriptionTracker pdTracker;
     private final SystemTracker systemTracker;
     private final AlarmManager alarmManager;
@@ -50,26 +55,31 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
     @Override
     public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {
+        logger.debug("Entry '" + entry.plantDescription() + "' added, checking for inconcistencies...");
         checkSystems();
     }
 
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
+        logger.debug("Entry '" + entry.plantDescription() + "' updated, checking for inconcistencies...");
         checkSystems();
     }
 
     @Override
     public void onPlantDescriptionRemoved(PlantDescriptionEntry entry) {
+        logger.debug("Entry '" + entry.plantDescription() + "' removed, checking for inconcistencies...");
         checkSystems();
     }
 
     @Override
     public void onSystemAdded(SrSystem system) {
+        logger.debug("System '" + system.systemName() + "' added, checking for inconcistencies...");
         checkSystems();
     }
 
     @Override
     public void onSystemRemoved(SrSystem system) {
+        logger.debug("System '" + system.systemName() + "' removed, checking for inconcistencies...");
         checkSystems();
     }
 
@@ -82,9 +92,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
         final Optional<String> name = entrySystem.systemName();
         if (name.isPresent()) {
-            if (name.get().equals(registeredSystem.systemName())) {
-                return true;
-            }
+            return name.get().equals(registeredSystem.systemName());
         } else {
             assert false;
             // TODO: This part of the code is never reached, since nameless
@@ -112,17 +120,18 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     private boolean alarmMatchesSystem(Alarm alarm, PdeSystem entrySystem) {
         Optional<String> systemName = entrySystem.systemName();
-        if (!systemName.isPresent()) {
-            assert false;
-            // TODO: This part of the code is never reached, since nameless
-            // systems are not yet supported.
-        }
+        assert systemName.isPresent();
         boolean systemNamesMatch = systemName.get().equals(alarm.systemName);
         boolean systemIdsMatch = alarm.systemId != null && entrySystem.systemId().equals(alarm.systemId);
         // TODO: Look for a match using metadata as well
         return systemIdsMatch || systemNamesMatch;
     }
 
+    /**
+     * Checks that the systems in the Service Registry match those in the
+     * currently active Plant Description. An alarm is raised for every
+     * mismatch.
+     */
     private void checkSystems() {
         final List<SrSystem> registeredSystems = systemTracker.getSystems();
         final PlantDescriptionEntry activeEntry = pdTracker.activeEntry();
@@ -137,18 +146,19 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
         // ---------------------------------------------------------------------
         // For each system in the active Plant Description...
         for (final var entrySystem : pdSystems) {
-            String systemName = null;
+            boolean matchFound = false;
 
             // ... check if the system is present in the Service Registry:
             for (final var registeredSystem : registeredSystems) {
                 if (systemsMatch(entrySystem, registeredSystem)) {
-                    systemName = registeredSystem.systemName();
+                    matchFound = true;
                 }
             }
 
             // If not, raise an alarm:
-            if (systemName == null) {
-                alarmManager.raiseSystemNotRegistered(entrySystem.systemName(), entrySystem.metadata());
+            if (!matchFound) {
+                alarmManager.raiseSystemNotRegistered(
+                    entrySystem.systemName().orElse(null), entrySystem.metadata().orElse(null));
             }
         }
 

@@ -1,32 +1,26 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import se.arkalix.net.http.HttpStatus;
+import se.arkalix.net.http.service.HttpServiceRequest;
+import se.arkalix.net.http.service.HttpServiceResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdate;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdateBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import se.arkalix.net.http.HttpStatus;
-import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UpdatePlantDescriptionTest {
 
@@ -55,14 +49,14 @@ public class UpdatePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.OK, response.status().get());
+                    assertTrue(response.body().isPresent());
                     PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
-                    assertEquals(returnedEntry.plantDescription(), newName);
+                    assertEquals(newName, returnedEntry.plantDescription());
                     assertEquals(sizeBeforePut, pdTracker.getEntries().size());
                 })
-                .onFailure(throwable -> {
-                    assertNull(throwable);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -83,15 +77,14 @@ public class UpdatePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -112,15 +105,14 @@ public class UpdatePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.NOT_FOUND, response.status().get());
-
+                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
                     String expectedErrorMessage = "Plant Description with ID '" + nonExistentId + "' not found.";
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertTrue(response.body().isPresent());
+                    ErrorMessage body = (ErrorMessage) response.body().get();
+                    String actualErrorMessage = body.error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -172,15 +164,15 @@ public class UpdatePlantDescriptionTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     String expectedErrorMessage = "<Duplicate port name '" +
                         portName + "' in system '" + systemId + "'>";
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertTrue(response.body().isPresent());
+                    ErrorMessage body = (ErrorMessage) response.body().get();
+                    String actualErrorMessage = body.error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
-                .onFailure(e -> {
-                    assertNull(e);
-                });
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -211,12 +203,8 @@ public class UpdatePlantDescriptionTest {
 
         try {
             handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().get());
-                })
-                .onFailure(throwable -> {
-                    assertNull(throwable);
-                });
+                .ifSuccess(result -> assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status().orElse(null)))
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

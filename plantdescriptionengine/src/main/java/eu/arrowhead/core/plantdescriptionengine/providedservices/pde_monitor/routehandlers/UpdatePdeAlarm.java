@@ -1,7 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import java.util.Objects;
-
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateDto;
@@ -11,6 +9,8 @@ import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.Objects;
 
 /**
  * Handles HTTP requests to update PDE Alarms.
@@ -40,7 +40,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
     public Future<HttpServiceResponse> handle(
         final HttpServiceRequest request,
         final HttpServiceResponse response
-    ) throws Exception {
+    ) {
         return request
             .bodyAs(PdeAlarmUpdateDto.class)
             .map(newFields -> {

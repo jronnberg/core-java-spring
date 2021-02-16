@@ -1,23 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
-import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortBuilder;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class DtoUtils {
 
@@ -101,7 +92,7 @@ public final class DtoUtils {
                 for (var info : systemInfoList) {
 
                     boolean matchesServiceDefinition = info.serviceDefinition.equals(port.serviceDefinition());
-                    boolean matchesPort = info.matchesPortMetadata(system.metadata(), port.metadata());
+                    boolean matchesPort = info.matchesPortMetadata(system.metadata().orElse(null), port.metadata().orElse(null));
 
                     if (matchesServiceDefinition) { // TODO: Merge if-statements, this is just for checking test coverage
                         if (matchesPort) {
@@ -127,7 +118,7 @@ public final class DtoUtils {
         // If there is any monitor info left, it may belong to the system
         // itself, not a specific port.
         for (var infoBundle : systemInfoList) {
-            if (infoBundle.matchesSystemMetadata(system.metadata())) {
+            if (infoBundle.matchesSystemMetadata(system.metadata().orElse(null))) {
                 systemBuilder
                     .inventoryId(infoBundle.inventoryId)
                     .systemData(infoBundle.systemData);

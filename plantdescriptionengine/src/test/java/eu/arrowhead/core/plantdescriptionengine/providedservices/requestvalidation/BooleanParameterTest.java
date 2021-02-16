@@ -5,16 +5,15 @@ import org.junit.jupiter.api.Test;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import se.arkalix.net.http.service.HttpServiceRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BooleanParameterTest {
 
     @Test
-    public void shouldParseBooelans() throws ParseError {
+    public void shouldParseBooleans() throws ParseError {
 
         final List<QueryParameter> requiredParameters = List.of(
             new BooleanParameter("smart"),
@@ -37,16 +36,15 @@ public class BooleanParameterTest {
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
 
-        assertEquals(true, parser.getBoolean("smart").get());
-        assertEquals(false, parser.getBoolean("tired").get());
-        assertEquals(true, parser.getBoolean("strong").get());
-        assertEquals(false, parser.getBoolean("fat").get());
+        assertTrue(parser.getBoolean("smart").orElse(false));
+        assertFalse(parser.getBoolean("tired").orElse(true));
+        assertTrue(parser.getBoolean("strong").orElse(false));
+        assertFalse(parser.getBoolean("fat").orElse(true));
     }
 
     @Test
     public void shouldUseDefaultArgument() throws ParseError {
 
-        final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
             new BooleanParameter("good").setDefault(true),
             new BooleanParameter("happy").setDefault(false)
@@ -56,14 +54,14 @@ public class BooleanParameterTest {
             .queryParameters(Map.of())
             .build();
 
-        final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+        final var parser = new QueryParamParser(null, acceptedParameters, request);
 
-        assertEquals(true, parser.getBoolean("good").get());
-        assertEquals(false, parser.getBoolean("happy").get());
+        assertTrue(parser.getBoolean("good").orElse(false));
+        assertFalse(parser.getBoolean("happy").orElse(true));
     }
 
     @Test
-    public void shouldNonBooleans() throws ParseError {
+    public void shouldNonBooleans() {
         final List<QueryParameter> requiredParameters = List.of(
             new BooleanParameter("cool")
         );
@@ -72,9 +70,7 @@ public class BooleanParameterTest {
             .queryParameters(Map.of("cool", List.of("128")))
             .build();
 
-        Exception exception = assertThrows(ParseError.class, () -> {
-            new QueryParamParser(requiredParameters, null, request);
-        });
+        Exception exception = assertThrows(ParseError.class, () -> new QueryParamParser(requiredParameters, null, request));
 
         assertEquals(
             "<Query parameter 'cool' must be true or false, got '128'.>",
@@ -85,7 +81,6 @@ public class BooleanParameterTest {
     @Test
     public void shouldReportMissingParameter() {
 
-        final List<QueryParameter> acceptedParameters = null;
         final List<QueryParameter> requiredParameters = List.of(
             new BooleanParameter("weekends")
         );
@@ -94,7 +89,7 @@ public class BooleanParameterTest {
             final HttpServiceRequest request = new MockRequest.Builder()
                 .queryParameters(Map.of())
                 .build();
-            new QueryParamParser(requiredParameters, acceptedParameters, request);
+            new QueryParamParser(requiredParameters, null, request);
         });
         assertEquals(
             "<Missing parameter 'weekends'.>",
@@ -109,13 +104,12 @@ public class BooleanParameterTest {
             new BooleanParameter("sort")
                 .requires(new IntParameter("item_per_page"))
         );
-        final List<QueryParameter> requiredParameters = null;
 
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()
                 .queryParameters(Map.of("sort", List.of("true")))
                 .build();
-            new QueryParamParser(requiredParameters, acceptedParameters, request);
+            new QueryParamParser(null, acceptedParameters, request);
         });
         assertEquals(
             "<Missing parameter 'item_per_page'.>",

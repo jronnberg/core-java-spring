@@ -1,11 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.alarms;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AlarmTest {
 
@@ -28,9 +25,7 @@ public class AlarmTest {
 
     @Test
     public void shouldRejectNullAlarmCause() {
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            new Alarm("XYZ", null, null);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () -> new Alarm("XYZ", null, null));
         assertEquals(
             "Expected an alarm cause.",
             exception.getMessage()

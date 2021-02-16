@@ -1,24 +1,18 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
+
+import java.net.InetSocketAddress;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Object used to keep track of registered Arrowhead systems.
@@ -27,16 +21,16 @@ public class SystemTracker {
     private static final Logger logger = LoggerFactory.getLogger(SystemTracker.class);
 
     private final HttpClient httpClient;
-    private InetSocketAddress serviceRegistryAddress = null;
+    private InetSocketAddress serviceRegistryAddress;
     private boolean initialized;
-    private int pollInterval = 5000;
+    private final int pollInterval = 5000;
 
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
-    protected List<SystemUpdateListener> listeners = new ArrayList<>();
+    protected final List<SystemUpdateListener> listeners = new ArrayList<>();
 
     // Map from system name to system:
-    protected Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    protected final Map<String, SrSystem> systems = new ConcurrentHashMap<>();
 
     /**
      * Class constructor
@@ -84,7 +78,8 @@ public class SystemTracker {
      * Informs all registered listeners of which systems have been added or
      * removed from the service registry since the last refresh.
      *
-     * @param newSystems
+     * @param oldSystems Systems that were previously present in the Service Registry.
+     * @param newSystems Systems that are present in the Service Registry.
      */
     private void notifyListeners(List<SrSystem> oldSystems, List<SrSystem> newSystems) {
         // Report removed systems
@@ -116,7 +111,7 @@ public class SystemTracker {
      * Registers another object to be notified whenever a system is added or
      * removed.
      *
-     * @param listener
+     * @param listener Object to notify.
      */
     public void addListener(SystemUpdateListener listener) {
         listeners.add(listener);
@@ -138,7 +133,7 @@ public class SystemTracker {
     }
 
     public List<SrSystem> getSystems() {
-        return new ArrayList<SrSystem>(systems.values());
+        return new ArrayList<>(systems.values());
     }
 
     /**
@@ -154,9 +149,7 @@ public class SystemTracker {
                 @Override
                 public void run() {
                     fetchSystems()
-                        .onFailure(error -> {
-                            logger.error("Failed to retrieve registered systems", error);
-                        });
+                        .onFailure(error -> logger.error("Failed to retrieve registered systems", error));
                 }
             }, 0, pollInterval);
 

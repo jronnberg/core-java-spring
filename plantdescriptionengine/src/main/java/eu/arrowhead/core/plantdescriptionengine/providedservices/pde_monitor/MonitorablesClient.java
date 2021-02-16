@@ -1,16 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.SystemDataDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.ArSystem;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
@@ -21,12 +16,16 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.query.ServiceQuery;
 
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MonitorablesClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorablesClient.class);
     private final static int fetchInfoInterval = 6000; // Milliseconds
     private final static int pingInterval = 10000; // Milliseconds
-    private ServiceQuery serviceQuery;
+    private final ServiceQuery serviceQuery;
     private final HttpClient httpClient;
     private final MonitorInfo monitorInfo;
     private final AlarmManager alarmManager;
@@ -86,9 +85,7 @@ public class MonitorablesClient {
                     ping(service);
                 }
             })
-            .onFailure(e -> {
-                logger.error("Failed to ping monitorable systems.", e);
-            });
+            .onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
     }
 
     /**
@@ -102,9 +99,7 @@ public class MonitorablesClient {
                     retrieveSystemData(service);
                 }
             })
-            .onFailure(e -> {
-                logger.error("Failed to fetch monitor info from monitorable systems.", e);
-            });
+            .onFailure(e -> logger.error("Failed to fetch monitor info from monitorable systems.", e));
     }
 
     private void ping(ServiceDescription service) {
@@ -129,15 +124,14 @@ public class MonitorablesClient {
     private void retrieveId(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
+        //noinspection SpellCheckingInspection
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri(service.uri() + "/inventoryid")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
-            .ifSuccess(inventoryId -> {
-                monitorInfo.putInventoryId(service, inventoryId.id());
-            })
+            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id()))
             .onFailure(e -> {
                 String errorMessage = "Failed to retrieve inventory ID for system '" +
                     service.provider().name() + "', service '" + service.name() + "'.";
@@ -150,15 +144,14 @@ public class MonitorablesClient {
     private void retrieveSystemData(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
+        //noinspection SpellCheckingInspection
         httpClient.send(address, new HttpClientRequest()
             .method(HttpMethod.GET)
             .uri(service.uri() + "/systemdata")
             .header("accept", "application/json"))
             .flatMap(result -> result
                 .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
-            .ifSuccess(systemData -> {
-                monitorInfo.putSystemData(service, systemData.data());
-            })
+            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data()))
             .onFailure(e -> {
                 String errorMessage = "Failed to retrieve system data for system '" +
                     service.provider().name() + "', service '" + service.name() + "'.";

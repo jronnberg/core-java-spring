@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto;
 
-import java.util.List;
-
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
+
+import java.util.List;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 

@@ -1,11 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 
 /**
  * Plant Description backing store that only stores data in memory.
@@ -15,14 +15,14 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 public class InMemoryPdStore implements PdStore {
 
     // ID-to-entry map:
-    private Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
+    private final Map<Integer, PlantDescriptionEntryDto> entries = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
-        return new ArrayList<PlantDescriptionEntryDto>(entries.values());
+        return new ArrayList<>(entries.values());
     }
 
     /**

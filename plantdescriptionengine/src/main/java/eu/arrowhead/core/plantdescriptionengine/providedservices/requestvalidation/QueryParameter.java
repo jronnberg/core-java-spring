@@ -1,9 +1,9 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation;
 
+import se.arkalix.net.http.service.HttpServiceRequest;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import se.arkalix.net.http.service.HttpServiceRequest;
 
 /**
  * An instance of this class embodies a set of requirements placed on a single
@@ -12,8 +12,8 @@ import se.arkalix.net.http.service.HttpServiceRequest;
  */
 public abstract class QueryParameter {
 
-    protected String name;
-    protected List<QueryParameter> requiredParameters = new ArrayList<>();
+    protected final String name;
+    protected final List<QueryParameter> requiredParameters = new ArrayList<>();
 
     /**
      * @param param A query parameter that must be present if this one is.

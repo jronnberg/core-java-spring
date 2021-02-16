@@ -1,26 +1,22 @@
 package eu.arrowhead.core.plantdescriptionengine.alarms;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import java.util.Optional;
-
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import org.junit.jupiter.api.Test;
 
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AlarmManagerTest {
 
     @Test
     public void shouldRaiseNotRegistered() {
+        final String systemId = "Sys-A";
         final String systemName = "System A";
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotRegistered(Optional.of(systemName), null);
+        alarmManager.raiseSystemNotRegistered(systemId, systemName);
         final PdeAlarm alarm = alarmManager.getAlarms().get(0);
 
-        assertEquals(systemName, alarm.systemName().get());
+        assertEquals(systemName, alarm.systemName().orElse(null));
         assertEquals("System named '" + systemName + "' cannot be found in the Service Registry.", alarm.description());
         assertFalse(alarm.acknowledged());
     }
@@ -37,7 +33,7 @@ public class AlarmManagerTest {
         final var alarm = alarms.get(0);
 
         assertEquals(1, alarms.size());
-        assertEquals(systemName, alarm.systemName().get());
+        assertEquals(systemName, alarm.systemName().orElse(null));
         assertFalse(alarm.systemId().isPresent());
     }
 
@@ -64,9 +60,9 @@ public class AlarmManagerTest {
         for (final var alarm : alarmManager.getAlarms()) {
             if (alarm.clearedAt().isPresent()) {
                 numCleared++;
-                assertEquals(systemNameA, alarm.systemName().get());
+                assertEquals(systemNameA, alarm.systemName().orElse(null));
             } else {
-                assertEquals(systemNameB, alarm.systemName().get());
+                assertEquals(systemNameB, alarm.systemName().orElse(null));
             }
         }
         assertEquals(1, numCleared);

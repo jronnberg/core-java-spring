@@ -2,17 +2,11 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class PlantDescriptionEntryTest {
@@ -441,7 +435,7 @@ public class PlantDescriptionEntryTest {
             .active(true)
             .build();
 
-        List<PlantDescriptionEntry> entries = Arrays.asList(entry);
+        List<PlantDescriptionEntry> entries = Collections.singletonList(entry);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
             PlantDescriptionEntry.sort(entries, "Nonexistent", true)

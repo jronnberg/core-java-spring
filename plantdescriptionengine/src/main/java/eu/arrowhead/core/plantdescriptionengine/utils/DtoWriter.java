@@ -1,13 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import se.arkalix.dto.binary.BinaryWriter;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import se.arkalix.dto.binary.BinaryWriter;
 
 public class DtoWriter implements BinaryWriter {
 

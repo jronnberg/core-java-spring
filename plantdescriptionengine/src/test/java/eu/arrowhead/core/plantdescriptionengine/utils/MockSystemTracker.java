@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.net.InetSocketAddress;
-
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import se.arkalix.net.http.client.HttpClient;
+
+import java.net.InetSocketAddress;
 
 /**
  * Subclass of SystemTracker used for testing purposes.

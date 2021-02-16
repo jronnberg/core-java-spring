@@ -1,6 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +14,7 @@ import se.arkalix.net.http.HttpStatus;
 public class DtoReadExceptionCatcherTest {
 
     @Test
-    public void shouldReturnAllEntries() throws Exception {
+    public void shouldReturnAllEntries() {
 
         final var catcher = new DtoReadExceptionCatcher();
 
@@ -28,7 +29,8 @@ public class DtoReadExceptionCatcherTest {
         var response = new MockServiceResponse();
 
         catcher.handle(exception, request, response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+        assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+        assertTrue(response.body().isPresent());
         String body = response.body().get().toString();
 
         assertEquals(

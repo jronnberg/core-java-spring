@@ -1,25 +1,22 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
+import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 
-import javax.net.ssl.SSLException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class SystemTrackerTest {
 
@@ -29,9 +26,7 @@ public class SystemTrackerTest {
         HttpClient httpClient = new HttpClient.Builder().insecure().build();
         SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            systemTracker.getSystemByName("System A");
-        });
+        Exception exception = assertThrows(RuntimeException.class, () -> systemTracker.getSystemByName("System A"));
         assertEquals(
             "SystemTracker has not been initialized.",
             exception.getMessage()
@@ -46,19 +41,19 @@ public class SystemTrackerTest {
         String systemName = "Sys-A";
         int systemId = 92;
         // Create some fake data for the HttpClient to respond with:
-        final MockClientResponse response = new MockClientResponse();
-        response.status(HttpStatus.OK);
-        response.body(
-            new SrSystemListBuilder()
-                .count(1)
-                .data(new SrSystemBuilder()
-                    .id(systemId)
-                    .systemName(systemName)
-                    .address("0.0.0.0")
-                    .port(5009)
-                    .build())
-                .build()
-        );
+        final MockClientResponse response = new MockClientResponse()
+            .status(HttpStatus.OK)
+            .body(
+                new SrSystemListBuilder()
+                    .count(1)
+                    .data(new SrSystemBuilder()
+                        .id(systemId)
+                        .systemName(systemName)
+                        .address("0.0.0.0")
+                        .port(5009)
+                        .build())
+                    .build()
+            );
 
         when(
             httpClient.send(
@@ -72,8 +67,6 @@ public class SystemTrackerTest {
                 final var system = systemTracker.getSystemByName(systemName);
                 assertEquals(systemId, system.id());
             })
-            .onFailure(error -> {
-                assertNull(error);
-            });
+            .onFailure(Assertions::assertNull);
     }
 }

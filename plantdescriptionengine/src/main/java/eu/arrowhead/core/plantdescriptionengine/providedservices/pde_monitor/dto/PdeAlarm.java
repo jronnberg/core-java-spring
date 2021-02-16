@@ -1,14 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto;
 
-import java.time.Instant;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
+
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
@@ -20,43 +19,25 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface PdeAlarm {
 
-    final static Comparator<PdeAlarm> ID_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PdeAlarm a1, PdeAlarm a2) {
-            return a1.id() - a2.id();
+    Comparator<PdeAlarm> ID_COMPARATOR = Comparator.comparingInt(PdeAlarm::id);
+
+    Comparator<PdeAlarm> RAISED_AT_COMPARATOR = Comparator.comparing(PdeAlarm::raisedAt);
+
+    Comparator<PdeAlarm> UPDATED_AT_COMPARATOR = Comparator.comparing(PdeAlarm::updatedAt);
+
+    Comparator<PdeAlarm> CLEARED_AT_COMPARATOR = (a1, a2) -> {
+        Optional<Instant> cleared1 = a1.clearedAt();
+        Optional<Instant> cleared2 = a2.clearedAt();
+
+        if (cleared1.isEmpty()) {
+            return cleared2.isEmpty() ? 0 : 1;
         }
-    };
 
-    final static Comparator<PdeAlarm> RAISED_AT_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PdeAlarm a1, PdeAlarm a2) {
-            return a1.raisedAt().compareTo(a2.raisedAt());
+        if (cleared2.isEmpty()) {
+            return -1;
         }
-    };
 
-    final static Comparator<PdeAlarm> UPDATED_AT_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PdeAlarm a1, PdeAlarm a2) {
-            return a1.updatedAt().compareTo(a2.updatedAt());
-        }
-    };
-
-    final static Comparator<PdeAlarm> CLEARED_AT_COMPARATOR = new Comparator<>() {
-        @Override
-        public int compare(PdeAlarm a1, PdeAlarm a2) {
-            Optional<Instant> cleared1 = a1.clearedAt();
-            Optional<Instant> cleared2 = a2.clearedAt();
-
-            if (cleared1.isEmpty()) {
-                return cleared2.isEmpty() ? 0 : 1;
-            }
-
-            if (cleared2.isEmpty()) {
-                return -1;
-            }
-
-            return cleared1.get().compareTo(cleared2.get());
-        }
+        return cleared1.get().compareTo(cleared2.get());
     };
 
 
@@ -91,7 +72,7 @@ public interface PdeAlarm {
         if (acknowledged) {
             alarms.removeIf(alarm -> !alarm.acknowledged());
         } else {
-            alarms.removeIf(alarm -> alarm.acknowledged());
+            alarms.removeIf(PdeAlarm::acknowledged);
         }
     }
 
@@ -120,7 +101,7 @@ public interface PdeAlarm {
     }
 
     static void sort(List<? extends PdeAlarm> alarms, String sortField, boolean sortAscending) {
-        Comparator<PdeAlarm> comparator = null;
+        Comparator<PdeAlarm> comparator;
         switch (sortField) {
             case "id":
                 comparator = ID_COMPARATOR;
@@ -140,9 +121,9 @@ public interface PdeAlarm {
         }
 
         if (sortAscending) {
-            Collections.sort(alarms, comparator);
+            alarms.sort(comparator);
         } else {
-            Collections.sort(alarms, comparator.reversed());
+            alarms.sort(comparator.reversed());
         }
     }
 }

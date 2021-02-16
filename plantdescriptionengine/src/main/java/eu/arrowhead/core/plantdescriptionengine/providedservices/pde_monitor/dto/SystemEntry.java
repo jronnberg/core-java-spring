@@ -1,15 +1,15 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
+import se.arkalix.dto.DtoReadableAs;
+import se.arkalix.dto.DtoToString;
+import se.arkalix.dto.DtoWritableAs;
+import se.arkalix.dto.json.value.JsonObject;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import se.arkalix.dto.DtoReadableAs;
-import se.arkalix.dto.DtoToString;
-import se.arkalix.dto.DtoWritableAs;
-import se.arkalix.dto.json.value.JsonObject;
+import static se.arkalix.dto.DtoEncoding.JSON;
 
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)

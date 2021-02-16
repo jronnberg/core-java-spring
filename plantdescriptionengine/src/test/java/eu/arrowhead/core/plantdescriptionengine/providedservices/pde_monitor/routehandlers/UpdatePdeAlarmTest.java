@@ -1,23 +1,20 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateBuilder;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UpdatePdeAlarmTest {
 
@@ -44,12 +41,11 @@ public class UpdatePdeAlarmTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     final var updatedAlarm = (PdeAlarm) response.body().get();
                     assertTrue(updatedAlarm.acknowledged());
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -60,7 +56,7 @@ public class UpdatePdeAlarmTest {
 
         final String invalidEntryId = "Invalid ID";
         final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(invalidEntryId)))
+            .pathParameters(List.of(invalidEntryId))
             .body(new PdeAlarmUpdateBuilder()
                 .acknowledged(true)
                 .build())
@@ -71,13 +67,12 @@ public class UpdatePdeAlarmTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid PDE Alarm ID.";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -88,7 +83,7 @@ public class UpdatePdeAlarmTest {
 
         final String nonexistentId = "31";
         final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(nonexistentId)))
+            .pathParameters(List.of(nonexistentId))
             .body(new PdeAlarmUpdateBuilder()
                 .acknowledged(true)
                 .build())
@@ -99,13 +94,12 @@ public class UpdatePdeAlarmTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.NOT_FOUND, response.status().get());
+                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
                     String expectedErrorMessage = "PDE Alarm with ID '" + nonexistentId + "' not found.";
+                    assertTrue(response.body().isPresent());
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -131,12 +125,11 @@ public class UpdatePdeAlarmTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     final var updatedAlarm = (PdeAlarm) response.body().get();
                     assertFalse(updatedAlarm.acknowledged());
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }

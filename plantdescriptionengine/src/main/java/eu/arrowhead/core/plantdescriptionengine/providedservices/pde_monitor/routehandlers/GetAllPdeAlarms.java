@@ -1,30 +1,24 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmSeverity;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.BooleanParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.IntParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.ParseError;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.QueryParamParser;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.QueryParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.StringParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Handles HTTP requests to retrieve PDE alarms.
@@ -54,9 +48,8 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
     public Future<HttpServiceResponse> handle(
         final HttpServiceRequest request,
         final HttpServiceResponse response
-    ) throws Exception {
+    ) {
 
-        final List<QueryParameter> requiredParameters = null;
         List<String> severityValues = new ArrayList<>();
         for (var severity : AlarmSeverity.values()) {
             severityValues.add(severity.toString());
@@ -82,7 +75,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         QueryParamParser parser;
 
         try {
-            parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+            parser = new QueryParamParser(null, acceptedParameters, request);
         } catch (ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                 error.getMessage());
@@ -97,7 +90,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
             final String sortDirection = parser.getString("direction").get();
-            final boolean sortAscending = (sortDirection.equals("ASC") ? true : false);
+            final boolean sortAscending = (sortDirection.equals("ASC"));
             PdeAlarm.sort(alarms, sortField.get(), sortAscending);
         }
 

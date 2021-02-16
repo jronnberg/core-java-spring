@@ -1,38 +1,22 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for the
- * {@link eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PlantDescriptionEntry}
+ * {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker}
  * class.
  */
 public class PlantDescriptionTrackerTest {
@@ -42,7 +26,7 @@ public class PlantDescriptionTrackerTest {
     PdStore store;
     PlantDescriptionTracker pdTracker;
 
-    final class Listener implements PlantDescriptionUpdateListener {
+    static final class Listener implements PlantDescriptionUpdateListener {
 
         int numAdded = 0;
         int numUpdated = 0;
@@ -456,11 +440,11 @@ public class PlantDescriptionTrackerTest {
         var retrievedA = systems.stream()
             .filter(system -> system.systemId().equals(systemIdA))
             .findFirst()
-            .get();
+            .orElse(null);
         var retrievedB = systems.stream()
             .filter(system -> system.systemId().equals(systemIdB))
             .findFirst()
-            .get();
+            .orElse(null);
         var retrievedC = systems.stream()
             .filter(system -> system.systemId().equals(systemIdC))
             .findFirst()
@@ -585,7 +569,7 @@ public class PlantDescriptionTrackerTest {
     }
 
     @Test
-    public void shouldReturnEmptyListWhenNoEntryIsActive() throws PdStoreException {
+    public void shouldReturnEmptyListWhenNoEntryIsActive() {
         final var connections = pdTracker.getActiveConnections();
         assertEquals(0, connections.size());
     }
@@ -689,9 +673,7 @@ public class PlantDescriptionTrackerTest {
 
         pdTracker.put(entry);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            pdTracker.getServiceDefinition(nonexistentPort);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> pdTracker.getServiceDefinition(nonexistentPort));
         assertEquals(
             "No port named '" + nonexistentPort + "' could be found in the Plant Description Tracker.",
             exception.getMessage()
@@ -699,11 +681,9 @@ public class PlantDescriptionTrackerTest {
     }
 
     @Test
-    public void shouldThrowWhenGettingSdNoActiveEntry() throws PdStoreException {
+    public void shouldThrowWhenGettingSdNoActiveEntry() {
         String nonexistentPort = "qwerty";
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            pdTracker.getServiceDefinition(nonexistentPort);
-        });
+        Exception exception = assertThrows(IllegalStateException.class, () -> pdTracker.getServiceDefinition(nonexistentPort));
 
         assertEquals(
             "No entry is currently active.",
@@ -723,9 +703,7 @@ public class PlantDescriptionTrackerTest {
         final var systemId = "Nonexistent";
 
         pdTracker.put(entry);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            pdTracker.getSystem(systemId);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> pdTracker.getSystem(systemId));
 
         assertEquals(
             "Could not find system with ID '" + systemId + "'.",

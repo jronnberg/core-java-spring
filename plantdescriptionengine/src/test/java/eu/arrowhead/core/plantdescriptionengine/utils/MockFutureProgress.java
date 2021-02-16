@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import java.util.function.Consumer;
-
 import se.arkalix.util.Result;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.FutureProgress;
+
+import java.util.function.Consumer;
 
 /**
  * Mock MockFutureProgress implementation used for testing.

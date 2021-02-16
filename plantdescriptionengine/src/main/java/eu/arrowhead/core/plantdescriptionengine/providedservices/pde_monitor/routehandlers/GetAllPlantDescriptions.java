@@ -1,30 +1,24 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.BooleanParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.IntParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.ParseError;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.QueryParamParser;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.QueryParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.StringParameter;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Handles HTTP requests to retrieve all current Plant Description Entries.
@@ -64,7 +58,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
     public Future<HttpServiceResponse> handle(
         final HttpServiceRequest request,
         final HttpServiceResponse response
-    ) throws Exception {
+    ) {
         final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
@@ -82,7 +76,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         QueryParamParser parser;
 
         try {
-            parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
+            parser = new QueryParamParser(null, acceptedParameters, request);
         } catch (ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " +
                 error.getMessage());
@@ -98,7 +92,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         final Optional<String> sortField = parser.getString("sort_field");
         if (sortField.isPresent()) {
             final String sortDirection = parser.getString("direction").get();
-            final boolean sortAscending = (sortDirection.equals("ASC") ? true : false);
+            final boolean sortAscending = (sortDirection.equals("ASC"));
             PlantDescriptionEntry.sort(entries, sortField.get(), sortAscending);
         }
 

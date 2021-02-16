@@ -1,38 +1,18 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.net.InetSocketAddress;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryList;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
@@ -43,6 +23,12 @@ import se.arkalix.dto.json.value.JsonPair;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
+
+import java.net.InetSocketAddress;
+import java.time.Instant;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GetAllPlantDescriptionsTest {
 
@@ -65,13 +51,11 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
-
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     final var entries = (PlantDescriptionEntryList) response.body().get();
                     assertEquals(entryIds.size(), entries.count());
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -123,6 +107,7 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.body().isPresent());
                     final var entries = (PlantDescriptionEntryList) response.body().get();
                     final var retrievedEntry = entries.data().get(0);
                     assertEquals(1, retrievedEntry.connections().size());
@@ -138,9 +123,7 @@ public class GetAllPlantDescriptionsTest {
                     assertEquals(consumer.portName(), consumerPortName);
                     assertEquals(producer.portName(), producerPortName);
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -193,20 +176,19 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.body().isPresent());
                     final var entries = (PlantDescriptionEntryList) response.body().get();
                     final var retrievedEntry = entries.data().get(0);
                     final var retrievedSystem = retrievedEntry.systems().get(0);
                     assertEquals(1, retrievedSystem.ports().size());
 
                     final var retrievedPort = retrievedSystem.ports().get(0);
-                    assertEquals(isConsumer, retrievedPort.consumer().get());
-                    assertEquals(metadata, retrievedPort.metadata().get());
+                    assertEquals(isConsumer, retrievedPort.consumer().orElse(false));
+                    assertEquals(metadata, retrievedPort.metadata().orElse(null));
                     assertEquals(portName, retrievedPort.portName());
                     assertEquals(serviceDefinition, retrievedPort.serviceDefinition());
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -259,6 +241,7 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
+                    assertTrue(response.body().isPresent());
                     final var returnedEntries = (PlantDescriptionEntryList) response.body().get();
                     final var returnedEntry = returnedEntries.data().get(0);
                     final var returnedSystem = returnedEntry.systems().get(0);
@@ -266,9 +249,7 @@ public class GetAllPlantDescriptionsTest {
                     assertTrue(returnedSystem.systemData().isPresent());
                     assertEquals(returnedSystem.inventoryId().get(), inventoryId);
                     assertEquals(returnedSystem.systemData().get(), systemData);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -398,9 +379,7 @@ public class GetAllPlantDescriptionsTest {
                         assertTrue(entry.updatedAt().compareTo(previousTimestamp) < 0);
                         previousTimestamp = entry.updatedAt();
                     }
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -439,14 +418,12 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
-
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     final var entries = (PlantDescriptionEntryList) response.body().get();
                     assertEquals(1, entries.count());
                     assertEquals(entries.data().get(0).id(), activeEntryId, 0);
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -477,8 +454,8 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().get());
-
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     var entries = (PlantDescriptionEntryList) response.body().get();
                     assertEquals(itemsPerPage, entries.count());
 
@@ -491,9 +468,7 @@ public class GetAllPlantDescriptionsTest {
                         assertEquals((int) entryIds.get(index), entries.data().get(i).id());
                     }
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -517,15 +492,13 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -548,15 +521,13 @@ public class GetAllPlantDescriptionsTest {
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
                     String expectedErrorMessage = "<Missing parameter 'item_per_page'.>";
                     String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
 
-                }).onFailure(e -> {
-                assertNull(e);
-            });
+                }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }

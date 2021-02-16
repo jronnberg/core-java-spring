@@ -1,19 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
-import java.util.Objects;
-
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.DeletePlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.GetAllPlantDescriptions;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.AddPlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.ReplacePlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.GetPlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.UpdatePlantDescription;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.*;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
+
+import java.util.Objects;
 
 /**
  * This service enables management of Plant Descriptions in the Plant
@@ -43,8 +38,6 @@ public class PdeManagementService {
      * Registers this service with an Arrowhead system, eventually making it
      * accessible to remote Arrowhead systems.
      *
-     * @param arSystem An Arrowhead Framework system used to provide this
-     *                 service.
      * @return A HTTP Service used to manage Plant Descriptions.
      */
     public HttpService getService() {
