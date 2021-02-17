@@ -73,9 +73,10 @@ public class AlarmManager {
     public void setAcknowledged(int id, boolean acknowledged) throws IllegalArgumentException {
         final Alarm alarm = getAlarmData(id);
         if (alarm == null) {
-            throw new IllegalArgumentException("There is no alarm with ID " + id);
+            throw new IllegalArgumentException("There is no alarm with ID " + id + ".");
         }
         alarm.acknowledged = acknowledged;
+        alarm.acknowledgedAt = Instant.now();
     }
 
     private void raiseAlarm(String systemId, String systemName, AlarmCause cause) {

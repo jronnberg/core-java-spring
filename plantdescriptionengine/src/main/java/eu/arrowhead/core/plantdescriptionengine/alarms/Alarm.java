@@ -24,6 +24,7 @@ public class Alarm {
         this.systemName = systemName;
         this.cause = cause;
         this.acknowledged = false;
+        this.acknowledgedAt = null;
 
         raisedAt = Instant.now();
         updatedAt = Instant.now();
@@ -38,6 +39,7 @@ public class Alarm {
     boolean acknowledged;
     Instant updatedAt;
     Instant clearedAt;
+    Instant acknowledgedAt;
 
     protected String description() {
         String identifier = (systemName == null)
@@ -86,7 +88,7 @@ public class Alarm {
             .raisedAt(raisedAt)
             .updatedAt(updatedAt)
             .clearedAt(clearedAt)
-            .acknowledgedAt(null) // TODO: Implement
+            .acknowledgedAt(acknowledgedAt)
             .build();
     }
 }

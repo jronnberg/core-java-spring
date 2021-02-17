@@ -45,6 +45,7 @@ public class UpdatePdeAlarmTest {
                     assertTrue(response.body().isPresent());
                     final var updatedAlarm = (PdeAlarm) response.body().get();
                     assertTrue(updatedAlarm.acknowledged());
+                    assertTrue(updatedAlarm.acknowledgedAt().isPresent());
                 }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);

@@ -59,7 +59,6 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         final HttpServiceRequest request,
         final HttpServiceResponse response
     ) {
-        final List<QueryParameter> requiredParameters = null;
         final List<QueryParameter> acceptedParameters = List.of(
             new IntParameter("page")
                 .min(0)
