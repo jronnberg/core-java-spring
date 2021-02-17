@@ -16,7 +16,7 @@ public class InMemoryRuleStore implements RuleStore {
      * {@inheritDoc}
      */
     @Override
-    public Set<Integer> readRules() throws RuleStoreException {
+    public Set<Integer> readRules() {
         return new HashSet<>(rules);
     }
 
@@ -24,7 +24,7 @@ public class InMemoryRuleStore implements RuleStore {
      * {@inheritDoc}
      */
     @Override
-    public void setRules(Set<Integer> newRules) throws RuleStoreException {
+    public void setRules(Set<Integer> newRules) {
         rules = new HashSet<>(newRules);
     }
 
@@ -32,7 +32,7 @@ public class InMemoryRuleStore implements RuleStore {
      * {@inheritDoc}
      */
     @Override
-    public void removeAll() throws RuleStoreException {
+    public void removeAll() {
         rules.clear();
     }
 

@@ -28,6 +28,7 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dt
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRule;
+import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.InMemoryRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStore;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
@@ -481,7 +482,7 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
         // Use a mock rule store in order to make it throw exceptions.
-        ruleStore = Mockito.mock(InMemoryRuleStore.class);
+        ruleStore = Mockito.mock(FileRuleStore.class);
 
         String errorMessage = "Mocked exception";
         doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules();
