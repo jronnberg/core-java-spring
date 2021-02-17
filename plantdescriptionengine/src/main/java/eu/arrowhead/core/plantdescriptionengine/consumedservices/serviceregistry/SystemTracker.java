@@ -21,7 +21,7 @@ public class SystemTracker {
     private static final Logger logger = LoggerFactory.getLogger(SystemTracker.class);
 
     private final HttpClient httpClient;
-    private InetSocketAddress serviceRegistryAddress;
+    private final InetSocketAddress serviceRegistryAddress;
     private boolean initialized;
     private final int pollInterval = 5000;
 
@@ -89,6 +89,7 @@ public class SystemTracker {
                 .anyMatch(newSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!stillPresent) {
                 for (var listener : listeners) {
+                    logger.info("System '" + oldSystem.systemName() + "' has been removed from the Service Registry.");
                     listener.onSystemRemoved(oldSystem);
                 }
             }
@@ -100,6 +101,7 @@ public class SystemTracker {
                 .stream()
                 .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!wasPresent) {
+                logger.info("System '" + newSystem.systemName() + "' detected in Service Registry.");
                 for (var listener : listeners) {
                     listener.onSystemAdded(newSystem);
                 }
