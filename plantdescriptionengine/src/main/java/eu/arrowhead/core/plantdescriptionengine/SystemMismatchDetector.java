@@ -55,31 +55,31 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
     @Override
     public void onPlantDescriptionAdded(PlantDescriptionEntry entry) {
-        logger.debug("Entry '" + entry.plantDescription() + "' added, checking for inconcistencies...");
+        logger.debug("Entry '" + entry.plantDescription() + "' added, checking for inconsistencies...");
         checkSystems();
     }
 
     @Override
     public void onPlantDescriptionUpdated(PlantDescriptionEntry entry) {
-        logger.debug("Entry '" + entry.plantDescription() + "' updated, checking for inconcistencies...");
+        logger.debug("Entry '" + entry.plantDescription() + "' updated, checking for inconsistencies...");
         checkSystems();
     }
 
     @Override
     public void onPlantDescriptionRemoved(PlantDescriptionEntry entry) {
-        logger.debug("Entry '" + entry.plantDescription() + "' removed, checking for inconcistencies...");
+        logger.debug("Entry '" + entry.plantDescription() + "' removed, checking for inconsistencies...");
         checkSystems();
     }
 
     @Override
     public void onSystemAdded(SrSystem system) {
-        logger.debug("System '" + system.systemName() + "' added, checking for inconcistencies...");
+        logger.debug("System '" + system.systemName() + "' added, checking for inconsistencies...");
         checkSystems();
     }
 
     @Override
     public void onSystemRemoved(SrSystem system) {
-        logger.debug("System '" + system.systemName() + "' removed, checking for inconcistencies...");
+        logger.debug("System '" + system.systemName() + "' removed, checking for inconsistencies...");
         checkSystems();
     }
 
@@ -158,7 +158,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
             // If not, raise an alarm:
             if (!matchFound) {
                 alarmManager.raiseSystemNotRegistered(
-                    entrySystem.systemName().orElse(null), entrySystem.metadata().orElse(null));
+                    entrySystem.systemId(),
+                    entrySystem.systemName().orElse(null));
             }
         }
 
