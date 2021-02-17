@@ -20,7 +20,9 @@ public class FileRuleStoreTest {
                 deleteDirectory(file);
             }
         }
-        dir.delete();
+        if (!dir.delete()) {
+            throw new RuntimeException("Failed to delete directory.");
+        }
     }
 
     @AfterEach

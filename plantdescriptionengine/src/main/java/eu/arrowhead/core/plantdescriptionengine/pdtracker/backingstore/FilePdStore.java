@@ -50,7 +50,9 @@ public class FilePdStore implements PdStore {
         final File directory = new File(descriptionDirectory);
 
         if (!directory.exists()) {
-            directory.mkdirs();
+            if (!directory.mkdirs()) {
+                throw new PdStoreException("Failed to create directory for storing Plant Descriptions.");
+            }
         }
 
         final File[] directoryListing = directory.listFiles();
@@ -86,7 +88,9 @@ public class FilePdStore implements PdStore {
             final File file = path.toFile();
 
             if (!file.exists()) {
-                file.createNewFile();
+                if (!file.createNewFile()) {
+                    throw new PdStoreException("Failed to create file for Plant Description Entries.");
+                }
             }
 
             final FileOutputStream out = new FileOutputStream(file);

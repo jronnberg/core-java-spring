@@ -65,9 +65,14 @@ public class FileRuleStore implements RuleStore {
             // Create the file and parent directories, if they do not already
             // exist:
             if (file.getParentFile() != null) {
-                file.getParentFile().mkdirs();
+                if (!file.getParentFile().mkdirs()) {
+                    throw new RuleStoreException("Failed to create directory for storing Orchestrator rules.");
+                }
             }
-            file.createNewFile();
+
+            if (!file.createNewFile()) {
+                throw new RuleStoreException("Failed to create file for storing Orchestrator rules.");
+            }
 
             // Write each rule ID on a single line:
             final var writer = new BufferedWriter(new FileWriter(file));
@@ -85,9 +90,13 @@ public class FileRuleStore implements RuleStore {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws RuleStoreException
      */
     @Override
-    public void removeAll() {
-        new File(ruleStoreFile).delete();
+    public void removeAll() throws RuleStoreException {
+        if (!new File(ruleStoreFile).delete()) {
+            throw new RuleStoreException("Failed to delete orchestration rule directory");
+        }
     }
 }

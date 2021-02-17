@@ -25,7 +25,9 @@ public class FilePdStoreTest {
                 deleteDirectory(file);
             }
         }
-        dir.delete();
+        if (!dir.delete()) {
+            throw new RuntimeException("Failed to delete directory.");
+        }
     }
 
     @AfterEach
