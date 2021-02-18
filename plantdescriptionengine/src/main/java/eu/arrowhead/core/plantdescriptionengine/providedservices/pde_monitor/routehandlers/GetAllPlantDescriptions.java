@@ -37,8 +37,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * @param pdTracker   Object that stores information on Plant Description
      *                    entries.
      */
-    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
-    ) {
+    public GetAllPlantDescriptions(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker) {
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
 
@@ -51,56 +50,30 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      * present in the PDE.
      *
      * @param request  HTTP request object.
-     * @param response HTTP response whose body contains a list of Plant
-     *                 Description entries.
+     * @param response HTTP response whose body contains a list of Plant Description
+     *                 entries.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
-        final var itemPerPageParam = new IntParameter.Builder()
-            .name("item_per_page")
-            .min(0)
-            .build();
-        final var pageParam = new IntParameter.Builder()
-            .name("page")
-            .min(0)
-            .requires(itemPerPageParam)
-            .build();
-        final var sortFieldParam = new StringParameter.Builder()
-            .name("sort_field")
-            .legalValues("id", "createdAt", "updatedAt")
-            .build();
-        final var directionParam = new StringParameter.Builder()
-            .name("direction")
-            .legalValues("ASC", "DESC")
-            .defaultValue("ASC")
-            .build();
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
+        final var itemPerPageParam = new IntParameter.Builder().name("item_per_page").min(0).build();
+        final var pageParam = new IntParameter.Builder().name("page").min(0).requires(itemPerPageParam).build();
+        final var sortFieldParam = new StringParameter.Builder().name("sort_field")
+            .legalValues("id", "createdAt", "updatedAt").build();
+        final var directionParam = new StringParameter.Builder().name("direction").legalValues("ASC", "DESC")
+            .defaultValue("ASC").build();
 
-        final var activeParam = new BooleanParameter.Builder()
-            .name("active")
-            .build();
+        final var activeParam = new BooleanParameter.Builder().name("active").build();
 
-        final List<QueryParameter> acceptedParameters = List.of(
-            pageParam,
-            sortFieldParam,
-            directionParam,
-            activeParam
-        );
+        final List<QueryParameter> acceptedParameters = List.of(pageParam, sortFieldParam, directionParam, activeParam);
 
         QueryParamParser parser;
 
         try {
             parser = new QueryParamParser(null, acceptedParameters, request);
         } catch (ParseError error) {
-            logger.error("Encountered the following error(s) while parsing an HTTP request: " +
-                error.getMessage());
+            logger.error("Encountered the following error(s) while parsing an HTTP request: " + error.getMessage());
 
-            return Future.success(response
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorMessage.of(error.getMessage()))
-            );
+            return Future.success(response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(error.getMessage())));
         }
 
         var entries = pdTracker.getEntries();
@@ -132,12 +105,8 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             extendedEntries.add(DtoUtils.extend(entry, monitorInfo));
         }
 
-        response
-            .status(HttpStatus.OK)
-            .body(new PlantDescriptionEntryListBuilder()
-                .data(extendedEntries)
-                .count(extendedEntries.size())
-                .build());
+        response.status(HttpStatus.OK)
+            .body(new PlantDescriptionEntryListBuilder().data(extendedEntries).count(extendedEntries.size()).build());
 
         return Future.success(response);
     }

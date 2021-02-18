@@ -34,30 +34,24 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
-            .plantDescription(newName)
-            .build();
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder().plantDescription(newName).build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
-            .body(update)
-            .build();
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
+            .body(update).build();
 
         pdTracker.put(entry);
 
         final int sizeBeforePut = pdTracker.getEntries().size();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertTrue(response.status().isPresent());
-                    assertEquals(HttpStatus.OK, response.status().get());
-                    assertTrue(response.body().isPresent());
-                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
-                    assertEquals(newName, returnedEntry.plantDescription());
-                    assertEquals(sizeBeforePut, pdTracker.getEntries().size());
-                })
-                .onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertTrue(response.status().isPresent());
+                assertEquals(HttpStatus.OK, response.status().get());
+                assertTrue(response.body().isPresent());
+                PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
+                assertEquals(newName, returnedEntry.plantDescription());
+                assertEquals(sizeBeforePut, pdTracker.getEntries().size());
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -69,23 +63,19 @@ public class UpdatePlantDescriptionTest {
         final var handler = new UpdatePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
-        HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(invalidEntryId))
-            .build();
+        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
-                    String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
-                    assertTrue(response.body().isPresent());
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                })
-                .onFailure(Assertions::assertNull);
+                String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
+                assertTrue(response.body().isPresent());
+                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -97,23 +87,20 @@ public class UpdatePlantDescriptionTest {
         final var handler = new UpdatePlantDescription(pdTracker);
         final int nonExistentId = 9;
 
-        HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(nonExistentId)))
+        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(nonExistentId)))
             .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
-                    String expectedErrorMessage = "Plant Description with ID '" + nonExistentId + "' not found.";
-                    assertTrue(response.body().isPresent());
-                    ErrorMessage body = (ErrorMessage) response.body().get();
-                    String actualErrorMessage = body.error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                })
-                .onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
+                String expectedErrorMessage = "Plant Description with ID '" + nonExistentId + "' not found.";
+                assertTrue(response.body().isPresent());
+                ErrorMessage body = (ErrorMessage) response.body().get();
+                String actualErrorMessage = body.error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -131,49 +118,27 @@ public class UpdatePlantDescriptionTest {
         pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder()
-                .portName(portName)
-                .serviceDefinition("service_a")
-                .consumer(true)
-                .build(),
-            new PortBuilder()
-                .portName(portName)
-                .serviceDefinition("service_b")
-                .consumer(true)
-                .build()
-        );
+            new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
+            new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
-            .systemId(systemId)
-            .ports(consumerPorts)
-            .build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(systemId).ports(consumerPorts).build();
 
-        final var update = new PlantDescriptionUpdateBuilder()
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .systems(List.of(consumerSystem))
-            .include(new ArrayList<>())
-            .connections(new ArrayList<>())
-            .build();
+        final var update = new PlantDescriptionUpdateBuilder().plantDescription("Plant Description 1A").active(true)
+            .systems(List.of(consumerSystem)).include(new ArrayList<>()).connections(new ArrayList<>()).build();
 
         final HttpServiceResponse response = new MockServiceResponse();
-        final MockRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
-            .body(update)
-            .build();
+        final MockRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
+            .body(update).build();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                    String expectedErrorMessage = "<Duplicate port name '" +
-                        portName + "' in system '" + systemId + "'>";
-                    assertTrue(response.body().isPresent());
-                    ErrorMessage body = (ErrorMessage) response.body().get();
-                    String actualErrorMessage = body.error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                })
-                .onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                String expectedErrorMessage = "<Duplicate port name '" + portName + "' in system '" + systemId + "'>";
+                assertTrue(response.body().isPresent());
+                ErrorMessage body = (ErrorMessage) response.body().get();
+                String actualErrorMessage = body.error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -189,18 +154,14 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
-            .plantDescription(newName)
-            .build();
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder().plantDescription(newName).build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
-            .body(update)
-            .build();
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
+            .body(update).build();
 
         pdTracker.put(entry);
 
-        doThrow(new PdStoreException("Mocked error")).when(backingStore).write(any(PlantDescriptionEntryDto.class));
+        doThrow(new PdStoreException("Mocked error")).when(backingStore).write(any());
 
         try {
             handler.handle(request, response)

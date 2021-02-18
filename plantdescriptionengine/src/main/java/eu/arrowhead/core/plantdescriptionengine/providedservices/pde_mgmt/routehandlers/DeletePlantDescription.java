@@ -35,8 +35,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
     }
 
     /**
-     * Handles an HTTP request to delete an existing Plant Description from the
-     * PDE.
+     * Handles an HTTP request to delete an existing Plant Description from the PDE.
      *
      * @param request  HTTP request containing a PlantDescription.
      * @param response HTTP response object.
@@ -50,15 +49,12 @@ public class DeletePlantDescription implements HttpRouteHandler {
             id = Integer.parseInt(request.pathParameter(0));
         } catch (NumberFormatException e) {
             final String errMsg = "'" + request.pathParameter(0) + "' is not a valid Plant Description Entry ID.";
-            response
-                .status(HttpStatus.BAD_REQUEST)
-                .body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
+            response.status(HttpStatus.BAD_REQUEST).body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
             return Future.success(response);
         }
 
         if (pdTracker.get(id) == null) {
-            response
-                .status(HttpStatus.NOT_FOUND)
+            response.status(HttpStatus.NOT_FOUND)
                 .body(ErrorMessage.of("Plant Description with ID " + id + " not found."));
             return Future.success(response);
         }
@@ -69,19 +65,15 @@ public class DeletePlantDescription implements HttpRouteHandler {
         entries.remove(id);
         final var validator = new PlantDescriptionValidator(entries);
         if (validator.hasError()) {
-            response
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorMessage.of(validator.getErrorMessage()));
+            response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(validator.getErrorMessage()));
             return Future.success(response);
         }
-
 
         try {
             pdTracker.remove(id);
         } catch (PdStoreException e) {
             logger.error("Failed to remove Plant Description Entry from backing store", e);
-            response
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorMessage.of("Encountered an error while deleting entry file."));
             return Future.success(response);
         }

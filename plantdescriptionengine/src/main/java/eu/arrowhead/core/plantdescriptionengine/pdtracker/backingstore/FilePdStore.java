@@ -35,8 +35,8 @@ public class FilePdStore implements PdStore {
     }
 
     /**
-     * @return The file path to use for reading or writing a Plant Description
-     * Entry to disk.
+     * @return The file path to use for reading or writing a Plant Description Entry
+     * to disk.
      */
     private Path getFilePath(final int entryId) {
         return Paths.get(descriptionDirectory, entryId + ".json");
@@ -59,8 +59,8 @@ public class FilePdStore implements PdStore {
 
         // Read all Plant Description entries into memory.
         if (directoryListing == null) {
-            throw new PdStoreException(new FileNotFoundException("Failed to read Plant Descriptions from directory '" +
-                descriptionDirectory + "'."));
+            throw new PdStoreException(new FileNotFoundException(
+                "Failed to read Plant Descriptions from directory '" + descriptionDirectory + "'."));
         }
 
         final var result = new ArrayList<PlantDescriptionEntryDto>();

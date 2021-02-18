@@ -28,10 +28,7 @@ public class SystemTrackerTest {
         SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
 
         Exception exception = assertThrows(RuntimeException.class, () -> systemTracker.getSystemByName("System A"));
-        assertEquals(
-            "SystemTracker has not been initialized.",
-            exception.getMessage()
-        );
+        assertEquals("SystemTracker has not been initialized.", exception.getMessage());
     }
 
     @Test
@@ -42,32 +39,17 @@ public class SystemTrackerTest {
         String systemName = "Sys-A";
         int systemId = 92;
         // Create some fake data for the HttpClient to respond with:
-        final MockClientResponse response = new MockClientResponse()
-            .status(HttpStatus.OK)
-            .body(
-                new SrSystemListBuilder()
-                    .count(1)
-                    .data(new SrSystemBuilder()
-                        .id(systemId)
-                        .systemName(systemName)
-                        .address("0.0.0.0")
-                        .port(5009)
-                        .build())
-                    .build()
-            );
+        final MockClientResponse response = new MockClientResponse().status(HttpStatus.OK)
+            .body(new SrSystemListBuilder().count(1)
+                .data(new SrSystemBuilder().id(systemId).systemName(systemName).address("0.0.0.0").port(5009).build())
+                .build());
 
-        when(
-            httpClient.send(
-                any(InetSocketAddress.class),
-                any(HttpClientRequest.class)
-            )
-        ).thenReturn(Future.success(response));
+        when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
+            .thenReturn(Future.success(response));
 
-        systemTracker.start()
-            .ifSuccess(result -> {
-                final var system = systemTracker.getSystemByName(systemName);
-                assertEquals(systemId, system.id());
-            })
-            .onFailure(Assertions::assertNull);
+        systemTracker.start().ifSuccess(result -> {
+            final var system = systemTracker.getSystemByName(systemName);
+            assertEquals(systemId, system.id());
+        }).onFailure(Assertions::assertNull);
     }
 }

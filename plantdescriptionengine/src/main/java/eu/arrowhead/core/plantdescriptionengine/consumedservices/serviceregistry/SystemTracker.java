@@ -19,23 +19,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SystemTracker {
     private static final Logger logger = LoggerFactory.getLogger(SystemTracker.class);
-
-    private final HttpClient httpClient;
-    private final InetSocketAddress serviceRegistryAddress;
-    private boolean initialized;
-    private final int pollInterval = 5000;
-
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
     protected final List<SystemUpdateListener> listeners = new ArrayList<>();
-
     // Map from system name to system:
     protected final Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    private final HttpClient httpClient;
+    private final InetSocketAddress serviceRegistryAddress;
+    private final int pollInterval = 5000;
+    private boolean initialized;
 
     /**
      * Class constructor
      *
-     * @param httpClient             Object for communicating with the Service Registry.
+     * @param httpClient             Object for communicating with the Service
+     *                               Registry.
      * @param serviceRegistryAddress Address of the Service Registry.
      */
     public SystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
@@ -54,10 +52,10 @@ public class SystemTracker {
      * {@link #getSystems()} or {@link #getSystemByName(String) }.
      */
     private Future<Void> fetchSystems() {
-        return httpClient.send(serviceRegistryAddress, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri("/serviceregistry/mgmt/systems")
-            .header("accept", "application/json"))
+        return httpClient
+            .send(serviceRegistryAddress,
+                new HttpClientRequest().method(HttpMethod.GET).uri("/serviceregistry/mgmt/systems").header("accept",
+                    "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
                 List<SrSystem> newSystems = systemList.data();
@@ -75,17 +73,17 @@ public class SystemTracker {
     }
 
     /**
-     * Informs all registered listeners of which systems have been added or
-     * removed from the service registry since the last refresh.
+     * Informs all registered listeners of which systems have been added or removed
+     * from the service registry since the last refresh.
      *
-     * @param oldSystems Systems that were previously present in the Service Registry.
+     * @param oldSystems Systems that were previously present in the Service
+     *                   Registry.
      * @param newSystems Systems that are present in the Service Registry.
      */
     private void notifyListeners(List<SrSystem> oldSystems, List<SrSystem> newSystems) {
         // Report removed systems
         for (var oldSystem : oldSystems) {
-            boolean stillPresent = newSystems
-                .stream()
+            boolean stillPresent = newSystems.stream()
                 .anyMatch(newSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!stillPresent) {
                 for (var listener : listeners) {
@@ -97,8 +95,7 @@ public class SystemTracker {
 
         // Report added systems
         for (var newSystem : newSystems) {
-            boolean wasPresent = oldSystems
-                .stream()
+            boolean wasPresent = oldSystems.stream()
                 .anyMatch(oldSystem -> newSystem.systemName().equals(oldSystem.systemName()));
             if (!wasPresent) {
                 logger.info("System '" + newSystem.systemName() + "' detected in Service Registry.");
@@ -120,8 +117,8 @@ public class SystemTracker {
     }
 
     /**
-     * Retrieves the specified system. Note that the returned data will be stale
-     * if the system in question has changed state since the last call to
+     * Retrieves the specified system. Note that the returned data will be stale if
+     * the system in question has changed state since the last call to
      * {@link #fetchSystems()}.
      *
      * @param systemName Name of a system.
@@ -141,8 +138,7 @@ public class SystemTracker {
     /**
      * Starts polling the Service Registry for registered systems.
      *
-     * @return A Future that completes on the first reply from the Service
-     * Registry.
+     * @return A Future that completes on the first reply from the Service Registry.
      */
     public Future<Void> start() {
         return fetchSystems().flatMap(result -> {
@@ -150,8 +146,7 @@ public class SystemTracker {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    fetchSystems()
-                        .onFailure(error -> logger.error("Failed to retrieve registered systems", error));
+                    fetchSystems().onFailure(error -> logger.error("Failed to retrieve registered systems", error));
                 }
             }, 0, pollInterval);
 

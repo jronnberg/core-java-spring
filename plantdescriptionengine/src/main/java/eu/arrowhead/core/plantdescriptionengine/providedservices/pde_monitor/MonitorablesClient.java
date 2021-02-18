@@ -49,9 +49,7 @@ public class MonitorablesClient {
         this.monitorInfo = monitorInfo;
         this.alarmManager = alarmManager;
 
-        serviceQuery = arSystem.consume()
-            .name("monitorable")
-            .transports(TransportDescriptor.HTTP)
+        serviceQuery = arSystem.consume().name("monitorable").transports(TransportDescriptor.HTTP)
             .encodings(EncodingDescriptor.JSON);
     }
 
@@ -79,85 +77,75 @@ public class MonitorablesClient {
      * Check if each monitorable service is active.
      */
     private void ping() {
-        serviceQuery.resolveAll()
-            .ifSuccess(services -> {
-                for (var service : services) {
-                    ping(service);
-                }
-            })
-            .onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
+        serviceQuery.resolveAll().ifSuccess(services -> {
+            for (var service : services) {
+                ping(service);
+            }
+        }).onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
     }
 
     /**
      * Retrieve new data from each monitorable service.
      */
     private void retrieveMonitorInfo() {
-        serviceQuery.resolveAll()
-            .ifSuccess(services -> {
-                for (var service : services) {
-                    retrieveId(service);
-                    retrieveSystemData(service);
-                }
-            })
-            .onFailure(e -> logger.error("Failed to fetch monitor info from monitorable systems.", e));
+        serviceQuery.resolveAll().ifSuccess(services -> {
+            for (var service : services) {
+                retrieveId(service);
+                retrieveSystemData(service);
+            }
+        }).onFailure(e -> logger.error("Failed to fetch monitor info from monitorable systems.", e));
     }
 
     private void ping(ServiceDescription service) {
         final var address = service.provider().socketAddress();
         final String providerName = service.provider().name();
-        httpClient.send(address, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri(service.uri() + "/ping")
-            .header("accept", "application/json"))
-            .flatMap(result -> result
-                .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+        httpClient
+            .send(address,
+                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping").header("accept",
+                    "application/json"))
+            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 logger.info("Successfully pinged system '" + providerName + "'.");
                 alarmManager.clearSystemInactive(providerName);
-            })
-            .onFailure(e -> {
-                logger.warn("Failed to ping system '" + providerName + "'.", e);
-                alarmManager.raiseSystemInactive(providerName);
-            });
+            }).onFailure(e -> {
+            logger.warn("Failed to ping system '" + providerName + "'.", e);
+            alarmManager.raiseSystemInactive(providerName);
+        });
     }
 
     private void retrieveId(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
-        //noinspection SpellCheckingInspection
-        httpClient.send(address, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri(service.uri() + "/inventoryid")
-            .header("accept", "application/json"))
-            .flatMap(result -> result
-                .bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
-            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id()))
-            .onFailure(e -> {
-                String errorMessage = "Failed to retrieve inventory ID for system '" +
-                    service.provider().name() + "', service '" + service.name() + "'.";
-                logger.warn(errorMessage, e);
+        // noinspection SpellCheckingInspection
+        httpClient
+            .send(address,
+                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid").header("accept",
+                    "application/json"))
+            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id())).onFailure(e -> {
+            String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
+                + "', service '" + service.name() + "'.";
+            logger.warn(errorMessage, e);
 
-                // TODO: Raise an alarm?
-            });
+            // TODO: Raise an alarm?
+        });
     }
 
     private void retrieveSystemData(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
-        //noinspection SpellCheckingInspection
-        httpClient.send(address, new HttpClientRequest()
-            .method(HttpMethod.GET)
-            .uri(service.uri() + "/systemdata")
-            .header("accept", "application/json"))
-            .flatMap(result -> result
-                .bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
-            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data()))
-            .onFailure(e -> {
-                String errorMessage = "Failed to retrieve system data for system '" +
-                    service.provider().name() + "', service '" + service.name() + "'.";
-                logger.error(errorMessage, e);
-                // TODO: Raise an alarm?
-            });
+        // noinspection SpellCheckingInspection
+        httpClient
+            .send(address,
+                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata").header("accept",
+                    "application/json"))
+            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
+            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data())).onFailure(e -> {
+            String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
+                + "', service '" + service.name() + "'.";
+            logger.error(errorMessage, e);
+            // TODO: Raise an alarm?
+        });
     }
 
 }

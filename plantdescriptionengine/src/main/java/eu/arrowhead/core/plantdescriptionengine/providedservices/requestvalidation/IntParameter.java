@@ -13,28 +13,7 @@ import java.util.Scanner;
  */
 public class IntParameter extends QueryParameter {
 
-    public static class Builder extends QueryParameter.Builder<Builder> {
-
-        private int minValue = Integer.MIN_VALUE;
-
-        /**
-         * @param i The minimum allowed value for the constructed parameter.
-         * @return This instance.
-         */
-        public Builder min(int i) {
-            minValue = i;
-            return this;
-        }
-
-        public IntParameter build() {
-            return new IntParameter(this);
-        }
-
-        @Override
-        public Builder self() {
-            return this;
-        }
-    }
+    private final int minValue;
 
     /**
      * {@inheritDoc}
@@ -44,20 +23,21 @@ public class IntParameter extends QueryParameter {
         this.minValue = builder.minValue;
     }
 
-    private final int minValue;
-
     /**
      * @return True if the provided string is a base 10 integer.
      */
     private static boolean isInteger(String s) {
         int radix = 10;
+        boolean result = false;
         Scanner scanner = new Scanner(s.trim());
 
-        if (!scanner.hasNextInt(radix)) {
-            return false;
+        if (scanner.hasNextInt(radix)) {
+            scanner.nextInt(radix);
+            result = !scanner.hasNext();
         }
-        scanner.nextInt(radix);
-        return !scanner.hasNext();
+
+        scanner.close();
+        return result;
     }
 
     /**
@@ -82,21 +62,43 @@ public class IntParameter extends QueryParameter {
         String value = possibleValue.get();
 
         if (!isInteger(value)) {
-            parser.report(new ParseError("Query parameter '" + name +
-                "' must be a valid integer, got '" + value + "'."));
+            parser
+                .report(new ParseError("Query parameter '" + name + "' must be a valid integer, got '" + value + "'."));
             return;
         }
 
         int intValue = Integer.parseInt(value);
 
         if (intValue < minValue) {
-            parser.report(new ParseError("Query parameter '" + name +
-                "' must be greater than " + minValue + ", got " + intValue
-                + "."));
+            parser.report(new ParseError(
+                "Query parameter '" + name + "' must be greater than " + minValue + ", got " + intValue + "."));
         }
 
         if (!parser.hasError()) {
             parser.putInt(this, intValue);
+        }
+    }
+
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private int minValue = Integer.MIN_VALUE;
+
+        /**
+         * @param i The minimum allowed value for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder min(int i) {
+            minValue = i;
+            return this;
+        }
+
+        public IntParameter build() {
+            return new IntParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
         }
     }
 

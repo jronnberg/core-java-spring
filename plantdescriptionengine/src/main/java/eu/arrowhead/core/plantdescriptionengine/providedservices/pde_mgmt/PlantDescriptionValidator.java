@@ -11,8 +11,8 @@ import java.util.*;
  */
 public class PlantDescriptionValidator {
 
-    private final List<String> errors = new ArrayList<>();
     final Map<Integer, PlantDescriptionEntry> entries;
+    private final List<String> errors = new ArrayList<>();
 
     /**
      * Constructor.
@@ -105,8 +105,8 @@ public class PlantDescriptionValidator {
         for (var entry : entries.values()) {
             for (int includedId : entry.include()) {
                 if (!entries.containsKey(includedId)) {
-                    errors.add("Error in include list: Entry '" + includedId
-                        + "' is required by entry '" + entry.id() + "'.");
+                    errors.add(
+                        "Error in include list: Entry '" + includedId + "' is required by entry '" + entry.id() + "'.");
                 }
             }
         }
@@ -194,8 +194,8 @@ public class PlantDescriptionValidator {
      * Ensures that the given system's ports are all unique.
      * <p>
      * The PDE must be able to differentiate between the ports of a system. When
-     * multiple ports share the same service definition, they must have
-     * different metadata. This method ensures that this property holds.
+     * multiple ports share the same service definition, they must have different
+     * metadata. This method ensures that this property holds.
      * <p>
      * TODO: Check that metadata is unique
      *
@@ -239,8 +239,8 @@ public class PlantDescriptionValidator {
             // Ensure that there is metadata to differentiate between ports when
             // multiple ports share service definition:
             if (numPorts > numMetadata + 1) {
-                errors.add(system.systemId() + " has multiple ports with service definition '" +
-                    serviceDefinition + "' without metadata.");
+                errors.add(system.systemId() + " has multiple ports with service definition '" + serviceDefinition
+                    + "' without metadata.");
             }
 
             // Ensure that the metadata is unique within each serviceDefinition:
@@ -248,8 +248,8 @@ public class PlantDescriptionValidator {
             if (serviceMetadata.size() > 1) {
                 var uniqueMetadata = new HashSet<>(serviceMetadata);
                 if (uniqueMetadata.size() < serviceMetadata.size()) {
-                    errors.add(system.systemId() + " has duplicate metadata for ports with service definition '" +
-                        serviceDefinition + "'");
+                    errors.add(system.systemId() + " has duplicate metadata for ports with service definition '"
+                        + serviceDefinition + "'");
                 }
             }
         }

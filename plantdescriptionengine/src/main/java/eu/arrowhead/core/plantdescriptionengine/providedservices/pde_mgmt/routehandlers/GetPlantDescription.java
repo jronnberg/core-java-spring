@@ -29,18 +29,15 @@ public class GetPlantDescription implements HttpRouteHandler {
     }
 
     /**
-     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by
-     * the id path parameter.
+     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by the id
+     * path parameter.
      *
      * @param request  HTTP request object.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
 
         String idString = request.pathParameter(0);
         int id;
@@ -48,25 +45,17 @@ public class GetPlantDescription implements HttpRouteHandler {
         try {
             id = Integer.parseInt(idString);
         } catch (NumberFormatException e) {
-            return Future.success(response
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorMessage.of(idString + " is not a valid Plant Description Entry ID."))
-            );
+            return Future.success(response.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(idString + " is not a valid Plant Description Entry ID.")));
         }
 
         final PlantDescriptionEntryDto entry = pdTracker.get(id);
 
         if (entry == null) {
-            return Future.success(response
-                .body(ErrorMessage.of("Plant Description with ID " + id + " not found."))
-                .status(HttpStatus.NOT_FOUND)
-            );
+            return Future.success(response.body(ErrorMessage.of("Plant Description with ID " + id + " not found."))
+                .status(HttpStatus.NOT_FOUND));
         }
 
-        return Future.success(
-            response
-                .status(HttpStatus.OK)
-                .body(entry)
-        );
+        return Future.success(response.status(HttpStatus.OK).body(entry));
     }
 }

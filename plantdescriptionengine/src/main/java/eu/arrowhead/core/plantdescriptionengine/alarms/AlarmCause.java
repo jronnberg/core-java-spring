@@ -1,7 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.alarms;
 
 public enum AlarmCause {
-    systemInactive,
-    systemNotRegistered,
-    systemNotInDescription
+    systemInactive, systemNotRegistered, systemNotInDescription
 }

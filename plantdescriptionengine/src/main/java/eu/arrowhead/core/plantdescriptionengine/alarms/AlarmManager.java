@@ -48,9 +48,7 @@ public class AlarmManager {
      * @return A list containing the raw alarm data stored by this instance.
      */
     public List<Alarm> getActiveAlarmData(List<AlarmCause> causes) {
-        return activeAlarms.stream()
-            .filter(alarm -> causes.contains(alarm.cause))
-            .collect(Collectors.toList());
+        return activeAlarms.stream().filter(alarm -> causes.contains(alarm.cause)).collect(Collectors.toList());
     }
 
     /**
@@ -92,10 +90,8 @@ public class AlarmManager {
     }
 
     private void clearAlarm(String systemId, String systemName, AlarmCause cause) {
-        final List<Alarm> newlyCleared = activeAlarms
-            .stream()
-            .filter(alarm -> alarm.matches(systemId, systemName, cause))
-            .collect(Collectors.toList());
+        final List<Alarm> newlyCleared = activeAlarms.stream()
+            .filter(alarm -> alarm.matches(systemId, systemName, cause)).collect(Collectors.toList());
 
         for (var alarm : newlyCleared) {
             alarm.clearedAt = Instant.now();

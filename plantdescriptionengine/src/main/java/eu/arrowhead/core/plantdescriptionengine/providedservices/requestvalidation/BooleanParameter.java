@@ -4,7 +4,6 @@ import se.arkalix.net.http.service.HttpServiceRequest;
 
 import java.util.Optional;
 
-
 /**
  * An instance of this class embodies a set of requirements placed on a single
  * HttpServiceRequest query parameter, where the value is expected to be a
@@ -14,29 +13,6 @@ import java.util.Optional;
 public class BooleanParameter extends QueryParameter {
 
     private final Boolean defaultValue;
-
-    public static class Builder extends QueryParameter.Builder<Builder> {
-
-        private Boolean defaultValue = null;
-
-        /**
-         * @param value A default value for the constructed parameter.
-         * @return This instance.
-         */
-        public Builder defaultValue(boolean value) {
-            this.defaultValue = value;
-            return this;
-        }
-
-        public BooleanParameter build() {
-            return new BooleanParameter(this);
-        }
-
-        @Override
-        public Builder self() {
-            return this;
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -74,5 +50,28 @@ public class BooleanParameter extends QueryParameter {
         }
 
         parser.putBoolean(this, value.equals("true"));
+    }
+
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private Boolean defaultValue = null;
+
+        /**
+         * @param value A default value for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder defaultValue(boolean value) {
+            this.defaultValue = value;
+            return this;
+        }
+
+        public BooleanParameter build() {
+            return new BooleanParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
     }
 }

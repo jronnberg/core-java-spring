@@ -19,32 +19,29 @@ public class QueryParamParser {
     private final List<ParseError> errors = new ArrayList<>();
 
     /**
-     * Constructs an instance of this class.
-     * The query parameters of the provided request are immediately parsed and
-     * validated according to the query parameter requirements specified by the
-     * two first arguments.
+     * Constructs an instance of this class. The query parameters of the provided
+     * request are immediately parsed and validated according to the query parameter
+     * requirements specified by the two first arguments.
      * <p>
-     * All of the parameters specified in {@code required} must be present, and
-     * all of their requirements fulfilled, for the request to be considered
-     * valid.
+     * All of the parameters specified in {@code required} must be present, and all
+     * of their requirements fulfilled, for the request to be considered valid.
      * <p>
      * The parameters in {@code accepted} may be left out of the request, but if
      * present, must fulfill their requirements.
      * <p>
      * If the parameters are invalid, a {@code #ParseError} is thrown.
      * <p>
-     * If the parameters are valid, their values will be accessible via the
-     * method {@code getValue}.
+     * If the parameters are valid, their values will be accessible via the method
+     * {@code getValue}.
      *
      * @param required A list of all query parameters that are required for this
-     *                 request to be considered valid, with specific constraints
-     *                 for each one.
+     *                 request to be considered valid, with specific constraints for
+     *                 each one.
      * @param accepted A list of accepted query parameters
      * @param request  The head and body of an incoming HTTP request.
      */
-    public QueryParamParser(
-        List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request
-    ) throws ParseError {
+    public QueryParamParser(List<QueryParameter> required, List<QueryParameter> accepted, HttpServiceRequest request)
+        throws ParseError {
 
         if (required == null) {
             required = new ArrayList<>();
@@ -104,10 +101,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return An {@code Optional} that contains the value of the query
-     * parameter if it was present in the parsed
-     * {@code HttpServiceRequest} or if the parameter has a default
-     * value.
+     * @return An {@code Optional} that contains the value of the query parameter if
+     * it was present in the parsed {@code HttpServiceRequest} or if the
+     * parameter has a default value.
      */
     public Optional<Boolean> getValue(BooleanParameter param) {
         return Optional.ofNullable(boolValues.get(param));
@@ -115,10 +111,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return An {@code Optional} that contains the value of the query
-     * parameter if it was present in the parsed
-     * {@code HttpServiceRequest} or if the parameter has a default
-     * value.
+     * @return An {@code Optional} that contains the value of the query parameter if
+     * it was present in the parsed {@code HttpServiceRequest} or if the
+     * parameter has a default value.
      */
     public Optional<Integer> getValue(IntParameter param) {
         return Optional.ofNullable(intValues.get(param));
@@ -126,10 +121,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return An {@code Optional} that contains the value of the query
-     * parameter if it was present in the parsed
-     * {@code HttpServiceRequest} or if the parameter has a default
-     * value.
+     * @return An {@code Optional} that contains the value of the query parameter if
+     * it was present in the parsed {@code HttpServiceRequest} or if the
+     * parameter has a default value.
      */
     public Optional<String> getValue(StringParameter param) {
         return Optional.ofNullable(stringValues.get(param));
@@ -137,10 +131,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return The value of the query parameter. It is the caller's
-     * responsibility to ensure that this value was present in the
-     * parsed {@code HttpServiceRequest} or that the parameter has a
-     * default value.
+     * @return The value of the query parameter. It is the caller's responsibility
+     * to ensure that this value was present in the parsed
+     * {@code HttpServiceRequest} or that the parameter has a default value.
      */
     public boolean getRequiredValue(BooleanParameter param) {
         return boolValues.get(param);
@@ -148,10 +141,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return The value of the query parameter. It is the caller's
-     * responsibility to ensure that this value was present in the
-     * parsed {@code HttpServiceRequest} or that the parameter has a
-     * default value.
+     * @return The value of the query parameter. It is the caller's responsibility
+     * to ensure that this value was present in the parsed
+     * {@code HttpServiceRequest} or that the parameter has a default value.
      */
     public int getRequiredValue(IntParameter param) {
         return intValues.get(param);
@@ -159,10 +151,9 @@ public class QueryParamParser {
 
     /**
      * @param param A {@code QueryParam} that has been parse by this instance.
-     * @return The value of the query parameter. It is the caller's
-     * responsibility to ensure that this value was present in the
-     * parsed {@code HttpServiceRequest} or that the parameter has a
-     * default value.
+     * @return The value of the query parameter. It is the caller's responsibility
+     * to ensure that this value was present in the parsed
+     * {@code HttpServiceRequest} or that the parameter has a default value.
      */
     public String getRequiredValue(StringParameter param) {
         return stringValues.get(param);

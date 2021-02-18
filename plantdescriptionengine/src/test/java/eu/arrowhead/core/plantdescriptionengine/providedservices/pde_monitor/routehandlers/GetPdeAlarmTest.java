@@ -25,22 +25,20 @@ public class GetPdeAlarmTest {
         alarmManager.raiseSystemNotInDescription("System A");
         final var alarm = alarmManager.getAlarms().get(0);
 
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(alarm.id())))
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(alarm.id())))
             .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(alarmManager);
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.OK, response.status().orElse(null));
-                    assertTrue(response.body().isPresent());
-                    final var retrievedAlarm = (PdeAlarm) response.body().get();
-                    assertEquals(alarm.systemName().orElse(null), retrievedAlarm.systemName().orElse(null));
-                    assertEquals(alarm.severity(), retrievedAlarm.severity());
-                    assertEquals(alarm.acknowledged(), retrievedAlarm.acknowledged());
-                }).onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.OK, response.status().orElse(null));
+                assertTrue(response.body().isPresent());
+                final var retrievedAlarm = (PdeAlarm) response.body().get();
+                assertEquals(alarm.systemName().orElse(null), retrievedAlarm.systemName().orElse(null));
+                assertEquals(alarm.severity(), retrievedAlarm.severity());
+                assertEquals(alarm.acknowledged(), retrievedAlarm.acknowledged());
+            }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -50,21 +48,18 @@ public class GetPdeAlarmTest {
     public void shouldRejectInvalidId() {
 
         final String invalidEntryId = "Invalid ID";
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(invalidEntryId))
-            .build();
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                    String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid PDE Alarm ID.";
-                    assertTrue(response.body().isPresent());
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid PDE Alarm ID.";
+                assertTrue(response.body().isPresent());
+                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -74,21 +69,18 @@ public class GetPdeAlarmTest {
     public void shouldRejectNonexistentId() {
 
         final String nonexistentId = "31";
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(nonexistentId))
-            .build();
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(nonexistentId)).build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
-                    String expectedErrorMessage = "PDE Alarm with ID '" + nonexistentId + "' not found.";
-                    assertTrue(response.body().isPresent());
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                }).onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
+                String expectedErrorMessage = "PDE Alarm with ID '" + nonexistentId + "' not found.";
+                assertTrue(response.body().isPresent());
+                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }

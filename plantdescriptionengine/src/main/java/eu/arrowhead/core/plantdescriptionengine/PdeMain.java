@@ -36,8 +36,8 @@ public class PdeMain {
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
     /**
-     * Helper class for retrieving required properties. If the specified
-     * property is not present, an {@code IllegalArgumentException} is thrown.
+     * Helper class for retrieving required properties. If the specified property is
+     * not present, an {@code IllegalArgumentException} is thrown.
      *
      * @param appProps A set of properties.
      * @param propName Name of the property to retrieve.
@@ -54,8 +54,8 @@ public class PdeMain {
     /**
      * @param appProps Configurations used for this instance of the Plant
      *                 Description Engine.
-     * @return HTTP client useful for consuming Arrowhead services as a
-     * privileged system.
+     * @return HTTP client useful for consuming Arrowhead services as a privileged
+     * system.
      */
     static HttpClient createSysopHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
@@ -64,21 +64,14 @@ public class PdeMain {
             if (!secureMode) {
                 client = new HttpClient.Builder().insecure().build();
             } else {
-                OwnedIdentity identity = loadIdentity(
-                    getProp(appProps, "server.ssl.sysop.key-store"),
+                OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.sysop.key-store"),
                     getProp(appProps, "server.ssl.sysop.key-password").toCharArray(),
-                    getProp(appProps, "server.ssl.sysop.key-store-password").toCharArray()
-                );
+                    getProp(appProps, "server.ssl.sysop.key-store-password").toCharArray());
 
-                TrustStore trustStore = loadTrustStore(
-                    getProp(appProps, "server.ssl.sysop.trust-store"),
-                    getProp(appProps, "server.ssl.sysop.trust-store-password").toCharArray()
-                );
+                TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.sysop.trust-store"),
+                    getProp(appProps, "server.ssl.sysop.trust-store-password").toCharArray());
 
-                client = new HttpClient.Builder()
-                    .identity(identity)
-                    .trustStore(trustStore)
-                    .build();
+                client = new HttpClient.Builder().identity(identity).trustStore(trustStore).build();
             }
         } catch (SSLException e) {
             logger.error("Failed to create Sysop HTTP Client", e);
@@ -100,21 +93,14 @@ public class PdeMain {
             if (!secureMode) {
                 client = new HttpClient.Builder().insecure().build();
             } else {
-                OwnedIdentity identity = loadIdentity(
-                    getProp(appProps, "server.ssl.pde.key-store"),
+                OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.pde.key-store"),
                     getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
-                    getProp(appProps, "server.ssl.pde.key-store-password").toCharArray()
-                );
+                    getProp(appProps, "server.ssl.pde.key-store-password").toCharArray());
 
-                TrustStore trustStore = loadTrustStore(
-                    getProp(appProps, "server.ssl.pde.trust-store"),
-                    getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray()
-                );
+                TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.pde.trust-store"),
+                    getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray());
 
-                client = new HttpClient.Builder()
-                    .identity(identity)
-                    .trustStore(trustStore)
-                    .build();
+                client = new HttpClient.Builder().identity(identity).trustStore(trustStore).build();
             }
         } catch (SSLException e) {
             logger.error("Failed to create PDE HTTP Client", e);
@@ -124,8 +110,8 @@ public class PdeMain {
     }
 
     /**
-     * @param appProps               Configurations used for this instance of the Plant
-     *                               Description Engine.
+     * @param appProps               Configurations used for this instance of the
+     *                               Plant Description Engine.
      * @param serviceRegistryAddress Address of the Service Registry.
      * @return An Arrowhead Framework System.
      */
@@ -134,19 +120,13 @@ public class PdeMain {
         final int pdePort = Integer.parseInt(getProp(appProps, "server.port"));
 
         final var strategy = new OrchestrationStrategy(
-            new OrchestrationPattern()
-                .isIncludingService(true)
-                .option(OrchestrationOption.METADATA_SEARCH, false)
-                .option(OrchestrationOption.PING_PROVIDERS, true)
-                .option(OrchestrationOption.OVERRIDE_STORE, false));
+            new OrchestrationPattern().isIncludingService(true).option(OrchestrationOption.METADATA_SEARCH, false)
+                .option(OrchestrationOption.PING_PROVIDERS, true).option(OrchestrationOption.OVERRIDE_STORE, false));
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO))
-            .localPort(pdePort)
-            .plugins(new HttpJsonCloudPlugin.Builder()
-                .orchestrationStrategy(strategy)
-                .serviceRegistrySocketAddress(serviceRegistryAddress)
-                .build());
+            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO)).localPort(pdePort)
+            .plugins(new HttpJsonCloudPlugin.Builder().orchestrationStrategy(strategy)
+                .serviceRegistrySocketAddress(serviceRegistryAddress).build());
 
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
 
@@ -158,8 +138,7 @@ public class PdeMain {
             final String keyStorePath = getProp(appProps, "server.ssl.pde.key-store");
             final char[] keyPassword = getProp(appProps, "server.ssl.pde.key-password").toCharArray();
             final char[] keyStorePassword = getProp(appProps, "server.ssl.pde.key-store-password").toCharArray();
-            systemBuilder
-                .identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
+            systemBuilder.identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
                 .trustStore(loadTrustStore(trustStorePath, trustStorePassword));
         }
 
@@ -168,17 +147,17 @@ public class PdeMain {
     }
 
     /**
-     * Loads the Arrowhead certificate chain and private key required to manage
-     * an <i>owned</i> system or operator identity.
+     * Loads the Arrowhead certificate chain and private key required to manage an
+     * <i>owned</i> system or operator identity.
      * <p>
-     * The provided arguments {@code keyPassword} and {@code keyStorePassword}
-     * are cleared for security reasons.
-     * If this function fails, the entire application is terminated.
+     * The provided arguments {@code keyPassword} and {@code keyStorePassword} are
+     * cleared for security reasons. If this function fails, the entire application
+     * is terminated.
      *
      * @param keyStorePath     Sets path to file containing JVM-compatible key
      *                         store.
-     * @param keyPassword      Password of private key associated with
-     *                         designated certificate in key store.
+     * @param keyPassword      Password of private key associated with designated
+     *                         certificate in key store.
      * @param keyStorePassword Password of provided key store.
      * @return An object holding the Arrowhead certificate chain and private key
      * required to manage an owned system or operator identity.
@@ -186,11 +165,8 @@ public class PdeMain {
     private static OwnedIdentity loadIdentity(String keyStorePath, char[] keyPassword, char[] keyStorePassword) {
         OwnedIdentity identity = null;
         try {
-            identity = new OwnedIdentity.Loader()
-                .keyStorePath(keyStorePath)
-                .keyPassword(keyPassword)
-                .keyStorePassword(keyStorePassword)
-                .load();
+            identity = new OwnedIdentity.Loader().keyStorePath(keyStorePath).keyPassword(keyPassword)
+                .keyStorePassword(keyStorePassword).load();
         } catch (GeneralSecurityException | IOException e) {
             logger.error("Failed to load OwnedIdentity", e);
             System.exit(1);
@@ -205,8 +181,8 @@ public class PdeMain {
     /**
      * Loads certificates associated with a <i>trusted</i> Arrowhead systems.
      * <p>
-     * The provided argument {@code password} is cleared for security reasons.
-     * If this function fails, the entire application is terminated.
+     * The provided argument {@code password} is cleared for security reasons. If
+     * this function fails, the entire application is terminated.
      *
      * @param path     Filesystem path to key store to load.
      * @param password Key store password.
@@ -263,18 +239,15 @@ public class PdeMain {
         logger.info("Start polling Service Registry for systems...");
         systemTracker.start().flatMap(result -> {
 
-            final CloudDto cloud = new CloudBuilder()
-                .name(getProp(appProps, "cloud.name"))
-                .operator(getProp(appProps, "cloud.operator"))
-                .build();
+            final CloudDto cloud = new CloudBuilder().name(getProp(appProps, "cloud.name"))
+                .operator(getProp(appProps, "cloud.operator")).build();
 
             final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = getProp(appProps, "orchestration_rules");
             final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
-            final var orchestratorClient = new OrchestratorClient(
-                sysopClient, cloud, new FileRuleStore(ruleDirectory), systemTracker, pdTracker
-            );
+            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, new FileRuleStore(ruleDirectory),
+                systemTracker, pdTracker);
 
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
             final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
@@ -282,27 +255,21 @@ public class PdeMain {
 
             logger.info("Initializing the Orchestrator client...");
 
-            return orchestratorClient.initialize()
-                .flatMap(orchestratorInitializationResult -> {
-                    logger.info("Orchestrator client initialized.");
-                    final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
-                    mismatchDetector.run();
-                    var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
-                    logger.info("Starting the PDE Management service...");
-                    return arSystem.provide(pdeManagementService.getService());
-                })
-                .flatMap(mgmtServiceResult -> {
-                    logger.info("The PDE Management service is up and running.");
-                    logger.info("Starting the PDE Monitor service...");
-                    return new PdeMonitorService(arSystem, pdTracker, pdeClient, alarmManager, secureMode)
-                        .provide();
-                });
-        })
-            .ifSuccess(consumer -> logger.info("The PDE Monitor service is up and running."))
-            .onFailure(throwable -> {
-                logger.error("Failed to launch Plant Description Engine", throwable);
-                System.exit(1);
+            return orchestratorClient.initialize().flatMap(orchestratorInitializationResult -> {
+                logger.info("Orchestrator client initialized.");
+                final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
+                mismatchDetector.run();
+                var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
+                logger.info("Starting the PDE Management service...");
+                return arSystem.provide(pdeManagementService.getService());
+            }).flatMap(mgmtServiceResult -> {
+                logger.info("The PDE Management service is up and running.");
+                logger.info("Starting the PDE Monitor service...");
+                return new PdeMonitorService(arSystem, pdTracker, pdeClient, alarmManager, secureMode).provide();
             });
-
+        }).ifSuccess(consumer -> logger.info("The PDE Monitor service is up and running.")).onFailure(throwable -> {
+            logger.error("Failed to launch Plant Description Engine", throwable);
+            System.exit(1);
+        });
     }
 }

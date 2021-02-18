@@ -26,22 +26,6 @@ public interface PlantDescriptionEntry {
 
     Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = Comparator.comparing(PlantDescriptionEntry::updatedAt);
 
-    int id();
-
-    String plantDescription();
-
-    boolean active();
-
-    List<Integer> include();
-
-    List<PdeSystem> systems();
-
-    List<Connection> connections();
-
-    Instant createdAt();
-
-    Instant updatedAt();
-
     /**
      * @param description The plant description to base this entry on.
      * @param id          Identifier to be used for the new entry.
@@ -61,16 +45,9 @@ public interface PlantDescriptionEntry {
 
         final Instant now = Instant.now();
 
-        return new PlantDescriptionEntryBuilder()
-            .id(id)
-            .plantDescription(description.plantDescription())
-            .active(description.active().orElse(false))
-            .include(description.include().orElse(null))
-            .systems(systems)
-            .connections(connections)
-            .createdAt(now)
-            .updatedAt(now)
-            .build();
+        return new PlantDescriptionEntryBuilder().id(id).plantDescription(description.plantDescription())
+            .active(description.active().orElse(false)).include(description.include().orElse(null)).systems(systems)
+            .connections(connections).createdAt(now).updatedAt(now).build();
     }
 
     /**
@@ -89,16 +66,9 @@ public interface PlantDescriptionEntry {
             connections.add((ConnectionDto) connection);
         }
 
-        return new PlantDescriptionEntryBuilder()
-            .id(entry.id())
-            .plantDescription(entry.plantDescription())
-            .active(false)
-            .include(entry.include())
-            .systems(systems)
-            .connections(connections)
-            .createdAt(entry.createdAt())
-            .updatedAt(Instant.now())
-            .build();
+        return new PlantDescriptionEntryBuilder().id(entry.id()).plantDescription(entry.plantDescription())
+            .active(false).include(entry.include()).systems(systems).connections(connections)
+            .createdAt(entry.createdAt()).updatedAt(Instant.now()).build();
     }
 
     /**
@@ -109,12 +79,10 @@ public interface PlantDescriptionEntry {
      */
     static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
 
-        var builder = new PlantDescriptionEntryBuilder()
-            .id(oldEntry.id())
+        var builder = new PlantDescriptionEntryBuilder().id(oldEntry.id())
             .plantDescription(newFields.plantDescription().orElse(oldEntry.plantDescription()))
             .active(newFields.active().orElse(oldEntry.active()))
-            .include(newFields.include().orElse(oldEntry.include()))
-            .createdAt(oldEntry.createdAt())
+            .include(newFields.include().orElse(oldEntry.include())).createdAt(oldEntry.createdAt())
             .updatedAt(Instant.now());
 
         // The methods 'systems' and 'connections' return instances of
@@ -149,7 +117,8 @@ public interface PlantDescriptionEntry {
                 comparator = UPDATED_AT_COMPARATOR;
                 break;
             default:
-                throw new IllegalArgumentException("'" + sortField + "' is not a valid sort field for Plant Description Entries.");
+                throw new IllegalArgumentException(
+                    "'" + sortField + "' is not a valid sort field for Plant Description Entries.");
         }
 
         if (sortAscending) {
@@ -174,13 +143,29 @@ public interface PlantDescriptionEntry {
         }
     }
 
+    int id();
+
+    String plantDescription();
+
+    boolean active();
+
+    List<Integer> include();
+
+    List<PdeSystem> systems();
+
+    List<Connection> connections();
+
+    Instant createdAt();
+
+    Instant updatedAt();
+
     /**
      * Helper function for finding service definition names.
      *
      * @param connectionIndex Index of a connection within this instance's
      *                        connection list.
-     * @return Service definition name of the *producer* service of the
-     * specified connection.
+     * @return Service definition name of the *producer* service of the specified
+     * connection.
      */
     default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
         final SystemPort producerPort = connections().get(connectionIndex).producer();
@@ -199,8 +184,8 @@ public interface PlantDescriptionEntry {
         }
 
         // TODO: Remove this and instead validate all plant descriptions.
-        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex +
-            " in Plant Description Entry '" + plantDescription() + "'");
+        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex
+            + " in Plant Description Entry '" + plantDescription() + "'");
         return serviceDefinitionName;
     }
 
@@ -210,9 +195,8 @@ public interface PlantDescriptionEntry {
      * instance.
      */
     default boolean matchesDescription(PlantDescription description) {
-        return (
-            description.plantDescription().equals(plantDescription()) &&
-                (description.active().orElse(false) == active())
+        return (description.plantDescription().equals(plantDescription())
+            && (description.active().orElse(false) == active())
             // TODO: Check 'include', 'systems' and 'connections' as well.
         );
     }

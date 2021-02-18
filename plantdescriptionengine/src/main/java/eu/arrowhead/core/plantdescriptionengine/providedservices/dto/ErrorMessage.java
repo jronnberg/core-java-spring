@@ -13,12 +13,10 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoWritableAs(JSON)
 @DtoToString
 public interface ErrorMessage {
-    String error();
-
     static ErrorMessageDto of(String message) {
         return new ErrorMessageBuilder().error(message).build();
     }
 
+    String error();
+
 }
-
-

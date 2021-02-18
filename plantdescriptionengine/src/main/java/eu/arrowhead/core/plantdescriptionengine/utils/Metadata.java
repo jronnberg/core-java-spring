@@ -27,8 +27,8 @@ public class Metadata {
     /**
      * @param a A String to String map (system or port metadata).
      * @param b A String to String map (system or port metadata).
-     * @return The union of maps a and b, where the values in b override the
-     * values of a in case of collisions.
+     * @return The union of maps a and b, where the values in b override the values
+     * of a in case of collisions.
      */
     public static Map<String, String> merge(Map<String, String> a, Map<String, String> b) {
         Map<String, String> result = new HashMap<>();
@@ -45,6 +45,5 @@ public class Metadata {
 
         return result;
     }
-
 
 }

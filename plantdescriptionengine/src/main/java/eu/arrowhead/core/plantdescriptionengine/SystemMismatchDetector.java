@@ -26,11 +26,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private final SystemTracker systemTracker;
     private final AlarmManager alarmManager;
 
-    public SystemMismatchDetector(
-        PlantDescriptionTracker pdTracker,
-        SystemTracker systemTracker,
-        AlarmManager alarmManager
-    ) {
+    public SystemMismatchDetector(PlantDescriptionTracker pdTracker, SystemTracker systemTracker,
+                                  AlarmManager alarmManager) {
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
         Objects.requireNonNull(systemTracker, "Expected System Tracker");
         Objects.requireNonNull(alarmManager, "Expected Alarm Manager");
@@ -41,9 +38,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     /**
-     * Start monitoring Plant Descriptions and registered systems, raising
-     * alarms whenever there is a mismatch, and clearing alarms when issues are
-     * solved.
+     * Start monitoring Plant Descriptions and registered systems, raising alarms
+     * whenever there is a mismatch, and clearing alarms when issues are solved.
      */
     public void run() {
         pdTracker.addListener(this);
@@ -86,8 +82,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     /**
      * @param entrySystem      A system in a Plant Description Entry.
      * @param registeredSystem A system retrieved from the Service registry.
-     * @return True if the two objects represent the same real-world system,
-     * false otherwise.
+     * @return True if the two objects represent the same real-world system, false
+     * otherwise.
      */
     private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
         final Optional<String> name = entrySystem.systemName();
@@ -128,9 +124,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     /**
-     * Checks that the systems in the Service Registry match those in the
-     * currently active Plant Description. An alarm is raised for every
-     * mismatch.
+     * Checks that the systems in the Service Registry match those in the currently
+     * active Plant Description. An alarm is raised for every mismatch.
      */
     private void checkSystems() {
         final List<SrSystem> registeredSystems = systemTracker.getSystems();
@@ -157,9 +152,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
             // If not, raise an alarm:
             if (!matchFound) {
-                alarmManager.raiseSystemNotRegistered(
-                    entrySystem.systemId(),
-                    entrySystem.systemName().orElse(null));
+                alarmManager.raiseSystemNotRegistered(entrySystem.systemId(), entrySystem.systemName().orElse(null));
             }
         }
 
@@ -185,10 +178,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     private void clearAlarms(List<SrSystem> registeredSystems, List<PdeSystem> pdSystems) {
-        final List<Alarm> activeAlarms = alarmManager.getActiveAlarmData(List.of(
-            AlarmCause.systemNotInDescription,
-            AlarmCause.systemNotRegistered
-        ));
+        final List<Alarm> activeAlarms = alarmManager
+            .getActiveAlarmData(List.of(AlarmCause.systemNotInDescription, AlarmCause.systemNotRegistered));
 
         // For each active "System not in description" and "System not
         // registered" alarm:

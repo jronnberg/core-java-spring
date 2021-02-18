@@ -7,7 +7,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class PdeSystemTest {
 
     @Test
@@ -26,30 +25,14 @@ public class PdeSystemTest {
         final var metadataC = Map.of("z", "3");
 
         final List<PortDto> ports = List.of(
-            new PortBuilder()
-                .portName(portNameA)
-                .serviceDefinition(serviceA)
-                .consumer(true)
-                .metadata(metadataA)
+            new PortBuilder().portName(portNameA).serviceDefinition(serviceA).consumer(true).metadata(metadataA)
                 .build(),
-            new PortBuilder()
-                .portName(portNameB)
-                .serviceDefinition(serviceB)
-                .metadata(metadataB)
-                .consumer(false)
+            new PortBuilder().portName(portNameB).serviceDefinition(serviceB).metadata(metadataB).consumer(false)
                 .build(),
-            new PortBuilder()
-                .portName(portNameC)
-                .serviceDefinition(serviceC)
-                .metadata(metadataC)
-                .consumer(true)
-                .build()
-        );
+            new PortBuilder().portName(portNameC).serviceDefinition(serviceC).metadata(metadataC).consumer(true)
+                .build());
 
-        final PdeSystemDto system = new PdeSystemBuilder()
-            .systemId("Sys-X")
-            .ports(ports)
-            .build();
+        final PdeSystemDto system = new PdeSystemBuilder().systemId("Sys-X").ports(ports).build();
 
         final var portA = system.getPort(portNameA);
         final var portB = system.getPort(portNameB);
@@ -84,27 +67,11 @@ public class PdeSystemTest {
         final String serviceC = "ser-c";
 
         final List<PortDto> ports = List.of(
-            new PortBuilder()
-                .portName(portNameA)
-                .serviceDefinition(serviceA)
-                .consumer(true)
-                .build(),
-            new PortBuilder()
-                .portName(portNameB)
-                .serviceDefinition(serviceB)
-                .consumer(false)
-                .build(),
-            new PortBuilder()
-                .portName(portNameC)
-                .serviceDefinition(serviceC)
-                .consumer(true)
-                .build()
-        );
+            new PortBuilder().portName(portNameA).serviceDefinition(serviceA).consumer(true).build(),
+            new PortBuilder().portName(portNameB).serviceDefinition(serviceB).consumer(false).build(),
+            new PortBuilder().portName(portNameC).serviceDefinition(serviceC).consumer(true).build());
 
-        final PdeSystemDto system = new PdeSystemBuilder()
-            .systemId("Sys-Y")
-            .ports(ports)
-            .build();
+        final PdeSystemDto system = new PdeSystemBuilder().systemId("Sys-Y").ports(ports).build();
 
         assertTrue(system.hasPort(portNameA));
         assertTrue(system.hasPort(portNameB));

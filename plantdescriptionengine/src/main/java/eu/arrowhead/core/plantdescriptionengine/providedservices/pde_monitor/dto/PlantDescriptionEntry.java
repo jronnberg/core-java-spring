@@ -24,6 +24,31 @@ public interface PlantDescriptionEntry {
 
     Comparator<PlantDescriptionEntry> UPDATED_AT_COMPARATOR = Comparator.comparing(PlantDescriptionEntry::updatedAt);
 
+    static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
+
+        Comparator<PlantDescriptionEntry> comparator;
+        switch (sortField) {
+            case "id":
+                comparator = ID_COMPARATOR;
+                break;
+            case "createdAt":
+                comparator = CREATED_AT_COMPARATOR;
+                break;
+            case "updatedAt":
+                comparator = UPDATED_AT_COMPARATOR;
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "'" + sortField + "' is not a valid sort field for Plant Description Entries.");
+        }
+
+        if (sortAscending) {
+            entries.sort(comparator);
+        } else {
+            entries.sort(comparator.reversed());
+        }
+    }
+
     int id();
 
     String plantDescription();
@@ -39,29 +64,5 @@ public interface PlantDescriptionEntry {
     Instant createdAt();
 
     Instant updatedAt();
-
-    static void sort(List<? extends PlantDescriptionEntry> entries, String sortField, boolean sortAscending) {
-
-        Comparator<PlantDescriptionEntry> comparator;
-        switch (sortField) {
-            case "id":
-                comparator = ID_COMPARATOR;
-                break;
-            case "createdAt":
-                comparator = CREATED_AT_COMPARATOR;
-                break;
-            case "updatedAt":
-                comparator = UPDATED_AT_COMPARATOR;
-                break;
-            default:
-                throw new IllegalArgumentException("'" + sortField + "' is not a valid sort field for Plant Description Entries.");
-        }
-
-        if (sortAscending) {
-            entries.sort(comparator);
-        } else {
-            entries.sort(comparator.reversed());
-        }
-    }
 
 }

@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class PdeMainTest {
 
     @Test
@@ -54,13 +53,10 @@ public class PdeMainTest {
         Properties appProps = new Properties();
         appProps.setProperty("server.port", Integer.toString(localPort));
         appProps.setProperty("server.ssl.enabled", "true");
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> PdeMain.createArSystem(appProps, new InetSocketAddress("0.0.0.0", 5000)));
-        assertEquals(
-            "Missing field 'server.ssl.pde.trust-store' in application properties.",
-            exception.getMessage()
-        );
+        Exception exception = assertThrows(IllegalArgumentException.class,
+            () -> PdeMain.createArSystem(appProps, new InetSocketAddress("0.0.0.0", 5000)));
+        assertEquals("Missing field 'server.ssl.pde.trust-store' in application properties.", exception.getMessage());
     }
-
 
     @Test
     public void shouldCreateSecureSystem() {

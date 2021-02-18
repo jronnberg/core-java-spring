@@ -14,6 +14,15 @@ public class Alarm {
 
     // Integer for storing the next alarm ID to be used:
     private final static AtomicInteger nextId = new AtomicInteger();
+    public final String systemName;
+    public final String systemId;
+    public final AlarmCause cause;
+    final int id;
+    final Instant raisedAt;
+    boolean acknowledged;
+    Instant updatedAt;
+    Instant clearedAt;
+    Instant acknowledgedAt;
 
     Alarm(String systemId, String systemName, AlarmCause cause) {
 
@@ -31,20 +40,8 @@ public class Alarm {
         clearedAt = null;
     }
 
-    public final String systemName;
-    public final String systemId;
-    public final AlarmCause cause;
-    final int id;
-    final Instant raisedAt;
-    boolean acknowledged;
-    Instant updatedAt;
-    Instant clearedAt;
-    Instant acknowledgedAt;
-
     protected String description() {
-        String identifier = (systemName == null)
-            ? "with ID '" + systemId + "'"
-            : "named '" + systemName + "'";
+        String identifier = (systemName == null) ? "with ID '" + systemId + "'" : "named '" + systemName + "'";
 
         switch (cause) {
             case systemInactive:
@@ -78,17 +75,8 @@ public class Alarm {
      */
     public PdeAlarmDto toPdeAlarm() {
         AlarmSeverity severity = (clearedAt == null) ? AlarmSeverity.warning : AlarmSeverity.cleared;
-        return new PdeAlarmBuilder()
-            .id(id)
-            .systemId(systemId)
-            .systemName(systemName)
-            .acknowledged(acknowledged)
-            .severity(severity.toString())
-            .description(description())
-            .raisedAt(raisedAt)
-            .updatedAt(updatedAt)
-            .clearedAt(clearedAt)
-            .acknowledgedAt(acknowledgedAt)
-            .build();
+        return new PdeAlarmBuilder().id(id).systemId(systemId).systemName(systemName).acknowledged(acknowledged)
+            .severity(severity.toString()).description(description()).raisedAt(raisedAt).updatedAt(updatedAt)
+            .clearedAt(clearedAt).acknowledgedAt(acknowledgedAt).build();
     }
 }

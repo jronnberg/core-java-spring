@@ -37,7 +37,6 @@ public class MockRequest implements HttpServiceRequest {
         _queryParameters = builder.queryParameters;
     }
 
-
     @Override
     public <R extends DtoReadable> FutureProgress<R> bodyAs(DtoEncoding encoding, Class<R> class_) {
         throw new UnsupportedOperationException();

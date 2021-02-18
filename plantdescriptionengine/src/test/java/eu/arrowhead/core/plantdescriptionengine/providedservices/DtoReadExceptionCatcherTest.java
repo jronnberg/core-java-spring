@@ -22,9 +22,7 @@ public class DtoReadExceptionCatcherTest {
         int offset = 0;
 
         DtoReadException exception = new DtoReadException(DtoEncoding.JSON, message, value, offset);
-        var request = new MockRequest.Builder()
-            .body("Body")
-            .build();
+        var request = new MockRequest.Builder().body("Body").build();
         var response = new MockServiceResponse();
 
         catcher.handle(exception, request, response);
@@ -32,9 +30,6 @@ public class DtoReadExceptionCatcherTest {
         assertTrue(response.body().isPresent());
         String body = response.body().get().toString();
 
-        assertEquals(
-            "ErrorMessage{error='Failed to read JSON; cause: Lorem Ipsum `ABC` at offset 0'}",
-            body
-        );
+        assertEquals("ErrorMessage{error='Failed to read JSON; cause: Lorem Ipsum `ABC` at offset 0'}", body);
     }
 }

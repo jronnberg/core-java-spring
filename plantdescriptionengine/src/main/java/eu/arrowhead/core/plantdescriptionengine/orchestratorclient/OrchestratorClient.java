@@ -80,20 +80,19 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
-        return deleteActiveRules().flatMap(deletionResult -> (activeEntry == null)
-            ? Future.done()
-            : postRules().flatMap(createdRules -> {
-            ruleStore.setRules(createdRules.getIds());
-            logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
-            return Future.done();
-        }));
+        return deleteActiveRules()
+            .flatMap(deletionResult -> (activeEntry == null) ? Future.done() : postRules().flatMap(createdRules -> {
+                ruleStore.setRules(createdRules.getIds());
+                logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
+                return Future.done();
+            }));
     }
 
     /**
      * Create an Orchestrator rule to be passed to the Orchestrator.
      *
-     * @param connection A connection between a producer and consumer system
-     *                   present in a Plant Description Entry.
+     * @param connection A connection between a producer and consumer system present
+     *                   in a Plant Description Entry.
      * @return An Orchestrator rule that embodies the specified connection.
      */
     StoreRuleDto createRule(Connection connection) {
@@ -111,7 +110,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         // is present.
 
         if (consumer.systemName().isEmpty() || provider.systemName().isEmpty()) {
-            logger.error("Failed to create Orchestrator rule. The current version of the PDE requires all Plant Description systems to specify a system name.");
+            logger.error(
+                "Failed to create Orchestrator rule. The current version of the PDE requires all Plant Description systems to specify a system name.");
             return null;
         }
 
@@ -125,16 +125,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         String portName = connection.producer().portName();
         String serviceDefinition = pdTracker.getServiceDefinition(portName);
 
-        var builder = new StoreRuleBuilder()
-            .cloud(cloud)
-            .serviceDefinitionName(serviceDefinition)
-            .consumerSystemId(consumerSystemSrEntry.id())
-            .attribute(provider.portMetadata(portName))
-            .providerSystem(new ProviderSystemBuilder()
-                .systemName(providerSystemSrEntry.systemName())
-                .address(providerSystemSrEntry.address())
-                .port(providerSystemSrEntry.port())
-                .build())
+        var builder = new StoreRuleBuilder().cloud(cloud).serviceDefinitionName(serviceDefinition)
+            .consumerSystemId(consumerSystemSrEntry.id()).attribute(provider.portMetadata(portName))
+            .providerSystem(new ProviderSystemBuilder().systemName(providerSystemSrEntry.systemName())
+                .address(providerSystemSrEntry.address()).port(providerSystemSrEntry.port()).build())
             .priority(1); // What priority should be used?
 
         if (client.isSecure()) {
@@ -175,11 +169,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.success(emptyRuleList());
         }
 
-        return client.send(orchestratorAddress, new HttpClientRequest()
-            .method(HttpMethod.POST)
-            .uri("/orchestrator/mgmt/store")
-            .body(DtoEncoding.JSON, rules)
-            .header("accept", "application/json"))
+        return client
+            .send(orchestratorAddress,
+                new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/mgmt/store")
+                    .body(DtoEncoding.JSON, rules).header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
@@ -197,9 +190,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return A Future that performs the deletion.
      */
     private Future<Void> deleteRule(int id) {
-        return client.send(orchestratorAddress, new HttpClientRequest()
-            .method(HttpMethod.DELETE)
-            .uri("/orchestrator/mgmt/store/" + id))
+        return client
+            .send(orchestratorAddress,
+                new HttpClientRequest().method(HttpMethod.DELETE).uri("/orchestrator/mgmt/store/" + id))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
                     // TODO: Throw some other type of Exception.
@@ -261,7 +254,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             msg += String.join(", ", ids) + "]";
             logger.info(msg);
         } else {
-            logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should something be done in this case?
+            logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should
+            // something be done in
+            // this case?
         }
     }
 
@@ -282,25 +277,21 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteActiveRules() : Future.done();
 
-        final Future<StoreEntryListDto> postRulesTask = shouldPostRules
-            ? postRules()
-            : Future.success(emptyRuleList());
+        final Future<StoreEntryListDto> postRulesTask = shouldPostRules ? postRules() : Future.success(emptyRuleList());
 
-        deleteRulesTask
-            .flatMap(result -> postRulesTask)
-            .ifSuccess(createdRules -> {
-                if (entry.active()) {
-                    activeEntry = entry;
-                    ruleStore.setRules(createdRules.getIds());
-                    logEntryActivated(entry, createdRules);
+        deleteRulesTask.flatMap(result -> postRulesTask).ifSuccess(createdRules -> {
+            if (entry.active()) {
+                activeEntry = entry;
+                ruleStore.setRules(createdRules.getIds());
+                logEntryActivated(entry, createdRules);
 
-                } else if (wasDeactivated) {
-                    activeEntry = null;
-                    logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
-                }
-            })
-            .onFailure(throwable -> logger.error("Encountered an error while handling the new Plant Description '"
-                + entry.plantDescription() + "'", throwable));
+            } else if (wasDeactivated) {
+                activeEntry = null;
+                logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
+            }
+        }).onFailure(throwable -> logger.error(
+            "Encountered an error while handling the new Plant Description '" + entry.plantDescription() + "'",
+            throwable));
     }
 
     /**
@@ -331,8 +322,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         deleteActiveRules()
             .ifSuccess(result -> logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
                 + entry.plantDescription() + "'"))
-            .onFailure(throwable -> logger.error("Encountered an error while attempting to delete Plant Description '"
-                + entry.plantDescription() + "'", throwable));
+            .onFailure(throwable -> logger.error(
+                "Encountered an error while attempting to delete Plant Description '" + entry.plantDescription() + "'",
+                throwable));
     }
 
 }

@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
-
 /**
  * Data Transfer Object (DTO) interface for store entry.
  */

@@ -31,17 +31,10 @@ public final class DtoUtils {
         List<ConnectionDto> result = new ArrayList<>();
 
         for (var connection : connections) {
-            var consumerPort = new SystemPortBuilder()
-                .portName(connection.consumer()
-                    .portName())
-                .systemId(connection.consumer().systemId())
-                .build();
-            var producerPort = new SystemPortBuilder()
-                .portName(connection.producer()
-                    .portName())
-                .systemId(connection.producer()
-                    .systemId())
-                .build();
+            var consumerPort = new SystemPortBuilder().portName(connection.consumer().portName())
+                .systemId(connection.consumer().systemId()).build();
+            var producerPort = new SystemPortBuilder().portName(connection.producer().portName())
+                .systemId(connection.producer().systemId()).build();
 
             var connectionCopy = new ConnectionBuilder().consumer(consumerPort).producer(producerPort).build();
             result.add(connectionCopy);
@@ -52,21 +45,18 @@ public final class DtoUtils {
     /**
      * Returns a Plant Description Entry System supplemented with monitor info.
      *
-     * @param system      The source system which will be supplemented with
-     *                    monitor info.
+     * @param system      The source system which will be supplemented with monitor
+     *                    info.
      * @param monitorInfo Object used for keeping track of inventory data of
      *                    monitorable systems.
-     * @return A Plant Description Entry System with all the information
-     * contained in the {@code system} argument, supplemented with any
-     * relevant info in the {@code monitorInfo} argument.
+     * @return A Plant Description Entry System with all the information contained
+     * in the {@code system} argument, supplemented with any relevant info
+     * in the {@code monitorInfo} argument.
      */
     private static SystemEntryDto extend(PdeSystem system, MonitorInfo monitorInfo) {
 
-        List<MonitorInfo.Bundle> systemInfoList = monitorInfo
-            .getSystemInfo(
-                system.systemName().orElse(null),
-                system.metadata().orElse(null)
-            );
+        List<MonitorInfo.Bundle> systemInfoList = monitorInfo.getSystemInfo(system.systemName().orElse(null),
+            system.metadata().orElse(null));
 
         List<PortEntryDto> ports = new ArrayList<>();
 
@@ -77,10 +67,8 @@ public final class DtoUtils {
             // 'consumer' defaults to false when no value is set:
             boolean isConsumer = port.consumer().orElse(false);
 
-            var portBuilder = new PortEntryBuilder()
-                .portName(port.portName())
-                .serviceDefinition(port.serviceDefinition())
-                .consumer(isConsumer)
+            var portBuilder = new PortEntryBuilder().portName(port.portName())
+                .serviceDefinition(port.serviceDefinition()).consumer(isConsumer)
                 .metadata(port.metadata().orElse(null));
 
             // Only add monitor info to ports where this system is the
@@ -92,9 +80,11 @@ public final class DtoUtils {
                 for (var info : systemInfoList) {
 
                     boolean matchesServiceDefinition = info.serviceDefinition.equals(port.serviceDefinition());
-                    boolean matchesPort = info.matchesPortMetadata(system.metadata().orElse(null), port.metadata().orElse(null));
+                    boolean matchesPort = info.matchesPortMetadata(system.metadata().orElse(null),
+                        port.metadata().orElse(null));
 
-                    if (matchesServiceDefinition) { // TODO: Merge if-statements, this is just for checking test coverage
+                    if (matchesServiceDefinition) { // TODO: Merge if-statements, this is just for checking test
+                        // coverage
                         if (matchesPort) {
                             serviceMonitorInfo = info;
                             systemInfoList.remove(info);
@@ -119,9 +109,7 @@ public final class DtoUtils {
         // itself, not a specific port.
         for (var infoBundle : systemInfoList) {
             if (infoBundle.matchesSystemMetadata(system.metadata().orElse(null))) {
-                systemBuilder
-                    .inventoryId(infoBundle.inventoryId)
-                    .systemData(infoBundle.systemData);
+                systemBuilder.inventoryId(infoBundle.inventoryId).systemData(infoBundle.systemData);
                 break;
             } else {
                 logger.warn("Unmatched data in MonitorInfo");
@@ -160,15 +148,8 @@ public final class DtoUtils {
 
         List<ConnectionDto> connections = mgmtToMonitor(entry.connections());
 
-        return new PlantDescriptionEntryBuilder()
-            .id(entry.id())
-            .plantDescription(entry.plantDescription())
-            .active(entry.active())
-            .include(entry.include())
-            .systems(systems)
-            .connections(connections)
-            .createdAt(entry.createdAt())
-            .updatedAt(entry.updatedAt())
-            .build();
+        return new PlantDescriptionEntryBuilder().id(entry.id()).plantDescription(entry.plantDescription())
+            .active(entry.active()).include(entry.include()).systems(systems).connections(connections)
+            .createdAt(entry.createdAt()).updatedAt(entry.updatedAt()).build();
     }
 }

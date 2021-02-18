@@ -41,9 +41,8 @@ public interface PdeSystem {
     }
 
     /**
-     * @return The union of service and port metadata.
-     * In case of overlaps between the two sets, service metadata has
-     * precedence.
+     * @return The union of service and port metadata. In case of overlaps between
+     * the two sets, service metadata has precedence.
      */
     default Map<String, String> portMetadata(String portName) {
         Port port = getPort(portName);

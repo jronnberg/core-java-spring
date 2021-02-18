@@ -13,23 +13,16 @@ public class AlarmTest {
         Alarm alarmFromNamedSystem = new Alarm(null, systemName, AlarmCause.systemNotRegistered);
         Alarm alarmFromUnnamedSystem = new Alarm(systemId, null, AlarmCause.systemNotInDescription);
 
-        assertEquals(
-            "System named '" + systemName + "' cannot be found in the Service Registry.",
-            alarmFromNamedSystem.description()
-        );
-        assertEquals(
-            "System with ID '" + systemId + "' is not present in the active Plant Description.",
-            alarmFromUnnamedSystem.description()
-        );
+        assertEquals("System named '" + systemName + "' cannot be found in the Service Registry.",
+            alarmFromNamedSystem.description());
+        assertEquals("System with ID '" + systemId + "' is not present in the active Plant Description.",
+            alarmFromUnnamedSystem.description());
     }
 
     @Test
     public void shouldRejectNullAlarmCause() {
         Exception exception = assertThrows(RuntimeException.class, () -> new Alarm("XYZ", null, null));
-        assertEquals(
-            "Expected an alarm cause.",
-            exception.getMessage()
-        );
+        assertEquals("Expected an alarm cause.", exception.getMessage());
     }
 
     @Test

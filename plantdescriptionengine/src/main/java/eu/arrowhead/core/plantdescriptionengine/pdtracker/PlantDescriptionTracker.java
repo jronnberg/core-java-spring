@@ -9,9 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Object used to keep track of Plant Description entries.
- * It keeps a reference to a
- * {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore},
+ * Object used to keep track of Plant Description entries. It keeps a reference
+ * to a {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore},
  * which is used to store Plant Description Entries in some permanent storage
  * (e.g. to file or a database).
  */
@@ -59,14 +58,13 @@ public class PlantDescriptionTracker {
     }
 
     /**
-     * Stores the given entry in memory and in the backing store.
-     * Any registered {@code PlantDescriptionUpdateListener} are notified.
+     * Stores the given entry in memory and in the backing store. Any registered
+     * {@code PlantDescriptionUpdateListener} are notified.
      *
      * @param entry Entry to store in the map.
-     * @throws PdStoreException If the entry is not successfully stored in
-     *                          permanent storage. In this case, the entry will
-     *                          not be stored in memory either, and no listeners
-     *                          will be notified.
+     * @throws PdStoreException If the entry is not successfully stored in permanent
+     *                          storage. In this case, the entry will not be stored
+     *                          in memory either, and no listeners will be notified.
      */
     public void put(final PlantDescriptionEntryDto entry) throws PdStoreException {
         backingStore.write(entry);
@@ -100,14 +98,14 @@ public class PlantDescriptionTracker {
     }
 
     /**
-     * Removes the specified Plant Description Entry.
-     * The entry is removed from memory and from the backing store.
+     * Removes the specified Plant Description Entry. The entry is removed from
+     * memory and from the backing store.
      *
      * @param id ID of the entry to remove.
      * @throws PdStoreException If the entry is not successfully removed from
-     *                          permanent storage. In this case, the entry will
-     *                          not be stored in memory either, and no listeners
-     *                          will be notified.
+     *                          permanent storage. In this case, the entry will not
+     *                          be stored in memory either, and no listeners will be
+     *                          notified.
      */
     public void remove(int id) throws PdStoreException {
         backingStore.remove(id);
@@ -139,10 +137,7 @@ public class PlantDescriptionTracker {
      */
     public PlantDescriptionEntryListDto getListDto() {
         var data = new ArrayList<>(entries.values());
-        return new PlantDescriptionEntryListBuilder()
-            .data(data)
-            .count(data.size())
-            .build();
+        return new PlantDescriptionEntryListBuilder().data(data).count(data.size()).build();
     }
 
     /**
@@ -171,15 +166,12 @@ public class PlantDescriptionTracker {
      * @param entry    A Plant Description Entry.
      * @param systemId The ID of a system.
      * @return The system with the given ID, if it exists in the specified Plant
-     * Description entry, or its chain of included entries. If the
-     * system is not present, null is returned.
+     * Description entry, or its chain of included entries. If the system is
+     * not present, null is returned.
      */
     private PdeSystem getSystem(PlantDescriptionEntry entry, String systemId) {
 
-        PdeSystem result = entry.systems()
-            .stream()
-            .filter(system -> system.systemId().equals(systemId))
-            .findAny()
+        PdeSystem result = entry.systems().stream().filter(system -> system.systemId().equals(systemId)).findAny()
             .orElse(null);
 
         if (result != null) {
@@ -202,9 +194,8 @@ public class PlantDescriptionTracker {
     /**
      * @param systemId The ID of a system.
      * @return The system with the given ID, if it exists in the active Plant
-     * Description entry, or its chain of included entries. If the
-     * system is not present, an {@code IllegalArgumentException} is
-     * thrown.
+     * Description entry, or its chain of included entries. If the system is
+     * not present, an {@code IllegalArgumentException} is thrown.
      */
     public PdeSystem getSystem(String systemId) {
         final var activeEntry = activeEntry();
@@ -221,8 +212,8 @@ public class PlantDescriptionTracker {
 
     /**
      * @param entry A Plant Description Entry.
-     * @return A list of all systems in the specified entry, as well as all
-     * systems in its chain of included entries.
+     * @return A list of all systems in the specified entry, as well as all systems
+     * in its chain of included entries.
      */
     private List<PdeSystem> getSystems(PlantDescriptionEntry entry) {
         Objects.requireNonNull(entry, "Expected Plant Description Entry");
@@ -238,8 +229,8 @@ public class PlantDescriptionTracker {
     }
 
     /**
-     * @return A list of all systems in the active entry, as well as all
-     * systems in its chain of included entries.
+     * @return A list of all systems in the active entry, as well as all systems in
+     * its chain of included entries.
      */
     public List<PdeSystem> getActiveSystems() {
         return getSystems(activeEntry());
@@ -254,8 +245,8 @@ public class PlantDescriptionTracker {
         final var entry = get(entryId);
 
         if (entry == null) {
-            throw new IllegalArgumentException("Plant Description with ID "
-                + entryId + " is not present in the Plant Description Tracker.");
+            throw new IllegalArgumentException(
+                "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker.");
         }
 
         List<Connection> connections = new ArrayList<>(entry.connections());
@@ -268,8 +259,8 @@ public class PlantDescriptionTracker {
     }
 
     /**
-     * @return All connections in the active Plant Description Entry and its
-     * chain of included entries.
+     * @return All connections in the active Plant Description Entry and its chain
+     * of included entries.
      */
     public List<Connection> getActiveConnections() {
         final var activeEntry = activeEntry();
@@ -281,9 +272,8 @@ public class PlantDescriptionTracker {
 
     /**
      * @param portName The name of a system port.
-     * @return The service definition of the specified port, if it is present
-     * among the systems of the active entry or its chain of included
-     * entries.
+     * @return The service definition of the specified port, if it is present among
+     * the systems of the active entry or its chain of included entries.
      */
     public String getServiceDefinition(String portName) {
         final var activeEntry = activeEntry();
@@ -300,8 +290,8 @@ public class PlantDescriptionTracker {
                 }
             }
         }
-        throw new IllegalArgumentException("No port named '" + portName
-            + "' could be found in the Plant Description Tracker.");
+        throw new IllegalArgumentException(
+            "No port named '" + portName + "' could be found in the Plant Description Tracker.");
     }
 
 }

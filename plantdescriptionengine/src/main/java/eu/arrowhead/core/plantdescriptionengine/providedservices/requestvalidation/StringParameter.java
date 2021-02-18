@@ -14,50 +14,6 @@ import java.util.Optional;
  */
 public class StringParameter extends QueryParameter {
 
-    public static class Builder extends QueryParameter.Builder<Builder> {
-
-        private List<String> legalValues = null;
-        private String defaultValue = null;
-
-        /**
-         * @param values A list of legal values for the constructed
-         *               parameter.
-         * @return This instance.
-         */
-        public Builder legalValues(String... values) {
-            this.legalValues = Arrays.asList(values);
-            return this;
-        }
-
-        /**
-         * @param values A list of legal values for the constructed parameter.
-         * @return This instance.
-         */
-        public Builder legalValues(List<String> values) {
-            this.legalValues = values;
-            return this;
-        }
-
-
-        /**
-         * @param s A default value to use for the constructed parameter.
-         * @return This instance.
-         */
-        public Builder defaultValue(String s) {
-            this.defaultValue = s;
-            return this;
-        }
-
-        public StringParameter build() {
-            return new StringParameter(this);
-        }
-
-        @Override
-        public Builder self() {
-            return this;
-        }
-    }
-
     private final List<String> legalValues;
     private final String defaultValue;
 
@@ -99,5 +55,47 @@ public class StringParameter extends QueryParameter {
         }
 
         parser.putString(this, value);
+    }
+
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private List<String> legalValues = null;
+        private String defaultValue = null;
+
+        /**
+         * @param values A list of legal values for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder legalValues(String... values) {
+            this.legalValues = Arrays.asList(values);
+            return this;
+        }
+
+        /**
+         * @param values A list of legal values for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder legalValues(List<String> values) {
+            this.legalValues = values;
+            return this;
+        }
+
+        /**
+         * @param s A default value to use for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder defaultValue(String s) {
+            this.defaultValue = s;
+            return this;
+        }
+
+        public StringParameter build() {
+            return new StringParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
     }
 }

@@ -31,21 +31,15 @@ public class PdeMonitorService {
     /**
      * Class constructor.
      *
-     * @param pdTracker    An object that maps ID:s to Plant Description
-     *                     Entries.
+     * @param pdTracker    An object that maps ID:s to Plant Description Entries.
      * @param arSystem     An Arrowhead Framework system used to provide this
      *                     service.
      * @param httpClient   Object for communicating with monitorable services.
      * @param alarmManager Object used for managing PDE alarms.
      * @param secure       Indicates whether the service should run in secure mode.
      */
-    public PdeMonitorService(
-        ArSystem arSystem,
-        PlantDescriptionTracker pdTracker,
-        HttpClient httpClient,
-        AlarmManager alarmManager,
-        boolean secure
-    ) {
+    public PdeMonitorService(ArSystem arSystem, PlantDescriptionTracker pdTracker, HttpClient httpClient,
+                             AlarmManager alarmManager, boolean secure) {
         Objects.requireNonNull(arSystem, "Expected AR System");
         Objects.requireNonNull(pdTracker, "Expected plant description tracker");
         Objects.requireNonNull(httpClient, "Expected HTTP client");
@@ -63,20 +57,17 @@ public class PdeMonitorService {
      * Registers this service with an Arrowhead system, eventually making it
      * accessible to remote Arrowhead systems.
      *
-     * @return A HTTP Service used to monitor alarms raised by the Plant
-     * Description Engine core system.
+     * @return A HTTP Service used to monitor alarms raised by the Plant Description
+     * Engine core system.
      */
     public Future<ArServiceHandle> provide() {
-        final var service = new HttpService()
-            .name("plant-description-monitor")
-            .encodings(EncodingDescriptor.JSON)
-            .basePath("/pde/monitor")
-            .get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
+        final var service = new HttpService().name("plant-description-monitor").encodings(EncodingDescriptor.JSON)
+            .basePath("/pde/monitor").get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
             .get("/pd/#id", new GetPlantDescription(monitorInfo, pdTracker))
-            .get("/alarm/#id", new GetPdeAlarm(alarmManager))
-            .get("/alarm", new GetAllPdeAlarms(alarmManager))
+            .get("/alarm/#id", new GetPdeAlarm(alarmManager)).get("/alarm", new GetAllPdeAlarms(alarmManager))
             .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager));
-        // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add this line?
+        // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add
+        // this line?
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

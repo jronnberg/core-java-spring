@@ -43,10 +43,7 @@ public class AddPlantDescription implements HttpRouteHandler {
      *                 entry.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
         return request.bodyAs(PlantDescriptionDto.class).map(description -> {
 
             final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());
@@ -57,9 +54,7 @@ public class AddPlantDescription implements HttpRouteHandler {
             entries.put(entry.id(), entry);
             final var validator = new PlantDescriptionValidator(entries);
             if (validator.hasError()) {
-                return response
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(ErrorMessage.of(validator.getErrorMessage()));
+                return response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(validator.getErrorMessage()));
             }
 
             try {

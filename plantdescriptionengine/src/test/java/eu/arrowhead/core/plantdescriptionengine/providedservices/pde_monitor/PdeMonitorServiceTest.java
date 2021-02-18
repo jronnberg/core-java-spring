@@ -18,15 +18,10 @@ public class PdeMonitorServiceTest {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
-        final ArSystem arSystem = new ArSystem.Builder()
-            .name("Test System")
-            .insecure()
-            .build();
+        final ArSystem arSystem = new ArSystem.Builder().name("Test System").insecure().build();
         final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), false);
 
-        service.provide()
-            .ifSuccess(Assertions::assertNotNull)
-            .onFailure(Assertions::assertNull);
+        service.provide().ifSuccess(Assertions::assertNotNull).onFailure(Assertions::assertNull);
     }
 
     @Test
@@ -34,14 +29,9 @@ public class PdeMonitorServiceTest {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
-        final ArSystem arSystem = new ArSystem.Builder()
-            .name("Test System")
-            .insecure()
-            .build();
+        final ArSystem arSystem = new ArSystem.Builder().name("Test System").insecure().build();
         final var service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), true);
 
-        service.provide()
-            .ifSuccess(Assertions::assertNull)
-            .onFailure(Assertions::assertNotNull);
+        service.provide().ifSuccess(Assertions::assertNull).onFailure(Assertions::assertNotNull);
     }
 }

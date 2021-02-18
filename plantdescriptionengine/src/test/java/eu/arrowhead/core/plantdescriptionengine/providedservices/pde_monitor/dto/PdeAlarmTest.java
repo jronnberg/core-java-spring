@@ -12,7 +12,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 public class PdeAlarmTest {
 
     final Instant now = Instant.now();
@@ -31,41 +30,15 @@ public class PdeAlarmTest {
         Instant t4 = t1.plus(3, ChronoUnit.HOURS);
         Instant t5 = t1.plus(4, ChronoUnit.HOURS);
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(t3)
-            .updatedAt(t3)
-            .clearedAt(t4)
-            .build();
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(t1)
-            .updatedAt(t1)
-            .clearedAt(t5)
-            .build();
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(t2)
-            .updatedAt(t4)
-            .build();
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(t3).updatedAt(t3).clearedAt(t4).build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(t1).updatedAt(t1).clearedAt(t5).build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(t2).updatedAt(t4).build();
 
-        final PdeAlarm alarmD = new PdeAlarmBuilder()
-            .id(idD)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(t4)
-            .updatedAt(t4)
-            .build();
+        final PdeAlarm alarmD = new PdeAlarmBuilder().id(idD).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(t4).updatedAt(t4).build();
 
         List<PdeAlarm> alarms = Arrays.asList(alarmA, alarmB, alarmC, alarmD);
 
@@ -102,22 +75,14 @@ public class PdeAlarmTest {
 
     @Test
     public void shouldDisallowIncorrectSortField() {
-        final PdeAlarm alarm = new PdeAlarmBuilder()
-            .id(6)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarm = new PdeAlarmBuilder().id(6).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = Collections.singletonList(alarm);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> PdeAlarm.sort(alarms, "Illegal", true));
-        assertEquals(
-            "'Illegal' is not a valid sort field for PDE Alarms.",
-            exception.getMessage()
-        );
+        Exception exception = assertThrows(IllegalArgumentException.class,
+            () -> PdeAlarm.sort(alarms, "Illegal", true));
+        assertEquals("'Illegal' is not a valid sort field for PDE Alarms.", exception.getMessage());
     }
 
     @Test
@@ -128,39 +93,15 @@ public class PdeAlarmTest {
         final int idC = 3;
         final int idD = 4;
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).acknowledged(false).severity("danger")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).acknowledged(false).severity("cleared")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).clearedAt(now.plus(1, ChronoUnit.HOURS))
             .build();
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .acknowledged(false)
-            .severity("danger")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .acknowledged(false)
-            .severity("cleared")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .clearedAt(now.plus(1, ChronoUnit.HOURS))
-            .build();
-        final PdeAlarm alarmD = new PdeAlarmBuilder()
-            .id(idD)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmD = new PdeAlarmBuilder().id(idD).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = new ArrayList<>();
         alarms.add(alarmA);
@@ -183,39 +124,15 @@ public class PdeAlarmTest {
         final int idC = 3;
         final int idD = 4;
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).acknowledged(false).severity("danger")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).acknowledged(false).severity("cleared")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).clearedAt(now.plus(1, ChronoUnit.HOURS))
             .build();
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .acknowledged(false)
-            .severity("danger")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .acknowledged(false)
-            .severity("cleared")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .clearedAt(now.plus(1, ChronoUnit.HOURS))
-            .build();
-        final PdeAlarm alarmD = new PdeAlarmBuilder()
-            .id(idD)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmD = new PdeAlarmBuilder().id(idD).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = new ArrayList<>();
         alarms.add(alarmA);
@@ -238,32 +155,14 @@ public class PdeAlarmTest {
         final int idB = 12;
         final int idC = 6;
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .acknowledged(true)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).acknowledged(true).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = new ArrayList<>();
         alarms.add(alarmA);
@@ -282,32 +181,14 @@ public class PdeAlarmTest {
         final int idB = 12;
         final int idC = 6;
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .acknowledged(true)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).acknowledged(true).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = new ArrayList<>();
         alarms.add(alarmA);
@@ -331,44 +212,17 @@ public class PdeAlarmTest {
         final String systemA = "Sys-A";
         final String systemB = "Sys-B";
 
-        final PdeAlarm alarmA = new PdeAlarmBuilder()
-            .id(idA)
-            .systemName(systemA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmA = new PdeAlarmBuilder().id(idA).systemName(systemA).acknowledged(false)
+            .severity("warning").description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmB = new PdeAlarmBuilder()
-            .id(idB)
-            .systemName(systemA)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmB = new PdeAlarmBuilder().id(idB).systemName(systemA).acknowledged(false)
+            .severity("warning").description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmC = new PdeAlarmBuilder()
-            .id(idC)
-            .systemName(systemB)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmC = new PdeAlarmBuilder().id(idC).systemName(systemB).acknowledged(false)
+            .severity("warning").description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
-        final PdeAlarm alarmD = new PdeAlarmBuilder()
-            .id(idD)
-            .acknowledged(false)
-            .severity("warning")
-            .description("Something went wrong")
-            .raisedAt(now)
-            .updatedAt(now)
-            .build();
+        final PdeAlarm alarmD = new PdeAlarmBuilder().id(idD).acknowledged(false).severity("warning")
+            .description("Something went wrong").raisedAt(now).updatedAt(now).build();
 
         List<PdeAlarm> alarms = new ArrayList<>();
         alarms.add(alarmA);

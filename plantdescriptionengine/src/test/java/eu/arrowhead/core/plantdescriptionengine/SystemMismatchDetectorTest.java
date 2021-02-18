@@ -30,35 +30,19 @@ public class SystemMismatchDetectorTest {
     private SystemMismatchDetector detector;
 
     private SrSystem getSrSystem(String systemName) {
-        return new SrSystemBuilder()
-            .id(0)
-            .systemName(systemName)
-            .address("0.0.0.0")
-            .port(5000)
-            .authenticationInfo(null)
-            .createdAt(Instant.now().toString())
-            .updatedAt(Instant.now().toString())
-            .build();
+        return new SrSystemBuilder().id(0).systemName(systemName).address("0.0.0.0").port(5000).authenticationInfo(null)
+            .createdAt(Instant.now().toString()).updatedAt(Instant.now().toString()).build();
     }
 
     private PdeSystemDto getSystem(String name, String id) {
-        return new PdeSystemBuilder()
-            .systemId(id)
-            .systemName(name)
-            .build();
+        return new PdeSystemBuilder().systemId(id).systemName(name).build();
     }
 
     private PlantDescriptionEntryDto getPdEntry(String systemName) {
         final String systemId = "1234";
         final var system = getSystem(systemName, systemId);
-        return new PlantDescriptionEntryBuilder()
-            .id(1)
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .systems(List.of(system))
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+        return new PlantDescriptionEntryBuilder().id(1).plantDescription("Plant Description 1A").active(true)
+            .systems(List.of(system)).createdAt(Instant.now()).updatedAt(Instant.now()).build();
     }
 
     @BeforeEach
@@ -94,10 +78,7 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemName, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
-        assertEquals(
-            "System named '" + systemName + "' cannot be found in the Service Registry.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemName + "' cannot be found in the Service Registry.", alarm.description());
         assertFalse(alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
     }
@@ -123,10 +104,8 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemNameB, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
         assertEquals("warning", alarm.severity());
-        assertEquals(
-            "System named '" + systemNameB + "' is not present in the active Plant Description.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemNameB + "' is not present in the active Plant Description.",
+            alarm.description());
         assertFalse(alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
     }
@@ -140,14 +119,8 @@ public class SystemMismatchDetectorTest {
         final var systemA = getSystem(systemNameA, "a");
         final var systemB = getSystem(systemNameB, "b");
 
-        final var pdeEntry = new PlantDescriptionEntryBuilder()
-            .id(1)
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .systems(List.of(systemA, systemB))
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+        final var pdeEntry = new PlantDescriptionEntryBuilder().id(1).plantDescription("Plant Description 1A")
+            .active(true).systems(List.of(systemA, systemB)).createdAt(Instant.now()).updatedAt(Instant.now()).build();
 
         pdTracker.put(pdeEntry);
         systemTracker.addSystem(getSrSystem(systemNameA));
@@ -166,10 +139,8 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemNameB, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals(
-            "System named '" + systemNameB + "' cannot be found in the Service Registry.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemNameB + "' cannot be found in the Service Registry.",
+            alarm.description());
         assertFalse(alarm.acknowledged());
     }
 
@@ -190,10 +161,7 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals(
-            "System named '" + systemName + "' cannot be found in the Service Registry.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemName + "' cannot be found in the Service Registry.", alarm.description());
         assertFalse(alarm.acknowledged());
     }
 
@@ -214,10 +182,8 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals(
-            "System named '" + systemName + "' is not present in the active Plant Description.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemName + "' is not present in the active Plant Description.",
+            alarm.description());
         assertFalse(alarm.acknowledged());
     }
 
@@ -238,10 +204,8 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals(
-            "System named '" + systemName + "' is not present in the active Plant Description.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemName + "' is not present in the active Plant Description.",
+            alarm.description());
         assertFalse(alarm.acknowledged());
     }
 
@@ -260,14 +224,10 @@ public class SystemMismatchDetectorTest {
 
         detector.run();
 
-        final var entryWithTwoSystems = new PlantDescriptionEntryBuilder()
-            .id(1)
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .systems(List.of(getSystem(systemNameA, "a"), getSystem(systemNameB, "b")))
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+        final var entryWithTwoSystems = new PlantDescriptionEntryBuilder().id(1)
+            .plantDescription("Plant Description 1A").active(true)
+            .systems(List.of(getSystem(systemNameA, "a"), getSystem(systemNameB, "b"))).createdAt(Instant.now())
+            .updatedAt(Instant.now()).build();
 
         pdTracker.put(entryWithTwoSystems);
 
@@ -279,10 +239,8 @@ public class SystemMismatchDetectorTest {
         assertEquals(systemNameA, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
-        assertEquals(
-            "System named '" + systemNameA + "' is not present in the active Plant Description.",
-            alarm.description()
-        );
+        assertEquals("System named '" + systemNameA + "' is not present in the active Plant Description.",
+            alarm.description());
         assertFalse(alarm.acknowledged());
     }
 

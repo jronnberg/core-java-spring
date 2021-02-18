@@ -27,8 +27,7 @@ public class GetPlantDescription implements HttpRouteHandler {
      * @param pdTracker   Object that stores information on Plant Description
      *                    entries.
      */
-    public GetPlantDescription(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker
-    ) {
+    public GetPlantDescription(MonitorInfo monitorInfo, PlantDescriptionTracker pdTracker) {
         Objects.requireNonNull(monitorInfo, "Expected MonitorInfo");
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
 
@@ -37,18 +36,15 @@ public class GetPlantDescription implements HttpRouteHandler {
     }
 
     /**
-     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by
-     * the id path parameter.
+     * Handles an HTTP call to acquire the PlantDescriptionEntry specified by the id
+     * path parameter.
      *
      * @param request  HTTP request object.
      * @param response HTTP response containing the current
      *                 PlantDescriptionEntryList.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
 
         String idString = request.pathParameter(0);
         int id;

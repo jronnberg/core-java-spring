@@ -41,7 +41,6 @@ public class FileRuleStoreTest {
         assertEquals(rules, storedRules);
     }
 
-
     @Test
     public void shouldRemoveRules() throws RuleStoreException {
         final var store = new FileRuleStore(entryDirectory);

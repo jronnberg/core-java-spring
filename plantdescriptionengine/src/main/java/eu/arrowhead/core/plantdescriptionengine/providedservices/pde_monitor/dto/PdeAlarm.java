@@ -40,27 +40,6 @@ public interface PdeAlarm {
         return cleared1.get().compareTo(cleared2.get());
     };
 
-
-    int id();
-
-    Optional<String> systemName();
-
-    Optional<String> systemId();
-
-    boolean acknowledged();
-
-    String severity();
-
-    String description();
-
-    Instant raisedAt();
-
-    Instant updatedAt();
-
-    Optional<Instant> clearedAt();
-
-    Optional<Instant> acknowledgedAt();
-
     /**
      * Filters out cleared/uncleared alarms from the given list.
      *
@@ -126,4 +105,24 @@ public interface PdeAlarm {
             alarms.sort(comparator.reversed());
         }
     }
+
+    int id();
+
+    Optional<String> systemName();
+
+    Optional<String> systemId();
+
+    boolean acknowledged();
+
+    String severity();
+
+    String description();
+
+    Instant raisedAt();
+
+    Instant updatedAt();
+
+    Optional<Instant> clearedAt();
+
+    Optional<Instant> acknowledgedAt();
 }

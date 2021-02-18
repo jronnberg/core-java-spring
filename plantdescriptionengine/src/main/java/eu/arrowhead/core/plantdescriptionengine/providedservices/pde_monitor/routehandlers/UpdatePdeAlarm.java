@@ -37,49 +37,41 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
      * @param response HTTP response containing the updated entry.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
-        return request
-            .bodyAs(PdeAlarmUpdateDto.class)
-            .map(newFields -> {
-                final String idString = request.pathParameter(0);
-                int id;
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
+        return request.bodyAs(PdeAlarmUpdateDto.class).map(newFields -> {
+            final String idString = request.pathParameter(0);
+            int id;
 
+            try {
+                id = Integer.parseInt(idString);
+            } catch (final NumberFormatException e) {
+                response.status(HttpStatus.BAD_REQUEST);
+                response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
+                return response.status(HttpStatus.BAD_REQUEST);
+            }
+
+            boolean alarmNotFound = false;
+
+            if (newFields.acknowledged().isPresent()) {
                 try {
-                    id = Integer.parseInt(idString);
-                } catch (final NumberFormatException e) {
-                    response.status(HttpStatus.BAD_REQUEST);
-                    response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
-                    return response.status(HttpStatus.BAD_REQUEST);
-                }
-
-                boolean alarmNotFound = false;
-
-                if (newFields.acknowledged().isPresent()) {
-                    try {
-                        alarmManager.setAcknowledged(id, newFields.acknowledged().get());
-                    } catch (IllegalArgumentException e) {
-                        alarmNotFound = true;
-                    }
-                }
-
-                final var alarm = alarmManager.getAlarmDto(id);
-                if (alarm == null) {
+                    alarmManager.setAcknowledged(id, newFields.acknowledged().get());
+                } catch (IllegalArgumentException e) {
                     alarmNotFound = true;
                 }
+            }
 
-                if (alarmNotFound) {
-                    return response
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(ErrorMessage.of("PDE Alarm with ID '" + idString + "' not found."));
-                } else {
-                    return response
-                        .status(HttpStatus.OK)
-                        .body(alarmManager.getAlarmDto(id));
-                }
+            final var alarm = alarmManager.getAlarmDto(id);
+            if (alarm == null) {
+                alarmNotFound = true;
+            }
 
-            });
+            if (alarmNotFound) {
+                return response.status(HttpStatus.NOT_FOUND)
+                    .body(ErrorMessage.of("PDE Alarm with ID '" + idString + "' not found."));
+            } else {
+                return response.status(HttpStatus.OK).body(alarmManager.getAlarmDto(id));
+            }
+
+        });
     }
 }

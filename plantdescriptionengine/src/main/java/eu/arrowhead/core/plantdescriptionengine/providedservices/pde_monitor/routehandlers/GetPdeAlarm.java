@@ -37,10 +37,7 @@ public class GetPdeAlarm implements HttpRouteHandler {
      *                 PlantDescriptionEntryList.
      */
     @Override
-    public Future<HttpServiceResponse> handle(
-        final HttpServiceRequest request,
-        final HttpServiceResponse response
-    ) {
+    public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
 
         String idString = request.pathParameter(0);
         int id;

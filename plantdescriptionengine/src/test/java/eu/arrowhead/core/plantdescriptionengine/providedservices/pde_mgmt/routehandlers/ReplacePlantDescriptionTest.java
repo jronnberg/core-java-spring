@@ -32,26 +32,22 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of("35"))
-            .body(description)
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of("35")).body(description)
             .build();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.CREATED, response.status().orElse(null));
-                    assertNotNull(response.body());
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.CREATED, response.status().orElse(null));
+                assertNotNull(response.body());
 
-                    assertTrue(response.body().isPresent());
-                    PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
-                    assertTrue(entry.matchesDescription(description));
+                assertTrue(response.body().isPresent());
+                PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
+                assertTrue(entry.matchesDescription(description));
 
-                    var entryInMap = pdTracker.get(entry.id());
-                    assertNotNull(entryInMap);
-                    // TODO: Compare 'entryInMap' with 'entry'.
-                })
-                .onFailure(Assertions::assertNull);
+                var entryInMap = pdTracker.get(entry.id());
+                assertNotNull(entryInMap);
+                // TODO: Compare 'entryInMap' with 'entry'.
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -66,34 +62,25 @@ public class ReplacePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescription description = new PlantDescriptionBuilder()
-            .plantDescription(newName)
-            .active(true)
-            .include(new ArrayList<>())
-            .systems(new ArrayList<>())
-            .connections(new ArrayList<>())
-            .build();
+        final PlantDescription description = new PlantDescriptionBuilder().plantDescription(newName).active(true)
+            .include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>()).build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
-            .body(description)
-            .build();
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
+            .body(description).build();
 
         pdTracker.put(entry);
 
         final int sizeBeforePut = pdTracker.getEntries().size();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.CREATED, response.status().orElse(null));
-                    assertNotNull(response.body());
-                    assertTrue(response.body().isPresent());
-                    PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
-                    assertEquals(returnedEntry.plantDescription(), newName);
-                    assertEquals(sizeBeforePut, pdTracker.getEntries().size());
-                })
-                .onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.CREATED, response.status().orElse(null));
+                assertNotNull(response.body());
+                assertTrue(response.body().isPresent());
+                PlantDescriptionEntry returnedEntry = (PlantDescriptionEntry) response.body().get();
+                assertEquals(returnedEntry.plantDescription(), newName);
+                assertEquals(sizeBeforePut, pdTracker.getEntries().size());
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -105,21 +92,17 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
-        HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(invalidEntryId))
-            .build();
+        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
-                    String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
-                    assertEquals(expectedBody, response.body().orElse(null));
-                })
-                .onFailure(Assertions::assertNull);
+                String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
+                assertEquals(expectedBody, response.body().orElse(null));
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -137,48 +120,26 @@ public class ReplacePlantDescriptionTest {
         pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder()
-                .portName(portName)
-                .serviceDefinition("service_a")
-                .consumer(true)
-                .build(),
-            new PortBuilder()
-                .portName(portName)
-                .serviceDefinition("service_b")
-                .consumer(true)
-                .build()
-        );
+            new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
+            new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
-            .systemId(systemId)
-            .ports(consumerPorts)
-            .build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(systemId).ports(consumerPorts).build();
 
-        final var description = new PlantDescriptionBuilder()
-            .plantDescription("Plant Description 1A")
-            .active(true)
-            .systems(List.of(consumerSystem))
-            .include(new ArrayList<>())
-            .connections(new ArrayList<>())
-            .build();
+        final var description = new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
+            .systems(List.of(consumerSystem)).include(new ArrayList<>()).connections(new ArrayList<>()).build();
 
         final HttpServiceResponse response = new MockServiceResponse();
-        final MockRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(entryId)))
-            .body(description)
-            .build();
+        final MockRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
+            .body(description).build();
 
         try {
-            handler.handle(request, response)
-                .ifSuccess(result -> {
-                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                    String expectedErrorMessage = "<Duplicate port name '" +
-                        portName + "' in system '" + systemId + "'>";
-                    assertTrue(response.body().isPresent());
-                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                    assertEquals(expectedErrorMessage, actualErrorMessage);
-                })
-                .onFailure(Assertions::assertNull);
+            handler.handle(request, response).ifSuccess(result -> {
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                String expectedErrorMessage = "<Duplicate port name '" + portName + "' in system '" + systemId + "'>";
+                assertTrue(response.body().isPresent());
+                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+            }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -192,9 +153,7 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of("87"))
-            .body(description)
+        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of("87")).body(description)
             .build();
 
         doThrow(new PdStoreException("Mocked error")).when(backingStore).write(any(PlantDescriptionEntryDto.class));
