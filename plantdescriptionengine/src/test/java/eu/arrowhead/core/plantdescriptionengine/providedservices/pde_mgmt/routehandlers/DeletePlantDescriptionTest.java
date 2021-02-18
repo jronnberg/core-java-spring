@@ -1,16 +1,17 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
-import eu.arrowhead.core.plantdescriptionengine.utils.MockPdStore;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -19,6 +20,8 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 
 public class DeletePlantDescriptionTest {
 
@@ -158,7 +161,7 @@ public class DeletePlantDescriptionTest {
     @Test
     public void shouldHandleBackingStoreFailure() throws PdStoreException {
 
-        final var backingStore = new MockPdStore();
+        final var backingStore = Mockito.mock(FilePdStore.class);
         final var pdTracker = new PlantDescriptionTracker(backingStore);
         final var handler = new DeletePlantDescription(pdTracker);
         final int entryId = 87;
@@ -170,7 +173,7 @@ public class DeletePlantDescriptionTest {
 
         HttpServiceResponse response = new MockServiceResponse();
 
-        backingStore.setFailOnNextRemove();
+        doThrow(new PdStoreException("Mocked error")).when(backingStore).remove(anyInt());
 
         try {
             handler.handle(request, response)
