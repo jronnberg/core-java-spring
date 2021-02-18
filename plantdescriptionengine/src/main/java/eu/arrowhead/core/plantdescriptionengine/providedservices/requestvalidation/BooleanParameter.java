@@ -13,22 +13,37 @@ import java.util.Optional;
  */
 public class BooleanParameter extends QueryParameter {
 
-    private Boolean defaultValue = null; // Use generics?
+    private Boolean defaultValue = null;
+
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private Boolean defaultValue = null;
+
+        /**
+         * @param value A default value for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder defaultValue(boolean value) {
+            this.defaultValue = value;
+            return this;
+        }
+
+        public BooleanParameter build() {
+            return new BooleanParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
-    public BooleanParameter(String name) {
-        super(name);
-    }
-
-    /**
-     * @param value A default value for the parameter.
-     * @return This instance.
-     */
-    public BooleanParameter setDefault(boolean value) {
-        this.defaultValue = value;
-        return this;
+    public BooleanParameter(Builder builder) {
+        super(builder);
+        this.defaultValue = builder.defaultValue;
     }
 
     /**
@@ -44,7 +59,7 @@ public class BooleanParameter extends QueryParameter {
                 parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
-                parser.putBoolean(name, defaultValue);
+                parser.putBoolean(this, defaultValue);
             }
             return;
         }
@@ -58,6 +73,6 @@ public class BooleanParameter extends QueryParameter {
             parser.report(new ParseError("Query parameter '" + name + "' must be true or false, got '" + value + "'."));
         }
 
-        parser.putBoolean(name, value.equals("true"));
+        parser.putBoolean(this, value.equals("true"));
     }
 }

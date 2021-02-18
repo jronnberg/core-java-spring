@@ -59,17 +59,34 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         final HttpServiceRequest request,
         final HttpServiceResponse response
     ) {
+        final var itemPerPageParam = new IntParameter.Builder()
+            .name("item_per_page")
+            .min(0)
+            .build();
+        final var pageParam = new IntParameter.Builder()
+            .name("page")
+            .min(0)
+            .requires(itemPerPageParam)
+            .build();
+        final var sortFieldParam = new StringParameter.Builder()
+            .name("sort_field")
+            .legalValues(List.of("id", "createdAt", "updatedAt"))
+            .build();
+        final var directionParam = new StringParameter.Builder()
+            .name("direction")
+            .legalValues(List.of("ASC", "DESC"))
+            .defaultValue("ASC")
+            .build();
+
+        final var activeParam = new BooleanParameter.Builder()
+            .name("active")
+            .build();
+
         final List<QueryParameter> acceptedParameters = List.of(
-            new IntParameter("page")
-                .min(0)
-                .requires(new IntParameter("item_per_page")
-                    .min(0)),
-            new StringParameter("sort_field")
-                .legalValues(List.of("id", "createdAt", "updatedAt")),
-            new StringParameter("direction")
-                .legalValues(List.of("ASC", "DESC"))
-                .setDefault("ASC"),
-            new BooleanParameter("active")
+            pageParam,
+            sortFieldParam,
+            directionParam,
+            activeParam
         );
 
         QueryParamParser parser;
@@ -88,22 +105,22 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         var entries = pdTracker.getEntries();
 
-        final Optional<String> sortField = parser.getString("sort_field");
+        final Optional<String> sortField = parser.getValue(sortFieldParam);
         if (sortField.isPresent()) {
-            final String sortDirection = parser.getString("direction").get();
-            final boolean sortAscending = (sortDirection.equals("ASC"));
+            final String sortDirection = parser.getRequiredValue(directionParam);
+            final boolean sortAscending = sortDirection.equals("ASC");
             PlantDescriptionEntry.sort(entries, sortField.get(), sortAscending);
         }
 
-        final Optional<Integer> page = parser.getInt("page");
+        final Optional<Integer> page = parser.getValue(pageParam);
         if (page.isPresent()) {
-            int itemsPerPage = parser.getInt("item_per_page").get();
+            int itemsPerPage = parser.getRequiredValue(itemPerPageParam);
             int from = Math.min(page.get() * itemsPerPage, entries.size());
             int to = Math.min(from + itemsPerPage, entries.size());
             entries = entries.subList(from, to);
         }
 
-        final Optional<Boolean> active = parser.getBoolean("active");
+        final Optional<Boolean> active = parser.getValue(activeParam);
         if (active.isPresent()) {
             PlantDescriptionEntry.filterByActive(entries, active.get());
         }

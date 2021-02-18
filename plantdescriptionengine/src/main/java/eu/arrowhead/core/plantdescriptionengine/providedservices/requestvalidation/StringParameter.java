@@ -13,32 +13,50 @@ import java.util.Optional;
  */
 public class StringParameter extends QueryParameter {
 
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private List<String> legalValues = null;
+        private String defaultValue = null;
+
+        /**
+         * @param legalValues A list of legal values for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder legalValues(List<String> values) {
+            this.legalValues = values;
+            return this;
+        }
+
+
+        /**
+         * @param s A default value to use for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder defaultValue(String s) {
+            this.defaultValue = s;
+            return this;
+        }
+
+        public StringParameter build() {
+            return new StringParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+    }
+
     private List<String> legalValues = null;
     private String defaultValue = null;
 
     /**
      * {@inheritDoc}
      */
-    public StringParameter(String name) {
-        super(name);
-    }
-
-    /**
-     * @param legalValues A list of legal values for this parameter.
-     * @return This instance.
-     */
-    public StringParameter legalValues(List<String> legalValues) {
-        this.legalValues = legalValues;
-        return this;
-    }
-
-    /**
-     * @param s A default value to use for this parameter.
-     * @return This instance.
-     */
-    public StringParameter setDefault(String s) {
-        this.defaultValue = s;
-        return this;
+    private StringParameter(Builder builder) {
+        super(builder);
+        this.legalValues = builder.legalValues;
+        this.defaultValue = builder.defaultValue;
     }
 
     /**
@@ -54,7 +72,7 @@ public class StringParameter extends QueryParameter {
                 parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
-                parser.putString(name, defaultValue);
+                parser.putString(this, defaultValue);
             }
             return;
         }
@@ -69,6 +87,6 @@ public class StringParameter extends QueryParameter {
             parser.report(new ParseError(value + " is not a legal value for parameter " + name + "."));
         }
 
-        parser.putString(name, value);
+        parser.putString(this, value);
     }
 }

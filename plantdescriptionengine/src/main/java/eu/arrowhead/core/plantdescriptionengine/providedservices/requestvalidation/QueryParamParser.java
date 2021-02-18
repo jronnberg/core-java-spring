@@ -12,9 +12,9 @@ public class QueryParamParser {
     private final List<QueryParameter> required;
     private final List<QueryParameter> accepted;
 
-    private final Map<String, Integer> intValues = new HashMap<>();
-    private final Map<String, Boolean> boolValues = new HashMap<>();
-    private final Map<String, String> stringValues = new HashMap<>();
+    private final Map<IntParameter, Integer> intValues = new HashMap<>();
+    private final Map<BooleanParameter, Boolean> boolValues = new HashMap<>();
+    private final Map<StringParameter, String> stringValues = new HashMap<>();
 
     private final List<ParseError> errors = new ArrayList<>();
 
@@ -34,7 +34,7 @@ public class QueryParamParser {
      * If the parameters are invalid, a {@code #ParseError} is thrown.
      * <p>
      * If the parameters are valid, their values will be accessible via the
-     * methods {@code getInt}, {@code getBoolean} and {@code getString}.
+     * method {@code getValue}.
      *
      * @param required A list of all query parameters that are required for this
      *                 request to be considered valid, with specific constraints
@@ -90,31 +90,82 @@ public class QueryParamParser {
         }
     }
 
-    void putInt(String key, Integer value) {
+    void putInt(IntParameter key, Integer value) { // TODO: Rename to put
         intValues.put(key, value);
     }
 
-    public Optional<Integer> getInt(String name) {
-        Integer i = intValues.get(name);
-        return Optional.ofNullable(i);
-    }
-
-    void putBoolean(String key, Boolean value) {
+    void putBoolean(BooleanParameter key, Boolean value) {
         boolValues.put(key, value);
     }
 
-    public Optional<Boolean> getBoolean(String name) {
-        Boolean value = boolValues.get(name);
-        return Optional.ofNullable(value);
-    }
-
-    void putString(String key, String value) {
+    void putString(StringParameter key, String value) {
         stringValues.put(key, value);
     }
 
-    public Optional<String> getString(String name) {
-        String s = stringValues.get(name);
-        return Optional.ofNullable(s);
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return An {@code Optional} that contains the value of the query
+     * parameter if it was present in the parsed
+     * {@code HttpServiceRequest} or if the parameter has a default
+     * value.
+     */
+    public Optional<Boolean> getValue(BooleanParameter param) {
+        return Optional.ofNullable(boolValues.get(param));
+    }
+
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return An {@code Optional} that contains the value of the query
+     * parameter if it was present in the parsed
+     * {@code HttpServiceRequest} or if the parameter has a default
+     * value.
+     */
+    public Optional<Integer> getValue(IntParameter param) {
+        return Optional.ofNullable(intValues.get(param));
+    }
+
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return An {@code Optional} that contains the value of the query
+     * parameter if it was present in the parsed
+     * {@code HttpServiceRequest} or if the parameter has a default
+     * value.
+     */
+    public Optional<String> getValue(StringParameter param) {
+        return Optional.ofNullable(stringValues.get(param));
+    }
+
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return The value of the query parameter. It is the caller's
+     * responsibility to ensure that this value was present in the
+     * parsed {@code HttpServiceRequest} or that the parameter has a
+     * default value.
+     */
+    public boolean getRequiredValue(BooleanParameter param) {
+        return boolValues.get(param);
+    }
+
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return The value of the query parameter. It is the caller's
+     * responsibility to ensure that this value was present in the
+     * parsed {@code HttpServiceRequest} or that the parameter has a
+     * default value.
+     */
+    public int getRequiredValue(IntParameter param) {
+        return intValues.get(param);
+    }
+
+    /**
+     * @param param A {@code QueryParam} that has been parse by this instance.
+     * @return The value of the query parameter. It is the caller's
+     * responsibility to ensure that this value was present in the
+     * parsed {@code HttpServiceRequest} or that the parameter has a
+     * default value.
+     */
+    public String getRequiredValue(StringParameter param) {
+        return stringValues.get(param);
     }
 
     /**

@@ -13,6 +13,37 @@ import java.util.Scanner;
  */
 public class IntParameter extends QueryParameter {
 
+    public static class Builder extends QueryParameter.Builder<Builder> {
+
+        private int minValue = Integer.MIN_VALUE;
+
+        /**
+         * @param i The minimum allowed value for the constructed parameter.
+         * @return This instance.
+         */
+        public Builder min(int i) {
+            minValue = i;
+            return this;
+        }
+
+        public IntParameter build() {
+            return new IntParameter(this);
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private IntParameter(Builder builder) {
+        super(builder);
+        this.minValue = builder.minValue;
+    }
+
     private int minValue = Integer.MIN_VALUE;
 
     /**
@@ -27,13 +58,6 @@ public class IntParameter extends QueryParameter {
         }
         scanner.nextInt(radix);
         return !scanner.hasNext();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IntParameter(String name) {
-        super(name);
     }
 
     /**
@@ -72,16 +96,8 @@ public class IntParameter extends QueryParameter {
         }
 
         if (!parser.hasError()) {
-            parser.putInt(name, intValue);
+            parser.putInt(this, intValue);
         }
     }
 
-    /**
-     * @param i The minimum allowed value for this parameter.
-     * @return This instance.
-     */
-    public QueryParameter min(int i) {
-        minValue = i;
-        return this;
-    }
 }

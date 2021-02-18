@@ -16,14 +16,17 @@ public class IntParameterTest {
     @Test
     public void shouldParseIntegers() throws ParseError {
 
+        final var a = new IntParameter.Builder().name("a").build();
+        final var b = new IntParameter.Builder().name("b").build();
+        final var c = new IntParameter.Builder().name("c").build();
+        final var d = new IntParameter.Builder().name("d").build();
+
         final List<QueryParameter> requiredParameters = List.of(
-            new IntParameter("a"),
-            new IntParameter("b")
+            a, b
         );
 
         final List<QueryParameter> acceptedParameters = List.of(
-            new IntParameter("c"),
-            new IntParameter("d")
+            c, d
         );
 
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -37,16 +40,16 @@ public class IntParameterTest {
 
         final var parser = new QueryParamParser(requiredParameters, acceptedParameters, request);
 
-        assertEquals(0, parser.getInt("a").orElse(null));
-        assertEquals(1, parser.getInt("b").orElse(null));
-        assertEquals(126, parser.getInt("c").orElse(null));
-        assertEquals(99999, parser.getInt("d").orElse(null));
+        assertEquals(0, parser.getRequiredValue(a));
+        assertEquals(1, parser.getRequiredValue(b));
+        assertEquals(126, parser.getValue(c).orElse(null));
+        assertEquals(99999, parser.getValue(d).orElse(null));
     }
 
     @Test
     public void shouldRejectNonInteger() {
         final List<QueryParameter> requiredParameters = List.of(
-            new IntParameter("weight")
+            new IntParameter.Builder().name("weight").build()
         );
 
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -64,7 +67,7 @@ public class IntParameterTest {
     @Test
     public void shouldRejectInvalidInteger() {
         final List<QueryParameter> requiredParameters = List.of(
-            new IntParameter("weight")
+            new IntParameter.Builder().name("weight").build()
         );
 
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -82,9 +85,9 @@ public class IntParameterTest {
     @Test
     public void shouldRejectTooSmallValues() {
         final List<QueryParameter> requiredParameters = List.of(
-            new IntParameter("a").min(38),
-            new IntParameter("b").min(38),
-            new IntParameter("c").min(38)
+            new IntParameter.Builder().name("a").min(38).build(),
+            new IntParameter.Builder().name("b").min(38).build(),
+            new IntParameter.Builder().name("c").min(38).build()
         );
 
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -109,7 +112,7 @@ public class IntParameterTest {
     public void shouldReportMissingParameter() {
 
         final List<QueryParameter> requiredParameters = List.of(
-            new IntParameter("height")
+            new IntParameter.Builder().name("height").build()
         );
 
         Exception exception = assertThrows(ParseError.class, () -> {
@@ -128,8 +131,8 @@ public class IntParameterTest {
     public void shouldReportMissingDependency() {
 
         final List<QueryParameter> acceptedParameters = List.of(
-            new IntParameter("a")
-                .requires(new IntParameter("b"))
+            new IntParameter.Builder().name("a")
+                .requires(new IntParameter.Builder().name("b").build()).build()
         );
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()
