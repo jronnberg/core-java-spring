@@ -5,7 +5,10 @@ import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 

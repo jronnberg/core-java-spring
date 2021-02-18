@@ -1,8 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation;
 
-import org.junit.jupiter.api.Test;
-
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.service.HttpServiceRequest;
 
 import java.util.List;

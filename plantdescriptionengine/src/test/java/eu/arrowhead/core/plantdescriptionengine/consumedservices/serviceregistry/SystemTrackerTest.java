@@ -14,7 +14,8 @@ import se.arkalix.util.concurrent.Future;
 import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 

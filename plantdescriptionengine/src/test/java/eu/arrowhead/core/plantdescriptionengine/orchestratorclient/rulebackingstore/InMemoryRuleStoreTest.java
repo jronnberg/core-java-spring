@@ -1,12 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InMemoryRuleStoreTest {
 

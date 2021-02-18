@@ -1,15 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import org.junit.jupiter.api.Test;
-
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
+import org.junit.jupiter.api.Test;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import javax.net.ssl.SSLException;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MonitorablesClientTest {
 

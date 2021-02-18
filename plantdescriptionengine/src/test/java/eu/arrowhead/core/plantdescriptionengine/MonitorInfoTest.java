@@ -1,7 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import org.junit.jupiter.api.Test;
-
 import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
@@ -10,14 +9,12 @@ import se.arkalix.dto.json.value.JsonBoolean;
 import se.arkalix.dto.json.value.JsonObject;
 import se.arkalix.dto.json.value.JsonPair;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MonitorInfoTest {
 

@@ -1,15 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
+import org.junit.jupiter.api.Test;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.HttpStatus;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DtoReadExceptionCatcherTest {
 

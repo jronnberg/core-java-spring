@@ -1,15 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation;
 
-import org.junit.jupiter.api.Test;
-
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
+import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.service.HttpServiceRequest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringParameterTest {
 

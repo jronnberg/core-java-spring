@@ -4,7 +4,9 @@ import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.json.value.JsonObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
