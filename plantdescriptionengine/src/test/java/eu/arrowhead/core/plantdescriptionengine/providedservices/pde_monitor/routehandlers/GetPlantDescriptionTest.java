@@ -30,7 +30,8 @@ public class GetPlantDescriptionTest {
         final int nonExistentEntryId = 0;
 
         HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(nonExistentEntryId))).build();
+            .pathParameters(List.of(String.valueOf(nonExistentEntryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 

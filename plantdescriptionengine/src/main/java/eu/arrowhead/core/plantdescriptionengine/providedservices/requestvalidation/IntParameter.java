@@ -44,7 +44,7 @@ public class IntParameter extends QueryParameter {
         this.minValue = builder.minValue;
     }
 
-    private int minValue = Integer.MIN_VALUE;
+    private final int minValue;
 
     /**
      * @return True if the provided string is a base 10 integer.

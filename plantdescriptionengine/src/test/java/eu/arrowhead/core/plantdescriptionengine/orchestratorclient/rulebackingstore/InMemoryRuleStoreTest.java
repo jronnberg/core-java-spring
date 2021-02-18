@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class InMemoryRuleStoreTest {
 
     @Test
-    public void shouldReadRules() throws RuleStoreException {
+    public void shouldReadRules() {
         var store = new InMemoryRuleStore();
         Set<Integer> rules = Set.of(1, 2, 3);
         store.setRules(rules);
@@ -20,7 +20,7 @@ public class InMemoryRuleStoreTest {
     }
 
     @Test
-    public void shouldRemoveRules() throws RuleStoreException {
+    public void shouldRemoveRules() {
         var store = new InMemoryRuleStore();
         store.setRules(Set.of(1, 2, 3));
         store.removeAll();

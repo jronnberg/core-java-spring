@@ -70,11 +70,11 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
             .build();
         final var sortFieldParam = new StringParameter.Builder()
             .name("sort_field")
-            .legalValues(List.of("id", "createdAt", "updatedAt"))
+            .legalValues("id", "createdAt", "updatedAt")
             .build();
         final var directionParam = new StringParameter.Builder()
             .name("direction")
-            .legalValues(List.of("ASC", "DESC"))
+            .legalValues("ASC", "DESC")
             .defaultValue("ASC")
             .build();
 

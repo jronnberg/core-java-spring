@@ -13,17 +13,28 @@ import java.util.Objects;
  */
 public class QueryParameter {
 
+    /**
+     * Helper class used for constructing Query Parameters.
+     */
     protected abstract static class Builder<T extends Builder<T>> {
         protected String name = null;
         protected final List<QueryParameter> requiredParameters = new ArrayList<>();
 
         public abstract T self();
 
+        /**
+         * @param name A name to use for the constructed query parameter.
+         * @return This instance.
+         */
         public T name(String name) {
             this.name = name;
             return self();
         }
 
+        /**
+         * @param param A query parameter that must be present if the one being constructed is.
+         * @return This instance.
+         */
         public T requires(QueryParameter param) {
             requiredParameters.add(param);
             return self();
@@ -32,6 +43,7 @@ public class QueryParameter {
 
     /**
      * Class constructor.
+     *
      * @param builder Builder instance used to configure the instance.
      */
     protected QueryParameter(Builder<?> builder) {
@@ -42,27 +54,8 @@ public class QueryParameter {
         this.requiredParameters.addAll(builder.requiredParameters);
     }
 
-    /**
-     * Constructs an instance of this class.
-     *
-     * @param name The field name of the query parameter that this instance
-     *             refers to.
-     */
-    public QueryParameter(String name) {
-        this.name = name;
-    }
-
     protected final String name;
     protected final List<QueryParameter> requiredParameters = new ArrayList<>();
-
-    /**
-     * @param param A query parameter that must be present if this one is.
-     * @return This instance.
-     */
-    public QueryParameter requires(QueryParameter param) {
-        requiredParameters.add(param);
-        return this;
-    }
 
     /**
      * Validate and parse the query parameter that this instance corresponds to.

@@ -119,7 +119,6 @@ public class PlantDescriptionValidatorTest {
             entryIdB, entryB
         );
         final var validator = new PlantDescriptionValidator(entries);
-        System.out.println(validator.getErrorMessage());
         assertFalse(validator.hasError());
     }
 
@@ -680,7 +679,6 @@ public class PlantDescriptionValidatorTest {
         String expectedErrorMessage = "<Error in include list: Entry '" + nonExistentA +
             "' is required by entry '" + entryId + "'.>, "
             + "<Error in include list: Entry '" + nonExistentB + "' is required by entry '" + entryId + "'.>";
-        System.out.println(validator.getErrorMessage());
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 

@@ -21,7 +21,7 @@ public class StringParameterTest {
             .build();
         final var episodeParam = new StringParameter.Builder()
             .name("episode")
-            .legalValues(List.of("A New Hope", "The Empire Strikes Back", "Return of the Jedi"))
+            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
             .requires(scoreParam)
             .build();
 
@@ -45,7 +45,7 @@ public class StringParameterTest {
 
         final var episodeParam = new StringParameter.Builder()
             .name("episode")
-            .legalValues(List.of("A New Hope", "The Empire Strikes Back", "Return of the Jedi"))
+            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
             .defaultValue("A new Hope")
             .build();
 
@@ -65,7 +65,8 @@ public class StringParameterTest {
 
         final List<QueryParameter> requiredParameters = List.of(
             new StringParameter.Builder().name("sort_field")
-                .legalValues(List.of("id", "createdAt", "updatedAt")).build()
+                .legalValues("id", "createdAt", "updatedAt")
+                .build()
         );
 
         Exception exception = assertThrows(ParseError.class, () -> {
@@ -106,12 +107,8 @@ public class StringParameterTest {
         final List<QueryParameter> requiredParameters = List.of(
             new StringParameter.Builder()
                 .name("episode")
-                .legalValues(List.of(
-                    "A New Hope",
-                    "The Empire Strikes Back",
-                    "Return of the Jedi"))
+                .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
                 .build());
-
 
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()

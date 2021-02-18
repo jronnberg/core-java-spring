@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class that reads and writes Orchestration rules to file.
  * <p>
@@ -16,6 +19,8 @@ import java.util.Set;
  * rules and their relationship to Plant Descriptions to file.
  */
 public class FileRuleStore implements RuleStore {
+
+    private static final Logger logger = LoggerFactory.getLogger(RuleStore.class);
 
     // File path to the directory for storing the IDs of created Orchestration
     // rules created by the PDE:
@@ -64,14 +69,14 @@ public class FileRuleStore implements RuleStore {
         try {
             // Create the file and parent directories, if they do not already
             // exist:
-            if (file.getParentFile() != null) {
+            if (!file.getParentFile().exists()) {
                 if (!file.getParentFile().mkdirs()) {
                     throw new RuleStoreException("Failed to create directory for storing Orchestrator rules.");
                 }
             }
 
-            if (!file.createNewFile()) {
-                throw new RuleStoreException("Failed to create file for storing Orchestrator rules.");
+            if (file.createNewFile()) {
+                logger.info("Created a file for storing Orchestrator rules.");
             }
 
             // Write each rule ID on a single line:

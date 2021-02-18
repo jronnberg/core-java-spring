@@ -21,7 +21,7 @@ public class InMemoryPdStore implements PdStore {
      * {@inheritDoc}
      */
     @Override
-    public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
+    public List<PlantDescriptionEntryDto> readEntries() {
         return new ArrayList<>(entries.values());
     }
 
@@ -29,7 +29,7 @@ public class InMemoryPdStore implements PdStore {
      * {@inheritDoc}
      */
     @Override
-    public void write(final PlantDescriptionEntryDto entry) throws PdStoreException {
+    public void write(final PlantDescriptionEntryDto entry) {
         entries.put(entry.id(), entry);
     }
 
@@ -37,7 +37,7 @@ public class InMemoryPdStore implements PdStore {
      * {@inheritDoc}
      */
     @Override
-    public void remove(final int id) throws PdStoreException {
+    public void remove(final int id) {
         entries.remove(id);
     }
 

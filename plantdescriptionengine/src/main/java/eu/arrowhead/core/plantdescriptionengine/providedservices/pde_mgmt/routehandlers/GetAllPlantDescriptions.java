@@ -62,12 +62,12 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         final var sortFieldParam = new StringParameter.Builder()
             .name("sort_field")
-            .legalValues(List.of("id", "createdAt", "updatedAt"))
+            .legalValues("id", "createdAt", "updatedAt")
             .build();
 
         final var directionParam = new StringParameter.Builder()
             .name("direction")
-            .legalValues(List.of("ASC", "DESC"))
+            .legalValues("ASC", "DESC")
             .defaultValue("ASC")
             .build();
         final var activeParam = new BooleanParameter.Builder()
@@ -98,7 +98,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
 
         final Optional<String> sortField = parser.getValue(sortFieldParam);
         if (sortField.isPresent()) {
-            final String sortDirection = parser.getValue(directionParam).get();
+            final String sortDirection = parser.getRequiredValue(directionParam);
             final boolean sortAscending = (sortDirection.equals("ASC"));
             PlantDescriptionEntry.sort(entries, sortField.get(), sortAscending);
         }

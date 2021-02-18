@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 public class BooleanParameter extends QueryParameter {
 
-    private Boolean defaultValue = null;
+    private final Boolean defaultValue;
 
     public static class Builder extends QueryParameter.Builder<Builder> {
 

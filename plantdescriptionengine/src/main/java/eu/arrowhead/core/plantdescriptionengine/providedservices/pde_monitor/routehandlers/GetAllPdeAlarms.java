@@ -68,11 +68,11 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
 
         final var sortFieldParam = new StringParameter.Builder()
             .name("sort_field")
-            .legalValues(List.of("id", "raisedAt", "updatedAt"))
+            .legalValues("id", "raisedAt", "updatedAt")
             .build();
         final var directionParam = new StringParameter.Builder()
             .name("direction")
-            .legalValues(List.of("ASC", "DESC"))
+            .legalValues("ASC", "DESC")
             .defaultValue("ASC")
             .build();
         final var systemNameParam = new StringParameter.Builder()

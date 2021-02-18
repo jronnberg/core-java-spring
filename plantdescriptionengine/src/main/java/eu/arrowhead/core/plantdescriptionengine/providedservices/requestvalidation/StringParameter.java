@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidat
 
 import se.arkalix.net.http.service.HttpServiceRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,17 @@ public class StringParameter extends QueryParameter {
         private String defaultValue = null;
 
         /**
-         * @param legalValues A list of legal values for the constructed parameter.
+         * @param values A list of legal values for the constructed
+         *               parameter.
+         * @return This instance.
+         */
+        public Builder legalValues(String... values) {
+            this.legalValues = Arrays.asList(values);
+            return this;
+        }
+
+        /**
+         * @param values A list of legal values for the constructed parameter.
          * @return This instance.
          */
         public Builder legalValues(List<String> values) {
@@ -47,8 +58,8 @@ public class StringParameter extends QueryParameter {
         }
     }
 
-    private List<String> legalValues = null;
-    private String defaultValue = null;
+    private final List<String> legalValues;
+    private final String defaultValue;
 
     /**
      * {@inheritDoc}
