@@ -53,6 +53,12 @@ public class MonitorablesClient {
             .encodings(EncodingDescriptor.JSON);
     }
 
+    /**
+     * Begin monitoring all systems that provide the Monitorable service, to which the PDE has access via Orchestrator
+     * store rules.
+     *
+     * Monitor data is fetched and service availability is checked (via ping calls) periodically.
+     */
     public void start() {
         final var timer = new Timer();
 
@@ -113,6 +119,10 @@ public class MonitorablesClient {
         });
     }
 
+    /**
+     * Retrieve the inventory ID of a monitorable service.
+     * @param service A monitorable service.
+     */
     private void retrieveId(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
@@ -131,6 +141,10 @@ public class MonitorablesClient {
         });
     }
 
+    /**
+     * Retrieve system data of a monitorable service.
+     * @param service A monitorable service.
+     */
     private void retrieveSystemData(ServiceDescription service) {
         final var address = service.provider().socketAddress();
 
