@@ -259,15 +259,18 @@ public class PdeMain {
                 logger.info("Orchestrator client initialized.");
                 final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
                 mismatchDetector.run();
-                var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
-                logger.info("Starting the PDE Management service...");
-                return arSystem.provide(pdeManagementService.getService());
-            }).flatMap(mgmtServiceResult -> {
-                logger.info("The PDE Management service is up and running.");
                 logger.info("Starting the PDE Monitor service...");
                 return new PdeMonitorService(arSystem, pdTracker, pdeClient, alarmManager, secureMode).provide();
+            }).flatMap(mgmtServiceResult -> {
+                logger.info("The PDE Monitor service is ready.");
+                logger.info("Starting the PDE Management service...");
+                var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
+                return arSystem.provide(pdeManagementService.getService());
             });
-        }).ifSuccess(consumer -> logger.info("The PDE Monitor service is up and running.")).onFailure(throwable -> {
+        }).ifSuccess(consumer -> {
+            logger.info("The PDE Management service is ready.");
+            logger.info("The Plant Description Engine is up and running.");
+        }).onFailure(throwable -> {
             logger.error("Failed to launch Plant Description Engine", throwable);
             System.exit(1);
         });
