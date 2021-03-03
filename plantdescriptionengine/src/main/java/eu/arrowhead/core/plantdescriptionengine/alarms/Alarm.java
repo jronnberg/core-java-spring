@@ -41,18 +41,8 @@ public class Alarm {
     }
 
     protected String description() {
-        String identifier = (systemName == null) ? "with ID '" + systemId + "'" : "named '" + systemName + "'";
-
-        switch (cause) {
-            case systemInactive:
-                return "System " + identifier + " appears to be inactive.";
-            case systemNotRegistered:
-                return "System " + identifier + " cannot be found in the Service Registry.";
-            case systemNotInDescription:
-                return "System " + identifier + " is not present in the active Plant Description.";
-            default:
-                throw new RuntimeException("Invalid alarm cause.");
-        }
+        String identifier = (systemName == null) ? "System with ID '" + systemId + "'" : "System named '" + systemName + "'";
+        return cause.getDescription(identifier);
     }
 
     public boolean matches(String systemId, String systemName, AlarmCause cause) {
