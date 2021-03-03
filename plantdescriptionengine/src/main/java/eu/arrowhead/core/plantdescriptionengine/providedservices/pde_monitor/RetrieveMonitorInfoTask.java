@@ -1,21 +1,19 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.SystemDataDto;
-
-import java.util.Objects;
-import java.util.TimerTask;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.query.ServiceQuery;
+
+import java.util.Objects;
+import java.util.TimerTask;
 
 public class RetrieveMonitorInfoTask extends TimerTask {
 
@@ -63,17 +61,17 @@ public class RetrieveMonitorInfoTask extends TimerTask {
 
         // noinspection SpellCheckingInspection
         httpClient
-                .send(address,
-                        new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
-                                .header("accept", "application/json"))
-                .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
-                .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id())).onFailure(e -> {
-                    String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
-                            + "', service '" + service.name() + "'.";
-                    logger.warn(errorMessage, e);
+            .send(address,
+                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
+                    .header("accept", "application/json"))
+            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id())).onFailure(e -> {
+            String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
+                + "', service '" + service.name() + "'.";
+            logger.warn(errorMessage, e);
 
-                    // TODO: Raise an alarm?
-                });
+            // TODO: Raise an alarm?
+        });
     }
 
     /**
@@ -86,16 +84,16 @@ public class RetrieveMonitorInfoTask extends TimerTask {
 
         // noinspection SpellCheckingInspection
         httpClient
-                .send(address,
-                        new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
-                                .header("accept", "application/json"))
-                .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
-                .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data())).onFailure(e -> {
-                    String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
-                            + "', service '" + service.name() + "'.";
-                    logger.error(errorMessage, e);
-                    // TODO: Raise an alarm?
-                });
+            .send(address,
+                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
+                    .header("accept", "application/json"))
+            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
+            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data())).onFailure(e -> {
+            String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
+                + "', service '" + service.name() + "'.";
+            logger.error(errorMessage, e);
+            // TODO: Raise an alarm?
+        });
     }
 
 }

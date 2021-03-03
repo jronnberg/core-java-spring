@@ -24,7 +24,7 @@ import java.util.Timer;
 public class PdeMonitorService {
 
     private final static int fetchInfoInterval = 6000; // Milliseconds
-private final static int pingInterval = 10000; // Milliseconds
+    private final static int pingInterval = 10000; // Milliseconds
 
     private final ArSystem arSystem;
     private final MonitorInfo monitorInfo = new MonitorInfo();

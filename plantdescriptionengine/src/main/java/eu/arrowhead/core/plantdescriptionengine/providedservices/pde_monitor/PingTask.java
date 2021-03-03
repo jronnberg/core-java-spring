@@ -1,20 +1,16 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
+import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdDto;
-
-import java.util.Objects;
-import java.util.TimerTask;
-
 import se.arkalix.description.ServiceDescription;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.query.ServiceQuery;
+
+import java.util.Objects;
+import java.util.TimerTask;
 
 public class PingTask extends TimerTask {
 
@@ -51,7 +47,6 @@ public class PingTask extends TimerTask {
         }).onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
     }
 
-
     private void ping(ServiceDescription service) {
         final var address = service.provider().socketAddress();
         final String providerName = service.provider().name();
@@ -59,7 +54,6 @@ public class PingTask extends TimerTask {
             .send(address,
                 new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping").header("accept",
                     "application/json"))
-            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(result -> {
                 logger.info("Successfully pinged system '" + providerName + "'.");
                 alarmManager.clearSystemInactive(providerName);
