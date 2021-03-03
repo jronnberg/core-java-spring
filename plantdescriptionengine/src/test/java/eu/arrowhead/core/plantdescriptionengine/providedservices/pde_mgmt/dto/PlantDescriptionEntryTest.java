@@ -61,9 +61,9 @@ public class PlantDescriptionEntryTest {
             .createdAt(now).updatedAt(now).active(true).include(new ArrayList<>())
             .systems(List.of(consumerSystem, producerSystem)).connections(List.of()).build();
 
-        final List<ConnectionDto> newConnections = List.of(
-            new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(portName).build())
-                .producer(new SystemPortBuilder().systemId(producerId).portName(portName).build()).build());
+        final List<ConnectionDto> newConnections = List.of(new ConnectionBuilder()
+            .consumer(new SystemPortBuilder().systemId(consumerId).portName(portName).build())
+            .producer(new SystemPortBuilder().systemId(producerId).portName(portName).build()).build());
 
         final var newFields = new PlantDescriptionUpdateBuilder().connections(newConnections).build();
         final var updated = PlantDescriptionEntry.update(entry, newFields);
@@ -93,9 +93,9 @@ public class PlantDescriptionEntryTest {
 
         final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
 
-        final List<ConnectionDto> connections = List.of(
-            new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(portName).build())
-                .producer(new SystemPortBuilder().systemId(producerId).portName(portName).build()).build());
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
+            .consumer(new SystemPortBuilder().systemId(consumerId).portName(portName).build())
+            .producer(new SystemPortBuilder().systemId(producerId).portName(portName).build()).build());
 
         final var entry = new PlantDescriptionEntryBuilder().id(1).plantDescription("Plant Description 1A")
             .createdAt(now).updatedAt(now).active(true).include(new ArrayList<>())
@@ -128,18 +128,20 @@ public class PlantDescriptionEntryTest {
 
         final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
 
-        final List<ConnectionDto> connections = List.of(
-            new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameA).build())
-                .producer(new SystemPortBuilder().systemId(producerId).portName(portNameA).build()).build());
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
+            .consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameA).build())
+            .producer(new SystemPortBuilder().systemId(producerId).portName(portNameA).build()).build());
 
         final var entry = new PlantDescriptionEntryBuilder().id(1).plantDescription("Plant Description 1A")
             .createdAt(now).updatedAt(now).active(true).include(new ArrayList<>())
             .systems(List.of(consumerSystem, producerSystem)).connections(connections).build();
 
         final List<ConnectionDto> newConnections = List.of(
-            new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameB).build())
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameB).build())
                 .producer(new SystemPortBuilder().systemId(producerId).portName(portNameA).build()).build(),
-            new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameC).build())
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder().systemId(consumerId).portName(portNameC).build())
                 .producer(new SystemPortBuilder().systemId(producerId).portName(portNameA).build()).build());
 
         final var newFields = new PlantDescriptionUpdateBuilder().connections(newConnections).build();
@@ -267,7 +269,8 @@ public class PlantDescriptionEntryTest {
 
         final List<PortDto> producerPorts = List.of(
             new PortBuilder().portName(producerPortA).serviceDefinition(serviceDefinitionA).consumer(false).build(),
-            new PortBuilder().portName(producerPortB).serviceDefinition(serviceDefinitionB).consumer(false).build());
+            new PortBuilder().portName(producerPortB).serviceDefinition(serviceDefinitionB).consumer(false)
+                .build());
 
         final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerSystemName).ports(consumerPorts)
             .build();
@@ -275,8 +278,7 @@ public class PlantDescriptionEntryTest {
         final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerSystemName).ports(producerPorts)
             .build();
 
-        final List<ConnectionDto> connections = List.of(
-            new ConnectionBuilder()
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
                 .consumer(new SystemPortBuilder().systemId(consumerSystemName).portName(consumerPort).build())
                 .producer(new SystemPortBuilder().systemId(producerSystemName).portName(producerPortA).build()).build(),
             new ConnectionBuilder()
@@ -317,8 +319,7 @@ public class PlantDescriptionEntryTest {
         final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerSystemName).ports(producerPorts)
             .metadata(Map.of("b", "2")).build();
 
-        final List<ConnectionDto> connections = List.of(
-            new ConnectionBuilder()
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
                 .consumer(new SystemPortBuilder().systemId(consumerSystemName).portName(consumerPort).build())
                 .producer(new SystemPortBuilder().systemId(producerSystemName).portName(producerPortA).build()).build(),
             new ConnectionBuilder()
@@ -346,5 +347,54 @@ public class PlantDescriptionEntryTest {
             final var systemB = entry.systems().get(i);
             assertEquals(systemA.toString(), systemB.toString());
         }
+    }
+
+    @Test
+    public void shouldCreateFromDescription() {
+
+        final String consumerId = "Sys-A";
+        final String producerId = "Sys-B";
+        final String consumerName = "System A";
+        final String producerName = "System B";
+        final String consumerPort = "PortA";
+        final String producerPort = "PortB";
+
+        final List<PortDto> consumerPorts = List
+            .of(new PortBuilder().portName(consumerPort).serviceDefinition("Monitorable").consumer(true).build());
+
+        final List<PortDto> producerPorts = List
+            .of(new PortBuilder().portName(consumerPort).serviceDefinition("Monitorable").consumer(false).build());
+
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).systemName(consumerName)
+            .ports(consumerPorts).build();
+
+        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).systemName(producerName)
+            .ports(producerPorts).build();
+
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
+            .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPort).build())
+            .producer(new SystemPortBuilder().systemId(producerId).portName(producerPort).build()).build());
+
+        final var description = new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
+            .systems(List.of(consumerSystem, producerSystem)).connections(connections).build();
+
+        int entryId = 123;
+        final var entry = PlantDescriptionEntry.from(description, entryId);
+
+        assertEquals(2, entry.systems().size());
+        final var copiedConsumer = entry.systems().get(0);
+        final var copiedProducer = entry.systems().get(1);
+        assertEquals(consumerId, copiedConsumer.systemId());
+        assertEquals(producerId, copiedProducer.systemId());
+        assertEquals(consumerName, copiedConsumer.systemName().orElse(null));
+        assertEquals(producerName, copiedProducer.systemName().orElse(null));
+        assertEquals(1, consumerSystem.ports().size());
+        assertEquals(1, producerSystem.ports().size());
+        assertEquals(1, entry.connections().size());
+        final var copiedConnection = entry.connections().get(0);
+        assertEquals(consumerPort, copiedConnection.consumer().portName());
+        assertEquals(consumerId, copiedConnection.consumer().systemId());
+        assertEquals(producerPort, copiedConnection.producer().portName());
+        assertEquals(producerId, copiedConnection.producer().systemId());
     }
 }

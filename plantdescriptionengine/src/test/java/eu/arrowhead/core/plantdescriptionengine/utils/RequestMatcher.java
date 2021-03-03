@@ -14,6 +14,7 @@ public class RequestMatcher implements ArgumentMatcher<HttpClientRequest> {
 
     /**
      * Constructor
+     *
      * @param request Request used for comparisons.
      */
     public RequestMatcher(HttpClientRequest request) {
