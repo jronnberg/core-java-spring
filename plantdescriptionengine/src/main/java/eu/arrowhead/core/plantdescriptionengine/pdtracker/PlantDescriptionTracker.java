@@ -196,6 +196,8 @@ public class PlantDescriptionTracker {
      * @return The system with the given ID, if it exists in the active Plant
      * Description entry, or its chain of included entries. If the system is
      * not present, an {@code IllegalArgumentException} is thrown.
+     * If no entry is currently active, an {@code IllegalStateException} is
+     * thrown.
      */
     public PdeSystem getSystem(String systemId) {
         final var activeEntry = activeEntry();
@@ -244,10 +246,7 @@ public class PlantDescriptionTracker {
     private List<Connection> getAllConnections(int entryId) {
         final var entry = get(entryId);
 
-        if (entry == null) {
-            throw new IllegalArgumentException(
-                "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker.");
-        }
+        Objects.requireNonNull(entry, "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker.");
 
         List<Connection> connections = new ArrayList<>(entry.connections());
 

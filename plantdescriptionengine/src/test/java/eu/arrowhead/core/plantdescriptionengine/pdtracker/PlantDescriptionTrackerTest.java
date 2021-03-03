@@ -252,11 +252,25 @@ public class PlantDescriptionTrackerTest {
     }
 
     @Test
+    public void shouldThrowWhenNoEntryIsActive() throws PdStoreException {
+
+        final var entry = new PlantDescriptionEntryBuilder().id(1).plantDescription("ABC").createdAt(now).updatedAt(now)
+            .active(false).build();
+
+        pdTracker.put(entry);
+
+        Exception exception = assertThrows(IllegalStateException.class,
+        () -> pdTracker.getSystem("ABC"));
+        assertEquals("No active Plant Description.", exception.getMessage());
+    }
+
+    @Test
     public void shouldReturnSystemFromIncludedEntry() throws PdStoreException {
 
         int entryIdA = 32;
         int entryIdB = 8;
         int entryIdC = 58;
+        int entryIdX = 97;
 
         final String systemIdA = "Sys-A";
         final String systemIdB = "Sys-B";
@@ -274,12 +288,16 @@ public class PlantDescriptionTrackerTest {
         final var entryB = new PlantDescriptionEntryBuilder().id(entryIdB).plantDescription("B").createdAt(now)
             .updatedAt(now).active(false).include(List.of(entryIdA)).build();
 
+        final var entryX = new PlantDescriptionEntryBuilder().id(entryIdX).plantDescription("X").createdAt(now)
+            .updatedAt(now).active(false).build();
+
         final var entryC = new PlantDescriptionEntryBuilder().id(entryIdC).plantDescription("C").createdAt(now)
-            .updatedAt(now).active(true).include(List.of(entryIdB)).systems(List.of(systemC)).build();
+            .updatedAt(now).active(true).include(List.of(entryIdX, entryIdB)).systems(List.of(systemC)).build();
 
         pdTracker.put(entryA);
         pdTracker.put(entryB);
         pdTracker.put(entryC);
+        pdTracker.put(entryX);
 
         assertEquals(systemIdA, pdTracker.getSystem(systemIdA).systemId());
     }
