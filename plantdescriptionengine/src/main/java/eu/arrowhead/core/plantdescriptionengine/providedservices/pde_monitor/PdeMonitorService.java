@@ -7,12 +7,15 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.rou
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
+import se.arkalix.descriptor.TransportDescriptor;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.service.HttpService;
+import se.arkalix.query.ServiceQuery;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
 
 import java.util.Objects;
+import java.util.Timer;
 
 /**
  * This service enables monitoring of a plant and related alarms raised by Plant
@@ -20,13 +23,19 @@ import java.util.Objects;
  */
 public class PdeMonitorService {
 
+    private final static int fetchInfoInterval = 6000; // Milliseconds
+private final static int pingInterval = 10000; // Milliseconds
+
     private final ArSystem arSystem;
-    private final MonitorablesClient monitorableClient;
     private final MonitorInfo monitorInfo = new MonitorInfo();
     private final AlarmManager alarmManager;
 
     private final PlantDescriptionTracker pdTracker;
     private final boolean secure;
+
+    private final ServiceQuery serviceQuery;
+    private final PingTask pingTask;
+    private final RetrieveMonitorInfoTask retrieveMonitorInfoTask;
 
     /**
      * Class constructor.
@@ -50,7 +59,13 @@ public class PdeMonitorService {
         this.alarmManager = alarmManager;
         this.secure = secure;
 
-        this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
+        // this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
+
+        serviceQuery = arSystem.consume().name("monitorable").transports(TransportDescriptor.HTTP)
+            .encodings(EncodingDescriptor.JSON);
+
+        pingTask = new PingTask(serviceQuery, httpClient, alarmManager);
+        retrieveMonitorInfoTask = new RetrieveMonitorInfoTask(serviceQuery, httpClient, monitorInfo);
     }
 
     /**
@@ -75,7 +90,14 @@ public class PdeMonitorService {
             service.accessPolicy(AccessPolicy.unrestricted());
         }
 
-        monitorableClient.start();
+        final var timer = new Timer();
+
+        // Periodically check if all monitorable services are active
+        timer.schedule(pingTask, 0, pingInterval);
+
+        // Periodically request data from all monitorable services
+        timer.schedule(retrieveMonitorInfoTask, 0, fetchInfoInterval);
+
         return arSystem.provide(service);
     }
 
