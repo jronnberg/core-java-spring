@@ -54,7 +54,7 @@ public class SystemTracker {
     private Future<Void> fetchSystems() {
         return httpClient
             .send(serviceRegistryAddress,
-                new HttpClientRequest().method(HttpMethod.GET).uri("/serviceregistry/mgmt/systems").header("accept",
+                new HttpClientRequest().method(HttpMethod.GET).uri("/serviceregistry/systems").header("accept",
                     "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {

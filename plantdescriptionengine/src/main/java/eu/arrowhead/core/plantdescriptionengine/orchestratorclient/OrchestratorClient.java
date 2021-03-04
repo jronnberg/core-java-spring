@@ -171,7 +171,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         return client
             .send(orchestratorAddress,
-                new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/mgmt/store")
+                new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/store/flexible")
                     .body(DtoEncoding.JSON, rules).header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
@@ -192,7 +192,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private Future<Void> deleteRule(int id) {
         return client
             .send(orchestratorAddress,
-                new HttpClientRequest().method(HttpMethod.DELETE).uri("/orchestrator/mgmt/store/" + id))
+                new HttpClientRequest().method(HttpMethod.DELETE).uri("/orchestrator/store/flexible/" + id))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
                     // TODO: Throw some other type of Exception.
