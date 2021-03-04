@@ -14,23 +14,34 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PdeMainTest {
 
     @Test
-    public void shouldCreateInsecureSysopHttpClient() {
+    public void shouldCreateInsecureHttpClient() {
 
         Properties appProps = new Properties();
         appProps.setProperty("server.ssl.enabled", "false");
 
-        final HttpClient sysopClient = PdeMain.createSysopHttpClient(appProps);
-        assertFalse(sysopClient.isSecure());
+        final HttpClient pdeClient = PdeMain.createHttpClient(appProps);
+        assertFalse(pdeClient.isSecure());
     }
 
     @Test
-    public void shouldCreateInsecurePdeHttpClient() {
+    public void shouldCreateSecureHttpClient() {
 
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
+        String keyStorePath = keyStoreFile.getAbsolutePath();
+
+        int localPort = 8000;
         Properties appProps = new Properties();
-        appProps.setProperty("server.ssl.enabled", "false");
-
-        final HttpClient pdeClient = PdeMain.createPdeHttpClient(appProps);
-        assertFalse(pdeClient.isSecure());
+        appProps.setProperty("server.port", Integer.toString(localPort));
+        appProps.setProperty("server.ssl.enabled", "true");
+        appProps.setProperty("server.ssl.pde.key-store", keyStorePath);
+        appProps.setProperty("server.ssl.pde.trust-store", keyStorePath);
+        appProps.setProperty("server.ssl.pde.key-password", "123456");
+        appProps.setProperty("server.ssl.pde.trust-store-password", "123456");
+        appProps.setProperty("server.ssl.pde.key-store-password", "123456");
+        final var client = PdeMain.createHttpClient(appProps);
+        assertTrue(client.isSecure());
     }
 
     @Test
@@ -77,47 +88,5 @@ public class PdeMainTest {
         appProps.setProperty("server.ssl.pde.key-store-password", "123456");
         final var system = PdeMain.createArSystem(appProps, new InetSocketAddress("0.0.0.0", 5000));
         assertTrue(system.isSecure());
-    }
-
-    @Test
-    public void shouldCreateSecurePdeClient() {
-
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
-        String keyStorePath = keyStoreFile.getAbsolutePath();
-
-        int localPort = 8000;
-        Properties appProps = new Properties();
-        appProps.setProperty("server.port", Integer.toString(localPort));
-        appProps.setProperty("server.ssl.enabled", "true");
-        appProps.setProperty("server.ssl.pde.key-store", keyStorePath);
-        appProps.setProperty("server.ssl.pde.trust-store", keyStorePath);
-        appProps.setProperty("server.ssl.pde.key-password", "123456");
-        appProps.setProperty("server.ssl.pde.trust-store-password", "123456");
-        appProps.setProperty("server.ssl.pde.key-store-password", "123456");
-        final var client = PdeMain.createPdeHttpClient(appProps);
-        assertTrue(client.isSecure());
-    }
-
-    @Test
-    public void shouldCreateSecureSysopClient() {
-
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        File keyStoreFile = new File(Objects.requireNonNull(classLoader.getResource("crypto/keystore.p12")).getFile());
-        String keyStorePath = keyStoreFile.getAbsolutePath();
-
-        int localPort = 8000;
-        Properties appProps = new Properties();
-        appProps.setProperty("server.port", Integer.toString(localPort));
-        appProps.setProperty("server.ssl.enabled", "true");
-        appProps.setProperty("server.ssl.sysop.key-store", keyStorePath);
-        appProps.setProperty("server.ssl.sysop.trust-store", keyStorePath);
-        appProps.setProperty("server.ssl.sysop.key-password", "123456");
-        appProps.setProperty("server.ssl.sysop.trust-store-password", "123456");
-        appProps.setProperty("server.ssl.sysop.key-store-password", "123456");
-        final var client = PdeMain.createSysopHttpClient(appProps);
-        assertTrue(client.isSecure());
     }
 }

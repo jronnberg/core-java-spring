@@ -43,7 +43,7 @@ public class PdeMain {
      * @param propName Name of the property to retrieve.
      * @return The property with the given name.
      */
-    static private String getProp(Properties appProps, String propName) {
+    private static String getProp(Properties appProps, String propName) {
         String result = appProps.getProperty(propName);
         if (result == null) {
             throw new IllegalArgumentException("Missing field '" + propName + "' in application properties.");
@@ -54,39 +54,9 @@ public class PdeMain {
     /**
      * @param appProps Configurations used for this instance of the Plant
      *                 Description Engine.
-     * @return HTTP client useful for consuming Arrowhead services as a privileged
-     * system.
+     * @return HTTP client useful for consuming Arrowhead services.
      */
-    static HttpClient createSysopHttpClient(Properties appProps) {
-        final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
-        HttpClient client = null;
-        try {
-            if (!secureMode) {
-                client = new HttpClient.Builder().insecure().build();
-            } else {
-                OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.sysop.key-store"),
-                    getProp(appProps, "server.ssl.sysop.key-password").toCharArray(),
-                    getProp(appProps, "server.ssl.sysop.key-store-password").toCharArray());
-
-                TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.sysop.trust-store"),
-                    getProp(appProps, "server.ssl.sysop.trust-store-password").toCharArray());
-
-                client = new HttpClient.Builder().identity(identity).trustStore(trustStore).build();
-            }
-        } catch (SSLException e) {
-            logger.error("Failed to create Sysop HTTP Client", e);
-            System.exit(1);
-        }
-        return client;
-    }
-
-    /**
-     * @param appProps Configurations used for this instance of the Plant
-     *                 Description Engine.
-     * @return HTTP client useful for consuming Arrowhead services as a
-     * non-privileged system.
-     */
-    static HttpClient createPdeHttpClient(Properties appProps) {
+    static HttpClient createHttpClient(Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
         HttpClient client = null;
         try {
@@ -231,10 +201,9 @@ public class PdeMain {
         final String serviceRegistryIp = getProp(appProps, "service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(getProp(appProps, "service_registry.port"));
         final var serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
+        final HttpClient httpClient = createHttpClient(appProps);
 
-        final HttpClient sysopClient = createSysopHttpClient(appProps);
-
-        final SystemTracker systemTracker = new SystemTracker(sysopClient, serviceRegistryAddress);
+        final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
 
         logger.info("Start polling Service Registry for systems...");
         systemTracker.start().flatMap(result -> {
@@ -242,11 +211,10 @@ public class PdeMain {
             final CloudDto cloud = new CloudBuilder().name(getProp(appProps, "cloud.name"))
                 .operator(getProp(appProps, "cloud.operator")).build();
 
-            final HttpClient pdeClient = createPdeHttpClient(appProps);
             final String ruleDirectory = getProp(appProps, "orchestration_rules");
             final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
-            final var orchestratorClient = new OrchestratorClient(sysopClient, cloud, new FileRuleStore(ruleDirectory),
+            final var orchestratorClient = new OrchestratorClient(httpClient, cloud, new FileRuleStore(ruleDirectory),
                 systemTracker, pdTracker);
 
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
@@ -260,7 +228,7 @@ public class PdeMain {
                 final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
                 mismatchDetector.run();
                 logger.info("Starting the PDE Monitor service...");
-                return new PdeMonitorService(arSystem, pdTracker, pdeClient, alarmManager, secureMode).provide();
+                return new PdeMonitorService(arSystem, pdTracker, httpClient, alarmManager, secureMode).provide();
             }).flatMap(mgmtServiceResult -> {
                 logger.info("The PDE Monitor service is ready.");
                 logger.info("Starting the PDE Management service...");
