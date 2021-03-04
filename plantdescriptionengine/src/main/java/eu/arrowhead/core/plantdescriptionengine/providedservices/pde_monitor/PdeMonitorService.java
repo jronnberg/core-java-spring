@@ -61,7 +61,9 @@ public class PdeMonitorService {
 
         // this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
 
-        serviceQuery = arSystem.consume().name("monitorable").transports(TransportDescriptor.HTTP)
+        serviceQuery = arSystem.consume()
+            .name("monitorable")
+            .transports(TransportDescriptor.HTTP)
             .encodings(EncodingDescriptor.JSON);
 
         pingTask = new PingTask(serviceQuery, httpClient, alarmManager);

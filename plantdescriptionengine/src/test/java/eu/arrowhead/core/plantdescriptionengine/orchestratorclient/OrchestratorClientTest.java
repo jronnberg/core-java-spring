@@ -67,7 +67,7 @@ public class OrchestratorClientTest {
     private final SrSystemDto orchestratorSrSystem = new SrSystemBuilder().id(0).systemName("orchestrator")
         .address("0.0.0.5").port(5001).authenticationInfo(null).createdAt(now.toString()).updatedAt(now.toString())
         .build();
-    private final CloudDto cloud = new CloudBuilder().name("Cloud_a").operator("Operator_a").build();
+
     private PlantDescriptionTracker pdTracker;
     private HttpClient httpClient;
     private MockSystemTracker systemTracker;
@@ -113,7 +113,7 @@ public class OrchestratorClientTest {
         systemTracker.addSystem(orchestratorSrSystem);
 
         ruleStore = new InMemoryRuleStore();
-        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
+        orchestratorClient = new OrchestratorClient(httpClient, ruleStore, systemTracker, pdTracker);
     }
 
     @Test
@@ -121,13 +121,9 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto entry = createEntry();
         pdTracker.put(entry);
         var rule = orchestratorClient.createRule(entry.connections().get(0));
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
-        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
-        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
+        assertEquals(consumerSrSystem.systemName(), rule.consumerSystem().systemName().orElse(null));
+        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName().orElse(null));
         assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
     }
 
@@ -141,13 +137,9 @@ public class OrchestratorClientTest {
         when(httpClient.isSecure()).thenReturn(true);
 
         var rule = orchestratorClient.createRule(connection);
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
-        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
-        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName());
+        assertEquals(consumerSrSystem.systemName(), rule.consumerSystem().systemName().orElse(null));
+        assertEquals(producerSrSystem.systemName(), rule.providerSystem().systemName().orElse(null));
         assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals("HTTP-SECURE-JSON", rule.serviceInterfaceName());
     }
 
@@ -188,13 +180,9 @@ public class OrchestratorClientTest {
         pdTracker.put(entryB);
 
         var rule = orchestratorClient.createRule(connection);
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
-        assertEquals(consumerSrSystem.id(), rule.consumerSystemId());
-        assertEquals(producerNameB, rule.providerSystem().systemName());
+        assertEquals(consumerSrSystem.systemName(), rule.consumerSystem().systemName().orElse(null));
+        assertEquals(producerNameB, rule.providerSystem().systemName().orElse(null));
         assertEquals(producerSystemB.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-        assertEquals(cloud.name(), rule.cloud().name());
-        assertEquals(cloud.operator(), rule.cloud().operator());
         assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
     }
 
@@ -246,7 +234,7 @@ public class OrchestratorClientTest {
         HttpClientRequest capturedRequest = requestCaptor.getValue();
 
         assertEquals(HttpMethod.POST, capturedRequest.method().orElse(null));
-        assertEquals("/orchestrator/mgmt/store", capturedRequest.uri().orElse(null));
+        assertEquals("/orchestrator/store/flexible", capturedRequest.uri().orElse(null));
         assertEquals(orchestratorSrSystem.address(), capturedAddress.getAddress().getHostAddress());
         assertEquals(orchestratorSrSystem.port(), capturedAddress.getPort());
 
@@ -255,14 +243,10 @@ public class OrchestratorClientTest {
         List<StoreRule> rulesSent = (List<StoreRule>) capturedRequest.body().get();
         assertEquals(1, rulesSent.size());
         StoreRule ruleSent = rulesSent.get(0);
-        assertEquals(1, ruleSent.priority());
+        assertTrue(ruleSent.priority().isEmpty());
         assertEquals(serviceDefinitionA, ruleSent.serviceDefinitionName());
-        assertEquals(producerSrSystem.systemName(), ruleSent.providerSystem().systemName());
-        assertEquals(producerSrSystem.address(), ruleSent.providerSystem().address());
-        assertEquals(producerSrSystem.port(), ruleSent.providerSystem().port());
-        assertEquals(consumerSrSystem.id(), ruleSent.consumerSystemId());
-        assertEquals(cloud.name(), ruleSent.cloud().name());
-        assertEquals(cloud.operator(), ruleSent.cloud().operator());
+        assertEquals(producerSrSystem.systemName(), ruleSent.providerSystem().systemName().orElse(null));
+        assertEquals(consumerSrSystem.systemName(), ruleSent.consumerSystem().systemName().orElse(null));
     }
 
     @Test
@@ -335,7 +319,7 @@ public class OrchestratorClientTest {
             // Assert that the Orchestrator was called with the proper data.
             assertEquals("/" + orchestratorSrSystem.address(), capturedAddress.getAddress().toString());
             assertEquals(orchestratorSrSystem.port(), capturedAddress.getPort());
-            assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().orElse(null));
+            assertEquals("/orchestrator/store/flexible/" + newRuleId, capturedRequest.uri().orElse(null));
             assertTrue(ruleStore.readRules().isEmpty());
         }).onFailure(e -> {
             fail(); // We should never get here.
@@ -353,7 +337,7 @@ public class OrchestratorClientTest {
         doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules();
 
         // We need to reinstantiate this with the mock rule store.
-        orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
+        orchestratorClient = new OrchestratorClient(httpClient, ruleStore, systemTracker, pdTracker);
 
         pdTracker.put(activeEntry);
         ruleStore.setRules(Set.of(12));
@@ -405,7 +389,7 @@ public class OrchestratorClientTest {
             // Assert that the Orchestrator was called with the proper data.
             assertEquals("/" + orchestratorSrSystem.address(), capturedAddress.getAddress().toString());
             assertEquals(orchestratorSrSystem.port(), capturedAddress.getPort());
-            assertEquals("/orchestrator/mgmt/store/" + newRuleId, capturedRequest.uri().orElse(null));
+            assertEquals("/orchestrator/store/flexible/" + newRuleId, capturedRequest.uri().orElse(null));
             assertTrue(ruleStore.readRules().isEmpty());
         }).onFailure(e -> {
             fail(); // We should never get here.
@@ -428,7 +412,7 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, systemTracker, pdTracker);
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -457,7 +441,7 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto inactiveEntry = PlantDescriptionEntry.deactivated(createEntry());
         pdTracker.put(inactiveEntry);
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, systemTracker, pdTracker);
         orchestratorClient.initialize().ifSuccess(result -> {
             assertTrue(ruleStore.readRules().isEmpty());
             orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
@@ -533,7 +517,7 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, cloud, ruleStore, systemTracker, pdTracker);
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, systemTracker, pdTracker);
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();

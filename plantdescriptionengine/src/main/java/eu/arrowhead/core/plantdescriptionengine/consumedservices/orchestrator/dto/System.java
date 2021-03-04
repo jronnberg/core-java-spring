@@ -15,17 +15,9 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 @DtoToString
-public interface StoreRule {
+public interface System {
 
-    System consumerSystem();
+    Optional<String> systemName();
 
-    System providerSystem();
-
-    String serviceDefinitionName();
-
-    String serviceInterfaceName();
-
-    Optional<Map<String, String>> serviceMetadata();
-
-    Optional<Integer> priority();
+    Optional<Map<String, String>> metadata();
 }

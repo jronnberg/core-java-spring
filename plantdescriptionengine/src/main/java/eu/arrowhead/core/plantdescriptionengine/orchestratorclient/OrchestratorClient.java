@@ -10,6 +10,7 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdate
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.arkalix.dto.DtoEncoding;
@@ -24,6 +25,7 @@ import se.arkalix.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,7 +34,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
     private final HttpClient client;
     private final InetSocketAddress orchestratorAddress;
-    private final CloudDto cloud;
     private final RuleStore ruleStore;
     private final SystemTracker systemTracker;
     private final PlantDescriptionTracker pdTracker;
@@ -42,22 +43,19 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * Class constructor.
      *
      * @param httpClient    Object for sending HTTP messages to the Orchestrator.
-     * @param cloud         DTO describing a Arrowhead Cloud.
      * @param ruleStore     Object providing permanent storage for Orchestration
      *                      rule data.
      * @param systemTracker Object used to track registered Arrowhead systems.
      */
-    public OrchestratorClient(HttpClient httpClient, CloudDto cloud, RuleStore ruleStore, SystemTracker systemTracker,
+    public OrchestratorClient(HttpClient httpClient, RuleStore ruleStore, SystemTracker systemTracker,
                               PlantDescriptionTracker pdTracker) {
 
         Objects.requireNonNull(httpClient, "Expected HttpClient");
-        Objects.requireNonNull(cloud, "Expected cloud");
         Objects.requireNonNull(ruleStore, "Expected backing store");
         Objects.requireNonNull(systemTracker, "Expected System Tracker");
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
 
         this.client = httpClient;
-        this.cloud = cloud;
         this.systemTracker = systemTracker;
         this.ruleStore = ruleStore;
         this.pdTracker = pdTracker;
@@ -122,14 +120,23 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return null;
         }
 
-        String portName = connection.producer().portName();
-        String serviceDefinition = pdTracker.getServiceDefinition(portName);
+        String producerPort = connection.producer().portName();
+        String consumerPort = connection.consumer().portName();
+        String serviceDefinition = pdTracker.getServiceDefinition(producerPort);
 
-        var builder = new StoreRuleBuilder().cloud(cloud).serviceDefinitionName(serviceDefinition)
-            .consumerSystemId(consumerSystemSrEntry.id()).attribute(provider.portMetadata(portName))
-            .providerSystem(new ProviderSystemBuilder().systemName(providerSystemSrEntry.systemName())
-                .address(providerSystemSrEntry.address()).port(providerSystemSrEntry.port()).build())
-            .priority(1); // What priority should be used?
+        final Map<String, String> providerMetadata = provider.portMetadata(producerPort);
+        final Map<String, String> consumerMetadata = consumer.portMetadata(consumerPort);
+
+        var builder = new StoreRuleBuilder()
+            .consumerSystem(new SystemBuilder()
+                .systemName(consumerSystemSrEntry.systemName())
+                .metadata(providerMetadata)
+                .build())
+            .providerSystem(new SystemBuilder()
+                .systemName(providerSystemSrEntry.systemName())
+                .metadata(consumerMetadata)
+                .build())
+            .serviceDefinitionName(serviceDefinition);
 
         if (client.isSecure()) {
             builder.serviceInterfaceName("HTTP-SECURE-JSON");

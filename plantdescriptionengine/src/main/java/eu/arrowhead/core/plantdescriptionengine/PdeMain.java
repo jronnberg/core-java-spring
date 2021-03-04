@@ -1,8 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.CloudDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
@@ -208,13 +206,10 @@ public class PdeMain {
         logger.info("Start polling Service Registry for systems...");
         systemTracker.start().flatMap(result -> {
 
-            final CloudDto cloud = new CloudBuilder().name(getProp(appProps, "cloud.name"))
-                .operator(getProp(appProps, "cloud.operator")).build();
-
             final String ruleDirectory = getProp(appProps, "orchestration_rules");
             final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
             final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
-            final var orchestratorClient = new OrchestratorClient(httpClient, cloud, new FileRuleStore(ruleDirectory),
+            final var orchestratorClient = new OrchestratorClient(httpClient, new FileRuleStore(ruleDirectory),
                 systemTracker, pdTracker);
 
             final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
