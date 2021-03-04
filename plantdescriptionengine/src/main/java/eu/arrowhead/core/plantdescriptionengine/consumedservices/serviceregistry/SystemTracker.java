@@ -146,9 +146,12 @@ public class SystemTracker {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    fetchSystems().onFailure(error -> logger.error("Failed to retrieve registered systems", error));
+                    fetchSystems()
+                    .onFailure(error -> {
+                        logger.error("Failed to retrieve registered systems", error);
+                    });
                 }
-            }, 0, pollInterval);
+            }, pollInterval, pollInterval);
 
             return Future.done();
         });
