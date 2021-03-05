@@ -68,7 +68,11 @@ public class AddPlantDescriptionTest {
             new PortBuilder().portName("port_b").serviceDefinition(serviceDefinition).metadata(metadataB).consumer(true)
                 .build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId("system_a").ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId("system_a")
+            .systemName("System A")
+            .ports(consumerPorts)
+            .build();
 
         final var description = new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
             .systems(List.of(consumerSystem)).build();
@@ -98,7 +102,11 @@ public class AddPlantDescriptionTest {
             new PortBuilder().portName(portName) // Duplicate port name, should be reported!
                 .serviceDefinition("service_b").consumer(true).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(systemId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(systemId)
+            .systemName("System A")
+            .ports(consumerPorts)
+            .build();
 
         final var description = new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
             .systems(List.of(consumerSystem)).build();

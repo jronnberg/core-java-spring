@@ -29,7 +29,6 @@ public class PlantDescriptionValidator {
         }
 
         ensureInclusionsExist();
-
         if (hasError()) {
             return;
         }
@@ -46,10 +45,31 @@ public class PlantDescriptionValidator {
 
         validateConnections();
 
+        ensureIdentifiableSystems();
+
         ensureUniquePorts();
 
         // TODO: Check that every system has a name (Future versions will accept
         // systems with only metadata as well).
+    }
+
+    /**
+     * Ensure that each system in every entry is uniquely identifiable, either
+     * by a name or by metadata.
+     */
+    private void ensureIdentifiableSystems() {
+        final var systems = new ArrayList<PdeSystem>();
+        for (var entry : entries.values()) {
+            systems.addAll(entry.systems());
+        }
+
+        for (final var system : systems) {
+            if (system.systemName().isEmpty() && system.metadata().isEmpty()) {
+                errors.add("Contains a system with neither a name nor metadata to identify it.");
+            }
+        }
+
+        // TODO: Check for uniqueness!
     }
 
     /**
@@ -149,6 +169,11 @@ public class PlantDescriptionValidator {
         }
 
         for (var connection : connections) {
+
+            if (connection.priority().orElse(0) < 0 ) { // TODO: Check for max value as well.
+                errors.add("A connection has a negative priority.");
+            }
+
             final var producer = connection.producer();
             final var consumer = connection.consumer();
 

@@ -121,10 +121,14 @@ public class UpdatePlantDescriptionTest {
             new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
             new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(systemId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(systemId)
+            .systemName("System A")
+            .ports(consumerPorts)
+            .build();
 
         final var update = new PlantDescriptionUpdateBuilder().plantDescription("Plant Description 1A").active(true)
-            .systems(List.of(consumerSystem)).include(new ArrayList<>()).connections(new ArrayList<>()).build();
+            .systems(List.of(consumerSystem)).build();
 
         final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))

@@ -38,6 +38,7 @@ public class PlantDescriptionValidatorTest {
             .ports(producerPortsA).build();
 
         final List<ConnectionDto> connectionsA = List.of(new ConnectionBuilder()
+            .priority(1)
             .consumer(new SystemPortBuilder().systemId(consumerIdA).portName(consumerPortA).build())
             .producer(new SystemPortBuilder().systemId(producerIdA).portName(producerPortA).build()).build());
 
@@ -80,7 +81,10 @@ public class PlantDescriptionValidatorTest {
             new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
             new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(systemId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(systemId)
+            .systemName("System XYZ")
+            .ports(consumerPorts).build();
 
         final var entry = new PlantDescriptionEntryBuilder().plantDescription("Plant Description 1A").id(123)
             .active(true).createdAt(now).updatedAt(now).systems(List.of(consumerSystem)).build();
@@ -111,9 +115,17 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer X")
+            .ports(consumerPorts)
+            .build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Producer Y")
+            .ports(producerPorts)
+            .build();
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
             .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPortA).build())
@@ -147,9 +159,16 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer X")
+            .ports(consumerPorts).build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Producer Y")
+            .ports(producerPorts)
+            .build();
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
             .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPort).build())
@@ -167,6 +186,66 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
+    public void shouldReportNegativePriority() {
+
+        // First entry
+        int entryIdA = 0;
+        String consumerIdA = "Cons-A";
+        String consumerNameA = "Consumer A";
+        String producerNameA = "Producer A";
+        String consumerPortA = "Cons-Port-A";
+        String producerPortA = "Prod-Port-A";
+        String producerIdA = "Prod-A";
+
+        final List<PortDto> consumerPortsA = List
+            .of(new PortBuilder().portName(consumerPortA).serviceDefinition("Monitorable").consumer(true).build());
+
+        final List<PortDto> producerPortsA = List
+            .of(new PortBuilder().portName(producerPortA).serviceDefinition("Monitorable").consumer(false).build());
+
+        final PdeSystemDto consumerSystemA = new PdeSystemBuilder().systemId(consumerIdA).systemName(consumerNameA)
+            .ports(consumerPortsA).build();
+
+        final PdeSystemDto producerSystemA = new PdeSystemBuilder().systemId(producerIdA).systemName(producerNameA)
+            .ports(producerPortsA).build();
+
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
+            .priority(-1)
+            .consumer(new SystemPortBuilder().systemId(consumerIdA).portName(consumerPortA).build())
+            .producer(new SystemPortBuilder().systemId(producerIdA).portName(producerPortA).build()).build());
+
+        final var entryA = new PlantDescriptionEntryBuilder().id(entryIdA).plantDescription("Plant Description A")
+            .createdAt(now).updatedAt(now).active(false).systems(List.of(consumerSystemA, producerSystemA))
+            .connections(connections).build();
+
+        // Second entry
+        int entryIdB = 1;
+        String consumerIdB = "Cons-B";
+        String consumerNameB = "Consumer B";
+        String consumerPortB = "Cons-Port-B";
+
+        final List<PortDto> consumerPortsB = List
+            .of(new PortBuilder().portName(consumerPortB).serviceDefinition("Monitorable").consumer(true).build());
+
+        final PdeSystemDto consumerSystemB = new PdeSystemBuilder().systemId(consumerIdB).systemName(consumerNameB)
+            .ports(consumerPortsB).build();
+
+        final List<ConnectionDto> connectionsB = List.of(new ConnectionBuilder()
+            .consumer(new SystemPortBuilder().systemId(consumerIdB).portName(consumerPortB).build())
+            .producer(new SystemPortBuilder().systemId(producerIdA).portName(producerPortA).build()).build());
+
+        final var entryB = new PlantDescriptionEntryBuilder().id(entryIdB).plantDescription("Plant Description B")
+            .createdAt(now).updatedAt(now).active(true).include(List.of(entryIdA)).systems(List.of(consumerSystemB))
+            .connections(connectionsB).build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entryIdA, entryA, entryIdB, entryB);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        assertEquals("<A connection has a negative priority.>", validator.getErrorMessage());
+    }
+
+
+    @Test
     public void shouldReportInvalidConsumerPort() {
 
         final String consumerId = "system_1";
@@ -182,9 +261,15 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer A")
+            .ports(consumerPorts).build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Consumer B")
+            .ports(producerPorts).build();
 
         final List<ConnectionDto> connections = List.of(
             new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(consumerId).portName(invalidPort).build())
@@ -218,9 +303,15 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer I")
+            .ports(consumerPorts).build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Producer J")
+            .ports(producerPorts).build();
 
         final List<ConnectionDto> connections = List.of(
             new ConnectionBuilder().consumer(new SystemPortBuilder().systemId(missingId).portName(consumerPort).build())
@@ -253,9 +344,17 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer A")
+            .ports(consumerPorts)
+            .build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Producer B")
+            .ports(producerPorts)
+            .build();
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
             .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPort).build())
@@ -291,9 +390,17 @@ public class PlantDescriptionValidatorTest {
         final List<PortDto> producerPorts = List
             .of(new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinition).consumer(false).build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).ports(consumerPorts).build();
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName("Consumer X")
+            .ports(consumerPorts)
+            .build();
 
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).ports(producerPorts).build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName("Producer Y")
+            .ports(producerPorts)
+            .build();
 
         final var entry = new PlantDescriptionEntryBuilder().id(23).plantDescription("Plant Description 1A")
             .active(true).systems(List.of(consumerSystem, producerSystem)).createdAt(now).updatedAt(now).build();

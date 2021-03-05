@@ -103,16 +103,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final PdeSystem consumer = pdTracker.getSystem(consumerId);
         final PdeSystem provider = pdTracker.getSystem(providerId);
 
-        // TODO: In the future, we will be able to create Orchestration rules
-        // using system name *or* metadata. For now, we assume that systemName
-        // is present.
-
-        if (consumer.systemName().isEmpty() || provider.systemName().isEmpty()) {
-            logger.error(
-                "Failed to create Orchestrator rule. The current version of the PDE requires all Plant Description systems to specify a system name.");
-            return null;
-        }
-
         final SrSystem consumerSystemSrEntry = systemTracker.getSystemByName(consumer.systemName().orElse(null));
         final SrSystem providerSystemSrEntry = systemTracker.getSystemByName(provider.systemName().orElse(null));
 
@@ -129,11 +119,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         var builder = new StoreRuleBuilder()
             .consumerSystem(new SystemBuilder()
-                .systemName(consumerSystemSrEntry.systemName())
+                .systemName(consumer.systemName().orElse(null))
                 .metadata(providerMetadata)
                 .build())
             .providerSystem(new SystemBuilder()
-                .systemName(providerSystemSrEntry.systemName())
+                .systemName(provider.systemName().orElse(null))
                 .metadata(consumerMetadata)
                 .build())
             .serviceDefinitionName(serviceDefinition);

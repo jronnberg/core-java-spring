@@ -6,6 +6,8 @@ import se.arkalix.dto.DtoWritableAs;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
+import java.util.Optional;
+
 /**
  * Data Transfer Object (DTO) interface for representing a plant description
  * connection, i.e. a connection between a service producer and a consumer.
@@ -18,4 +20,9 @@ public interface Connection {
     SystemPort consumer();
 
     SystemPort producer();
+
+    /**
+     * Priority for the connection. Lower value means higher priority.
+     */
+    Optional<Integer> priority();
 }
