@@ -31,12 +31,19 @@ public final class DtoUtils {
         List<ConnectionDto> result = new ArrayList<>();
 
         for (var connection : connections) {
-            var consumerPort = new SystemPortBuilder().portName(connection.consumer().portName())
-                .systemId(connection.consumer().systemId()).build();
-            var producerPort = new SystemPortBuilder().portName(connection.producer().portName())
-                .systemId(connection.producer().systemId()).build();
+            var consumerPort = new SystemPortBuilder()
+                .portName(connection.consumer().portName())
+                .systemId(connection.consumer().systemId())
+                .build();
+            var producerPort = new SystemPortBuilder()
+                .portName(connection.producer().portName())
+                .systemId(connection.producer().systemId())
+                .build();
 
-            var connectionCopy = new ConnectionBuilder().consumer(consumerPort).producer(producerPort).build();
+            var connectionCopy = new ConnectionBuilder()
+                .consumer(consumerPort)
+                .producer(producerPort)
+                .build();
             result.add(connectionCopy);
         }
         return result;
@@ -67,9 +74,12 @@ public final class DtoUtils {
             // 'consumer' defaults to false when no value is set:
             boolean isConsumer = port.consumer().orElse(false);
 
-            var portBuilder = new PortEntryBuilder().portName(port.portName())
-                .serviceDefinition(port.serviceDefinition()).consumer(isConsumer)
-                .metadata(port.metadata().orElse(null));
+            var portBuilder = new PortEntryBuilder()
+                .portName(port.portName())
+                .serviceDefinition(port.serviceDefinition())
+                .consumer(isConsumer)
+                .metadata(port.metadata()
+                    .orElse(null));
 
             // Only add monitor info to ports where this system is the
             // provider:
@@ -148,8 +158,15 @@ public final class DtoUtils {
 
         List<ConnectionDto> connections = mgmtToMonitor(entry.connections());
 
-        return new PlantDescriptionEntryBuilder().id(entry.id()).plantDescription(entry.plantDescription())
-            .active(entry.active()).include(entry.include()).systems(systems).connections(connections)
-            .createdAt(entry.createdAt()).updatedAt(entry.updatedAt()).build();
+        return new PlantDescriptionEntryBuilder()
+            .id(entry.id())
+            .plantDescription(entry.plantDescription())
+            .active(entry.active())
+            .include(entry.include())
+            .systems(systems)
+            .connections(connections)
+            .createdAt(entry.createdAt())
+            .updatedAt(entry.updatedAt())
+            .build();
     }
 }

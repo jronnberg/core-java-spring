@@ -12,9 +12,16 @@ public class TestUtils {
 
     public static PlantDescriptionEntryDto createEntry(int id, boolean active) {
         final Instant now = Instant.now();
-        return new PlantDescriptionEntryBuilder().id(id).plantDescription("Plant Description 1A").active(active)
-            .include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>()).createdAt(now)
-            .updatedAt(now).build();
+        return new PlantDescriptionEntryBuilder()
+            .id(id)
+            .plantDescription("Plant Description 1A")
+            .active(active)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
     }
 
     public static PlantDescriptionEntryDto createEntry(int id) {
@@ -22,8 +29,13 @@ public class TestUtils {
     }
 
     public static PlantDescriptionDto createDescription() {
-        return new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
-            .include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>()).build();
+        return new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .build();
     }
 
 }

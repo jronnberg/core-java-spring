@@ -20,9 +20,14 @@ public class MonitorInfoTest {
 
     private ServiceDescription createServiceDescription(final Map<String, String> metadata) {
         var provider = new ProviderDescription("Provider-system", new InetSocketAddress("0.0.0.0", 5000));
-        return new ServiceDescription.Builder().name("service-a").provider(provider).uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE).interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
-            .metadata(metadata).build();
+        return new ServiceDescription.Builder()
+            .name("service-a")
+            .provider(provider)
+            .uri("/test")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            .metadata(metadata)
+            .build();
     }
 
     private ServiceDescription createServiceDescription() {
@@ -151,14 +156,24 @@ public class MonitorInfoTest {
         String systemNameB = "System-b";
 
         var providerA = new ProviderDescription(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
-        var serviceA = new ServiceDescription.Builder().name("service-a").provider(providerA).uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE).interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
-            .metadata(metadataA).build();
+        var serviceA = new ServiceDescription.Builder()
+            .name("service-a")
+            .provider(providerA)
+            .uri("/test")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            .metadata(metadataA)
+            .build();
 
         var providerB = new ProviderDescription(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
-        var serviceB = new ServiceDescription.Builder().name("service-b").provider(providerB).uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE).interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
-            .metadata(metadataB).build();
+        var serviceB = new ServiceDescription.Builder()
+            .name("service-b")
+            .provider(providerB)
+            .uri("/test")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            .metadata(metadataB)
+            .build();
 
         String inventoryIdA = "id-A";
         String inventoryIdB = "id-B";

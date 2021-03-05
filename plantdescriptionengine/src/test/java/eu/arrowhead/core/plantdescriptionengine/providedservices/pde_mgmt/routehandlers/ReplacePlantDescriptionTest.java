@@ -32,7 +32,9 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of("35")).body(description)
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of("35"))
+            .body(description)
             .build();
 
         try {
@@ -62,11 +64,18 @@ public class ReplacePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescription description = new PlantDescriptionBuilder().plantDescription(newName).active(true)
-            .include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>()).build();
+        final PlantDescription description = new PlantDescriptionBuilder()
+            .plantDescription(newName)
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
-            .body(description).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(description)
+            .build();
 
         pdTracker.put(entry);
 
@@ -92,17 +101,21 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(invalidEntryId))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
-                String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
-                assertEquals(expectedBody, response.body().orElse(null));
-            }).onFailure(Assertions::assertNull);
+                    String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
+                    assertEquals(expectedBody, response.body().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -120,8 +133,16 @@ public class ReplacePlantDescriptionTest {
         pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
-            new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_a")
+                .consumer(true)
+                .build(),
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_b")
+                .consumer(true)
+                .build());
 
         final PdeSystemDto consumerSystem = new PdeSystemBuilder()
             .systemId(systemId)
@@ -129,12 +150,19 @@ public class ReplacePlantDescriptionTest {
             .ports(consumerPorts)
             .build();
 
-        final var description = new PlantDescriptionBuilder().plantDescription("Plant Description 1A").active(true)
-            .systems(List.of(consumerSystem)).include(new ArrayList<>()).connections(new ArrayList<>()).build();
+        final var description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(consumerSystem))
+            .include(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .build();
 
         final HttpServiceResponse response = new MockServiceResponse();
-        final MockRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
-            .body(description).build();
+        final MockRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(description)
+            .build();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
@@ -157,7 +185,9 @@ public class ReplacePlantDescriptionTest {
         final var handler = new ReplacePlantDescription(pdTracker);
         final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of("87")).body(description)
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of("87"))
+            .body(description)
             .build();
 
         doThrow(new PdStoreException("Mocked error")).when(backingStore).write(any(PlantDescriptionEntryDto.class));

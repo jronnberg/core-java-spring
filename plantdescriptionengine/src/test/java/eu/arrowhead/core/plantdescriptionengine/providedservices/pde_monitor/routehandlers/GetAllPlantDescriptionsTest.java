@@ -72,12 +72,26 @@ public class GetAllPlantDescriptionsTest {
         final String producerPortName = "provider-port";
         final String producerSystemId = "provider-id";
         connections.add(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder().portName(consumerPortName).systemId(consumerSystemId).build())
-            .producer(new SystemPortBuilder().portName(producerPortName).systemId(producerSystemId).build()).build());
+            .consumer(new SystemPortBuilder()
+                .portName(consumerPortName)
+                .systemId(consumerSystemId)
+                .build())
+            .producer(new SystemPortBuilder()
+                .portName(producerPortName)
+                .systemId(producerSystemId)
+                .build())
+            .build());
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>())
-            .systems(new ArrayList<>()).connections(connections).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(connections)
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         pdTracker.put(entry);
 
@@ -121,15 +135,29 @@ public class GetAllPlantDescriptionsTest {
         final boolean isConsumer = true;
         final String portName = "Port-A";
         final String serviceDefinition = "Service-A";
-        final List<PortDto> ports = List.of(new PortBuilder().consumer(isConsumer).metadata(metadata).portName(portName)
-            .serviceDefinition(serviceDefinition).build());
+        final List<PortDto> ports = List.of(new PortBuilder()
+            .consumer(isConsumer)
+            .metadata(metadata)
+            .portName(portName)
+            .serviceDefinition(serviceDefinition)
+            .build());
 
-        final PdeSystemDto system = new PdeSystemBuilder().systemName("System A").systemId("system_a").ports(ports)
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName("System A")
+            .systemId("system_a")
+            .ports(ports)
             .build();
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>()).systems(List.of(system))
-            .connections(new ArrayList<>()).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         pdTracker.put(entry);
 
@@ -164,16 +192,30 @@ public class GetAllPlantDescriptionsTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final String systemName = "System A";
-        final PdeSystemDto system = new PdeSystemBuilder().systemName(systemName).systemId("system_a").build();
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .systemId("system_a")
+            .build();
         final Instant now = Instant.now();
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>()).systems(List.of(system))
-            .connections(new ArrayList<>()).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         pdTracker.put(entry);
         final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
-        ServiceDescription serviceDescription = new ServiceDescription.Builder().name("service-name").uri("/abc")
-            .security(SecurityDescriptor.NOT_SECURE).provider(provider).interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+        ServiceDescription serviceDescription = new ServiceDescription.Builder()
+            .name("service-name")
+            .uri("/abc")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .provider(provider)
+            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
             .build();
 
         final String inventoryId = "system_a_inventory_id";
@@ -215,15 +257,36 @@ public class GetAllPlantDescriptionsTest {
         final Instant updatedAt2 = Instant.parse("2020-08-03T14:48:00.00Z");
         final Instant updatedAt3 = Instant.parse("2020-08-02T14:48:00.00Z");
 
-        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder().id(32)
-            .plantDescription("Plant Description 1").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt1).updatedAt(updatedAt1).build();
-        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder().id(2)
-            .plantDescription("Plant Description 2").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt2).updatedAt(updatedAt2).build();
-        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder().id(8)
-            .plantDescription("Plant Description 3").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt3).updatedAt(updatedAt3).build();
+        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder()
+            .id(32)
+            .plantDescription("Plant Description 1")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt1)
+            .updatedAt(updatedAt1)
+            .build();
+        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder()
+            .id(2)
+            .plantDescription("Plant Description 2")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt2)
+            .updatedAt(updatedAt2)
+            .build();
+        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder()
+            .id(8)
+            .plantDescription("Plant Description 3")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt3)
+            .updatedAt(updatedAt3)
+            .build();
 
         pdTracker.put(entry1);
         pdTracker.put(entry2);
@@ -235,11 +298,14 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest idDescendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC")))
+            .build();
         final HttpServiceRequest creationAscendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("createdAt"), "direction", List.of("ASC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("createdAt"), "direction", List.of("ASC")))
+            .build();
         final HttpServiceRequest updatesDescendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC")))
+            .build();
         final HttpServiceResponse response1 = new MockServiceResponse();
         final HttpServiceResponse response2 = new MockServiceResponse();
         final HttpServiceResponse response3 = new MockServiceResponse();
@@ -310,9 +376,16 @@ public class GetAllPlantDescriptionsTest {
 
         final var monitorInfo = new MonitorInfo();
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder().id(activeEntryId).plantDescription("Plant Description 1B")
-            .active(true).include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>())
-            .createdAt(now).updatedAt(now).build());
+        pdTracker.put(new PlantDescriptionEntryBuilder()
+            .id(activeEntryId)
+            .plantDescription("Plant Description 1B")
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build());
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("active", List.of("true")))
@@ -407,7 +480,8 @@ public class GetAllPlantDescriptionsTest {
         final HttpServiceResponse response = new MockServiceResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of("page", List.of(String.valueOf(page)))).build();
+            .queryParameters(Map.of("page", List.of(String.valueOf(page))))
+            .build();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {

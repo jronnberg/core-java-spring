@@ -152,7 +152,10 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
             // If not, raise an alarm:
             if (!matchFound) {
-                alarmManager.raiseSystemNotRegistered(entrySystem.systemId(), entrySystem.systemName().orElse(null));
+                alarmManager.raiseSystemNotRegistered(
+                    entrySystem.systemId(),
+                    entrySystem.systemName().orElse(null)
+                );
             }
         }
 

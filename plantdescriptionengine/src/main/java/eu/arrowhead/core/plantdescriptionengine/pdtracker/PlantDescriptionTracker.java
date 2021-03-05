@@ -137,7 +137,10 @@ public class PlantDescriptionTracker {
      */
     public PlantDescriptionEntryListDto getListDto() {
         var data = new ArrayList<>(entries.values());
-        return new PlantDescriptionEntryListBuilder().data(data).count(data.size()).build();
+        return new PlantDescriptionEntryListBuilder()
+            .data(data)
+            .count(data.size())
+            .build();
     }
 
     /**
@@ -171,7 +174,11 @@ public class PlantDescriptionTracker {
      */
     private PdeSystem getSystem(PlantDescriptionEntry entry, String systemId) {
 
-        PdeSystem result = entry.systems().stream().filter(system -> system.systemId().equals(systemId)).findAny()
+        PdeSystem result = entry.systems()
+            .stream()
+            .filter(system -> system.systemId()
+                .equals(systemId))
+            .findAny()
             .orElse(null);
 
         if (result != null) {
@@ -246,7 +253,9 @@ public class PlantDescriptionTracker {
     private List<Connection> getAllConnections(int entryId) {
         final var entry = get(entryId);
 
-        Objects.requireNonNull(entry, "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker.");
+        Objects.requireNonNull(
+            entry, "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker."
+        );
 
         List<Connection> connections = new ArrayList<>(entry.connections());
 

@@ -45,9 +45,18 @@ public interface PlantDescriptionEntry {
 
         final Instant now = Instant.now();
 
-        return new PlantDescriptionEntryBuilder().id(id).plantDescription(description.plantDescription())
-            .active(description.active().orElse(false)).include(description.include().orElse(null)).systems(systems)
-            .connections(connections).createdAt(now).updatedAt(now).build();
+        return new PlantDescriptionEntryBuilder()
+            .id(id)
+            .plantDescription(description.plantDescription())
+            .active(description.active()
+                .orElse(false))
+            .include(description.include()
+                .orElse(null))
+            .systems(systems)
+            .connections(connections)
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
     }
 
     /**
@@ -66,9 +75,16 @@ public interface PlantDescriptionEntry {
             connections.add((ConnectionDto) connection);
         }
 
-        return new PlantDescriptionEntryBuilder().id(entry.id()).plantDescription(entry.plantDescription())
-            .active(false).include(entry.include()).systems(systems).connections(connections)
-            .createdAt(entry.createdAt()).updatedAt(Instant.now()).build();
+        return new PlantDescriptionEntryBuilder()
+            .id(entry.id())
+            .plantDescription(entry.plantDescription())
+            .active(false)
+            .include(entry.include())
+            .systems(systems)
+            .connections(connections)
+            .createdAt(entry.createdAt())
+            .updatedAt(Instant.now())
+            .build();
     }
 
     /**
@@ -79,10 +95,15 @@ public interface PlantDescriptionEntry {
      */
     static PlantDescriptionEntryDto update(PlantDescriptionEntryDto oldEntry, PlantDescriptionUpdateDto newFields) {
 
-        var builder = new PlantDescriptionEntryBuilder().id(oldEntry.id())
-            .plantDescription(newFields.plantDescription().orElse(oldEntry.plantDescription()))
-            .active(newFields.active().orElse(oldEntry.active()))
-            .include(newFields.include().orElse(oldEntry.include())).createdAt(oldEntry.createdAt())
+        var builder = new PlantDescriptionEntryBuilder()
+            .id(oldEntry.id())
+            .plantDescription(newFields.plantDescription()
+                .orElse(oldEntry.plantDescription()))
+            .active(newFields.active()
+                .orElse(oldEntry.active()))
+            .include(newFields.include()
+                .orElse(oldEntry.include()))
+            .createdAt(oldEntry.createdAt())
             .updatedAt(Instant.now());
 
         // The methods 'systems' and 'connections' return instances of

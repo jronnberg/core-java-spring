@@ -23,6 +23,8 @@ public interface StoreEntryList {
     int count();
 
     default Set<Integer> getIds() {
-        return data().stream().map(StoreEntry::id).collect(Collectors.toSet());
+        return data().stream()
+            .map(StoreEntry::id)
+            .collect(Collectors.toSet());
     }
 }

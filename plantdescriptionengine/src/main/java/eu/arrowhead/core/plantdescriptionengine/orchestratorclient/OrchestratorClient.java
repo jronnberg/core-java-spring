@@ -10,7 +10,6 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdate
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.arkalix.dto.DtoEncoding;
@@ -23,11 +22,7 @@ import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Futures;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorClient.class);
@@ -168,8 +163,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         return client
             .send(orchestratorAddress,
-                new HttpClientRequest().method(HttpMethod.POST).uri("/orchestrator/store/flexible")
-                    .body(DtoEncoding.JSON, rules).header("accept", "application/json"))
+                new HttpClientRequest().method(HttpMethod.POST)
+                    .uri("/orchestrator/store/flexible")
+                    .body(DtoEncoding.JSON, rules)
+                    .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
@@ -189,7 +186,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private Future<Void> deleteRule(int id) {
         return client
             .send(orchestratorAddress,
-                new HttpClientRequest().method(HttpMethod.DELETE).uri("/orchestrator/store/flexible/" + id))
+                new HttpClientRequest().method(HttpMethod.DELETE)
+                    .uri("/orchestrator/store/flexible/" + id))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
                     // TODO: Throw some other type of Exception.
@@ -224,11 +222,12 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             deletions.add(deleteRule(rule));
         }
 
-        return Futures.serialize(deletions).flatMap(result -> {
-            ruleStore.removeAll();
-            logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
-            return Future.done();
-        });
+        return Futures.serialize(deletions)
+            .flatMap(result -> {
+                ruleStore.removeAll();
+                logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
+                return Future.done();
+            });
     }
 
     /**
@@ -276,19 +275,22 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Future<StoreEntryListDto> postRulesTask = shouldPostRules ? postRules() : Future.success(emptyRuleList());
 
-        deleteRulesTask.flatMap(result -> postRulesTask).ifSuccess(createdRules -> {
-            if (entry.active()) {
-                activeEntry = entry;
-                ruleStore.setRules(createdRules.getIds());
-                logEntryActivated(entry, createdRules);
+        deleteRulesTask.flatMap(result -> postRulesTask)
+            .ifSuccess(createdRules -> {
+                if (entry.active()) {
+                    activeEntry = entry;
+                    ruleStore.setRules(createdRules.getIds());
+                    logEntryActivated(entry, createdRules);
 
-            } else if (wasDeactivated) {
-                activeEntry = null;
-                logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
-            }
-        }).onFailure(throwable -> logger.error(
-            "Encountered an error while handling the new Plant Description '" + entry.plantDescription() + "'",
-            throwable));
+                } else if (wasDeactivated) {
+                    activeEntry = null;
+                    logger.info("Deactivated Plant Description '" + entry.plantDescription() + "'");
+                }
+            })
+            .onFailure(throwable -> logger.error(
+                "Encountered an error while handling the new Plant Description '" + entry.plantDescription() + "'",
+                throwable)
+            );
     }
 
     /**

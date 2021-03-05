@@ -28,18 +28,21 @@ public class GetPlantDescriptionTest {
         final int nonExistentEntryId = 0;
 
         HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(nonExistentEntryId))).build();
+            .pathParameters(List.of(String.valueOf(nonExistentEntryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
-                String expectedErrorMessage = "Plant Description with ID " + nonExistentEntryId + " not found.";
-                assertTrue(response.body().isPresent());
-                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
+                    String expectedErrorMessage = "Plant Description with ID " + nonExistentEntryId + " not found.";
+                    assertTrue(response.body().isPresent());
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -55,19 +58,24 @@ public class GetPlantDescriptionTest {
 
         GetPlantDescription handler = new GetPlantDescription(pdTracker);
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId))).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().orElse(null));
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
 
-                assertTrue(response.body().isPresent());
-                var returnedEntry = (PlantDescriptionEntry) response.body().get();
-                assertEquals(returnedEntry.id(), entryId, 0); // TODO: Add 'equals' method to entries and do a proper
-                // comparison?
-            }).onFailure(Assertions::assertNull);
+                    assertTrue(response.body().isPresent());
+                    var returnedEntry = (PlantDescriptionEntry) response.body().get();
+                    assertEquals(returnedEntry
+                        .id(), entryId, 0); // TODO: Add 'equals' method to entries and do a proper
+                    // comparison?
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -84,7 +92,8 @@ public class GetPlantDescriptionTest {
 
         GetPlantDescription handler = new GetPlantDescription(pdTracker);
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidId)).build();
+        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidId))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 

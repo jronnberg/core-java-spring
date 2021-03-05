@@ -43,12 +43,14 @@ public class RetrieveMonitorInfoTask extends TimerTask {
      * Retrieve new data from each monitorable service.
      */
     private void retrieveMonitorInfo() {
-        serviceQuery.resolveAll().ifSuccess(services -> {
-            for (var service : services) {
-                retrieveId(service);
-                retrieveSystemData(service);
-            }
-        }).onFailure(e -> logger.error("Failed to fetch monitor info from monitorable systems.", e));
+        serviceQuery.resolveAll()
+            .ifSuccess(services -> {
+                for (var service : services) {
+                    retrieveId(service);
+                    retrieveSystemData(service);
+                }
+            })
+            .onFailure(e -> logger.error("Failed to fetch monitor info from monitorable systems.", e));
     }
 
     /**
@@ -62,16 +64,19 @@ public class RetrieveMonitorInfoTask extends TimerTask {
         // noinspection SpellCheckingInspection
         httpClient
             .send(address,
-                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
+                new HttpClientRequest()
+                    .method(HttpMethod.GET)
+                    .uri(service.uri() + "/inventoryid")
                     .header("accept", "application/json"))
             .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
-            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id())).onFailure(e -> {
-            String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
-                + "', service '" + service.name() + "'.";
-            logger.warn(errorMessage, e);
+            .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id()))
+            .onFailure(e -> {
+                String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
+                    + "', service '" + service.name() + "'.";
+                logger.warn(errorMessage, e);
 
-            // TODO: Raise an alarm?
-        });
+                // TODO: Raise an alarm?
+            });
     }
 
     /**
@@ -85,15 +90,18 @@ public class RetrieveMonitorInfoTask extends TimerTask {
         // noinspection SpellCheckingInspection
         httpClient
             .send(address,
-                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
+                new HttpClientRequest()
+                    .method(HttpMethod.GET)
+                    .uri(service.uri() + "/systemdata")
                     .header("accept", "application/json"))
             .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
-            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data())).onFailure(e -> {
-            String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
-                + "', service '" + service.name() + "'.";
-            logger.error(errorMessage, e);
-            // TODO: Raise an alarm?
-        });
+            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data()))
+            .onFailure(e -> {
+                String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
+                    + "', service '" + service.name() + "'.";
+                logger.error(errorMessage, e);
+                // TODO: Raise an alarm?
+            });
     }
 
 }

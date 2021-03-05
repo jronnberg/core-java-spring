@@ -61,15 +61,36 @@ public class GetAllPlantDescriptionsTest {
         final Instant updatedAt2 = Instant.parse("2020-08-03T14:48:00.00Z");
         final Instant updatedAt3 = Instant.parse("2020-08-02T14:48:00.00Z");
 
-        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder().id(32)
-            .plantDescription("Plant Description 1").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt1).updatedAt(updatedAt1).build();
-        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder().id(2)
-            .plantDescription("Plant Description 2").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt2).updatedAt(updatedAt2).build();
-        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder().id(8)
-            .plantDescription("Plant Description 3").active(false).include(new ArrayList<>()).systems(new ArrayList<>())
-            .connections(new ArrayList<>()).createdAt(createdAt3).updatedAt(updatedAt3).build();
+        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder()
+            .id(32)
+            .plantDescription("Plant Description 1")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt1)
+            .updatedAt(updatedAt1)
+            .build();
+        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder()
+            .id(2)
+            .plantDescription("Plant Description 2")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt2)
+            .updatedAt(updatedAt2)
+            .build();
+        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder()
+            .id(8)
+            .plantDescription("Plant Description 3")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(createdAt3)
+            .updatedAt(updatedAt3)
+            .build();
 
         pdTracker.put(entry1);
         pdTracker.put(entry2);
@@ -79,11 +100,14 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
         final HttpServiceRequest idDescendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC")))
+            .build();
         final HttpServiceRequest creationAscendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("createdAt"), "direction", List.of("ASC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("createdAt"), "direction", List.of("ASC")))
+            .build();
         final HttpServiceRequest updatesDescendingRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC")))
+            .build();
         final HttpServiceResponse response1 = new MockServiceResponse();
         final HttpServiceResponse response2 = new MockServiceResponse();
         final HttpServiceResponse response3 = new MockServiceResponse();
@@ -152,9 +176,16 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder().id(activeEntryId).plantDescription("Plant Description XY")
-            .active(true).include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>())
-            .createdAt(now).updatedAt(now).build());
+        pdTracker.put(new PlantDescriptionEntryBuilder()
+            .id(activeEntryId)
+            .plantDescription("Plant Description XY")
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build());
 
         final String nonBoolean = "Not a boolean";
 
@@ -189,9 +220,16 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder().id(activeEntryId).plantDescription("Plant Description 1B")
-            .active(true).include(new ArrayList<>()).systems(new ArrayList<>()).connections(new ArrayList<>())
-            .createdAt(now).updatedAt(now).build());
+        pdTracker.put(new PlantDescriptionEntryBuilder()
+            .id(activeEntryId)
+            .plantDescription("Plant Description 1B")
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(new ArrayList<>())
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build());
 
         GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
         HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("active", List.of("true")))
@@ -225,8 +263,13 @@ public class GetAllPlantDescriptionsTest {
         final HttpServiceResponse response = new MockServiceResponse();
         final int page = 1;
         final int itemsPerPage = 2;
-        final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("sort_field", List.of("id"),
-            "page", List.of(String.valueOf(page)), "item_per_page", List.of(String.valueOf(itemsPerPage)))).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of(
+                "sort_field", List.of("id"),
+                "page", List.of(String.valueOf(page)),
+                "item_per_page", List.of(String.valueOf(itemsPerPage))
+            ))
+            .build();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
@@ -285,7 +328,8 @@ public class GetAllPlantDescriptionsTest {
         final HttpServiceResponse response = new MockServiceResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of("page", List.of(String.valueOf(page)))).build();
+            .queryParameters(Map.of("page", List.of(String.valueOf(page))))
+            .build();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {

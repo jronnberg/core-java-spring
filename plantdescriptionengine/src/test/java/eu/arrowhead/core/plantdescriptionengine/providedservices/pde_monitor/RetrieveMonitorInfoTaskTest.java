@@ -47,11 +47,17 @@ public class RetrieveMonitorInfoTaskTest {
         final var resolveResult = Future.success(services);
         String inventoryId = "ABC";
         final MockClientResponse inventoryIdResponse = new MockClientResponse()
-            .status(HttpStatus.OK).body(new InventoryIdBuilder().id("ABC").build());
+            .status(HttpStatus.OK)
+            .body(new InventoryIdBuilder()
+                .id("ABC")
+                .build());
 
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
         final MockClientResponse systemDataResponse = new MockClientResponse()
-            .status(HttpStatus.OK).body(new SystemDataBuilder().data(systemData).build());
+            .status(HttpStatus.OK)
+            .body(new SystemDataBuilder()
+                .data(systemData)
+                .build());
         ProviderDescription provider = Mockito.mock(ProviderDescription.class);
         InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
@@ -62,9 +68,13 @@ public class RetrieveMonitorInfoTaskTest {
         when(provider.name()).thenReturn(systemName);
         when(provider.socketAddress()).thenReturn(address);
 
-        final var inventoryIdRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
+        final var inventoryIdRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/inventoryid")
             .header("accept", "application/json");
-        final var systemDataRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
+        final var systemDataRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/systemdata")
             .header("accept", "application/json");
         when(httpClient.send(any(InetSocketAddress.class), argThat(new RequestMatcher(inventoryIdRequest))))
             .thenReturn(Future.success(inventoryIdResponse));
@@ -117,7 +127,10 @@ public class RetrieveMonitorInfoTaskTest {
 
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
         final MockClientResponse systemDataResponse = new MockClientResponse()
-            .status(HttpStatus.OK).body(new SystemDataBuilder().data(systemData).build());
+            .status(HttpStatus.OK)
+            .body(new SystemDataBuilder()
+                .data(systemData)
+                .build());
         ProviderDescription provider = Mockito.mock(ProviderDescription.class);
         InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
@@ -128,9 +141,13 @@ public class RetrieveMonitorInfoTaskTest {
         when(provider.name()).thenReturn(systemName);
         when(provider.socketAddress()).thenReturn(address);
 
-        final var inventoryIdRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
+        final var inventoryIdRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/inventoryid")
             .header("accept", "application/json");
-        final var systemDataRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
+        final var systemDataRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/systemdata")
             .header("accept", "application/json");
         final var error = new Throwable("Some error");
         when(httpClient.send(any(InetSocketAddress.class), argThat(new RequestMatcher(inventoryIdRequest))))
@@ -163,7 +180,10 @@ public class RetrieveMonitorInfoTaskTest {
         final var resolveResult = Future.success(services);
         String inventoryId = "ABC";
         final MockClientResponse inventoryIdResponse = new MockClientResponse()
-            .status(HttpStatus.OK).body(new InventoryIdBuilder().id("ABC").build());
+            .status(HttpStatus.OK)
+            .body(new InventoryIdBuilder()
+                .id("ABC")
+                .build());
 
         ProviderDescription provider = Mockito.mock(ProviderDescription.class);
         InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
@@ -175,9 +195,13 @@ public class RetrieveMonitorInfoTaskTest {
         when(provider.name()).thenReturn(systemName);
         when(provider.socketAddress()).thenReturn(address);
 
-        final var inventoryIdRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/inventoryid")
+        final var inventoryIdRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/inventoryid")
             .header("accept", "application/json");
-        final var systemDataRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/systemdata")
+        final var systemDataRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/systemdata")
             .header("accept", "application/json");
         final var error = new Throwable("Some error");
         when(httpClient.send(any(InetSocketAddress.class), argThat(new RequestMatcher(inventoryIdRequest))))

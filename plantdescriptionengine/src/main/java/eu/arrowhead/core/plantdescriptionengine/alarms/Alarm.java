@@ -65,8 +65,17 @@ public class Alarm {
      */
     public PdeAlarmDto toPdeAlarm() {
         AlarmSeverity severity = (clearedAt == null) ? AlarmSeverity.warning : AlarmSeverity.cleared;
-        return new PdeAlarmBuilder().id(id).systemId(systemId).systemName(systemName).acknowledged(acknowledged)
-            .severity(severity.toString()).description(description()).raisedAt(raisedAt).updatedAt(updatedAt)
-            .clearedAt(clearedAt).acknowledgedAt(acknowledgedAt).build();
+        return new PdeAlarmBuilder()
+            .id(id)
+            .systemId(systemId)
+            .systemName(systemName)
+            .acknowledged(acknowledged)
+            .severity(severity.toString())
+            .description(description())
+            .raisedAt(raisedAt)
+            .updatedAt(updatedAt)
+            .clearedAt(clearedAt)
+            .acknowledgedAt(acknowledgedAt)
+            .build();
     }
 }

@@ -38,7 +38,9 @@ public class IntParameterTest {
 
     @Test
     public void shouldRejectNonInteger() {
-        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder().name("weight").build());
+        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder()
+            .name("weight")
+            .build());
 
         final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("weight", List.of("heavy")))
             .build();
@@ -51,10 +53,13 @@ public class IntParameterTest {
 
     @Test
     public void shouldRejectInvalidInteger() {
-        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder().name("weight").build());
+        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder()
+            .name("weight")
+            .build());
 
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of("weight", List.of("123 test"))).build();
+            .queryParameters(Map.of("weight", List.of("123 test")))
+            .build();
 
         Exception exception = assertThrows(ParseError.class,
             () -> new QueryParamParser(requiredParameters, null, request));
@@ -64,11 +69,21 @@ public class IntParameterTest {
 
     @Test
     public void shouldRejectTooSmallValues() {
-        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder().name("a").min(38).build(),
-            new IntParameter.Builder().name("b").min(38).build(), new IntParameter.Builder().name("c").min(38).build());
+        final List<QueryParameter> requiredParameters = List.of(
+            new IntParameter.Builder()
+                .name("a")
+                .min(38)
+                .build(),
+            new IntParameter.Builder()
+                .name("b")
+                .min(38)
+                .build(), new IntParameter.Builder().name("c")
+                .min(38)
+                .build());
 
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of("a", List.of("39"), "b", List.of("38"), "c", List.of("37"))).build();
+            .queryParameters(Map.of("a", List.of("39"), "b", List.of("38"), "c", List.of("37")))
+            .build();
 
         Exception exception = assertThrows(ParseError.class,
             () -> new QueryParamParser(requiredParameters, null, request));
@@ -79,10 +94,14 @@ public class IntParameterTest {
     @Test
     public void shouldReportMissingParameter() {
 
-        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder().name("height").build());
+        final List<QueryParameter> requiredParameters = List.of(new IntParameter.Builder()
+            .name("height")
+            .build());
 
         Exception exception = assertThrows(ParseError.class, () -> {
-            final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of()).build();
+            final HttpServiceRequest request = new MockRequest.Builder()
+                .queryParameters(Map.of())
+                .build();
             new QueryParamParser(requiredParameters, null, request);
         });
         assertEquals("<Missing parameter 'height'.>", exception.getMessage());
@@ -91,8 +110,12 @@ public class IntParameterTest {
     @Test
     public void shouldReportMissingDependency() {
 
-        final List<QueryParameter> acceptedParameters = List
-            .of(new IntParameter.Builder().name("a").requires(new IntParameter.Builder().name("b").build()).build());
+        final List<QueryParameter> acceptedParameters = List.of(new IntParameter.Builder()
+            .name("a")
+            .requires(new IntParameter.Builder()
+                .name("b")
+                .build())
+            .build());
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("a", List.of("95")))
                 .build();

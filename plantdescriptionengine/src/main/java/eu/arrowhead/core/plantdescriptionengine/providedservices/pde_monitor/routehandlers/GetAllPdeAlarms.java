@@ -53,16 +53,35 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
         }
         severityValues.add("not_cleared");
 
-        final var itemPerPageParam = new IntParameter.Builder().name("item_per_page").min(0).build();
-        final var pageParam = new IntParameter.Builder().name("page").min(0).requires(itemPerPageParam).build();
+        final var itemPerPageParam = new IntParameter.Builder()
+            .name("item_per_page")
+            .min(0)
+            .build();
+        final var pageParam = new IntParameter.Builder()
+            .name("page")
+            .min(0)
+            .requires(itemPerPageParam)
+            .build();
 
-        final var sortFieldParam = new StringParameter.Builder().name("sort_field")
-            .legalValues("id", "raisedAt", "updatedAt").build();
-        final var directionParam = new StringParameter.Builder().name("direction").legalValues("ASC", "DESC")
-            .defaultValue("ASC").build();
-        final var systemNameParam = new StringParameter.Builder().name("systemName").build();
-        final var severityParam = new StringParameter.Builder().name("severity").legalValues(severityValues).build();
-        final var acknowledgedParam = new BooleanParameter.Builder().name("acknowledged").build();
+        final var sortFieldParam = new StringParameter.Builder()
+            .name("sort_field")
+            .legalValues("id", "raisedAt", "updatedAt")
+            .build();
+        final var directionParam = new StringParameter.Builder()
+            .name("direction")
+            .legalValues("ASC", "DESC")
+            .defaultValue("ASC")
+            .build();
+        final var systemNameParam = new StringParameter.Builder()
+            .name("systemName")
+            .build();
+        final var severityParam = new StringParameter.Builder()
+            .name("severity")
+            .legalValues(severityValues)
+            .build();
+        final var acknowledgedParam = new BooleanParameter.Builder()
+            .name("acknowledged")
+            .build();
 
         final List<QueryParameter> acceptedParameters = List.of(pageParam, sortFieldParam, directionParam,
             systemNameParam, systemNameParam, severityParam, acknowledgedParam);
@@ -110,7 +129,10 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             PdeAlarm.filterAcknowledged(alarms, acknowledged.get());
         }
 
-        response.body(new PdeAlarmListBuilder().data(alarms).count(alarms.size()).build());
+        response.body(new PdeAlarmListBuilder()
+            .data(alarms)
+            .count(alarms.size())
+            .build());
         response.status(HttpStatus.OK);
         return Future.success(response);
     }

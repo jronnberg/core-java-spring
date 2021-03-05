@@ -170,7 +170,7 @@ public class PlantDescriptionValidator {
 
         for (var connection : connections) {
 
-            if (connection.priority().orElse(0) < 0 ) { // TODO: Check for max value as well.
+            if (connection.priority().orElse(0) < 0) { // TODO: Check for max value as well.
                 errors.add("A connection has a negative priority.");
             }
 

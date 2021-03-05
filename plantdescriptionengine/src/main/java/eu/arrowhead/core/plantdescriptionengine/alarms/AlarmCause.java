@@ -5,9 +5,9 @@ public enum AlarmCause {
     systemNotRegistered("cannot be found in the Service Registry."),
     systemNotInDescription("is not present in the active Plant Description.");
 
-    private String description;
+    private final String description;
 
-    private AlarmCause(String description) {
+    AlarmCause(String description) {
         this.description = description;
     }
 

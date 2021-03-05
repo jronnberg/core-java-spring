@@ -55,14 +55,28 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
      */
     @Override
     public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
-        final var itemPerPageParam = new IntParameter.Builder().name("item_per_page").min(0).build();
-        final var pageParam = new IntParameter.Builder().name("page").min(0).requires(itemPerPageParam).build();
-        final var sortFieldParam = new StringParameter.Builder().name("sort_field")
-            .legalValues("id", "createdAt", "updatedAt").build();
-        final var directionParam = new StringParameter.Builder().name("direction").legalValues("ASC", "DESC")
-            .defaultValue("ASC").build();
+        final var itemPerPageParam = new IntParameter.Builder()
+            .name("item_per_page")
+            .min(0)
+            .build();
+        final var pageParam = new IntParameter.Builder()
+            .name("page")
+            .min(0)
+            .requires(itemPerPageParam)
+            .build();
+        final var sortFieldParam = new StringParameter.Builder()
+            .name("sort_field")
+            .legalValues("id", "createdAt", "updatedAt")
+            .build();
+        final var directionParam = new StringParameter.Builder()
+            .name("direction")
+            .legalValues("ASC", "DESC")
+            .defaultValue("ASC")
+            .build();
 
-        final var activeParam = new BooleanParameter.Builder().name("active").build();
+        final var activeParam = new BooleanParameter.Builder()
+            .name("active")
+            .build();
 
         final List<QueryParameter> acceptedParameters = List.of(pageParam, sortFieldParam, directionParam, activeParam);
 
@@ -73,7 +87,8 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         } catch (ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " + error.getMessage());
 
-            return Future.success(response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(error.getMessage())));
+            return Future.success(response.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(error.getMessage())));
         }
 
         var entries = pdTracker.getEntries();
@@ -106,7 +121,10 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         }
 
         response.status(HttpStatus.OK)
-            .body(new PlantDescriptionEntryListBuilder().data(extendedEntries).count(extendedEntries.size()).build());
+            .body(new PlantDescriptionEntryListBuilder()
+                .data(extendedEntries)
+                .count(extendedEntries.size())
+                .build());
 
         return Future.success(response);
     }

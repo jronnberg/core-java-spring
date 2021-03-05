@@ -30,7 +30,8 @@ public class GetPlantDescriptionTest {
         final int nonExistentEntryId = 0;
 
         HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(String.valueOf(nonExistentEntryId))).build();
+            .pathParameters(List.of(String.valueOf(nonExistentEntryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
@@ -58,7 +59,9 @@ public class GetPlantDescriptionTest {
         final var monitorInfo = new MonitorInfo();
         final var handler = new GetPlantDescription(monitorInfo, pdTracker);
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId))).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
@@ -87,7 +90,9 @@ public class GetPlantDescriptionTest {
         final var monitorInfo = new MonitorInfo();
         final var handler = new GetPlantDescription(monitorInfo, pdTracker);
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidId)).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(invalidId))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 

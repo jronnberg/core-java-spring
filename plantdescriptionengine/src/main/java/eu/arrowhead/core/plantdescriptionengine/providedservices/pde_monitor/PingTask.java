@@ -40,11 +40,13 @@ public class PingTask extends TimerTask {
      * Check if each monitorable service is active.
      */
     private void ping() {
-        serviceQuery.resolveAll().ifSuccess(services -> {
-            for (var service : services) {
-                ping(service);
-            }
-        }).onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
+        serviceQuery.resolveAll()
+            .ifSuccess(services -> {
+                for (var service : services) {
+                    ping(service);
+                }
+            })
+            .onFailure(e -> logger.error("Failed to ping monitorable systems.", e));
     }
 
     private void ping(ServiceDescription service) {
@@ -52,15 +54,19 @@ public class PingTask extends TimerTask {
         final String providerName = service.provider().name();
         httpClient
             .send(address,
-                new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping").header("accept",
-                    "application/json"))
+                new HttpClientRequest()
+                    .method(HttpMethod.GET)
+                    .uri(service.uri() + "/ping")
+                    .header("accept",
+                        "application/json"))
             .ifSuccess(result -> {
                 logger.info("Successfully pinged system '" + providerName + "'.");
                 alarmManager.clearSystemInactive(providerName);
-            }).onFailure(e -> {
-            logger.warn("Failed to ping system '" + providerName + "'.", e);
-            alarmManager.raiseSystemInactive(providerName);
-        });
+            })
+            .onFailure(e -> {
+                logger.warn("Failed to ping system '" + providerName + "'.", e);
+                alarmManager.raiseSystemInactive(providerName);
+            });
     }
 
 }

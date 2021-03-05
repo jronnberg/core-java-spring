@@ -32,10 +32,6 @@ public class RequestMatcher implements ArgumentMatcher<HttpClientRequest> {
             return false;
         }
 
-        if (!a.method().equals(b.method())) {
-            return false;
-        }
-
-        return true;
+        return a.method().equals(b.method());
     }
 }

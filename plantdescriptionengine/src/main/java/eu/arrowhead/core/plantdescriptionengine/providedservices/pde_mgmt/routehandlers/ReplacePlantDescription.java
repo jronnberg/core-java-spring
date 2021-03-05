@@ -45,34 +45,40 @@ public class ReplacePlantDescription implements HttpRouteHandler {
      */
     @Override
     public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
-        return request.bodyAs(PlantDescriptionDto.class).map(description -> {
-            int id;
+        return request.bodyAs(PlantDescriptionDto.class)
+            .map(description -> {
+                int id;
 
-            try {
-                id = Integer.parseInt(request.pathParameter(0));
-            } catch (NumberFormatException e) {
-                return response.status(HttpStatus.BAD_REQUEST)
-                    .body(request.pathParameter(0) + " is not a valid Plant Description Entry ID.");
-            }
+                try {
+                    id = Integer.parseInt(request.pathParameter(0));
+                } catch (NumberFormatException e) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(request.pathParameter(0) + " is not a valid Plant Description Entry ID.");
+                }
 
-            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, id);
 
-            // Check if introducing this entry leads to inconsistencies
-            // (e.g. include cycles):
-            final var entries = pdTracker.getEntryMap();
-            entries.put(id, entry);
-            final var validator = new PlantDescriptionValidator(entries);
-            if (validator.hasError()) {
-                return response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(validator.getErrorMessage()));
-            }
+                // Check if introducing this entry leads to inconsistencies
+                // (e.g. include cycles):
+                final var entries = pdTracker.getEntryMap();
+                entries.put(id, entry);
+                final var validator = new PlantDescriptionValidator(entries);
+                if (validator.hasError()) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(ErrorMessage.of(validator.getErrorMessage()));
+                }
 
-            try {
-                pdTracker.put(entry);
-            } catch (final PdStoreException e) {
-                logger.error("Failed to write Plant Description Entry update to backing store.", e);
-                return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return response.status(HttpStatus.CREATED).body(entry);
-        });
+                try {
+                    pdTracker.put(entry);
+                } catch (final PdStoreException e) {
+                    logger.error("Failed to write Plant Description Entry update to backing store.", e);
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                return response
+                    .status(HttpStatus.CREATED)
+                    .body(entry);
+            });
     }
 }

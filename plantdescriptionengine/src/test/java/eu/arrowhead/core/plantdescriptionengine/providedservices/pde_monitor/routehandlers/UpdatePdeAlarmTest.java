@@ -29,8 +29,12 @@ public class UpdatePdeAlarmTest {
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(alarm.id())))
-            .body(new PdeAlarmUpdateBuilder().acknowledged(true).build()).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(alarm.id())))
+            .body(new PdeAlarmUpdateBuilder()
+                .acknowledged(true)
+                .build())
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(alarmManager);
 
@@ -52,7 +56,10 @@ public class UpdatePdeAlarmTest {
 
         final String invalidEntryId = "Invalid ID";
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId))
-            .body(new PdeAlarmUpdateBuilder().acknowledged(true).build()).build();
+            .body(new PdeAlarmUpdateBuilder()
+                .acknowledged(true)
+                .build())
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(new AlarmManager());
 
@@ -74,7 +81,10 @@ public class UpdatePdeAlarmTest {
 
         final String nonexistentId = "31";
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(nonexistentId))
-            .body(new PdeAlarmUpdateBuilder().acknowledged(true).build()).build();
+            .body(new PdeAlarmUpdateBuilder()
+                .acknowledged(true)
+                .build())
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(new AlarmManager());
 
@@ -100,8 +110,10 @@ public class UpdatePdeAlarmTest {
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(alarm.id())))
-            .body(new PdeAlarmUpdateBuilder().build()).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(alarm.id())))
+            .body(new PdeAlarmUpdateBuilder().build())
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new UpdatePdeAlarm(alarmManager);
 

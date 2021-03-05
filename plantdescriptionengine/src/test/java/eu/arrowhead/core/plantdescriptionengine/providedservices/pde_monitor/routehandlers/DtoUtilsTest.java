@@ -32,27 +32,50 @@ public class DtoUtilsTest {
         final String serviceDefinition = "Service-AC";
         final List<PortDto> ports = List.of(
             // Port B and C will *not* be complemented by monitor info:
-            new PortBuilder().metadata(Map.of("i", "j")) // Differs from service A
-                .portName("Port-C").serviceDefinition(serviceDefinition) // Same as service A
+            new PortBuilder()
+                .metadata(Map.of("i", "j")) // Differs from service A
+                .portName("Port-C")
+                .serviceDefinition(serviceDefinition) // Same as service A
                 .build(),
-            new PortBuilder().metadata(Map.of("x", "y")) // Differs from service A
-                .portName("Port-B").serviceDefinition("Service-B") // Differs from service A
+            new PortBuilder()
+                .metadata(Map.of("x", "y")) // Differs from service A
+                .portName("Port-B")
+                .serviceDefinition("Service-B") // Differs from service A
                 .build(),
             // Port A will be complemented by monitor info:
-            new PortBuilder().metadata(metadata).portName(portName).serviceDefinition(serviceDefinition).build());
+            new PortBuilder()
+                .metadata(metadata)
+                .portName(portName)
+                .serviceDefinition(serviceDefinition)
+                .build());
 
-        final PdeSystemDto system = new PdeSystemBuilder().systemName(systemName).systemId("system_a").ports(ports)
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .systemId("system_a")
+            .ports(ports)
             .build();
 
         final Instant now = Instant.now();
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>()).systems(List.of(system))
-            .connections(new ArrayList<>()).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
-        ServiceDescription serviceDescription = new ServiceDescription.Builder().name(serviceDefinition)
-            .metadata(metadata).uri("/abc").security(SecurityDescriptor.NOT_SECURE).provider(provider)
-            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON).build();
+        ServiceDescription serviceDescription = new ServiceDescription.Builder()
+            .name(serviceDefinition)
+            .metadata(metadata)
+            .uri("/abc")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .provider(provider)
+            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+            .build();
 
         final String inventoryId = "system_a_inventory_id";
         JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
@@ -87,13 +110,27 @@ public class DtoUtilsTest {
         final String portName = "Port-A";
         final String serviceDefinition = "Service-A";
         final List<PortDto> ports = List
-            .of(new PortBuilder().metadata(metadata).portName(portName).serviceDefinition(serviceDefinition).build());
-        final PdeSystemDto system = new PdeSystemBuilder().systemName(systemName).systemId("system_a").ports(ports)
+            .of(new PortBuilder()
+                .metadata(metadata)
+                .portName(portName)
+                .serviceDefinition(serviceDefinition)
+                .build());
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .systemId("system_a")
+            .ports(ports)
             .build();
         final Instant now = Instant.now();
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>()).systems(List.of(system))
-            .connections(new ArrayList<>()).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         final var monitorInfo = new MonitorInfo();
 
@@ -116,18 +153,33 @@ public class DtoUtilsTest {
         final Map<String, String> metadata = Map.of("a", "b");
         final String serviceDefinition = "Service-AC";
 
-        final PdeSystemDto system = new PdeSystemBuilder().systemName(systemName).metadata(Map.of("foo", "bar"))
-            .systemId("system_a").build();
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .metadata(Map.of("foo", "bar"))
+            .systemId("system_a")
+            .build();
 
         final Instant now = Instant.now();
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
-            .plantDescription("Plant Description 1A").active(false).include(new ArrayList<>()).systems(List.of(system))
-            .connections(new ArrayList<>()).createdAt(now).updatedAt(now).build();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
 
         final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
-        ServiceDescription serviceDescription = new ServiceDescription.Builder().name(serviceDefinition)
-            .metadata(metadata).uri("/abc").security(SecurityDescriptor.NOT_SECURE).provider(provider)
-            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON).build();
+        ServiceDescription serviceDescription = new ServiceDescription.Builder()
+            .name(serviceDefinition)
+            .metadata(metadata)
+            .uri("/abc")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .provider(provider)
+            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+            .build();
 
         final String inventoryId = "system_a_inventory_id";
         JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));

@@ -30,43 +30,48 @@ public class GetAllPdeAlarmsTest {
         final var handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("ASC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("ASC")))
+            .build();
         final HttpServiceRequest descRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC")))
+            .build();
 
         final HttpServiceResponse ascResponse = new MockServiceResponse();
         final HttpServiceResponse descResponse = new MockServiceResponse();
 
         try {
-            handler.handle(ascRequest, ascResponse).map(ascendingResult -> {
-                assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
+            handler.handle(ascRequest, ascResponse)
+                .map(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
-                assertTrue(ascResponse.body().isPresent());
-                final var alarms = (PdeAlarmList) ascResponse.body().get();
-                assertEquals(3, alarms.count());
+                    assertTrue(ascResponse.body().isPresent());
+                    final var alarms = (PdeAlarmList) ascResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() >= previousId);
-                    previousId = alarm.id();
-                }
-                return handler.handle(descRequest, descResponse);
-            }).ifSuccess(descendingResult -> {
-                assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() >= previousId);
+                        previousId = alarm.id();
+                    }
+                    return handler.handle(descRequest, descResponse);
+                })
+                .ifSuccess(descendingResult -> {
+                    assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
-                assertTrue(descResponse.body().isPresent());
-                final var alarms = (PdeAlarmList) descResponse.body().get();
-                assertEquals(3, alarms.count());
+                    assertTrue(descResponse.body().isPresent());
+                    final var alarms = (PdeAlarmList) descResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() <= previousId);
-                    previousId = alarm.id();
-                }
-            }).onFailure(Assertions::assertNull);
+                    int previousId = alarms.data().get(0).id();
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() <= previousId);
+                        previousId = alarm.id();
+                    }
+                })
+                .onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -91,46 +96,51 @@ public class GetAllPdeAlarmsTest {
         final var handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("ASC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("ASC")))
+            .build();
         final HttpServiceRequest descRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("raisedAt"), "direction", List.of("DESC"))).build();
+            .queryParameters(Map.of("sort_field", List.of("raisedAt"), "direction", List.of("DESC")))
+            .build();
 
         final HttpServiceResponse ascResponse = new MockServiceResponse();
         final HttpServiceResponse descResponse = new MockServiceResponse();
 
         try {
-            handler.handle(ascRequest, ascResponse).map(ascendingResult -> {
-                assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
+            handler.handle(ascRequest, ascResponse)
+                .map(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
-                assertTrue(ascResponse.body().isPresent());
-                final var alarms = (PdeAlarmList) ascResponse.body().get();
-                assertEquals(3, alarms.count());
+                    assertTrue(ascResponse.body().isPresent());
+                    final var alarms = (PdeAlarmList) ascResponse.body().get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() >= previousId);
-                    previousId = alarm.id();
-                }
-                return handler.handle(descRequest, descResponse);
-            }).ifSuccess(descendingResult -> {
-                assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() >= previousId);
+                        previousId = alarm.id();
+                    }
+                    return handler.handle(descRequest, descResponse);
+                })
+                .ifSuccess(descendingResult -> {
+                    assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
-                assertTrue(descResponse.body().isPresent());
-                final var body = descResponse.body();
-                assertTrue(body.isPresent());
-                final var alarms = (PdeAlarmList) body.get();
-                assertEquals(3, alarms.count());
+                    assertTrue(descResponse.body().isPresent());
+                    final var body = descResponse.body();
+                    assertTrue(body.isPresent());
+                    final var alarms = (PdeAlarmList) body.get();
+                    assertEquals(3, alarms.count());
 
-                int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-                for (int i = 1; i < alarms.count(); i++) {
-                    final var alarm = alarms.data().get(i);
-                    assertTrue(alarm.id() <= previousId);
-                    previousId = alarm.id();
-                }
-            }).onFailure(Assertions::assertNull);
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final var alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() <= previousId);
+                        previousId = alarm.id();
+                    }
+                })
+                .onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             assertNull(e);
         }
@@ -143,19 +153,22 @@ public class GetAllPdeAlarmsTest {
         final String nonBoolean = "Not a boolean";
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of("acknowledged", List.of(nonBoolean) // Should be 'true' or 'false'
-            )).build();
+            ))
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
-                    + nonBoolean + "'.>";
-                final var body = response.body();
-                assertTrue(body.isPresent());
-                String actualErrorMessage = ((ErrorMessage) body.get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                    String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
+                        + nonBoolean + "'.>";
+                    final var body = response.body();
+                    assertTrue(body.isPresent());
+                    String actualErrorMessage = ((ErrorMessage) body.get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -187,11 +200,14 @@ public class GetAllPdeAlarmsTest {
 
         final var handler = new GetAllPdeAlarms(alarmManager);
         final HttpServiceRequest nameRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("systemName", List.of(systemNameA))).build();
+            .queryParameters(Map.of("systemName", List.of(systemNameA)))
+            .build();
         final HttpServiceRequest ackRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("acknowledged", List.of("true"))).build();
+            .queryParameters(Map.of("acknowledged", List.of("true")))
+            .build();
         final HttpServiceRequest severityRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("severity", List.of("cleared"))).build();
+            .queryParameters(Map.of("severity", List.of("cleared")))
+            .build();
 
         HttpServiceResponse nameResponse = new MockServiceResponse();
         HttpServiceResponse ackResponse = new MockServiceResponse();

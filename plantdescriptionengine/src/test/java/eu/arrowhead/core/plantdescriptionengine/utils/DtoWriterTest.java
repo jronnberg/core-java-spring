@@ -1,16 +1,15 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyByte;
-import static org.mockito.Mockito.doThrow;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 
 public class DtoWriterTest {
 
@@ -18,21 +17,21 @@ public class DtoWriterTest {
     public void shouldNotSupportWriteOffset() {
         final var writer = new DtoWriter(new ByteArrayOutputStream());
         assertThrows(UnsupportedOperationException.class,
-        () -> writer.writeOffset());
+            writer::writeOffset);
     }
 
     @Test
     public void shouldNotSupportWriteOffsetInt() {
         final var writer = new DtoWriter(new ByteArrayOutputStream());
         assertThrows(UnsupportedOperationException.class,
-        () -> writer.writeOffset(1));
+            () -> writer.writeOffset(1));
     }
 
     @Test
     public void shouldNotSupportWritableBytes() {
         final var writer = new DtoWriter(new ByteArrayOutputStream());
         assertThrows(UnsupportedOperationException.class,
-        () -> writer.writableBytes());
+            writer::writableBytes);
     }
 
     @Test

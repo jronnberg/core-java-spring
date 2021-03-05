@@ -15,14 +15,20 @@ public class StringParameterTest {
     @Test
     public void shouldParseParameters() throws ParseError {
 
-        final var scoreParam = new IntParameter.Builder().name("score").build();
-        final var episodeParam = new StringParameter.Builder().name("episode")
-            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi").requires(scoreParam).build();
+        final var scoreParam = new IntParameter.Builder()
+            .name("score")
+            .build();
+        final var episodeParam = new StringParameter.Builder()
+            .name("episode")
+            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
+            .requires(scoreParam)
+            .build();
 
         final List<QueryParameter> acceptedParameters = List.of(episodeParam);
 
         final HttpServiceRequest request = new MockRequest.Builder()
-            .queryParameters(Map.of("episode", List.of("The Empire Strikes Back"), "score", List.of("10"))).build();
+            .queryParameters(Map.of("episode", List.of("The Empire Strikes Back"), "score", List.of("10")))
+            .build();
 
         final var parser = new QueryParamParser(null, acceptedParameters, request);
 
@@ -34,12 +40,15 @@ public class StringParameterTest {
     public void shouldUseDefaultArgument() throws ParseError {
 
         final var episodeParam = new StringParameter.Builder().name("episode")
-            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi").defaultValue("A new Hope")
+            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
+            .defaultValue("A new Hope")
             .build();
 
         final List<QueryParameter> acceptedParameters = List.of(episodeParam);
 
-        final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of()).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of())
+            .build();
 
         final var parser = new QueryParamParser(null, acceptedParameters, request);
 
@@ -49,11 +58,15 @@ public class StringParameterTest {
     @Test
     public void shouldReportMissingParameter() {
 
-        final List<QueryParameter> requiredParameters = List
-            .of(new StringParameter.Builder().name("sort_field").legalValues("id", "createdAt", "updatedAt").build());
+        final List<QueryParameter> requiredParameters = List.of(new StringParameter.Builder()
+            .name("sort_field")
+            .legalValues("id", "createdAt", "updatedAt")
+            .build());
 
         Exception exception = assertThrows(ParseError.class, () -> {
-            final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of()).build();
+            final HttpServiceRequest request = new MockRequest.Builder()
+                .queryParameters(Map.of())
+                .build();
             new QueryParamParser(requiredParameters, null, request);
         });
         assertEquals(exception.getMessage(), "<Missing parameter 'sort_field'.>");
@@ -63,11 +76,14 @@ public class StringParameterTest {
     public void shouldReportMissingDependency() {
 
         final List<QueryParameter> acceptedParameters = List.of(new StringParameter.Builder().name("name")
-            .requires(new IntParameter.Builder().name("age").build()).build());
+            .requires(new IntParameter.Builder().name("age")
+                .build())
+            .build());
 
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()
-                .queryParameters(Map.of("name", List.of("Alice"))).build();
+                .queryParameters(Map.of("name", List.of("Alice")))
+                .build();
             new QueryParamParser(null, acceptedParameters, request);
         });
         assertEquals("<Missing parameter 'age'.>", exception.getMessage());
@@ -76,12 +92,15 @@ public class StringParameterTest {
     @Test
     public void shouldOnlyAcceptLegalValues() {
 
-        final List<QueryParameter> requiredParameters = List.of(new StringParameter.Builder().name("episode")
-            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi").build());
+        final List<QueryParameter> requiredParameters = List.of(new StringParameter.Builder()
+            .name("episode")
+            .legalValues("A New Hope", "The Empire Strikes Back", "Return of the Jedi")
+            .build());
 
         Exception exception = assertThrows(ParseError.class, () -> {
             final HttpServiceRequest request = new MockRequest.Builder()
-                .queryParameters(Map.of("episode", List.of("The Rise of Skywalker"))).build();
+                .queryParameters(Map.of("episode", List.of("The Rise of Skywalker")))
+                .build();
             new QueryParamParser(requiredParameters, null, request);
         });
         assertEquals(exception.getMessage(), "<The Rise of Skywalker is not a legal value for parameter episode.>");

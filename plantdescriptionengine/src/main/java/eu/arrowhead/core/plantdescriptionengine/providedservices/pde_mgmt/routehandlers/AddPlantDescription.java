@@ -44,26 +44,29 @@ public class AddPlantDescription implements HttpRouteHandler {
      */
     @Override
     public Future<HttpServiceResponse> handle(final HttpServiceRequest request, final HttpServiceResponse response) {
-        return request.bodyAs(PlantDescriptionDto.class).map(description -> {
+        return request.bodyAs(PlantDescriptionDto.class)
+            .map(description -> {
 
-            final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());
 
-            // Check if adding this entry leads to inconsistencies
-            // (e.g. include cycles):
-            final var entries = pdTracker.getEntryMap();
-            entries.put(entry.id(), entry);
-            final var validator = new PlantDescriptionValidator(entries);
-            if (validator.hasError()) {
-                return response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(validator.getErrorMessage()));
-            }
+                // Check if adding this entry leads to inconsistencies
+                // (e.g. include cycles):
+                final var entries = pdTracker.getEntryMap();
+                entries.put(entry.id(), entry);
+                final var validator = new PlantDescriptionValidator(entries);
+                if (validator.hasError()) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(ErrorMessage.of(validator.getErrorMessage()));
+                }
 
-            try {
-                pdTracker.put(entry);
-            } catch (final PdStoreException e) {
-                logger.error("Failure when communicating with backing store.", e);
-                return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return response.status(HttpStatus.CREATED).body(entry);
-        });
+                try {
+                    pdTracker.put(entry);
+                } catch (final PdStoreException e) {
+                    logger.error("Failure when communicating with backing store.", e);
+                    return response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                return response.status(HttpStatus.CREATED).body(entry);
+            });
     }
 }

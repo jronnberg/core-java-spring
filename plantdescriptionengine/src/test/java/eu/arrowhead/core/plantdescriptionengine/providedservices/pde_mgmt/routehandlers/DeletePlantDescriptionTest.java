@@ -33,7 +33,9 @@ public class DeletePlantDescriptionTest {
         final int entryId = 14;
         pdTracker.put(TestUtils.createEntry(entryId));
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId))).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
@@ -41,10 +43,12 @@ public class DeletePlantDescriptionTest {
         assertNotNull(pdTracker.get(entryId));
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().orElse(null));
-                assertNull(pdTracker.get(entryId));
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertNull(pdTracker.get(entryId));
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -56,19 +60,22 @@ public class DeletePlantDescriptionTest {
         final var handler = new DeletePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(invalidEntryId)).build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertTrue(response.status().isPresent());
-                assertTrue(response.body().isPresent());
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
-                String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
-                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertTrue(response.status().isPresent());
+                    assertTrue(response.body().isPresent());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
+                    String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -86,13 +93,15 @@ public class DeletePlantDescriptionTest {
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
-                String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
-                assertTrue(response.body().isPresent());
-                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
+                    String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
+                    assertTrue(response.body().isPresent());
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -106,10 +115,21 @@ public class DeletePlantDescriptionTest {
         final int entryIdA = 23;
         final int entryIdB = 24;
 
-        final var entryA = new PlantDescriptionEntryBuilder().id(entryIdA).plantDescription("A").createdAt(now)
-            .updatedAt(now).active(false).build();
-        final var entryB = new PlantDescriptionEntryBuilder().id(entryIdB).plantDescription("B").createdAt(now)
-            .updatedAt(now).active(false).include(List.of(entryIdA)).build();
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(entryIdA)
+            .plantDescription("A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .build();
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(entryIdB)
+            .plantDescription("B")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .include(List.of(entryIdA))
+            .build();
 
         pdTracker.put(entryA);
         pdTracker.put(entryB);
@@ -120,14 +140,16 @@ public class DeletePlantDescriptionTest {
         HttpServiceResponse response = new MockServiceResponse();
 
         try {
-            handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                String expectedErrorMessage = "<Error in include list: Entry '" + entryIdA + "' is required by entry '"
-                    + entryIdB + "'.>";
-                assertTrue(response.body().isPresent());
-                String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
-                assertEquals(expectedErrorMessage, actualErrorMessage);
-            }).onFailure(Assertions::assertNull);
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                    String expectedErrorMessage = "<Error in include list: Entry '" + entryIdA + "' is required by entry '"
+                        + entryIdB + "'.>";
+                    assertTrue(response.body().isPresent());
+                    String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
         }
@@ -142,7 +164,9 @@ public class DeletePlantDescriptionTest {
         final int entryId = 87;
         pdTracker.put(TestUtils.createEntry(entryId));
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId))).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 

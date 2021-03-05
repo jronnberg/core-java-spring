@@ -41,15 +41,22 @@ public class SystemTrackerTest {
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse response = new MockClientResponse().status(HttpStatus.OK)
             .body(new SrSystemListBuilder().count(1)
-                .data(new SrSystemBuilder().id(systemId).systemName(systemName).address("0.0.0.0").port(5009).build())
+                .data(new SrSystemBuilder()
+                    .id(systemId)
+                    .systemName(systemName)
+                    .address("0.0.0.0")
+                    .port(5009)
+                    .build())
                 .build());
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(Future.success(response));
 
-        systemTracker.start().ifSuccess(result -> {
-            final var system = systemTracker.getSystemByName(systemName);
-            assertEquals(systemId, system.id());
-        }).onFailure(Assertions::assertNull);
+        systemTracker.start()
+            .ifSuccess(result -> {
+                final var system = systemTracker.getSystemByName(systemName);
+                assertEquals(systemId, system.id());
+            })
+            .onFailure(Assertions::assertNull);
     }
 }

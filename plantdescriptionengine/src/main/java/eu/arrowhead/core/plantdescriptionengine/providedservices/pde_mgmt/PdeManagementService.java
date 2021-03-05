@@ -41,9 +41,14 @@ public class PdeManagementService {
      * @return A HTTP Service used to manage Plant Descriptions.
      */
     public HttpService getService() {
-        var service = new HttpService().name("pde-mgmt").encodings(EncodingDescriptor.JSON).basePath("/pde/mgmt")
-            .get("/pd/#id", new GetPlantDescription(pdTracker)).get("/pd", new GetAllPlantDescriptions(pdTracker))
-            .post("/pd", new AddPlantDescription(pdTracker)).delete("/pd/#id", new DeletePlantDescription(pdTracker))
+        var service = new HttpService()
+            .name("pde-mgmt")
+            .encodings(EncodingDescriptor.JSON)
+            .basePath("/pde/mgmt")
+            .get("/pd/#id", new GetPlantDescription(pdTracker))
+            .get("/pd", new GetAllPlantDescriptions(pdTracker))
+            .post("/pd", new AddPlantDescription(pdTracker))
+            .delete("/pd/#id", new DeletePlantDescription(pdTracker))
             .put("/pd/#id", new ReplacePlantDescription(pdTracker))
             .patch("/pd/#id", new UpdatePlantDescription(pdTracker))
             .catcher(DtoReadException.class, new DtoReadExceptionCatcher());

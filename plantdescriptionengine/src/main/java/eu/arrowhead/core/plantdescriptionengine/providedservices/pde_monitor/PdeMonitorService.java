@@ -33,7 +33,6 @@ public class PdeMonitorService {
     private final PlantDescriptionTracker pdTracker;
     private final boolean secure;
 
-    private final ServiceQuery serviceQuery;
     private final PingTask pingTask;
     private final RetrieveMonitorInfoTask retrieveMonitorInfoTask;
 
@@ -61,7 +60,7 @@ public class PdeMonitorService {
 
         // this.monitorableClient = new MonitorablesClient(arSystem, httpClient, monitorInfo, alarmManager);
 
-        serviceQuery = arSystem.consume()
+        ServiceQuery serviceQuery = arSystem.consume()
             .name("monitorable")
             .transports(TransportDescriptor.HTTP)
             .encodings(EncodingDescriptor.JSON);
@@ -78,10 +77,14 @@ public class PdeMonitorService {
      * Engine core system.
      */
     public Future<ArServiceHandle> provide() {
-        final var service = new HttpService().name("plant-description-monitor").encodings(EncodingDescriptor.JSON)
-            .basePath("/pde/monitor").get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
+        final var service = new HttpService()
+            .name("plant-description-monitor")
+            .encodings(EncodingDescriptor.JSON)
+            .basePath("/pde/monitor")
+            .get("/pd", new GetAllPlantDescriptions(monitorInfo, pdTracker))
             .get("/pd/#id", new GetPlantDescription(monitorInfo, pdTracker))
-            .get("/alarm/#id", new GetPdeAlarm(alarmManager)).get("/alarm", new GetAllPdeAlarms(alarmManager))
+            .get("/alarm/#id", new GetPdeAlarm(alarmManager))
+            .get("/alarm", new GetAllPdeAlarms(alarmManager))
             .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager));
         // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add
         // this line?

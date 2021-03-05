@@ -48,7 +48,9 @@ public class GetPdeAlarmTest {
     public void shouldRejectInvalidId() {
 
         final String invalidEntryId = "Invalid ID";
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(invalidEntryId))
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 
@@ -69,7 +71,9 @@ public class GetPdeAlarmTest {
     public void shouldRejectNonexistentId() {
 
         final String nonexistentId = "31";
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(nonexistentId)).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(nonexistentId))
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final var handler = new GetPdeAlarm(new AlarmManager());
 

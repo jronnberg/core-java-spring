@@ -49,7 +49,9 @@ public class DeletePlantDescription implements HttpRouteHandler {
             id = Integer.parseInt(request.pathParameter(0));
         } catch (NumberFormatException e) {
             final String errMsg = "'" + request.pathParameter(0) + "' is not a valid Plant Description Entry ID.";
-            response.status(HttpStatus.BAD_REQUEST).body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
+            response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
             return Future.success(response);
         }
 
@@ -65,7 +67,9 @@ public class DeletePlantDescription implements HttpRouteHandler {
         entries.remove(id);
         final var validator = new PlantDescriptionValidator(entries);
         if (validator.hasError()) {
-            response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(validator.getErrorMessage()));
+            response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(validator.getErrorMessage()));
             return Future.success(response);
         }
 

@@ -16,7 +16,6 @@ import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,10 +33,14 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder().plantDescription(newName).build();
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
+            .plantDescription(newName)
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
-            .body(update).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(update)
+            .build();
 
         pdTracker.put(entry);
 
@@ -63,7 +66,9 @@ public class UpdatePlantDescriptionTest {
         final var handler = new UpdatePlantDescription(pdTracker);
         final String invalidEntryId = "InvalidId";
 
-        HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId)).build();
+        HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(invalidEntryId))
+            .build();
 
         HttpServiceResponse response = new MockServiceResponse();
 
@@ -118,8 +123,16 @@ public class UpdatePlantDescriptionTest {
         pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder().portName(portName).serviceDefinition("service_a").consumer(true).build(),
-            new PortBuilder().portName(portName).serviceDefinition("service_b").consumer(true).build());
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_a")
+                .consumer(true)
+                .build(),
+            new PortBuilder()
+                .portName(portName)
+                .serviceDefinition("service_b")
+                .consumer(true)
+                .build());
 
         final PdeSystemDto consumerSystem = new PdeSystemBuilder()
             .systemId(systemId)
@@ -127,12 +140,17 @@ public class UpdatePlantDescriptionTest {
             .ports(consumerPorts)
             .build();
 
-        final var update = new PlantDescriptionUpdateBuilder().plantDescription("Plant Description 1A").active(true)
-            .systems(List.of(consumerSystem)).build();
+        final var update = new PlantDescriptionUpdateBuilder()
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(consumerSystem))
+            .build();
 
         final HttpServiceResponse response = new MockServiceResponse();
-        final MockRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
-            .body(update).build();
+        final MockRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(update)
+            .build();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
@@ -158,10 +176,14 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder().plantDescription(newName).build();
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
+            .plantDescription(newName)
+            .build();
         final HttpServiceResponse response = new MockServiceResponse();
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryId)))
-            .body(update).build();
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(entryId)))
+            .body(update)
+            .build();
 
         pdTracker.put(entry);
 

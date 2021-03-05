@@ -26,13 +26,28 @@ public class PlantDescriptionEntryTest {
         Instant t3 = t1.plus(2, ChronoUnit.HOURS);
         Instant t4 = t1.plus(3, ChronoUnit.HOURS);
 
-        final var entryA = new PlantDescriptionEntryBuilder().id(idA).plantDescription("A").createdAt(t3).updatedAt(t3)
-            .active(false).build();
+        final var entryA = new PlantDescriptionEntryBuilder()
+            .id(idA)
+            .plantDescription("A")
+            .createdAt(t3)
+            .updatedAt(t3)
+            .active(false)
+            .build();
 
-        final var entryB = new PlantDescriptionEntryBuilder().id(idB).plantDescription("B").createdAt(t1).updatedAt(t1)
-            .active(false).build();
-        final var entryC = new PlantDescriptionEntryBuilder().id(idC).plantDescription("C").createdAt(t2).updatedAt(t4)
-            .active(false).build();
+        final var entryB = new PlantDescriptionEntryBuilder()
+            .id(idB)
+            .plantDescription("B")
+            .createdAt(t1)
+            .updatedAt(t1)
+            .active(false)
+            .build();
+        final var entryC = new PlantDescriptionEntryBuilder()
+            .id(idC)
+            .plantDescription("C")
+            .createdAt(t2)
+            .updatedAt(t4)
+            .active(false)
+            .build();
 
         List<PlantDescriptionEntry> entries = Arrays.asList(entryA, entryB, entryC);
 
@@ -59,8 +74,13 @@ public class PlantDescriptionEntryTest {
 
     @Test
     public void shouldDisallowIncorrectSortField() {
-        final var entry = new PlantDescriptionEntryBuilder().id(1).plantDescription("ABC").createdAt(now).updatedAt(now)
-            .active(true).build();
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("ABC")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .build();
         List<PlantDescriptionEntry> entries = Collections.singletonList(entry);
 
         Exception exception = assertThrows(IllegalArgumentException.class,

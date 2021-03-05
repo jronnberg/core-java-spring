@@ -49,7 +49,9 @@ public class PingTaskTest {
         when(provider.name()).thenReturn(systemName);
         when(provider.socketAddress()).thenReturn(address);
 
-        final var expectedRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping")
+        final var expectedRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/ping")
             .header("accept", "application/json");
 
         when(httpClient.send(any(InetSocketAddress.class), argThat(new RequestMatcher(expectedRequest))))
@@ -59,9 +61,15 @@ public class PingTaskTest {
         final var pingTask = new PingTask(serviceQuery, httpClient, alarmManager);
 
         alarmManager.raiseSystemInactive(systemName);
-        assertFalse(alarmManager.getAlarms().get(0).clearedAt().isPresent());
+        assertFalse(alarmManager.getAlarms()
+            .get(0)
+            .clearedAt()
+            .isPresent());
         pingTask.run();
-        assertTrue(alarmManager.getAlarms().get(0).clearedAt().isPresent());
+        assertTrue(alarmManager.getAlarms()
+            .get(0)
+            .clearedAt()
+            .isPresent());
     }
 
     @Test
@@ -78,7 +86,9 @@ public class PingTaskTest {
         final MockClientResponse response = new MockClientResponse();
         response.status(HttpStatus.OK);
 
-        final var expectedRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping")
+        final var expectedRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/ping")
             .header("accept", "application/json");
 
         when(httpClient.send(any(InetSocketAddress.class), argThat(new RequestMatcher(expectedRequest))))
@@ -88,9 +98,15 @@ public class PingTaskTest {
         final var pingTask = new PingTask(serviceQuery, httpClient, alarmManager);
 
         alarmManager.raiseSystemInactive(systemName);
-        assertFalse(alarmManager.getAlarms().get(0).clearedAt().isPresent());
+        assertFalse(alarmManager.getAlarms()
+            .get(0)
+            .clearedAt()
+            .isPresent());
         pingTask.run();
-        assertFalse(alarmManager.getAlarms().get(0).clearedAt().isPresent());
+        assertFalse(alarmManager.getAlarms()
+            .get(0)
+            .clearedAt()
+            .isPresent());
     }
 
     @Test
@@ -118,7 +134,9 @@ public class PingTaskTest {
         when(provider.socketAddress()).thenReturn(address);
         final var error = new Throwable("Some error");
 
-        final var expectedRequest = new HttpClientRequest().method(HttpMethod.GET).uri(service.uri() + "/ping")
+        final var expectedRequest = new HttpClientRequest()
+            .method(HttpMethod.GET)
+            .uri(service.uri() + "/ping")
             .header("accept", "application/json");
         when(httpClient.send(eq(address), argThat(new RequestMatcher(expectedRequest))))
             .thenReturn(Future.failure(error));

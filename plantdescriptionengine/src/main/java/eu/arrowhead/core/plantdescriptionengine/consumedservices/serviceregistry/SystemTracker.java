@@ -54,8 +54,9 @@ public class SystemTracker {
     private Future<Void> fetchSystems() {
         return httpClient
             .send(serviceRegistryAddress,
-                new HttpClientRequest().method(HttpMethod.GET).uri("/serviceregistry/systems").header("accept",
-                    "application/json"))
+                new HttpClientRequest().method(HttpMethod.GET)
+                    .uri("/serviceregistry/systems")
+                    .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
                 List<SrSystem> newSystems = systemList.data();
@@ -147,9 +148,7 @@ public class SystemTracker {
                 @Override
                 public void run() {
                     fetchSystems()
-                    .onFailure(error -> {
-                        logger.error("Failed to retrieve registered systems", error);
-                    });
+                        .onFailure(error -> logger.error("Failed to retrieve registered systems", error));
                 }
             }, pollInterval, pollInterval);
 

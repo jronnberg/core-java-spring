@@ -59,7 +59,8 @@ public class PdeMain {
         HttpClient client = null;
         try {
             if (!secureMode) {
-                client = new HttpClient.Builder().insecure().build();
+                client = new HttpClient.Builder().insecure()
+                    .build();
             } else {
                 OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.pde.key-store"),
                     getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
@@ -68,7 +69,9 @@ public class PdeMain {
                 TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.pde.trust-store"),
                     getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray());
 
-                client = new HttpClient.Builder().identity(identity).trustStore(trustStore).build();
+                client = new HttpClient.Builder().identity(identity)
+                    .trustStore(trustStore)
+                    .build();
             }
         } catch (SSLException e) {
             logger.error("Failed to create PDE HTTP Client", e);
@@ -88,18 +91,23 @@ public class PdeMain {
         final int pdePort = Integer.parseInt(getProp(appProps, "server.port"));
 
         final var strategy = new OrchestrationStrategy(
-            new OrchestrationPattern().isIncludingService(true).option(OrchestrationOption.METADATA_SEARCH, false)
-                .option(OrchestrationOption.PING_PROVIDERS, true).option(OrchestrationOption.OVERRIDE_STORE, false));
+            new OrchestrationPattern().isIncludingService(true)
+                .option(OrchestrationOption.METADATA_SEARCH, false)
+                .option(OrchestrationOption.PING_PROVIDERS, true)
+                .option(OrchestrationOption.OVERRIDE_STORE, false));
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO)).localPort(pdePort)
+            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO))
+            .localPort(pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder().orchestrationStrategy(strategy)
-                .serviceRegistrySocketAddress(serviceRegistryAddress).build());
+                .serviceRegistrySocketAddress(serviceRegistryAddress)
+                .build());
 
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
 
         if (!secureMode) {
-            systemBuilder.name("pde").insecure();
+            systemBuilder.name("pde")
+                .insecure();
         } else {
             final String trustStorePath = getProp(appProps, "server.ssl.pde.trust-store");
             final char[] trustStorePassword = getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray();
@@ -133,8 +141,10 @@ public class PdeMain {
     private static OwnedIdentity loadIdentity(String keyStorePath, char[] keyPassword, char[] keyStorePassword) {
         OwnedIdentity identity = null;
         try {
-            identity = new OwnedIdentity.Loader().keyStorePath(keyStorePath).keyPassword(keyPassword)
-                .keyStorePassword(keyStorePassword).load();
+            identity = new OwnedIdentity.Loader().keyStorePath(keyStorePath)
+                .keyPassword(keyPassword)
+                .keyStorePassword(keyStorePassword)
+                .load();
         } catch (GeneralSecurityException | IOException e) {
             logger.error("Failed to load OwnedIdentity", e);
             System.exit(1);
@@ -204,38 +214,44 @@ public class PdeMain {
         final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
 
         logger.info("Start polling Service Registry for systems...");
-        systemTracker.start().flatMap(result -> {
+        systemTracker.start()
+            .flatMap(result -> {
 
-            final String ruleDirectory = getProp(appProps, "orchestration_rules");
-            final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
-            final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
-            final var orchestratorClient = new OrchestratorClient(httpClient, new FileRuleStore(ruleDirectory),
-                systemTracker, pdTracker);
+                final String ruleDirectory = getProp(appProps, "orchestration_rules");
+                final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
+                final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
+                final var orchestratorClient = new OrchestratorClient(httpClient, new FileRuleStore(ruleDirectory),
+                    systemTracker, pdTracker);
 
-            final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
-            final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
-            final AlarmManager alarmManager = new AlarmManager();
+                final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
+                final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
+                final AlarmManager alarmManager = new AlarmManager();
 
-            logger.info("Initializing the Orchestrator client...");
+                logger.info("Initializing the Orchestrator client...");
 
-            return orchestratorClient.initialize().flatMap(orchestratorInitializationResult -> {
-                logger.info("Orchestrator client initialized.");
-                final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
-                mismatchDetector.run();
-                logger.info("Starting the PDE Monitor service...");
-                return new PdeMonitorService(arSystem, pdTracker, httpClient, alarmManager, secureMode).provide();
-            }).flatMap(mgmtServiceResult -> {
-                logger.info("The PDE Monitor service is ready.");
-                logger.info("Starting the PDE Management service...");
-                var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
-                return arSystem.provide(pdeManagementService.getService());
+                return orchestratorClient.initialize()
+                    .flatMap(orchestratorInitializationResult -> {
+                        logger.info("Orchestrator client initialized.");
+                        final var mismatchDetector = new SystemMismatchDetector(pdTracker, systemTracker, alarmManager);
+                        mismatchDetector.run();
+                        logger.info("Starting the PDE Monitor service...");
+                        return new PdeMonitorService(arSystem, pdTracker, httpClient, alarmManager, secureMode)
+                            .provide();
+                    })
+                    .flatMap(mgmtServiceResult -> {
+                        logger.info("The PDE Monitor service is ready.");
+                        logger.info("Starting the PDE Management service...");
+                        var pdeManagementService = new PdeManagementService(pdTracker, secureMode);
+                        return arSystem.provide(pdeManagementService.getService());
+                    });
+            })
+            .ifSuccess(consumer -> {
+                logger.info("The PDE Management service is ready.");
+                logger.info("The Plant Description Engine is up and running.");
+            })
+            .onFailure(throwable -> {
+                logger.error("Failed to launch Plant Description Engine", throwable);
+                System.exit(1);
             });
-        }).ifSuccess(consumer -> {
-            logger.info("The PDE Management service is ready.");
-            logger.info("The Plant Description Engine is up and running.");
-        }).onFailure(throwable -> {
-            logger.error("Failed to launch Plant Description Engine", throwable);
-            System.exit(1);
-        });
     }
 }
