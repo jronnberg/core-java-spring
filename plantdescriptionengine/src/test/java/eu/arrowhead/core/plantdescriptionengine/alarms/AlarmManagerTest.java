@@ -13,7 +13,7 @@ public class AlarmManagerTest {
         final String systemName = "System A";
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotRegistered(systemId, systemName);
+        alarmManager.raiseSystemNotRegistered(systemId, systemName, null);
         final PdeAlarm alarm = alarmManager.getAlarms().get(0);
 
         assertEquals(systemName, alarm.systemName().orElse(null));

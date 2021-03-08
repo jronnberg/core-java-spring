@@ -22,7 +22,7 @@ public class GetPdeAlarmTest {
 
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotInDescription("System A");
+        alarmManager.raiseSystemNotInDescription("System A", null);
         final var alarm = alarmManager.getAlarms().get(0);
 
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(alarm.id())))

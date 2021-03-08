@@ -4,6 +4,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,6 +17,7 @@ public class Alarm {
     private final static AtomicInteger nextId = new AtomicInteger();
     public final String systemName;
     public final String systemId;
+    public final Map<String, String> metadata;
     public final AlarmCause cause;
     final int id;
     final Instant raisedAt;
@@ -24,13 +26,14 @@ public class Alarm {
     Instant clearedAt;
     Instant acknowledgedAt;
 
-    Alarm(String systemId, String systemName, AlarmCause cause) {
+    Alarm(String systemId, String systemName, Map<String, String> metadata, AlarmCause cause) {
 
         Objects.requireNonNull(cause, "Expected an alarm cause.");
 
         this.id = nextId.getAndIncrement();
         this.systemId = systemId;
         this.systemName = systemName;
+        this.metadata = metadata;
         this.cause = cause;
         this.acknowledged = false;
         this.acknowledgedAt = null;
@@ -45,19 +48,11 @@ public class Alarm {
         return cause.getDescription(identifier);
     }
 
-    public boolean matches(String systemId, String systemName, AlarmCause cause) {
-
-        if (systemName == null && systemId == null) {
-            return false;
-        }
-
-        if (systemName != null && !systemName.equals(this.systemName)) {
-            return false;
-        }
-        if (systemId != null && !systemId.equals(this.systemId)) {
-            return false;
-        }
-        return this.cause == cause;
+    public boolean matches(String systemId, String systemName, Map<String, String> metadata, AlarmCause cause) {
+        return cause == this.cause &&
+            Objects.equals(systemId, this.systemId) &&
+            Objects.equals(systemName, this.systemName) &&
+            Objects.equals(metadata, this.metadata);
     }
 
     /**

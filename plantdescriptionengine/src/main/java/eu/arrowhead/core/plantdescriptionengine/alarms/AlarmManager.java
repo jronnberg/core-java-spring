@@ -5,6 +5,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,20 @@ public class AlarmManager {
     }
 
     /**
-     * @return A list containing the raw alarm data stored by this instance.
+     * @param cause An alarm cause.
+     * @return A list of raw data describing currently active alarms with the
+     * given alarm cause.
+     */
+    public List<Alarm> getActiveAlarmData(AlarmCause cause) {
+        return activeAlarms.stream()
+            .filter(alarm -> cause.equals(alarm.cause))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * @param cause A list of alarm causes.
+     * @return A list of raw data describing currently active alarms whose alarm
+     * cause is any of the causes provided.
      */
     public List<Alarm> getActiveAlarmData(List<AlarmCause> causes) {
         return activeAlarms.stream()
@@ -79,55 +93,54 @@ public class AlarmManager {
         alarm.acknowledgedAt = Instant.now();
     }
 
-    private void raiseAlarm(String systemId, String systemName, AlarmCause cause) {
+    private void raiseAlarm(String systemId, String systemName, Map<String, String> metadata, AlarmCause cause) {
         // TODO: Concurrency handling
 
         // Check if this alarm has already been raised:
         for (final var alarm : activeAlarms) {
-            if (alarm.matches(systemId, systemName, cause)) {
+            if (alarm.matches(systemId, systemName, metadata, cause)) {
                 return;
             }
         }
-        activeAlarms.add(new Alarm(systemId, systemName, cause));
-    }
-
-    private void clearAlarm(String systemId, String systemName, AlarmCause cause) {
-        final List<Alarm> newlyCleared = activeAlarms.stream()
-            .filter(alarm -> alarm.matches(systemId, systemName, cause))
-            .collect(Collectors.toList());
-
-        for (var alarm : newlyCleared) {
-            alarm.clearedAt = Instant.now();
-            alarm.updatedAt = Instant.now();
-        }
-
-        clearedAlarms.addAll(newlyCleared);
-        activeAlarms.removeAll(newlyCleared);
+        activeAlarms.add(new Alarm(systemId, systemName, metadata, cause));
     }
 
     public void clearAlarm(Alarm alarm) {
-        clearAlarm(alarm.systemId, alarm.systemName, alarm.cause);
+
+        // TODO: Find the alarm from active alarms instead. That way, a copy can
+        // be passed instead of the actual instance.
+
+        alarm.clearedAt = Instant.now();
+        alarm.updatedAt = Instant.now();
+
+        clearedAlarms.add(alarm);
+        activeAlarms.remove(alarm);
     }
 
-    public void raiseSystemNotRegistered(String systemId, String systemName) {
-        Objects.requireNonNull(systemId, "Expected System ID");
-        raiseAlarm(systemId, systemName, AlarmCause.systemNotRegistered);
+    public void raiseSystemNotRegistered(String systemId, String systemName, Map<String, String> metadata) {
+        Objects.requireNonNull(systemId, "Expected system ID");
+        raiseAlarm(systemId, systemName, metadata, AlarmCause.systemNotRegistered);
     }
 
     public void raiseSystemInactive(String systemName) {
-        raiseAlarm(null, systemName, AlarmCause.systemInactive);
+        raiseAlarm(null, systemName, null, AlarmCause.systemInactive);
     }
 
     public void clearSystemInactive(String systemName) {
-        clearAlarm(null, systemName, AlarmCause.systemInactive);
+
+        final List<Alarm> cleared = activeAlarms.stream()
+            .filter(alarm ->
+                alarm.cause == AlarmCause.systemInactive &&
+                    alarm.systemName == systemName
+            )
+            .collect(Collectors.toList());
+
+        for (var alarm : cleared) {
+            clearAlarm(alarm);
+        }
     }
 
-    public void raiseSystemNotInDescription(String systemName) {
-        raiseAlarm(null, systemName, AlarmCause.systemNotInDescription);
+    public void raiseSystemNotInDescription(String systemName, Map<String, String> metadata) {
+        raiseAlarm(null, systemName, metadata, AlarmCause.systemNotInDescription);
     }
-
-    public void clearSystemNotInDescription(String systemName) {
-        clearAlarm(null, systemName, AlarmCause.systemNotInDescription);
-    }
-
 }

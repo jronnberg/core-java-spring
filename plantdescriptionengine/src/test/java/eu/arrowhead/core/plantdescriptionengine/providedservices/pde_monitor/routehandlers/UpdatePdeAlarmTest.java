@@ -25,7 +25,7 @@ public class UpdatePdeAlarmTest {
 
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotInDescription(systemNameA);
+        alarmManager.raiseSystemNotInDescription(systemNameA, null);
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 
@@ -106,7 +106,7 @@ public class UpdatePdeAlarmTest {
 
         final var alarmManager = new AlarmManager();
 
-        alarmManager.raiseSystemNotInDescription("SystemA");
+        alarmManager.raiseSystemNotInDescription("SystemA", null);
         final var alarm = alarmManager.getAlarms().get(0);
         assertFalse(alarm.acknowledged());
 
