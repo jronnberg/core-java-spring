@@ -196,7 +196,7 @@ public class DtoUtilsTest {
         // TODO: Assert that a warning has been logged.
     }
 
-    // TODO: Add test to check that monitor info is only added to ports where the
-    // system is a provider.
+    // TODO: Add test to check that monitor info is only added to ports where
+    // the system is a provider.
 
 }

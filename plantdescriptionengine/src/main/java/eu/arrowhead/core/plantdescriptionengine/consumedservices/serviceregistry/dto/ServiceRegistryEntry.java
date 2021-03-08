@@ -25,7 +25,7 @@ public interface ServiceRegistryEntry {
 
     String serviceUri();
 
-    Optional<String> endOfValidity(); // TODO: Should this be Optional?
+    Optional<String> endOfValidity();
 
     String secure();
 

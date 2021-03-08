@@ -4,6 +4,7 @@ import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
@@ -17,7 +18,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface SrSystem {
 
-    Integer id(); // TODO: Should this be Optional?
+    Integer id();
 
     String systemName();
 
@@ -25,10 +26,13 @@ public interface SrSystem {
 
     Integer port();
 
-    Optional<String> authenticationInfo(); // TODO: Should this be Optional?
+    Optional<String> authenticationInfo();
 
     Optional<String> createdAt();
 
     Optional<String> updatedAt();
+
+    Optional<Map<String, String>> metadata();
+
 
 }

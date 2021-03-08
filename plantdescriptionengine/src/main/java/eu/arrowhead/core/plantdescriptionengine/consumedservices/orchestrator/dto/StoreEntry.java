@@ -29,7 +29,7 @@ public interface StoreEntry {
 
     SrSystem providerSystem();
 
-    Optional<ProviderCloud> providerCloud(); // TODO: Should this be Optional?
+    Optional<ProviderCloud> providerCloud();
 
     ServiceInterface serviceInterface();
 

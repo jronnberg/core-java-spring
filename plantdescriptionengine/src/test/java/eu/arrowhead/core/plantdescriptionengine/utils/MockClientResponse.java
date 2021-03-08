@@ -55,13 +55,11 @@ public class MockClientResponse implements HttpClientResponse {
 
     @Override
     public HttpHeaders headers() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public HttpClientRequest request() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -72,7 +70,6 @@ public class MockClientResponse implements HttpClientResponse {
 
     @Override
     public HttpVersion version() {
-        // TODO Auto-generated method stub
         return null;
     }
 

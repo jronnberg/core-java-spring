@@ -250,9 +250,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             msg += String.join(", ", ids) + "]";
             logger.info(msg);
         } else {
-            logger.warn("No new rules were created for Plant Description '" + entryName + "'."); // TODO: Should
-            // something be done in
-            // this case?
+            logger.warn("No new rules were created for Plant Description '" + entryName + "'.");
+            // TODO: Should something be done in this case?
         }
     }
 
