@@ -130,11 +130,9 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     private boolean alarmMatchesSystem(Alarm alarm, PdeSystem system) {
 
-        System.out.println("Comparing systems");
         // If systemName is present on both alarm and system, they must match.
         if (alarm.systemName != null && system.systemName().isPresent()) {
             if (!alarm.systemName.equals(system.systemName().get())) {
-                System.out.println("Miss1");
                 return false;
             }
         }

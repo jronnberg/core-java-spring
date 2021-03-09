@@ -19,6 +19,7 @@ import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -267,6 +268,72 @@ public class SystemMismatchDetectorTest {
         assertTrue(alarm.clearedAt().isPresent());
         assertEquals("cleared", alarm.severity());
         assertEquals("System named '" + systemNameA + "' is not present in the active Plant Description.",
+            alarm.description());
+        assertFalse(alarm.acknowledged());
+    }
+
+    @Test
+    public void shouldClearWhenPdIsUpdatedWithMetadata() throws PdStoreException {
+
+        final String systemNameA = "System A";
+
+        final var entryWithOneSystem = new PlantDescriptionEntryBuilder().id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(getSystem(systemNameA, "a")))
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        pdTracker.put(entryWithOneSystem);
+
+        final String systemNameB = "System B";
+        final var srSystemB = new SrSystemBuilder()
+            .id(38)
+            .systemName(systemNameB)
+            .address("0.0.2.1")
+            .port(5022)
+            .authenticationInfo(null)
+            .metadata(Map.of("a", "1", "b", "2"))
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
+
+        systemTracker.addSystem(getSrSystem(systemNameA));
+        systemTracker.addSystem(srSystemB);
+
+        // An unnamed system is missing from the PD.
+
+        detector.run();
+
+        final var systemB = new PdeSystemBuilder()
+            .systemId("b")
+            .metadata(Map.of("b", "2")) // Subset of the SR system metadata
+            .build();
+
+        final var entryWithTwoSystems = new PlantDescriptionEntryBuilder().id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(getSystem(systemNameA, "a"), systemB))
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        pdTracker.put(entryWithTwoSystems);
+
+        // The unnamed system is no longer missing from the active PD.
+
+        final var alarms = alarmManager.getAlarms();
+        final var alarm = alarms.get(0);
+
+        assertEquals(1, alarms.size());
+        assertTrue(alarm.systemName().isPresent());
+        assertEquals(systemNameB, alarm.systemName().get());
+        assertTrue(alarm.clearedAt().isPresent());
+        assertEquals("cleared", alarm.severity());
+        assertEquals("System named '" + systemNameB + "' is not present in the active Plant Description.",
             alarm.description());
         assertFalse(alarm.acknowledged());
     }
