@@ -122,6 +122,11 @@ public class AlarmManager {
         raiseAlarm(systemId, systemName, metadata, AlarmCause.systemNotRegistered);
     }
 
+    public void raiseSystemNotUniqueInSr(String systemId, String systemName, Map<String, String> metadata) {
+        Objects.requireNonNull(systemId, "Expected system ID");
+        raiseAlarm(systemId, systemName, metadata, AlarmCause.systemNotUniqueInSr);
+    }
+
     public void raiseSystemInactive(String systemName) {
         raiseAlarm(null, systemName, null, AlarmCause.systemInactive);
     }

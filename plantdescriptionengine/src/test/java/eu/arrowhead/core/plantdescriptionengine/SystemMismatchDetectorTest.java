@@ -179,9 +179,8 @@ public class SystemMismatchDetectorTest {
         pdTracker.remove(entry.id());
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -200,9 +199,8 @@ public class SystemMismatchDetectorTest {
         pdTracker.put(getPdEntry(systemName));
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -222,9 +220,8 @@ public class SystemMismatchDetectorTest {
         systemTracker.remove(systemName);
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -260,9 +257,8 @@ public class SystemMismatchDetectorTest {
         pdTracker.put(entryWithTwoSystems);
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameA, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -326,9 +322,8 @@ public class SystemMismatchDetectorTest {
         // The unnamed system is no longer missing from the active PD.
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameB, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -338,4 +333,65 @@ public class SystemMismatchDetectorTest {
         assertFalse(alarm.acknowledged());
     }
 
+    @Test
+    public void shouldReportWhenSystemCannotBeUniquelyIdentified() throws PdStoreException {
+
+        final String systemId = "System X";
+        final var systemA = new PdeSystemBuilder()
+            .systemId(systemId)
+            .metadata(Map.of("a", "1", "b", "2"))
+            .build();
+
+        final var entry = new PlantDescriptionEntryBuilder().id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(systemA))
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        // System with matching metadata:
+        final var srSystemA = new SrSystemBuilder()
+            .id(0)
+            .systemName("System A")
+            .metadata(Map.of("a", "1", "b", "2", "c", "3"))
+            .address("0.0.0.0")
+            .port(5000)
+            .authenticationInfo(null)
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
+
+        // Another system with matching metadata:
+        final var srSystemB = new SrSystemBuilder()
+            .id(0)
+            .systemName("System B")
+            .metadata(Map.of("a", "1", "b", "2", "d", "4"))
+            .address("0.0.0.1")
+            .port(5001)
+            .authenticationInfo(null)
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
+
+        pdTracker.put(entry);
+        systemTracker.addSystem(srSystemA);
+        systemTracker.addSystem(srSystemB);
+        detector.run();
+
+        final var alarms = alarmManager.getAlarms();
+        assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
+        System.out.println(alarm);
+        assertTrue(alarm.systemName().isEmpty());
+        assertEquals("warning", alarm.severity());
+        assertEquals("System with ID '" + systemId + "' cannot be uniquely identified in the Service Registry.",
+            alarm.description());
+        assertFalse(alarm.acknowledged());
+
+    }
 }

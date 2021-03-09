@@ -166,16 +166,25 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private void raiseAlarms(List<SrSystem> registeredSystems, List<PdeSystem> pdSystems) {
         for (final var entrySystem : pdSystems) {
 
-            boolean systemIsRegistered = registeredSystems.stream()
-                .anyMatch(registeredSystem -> systemsMatch(entrySystem, registeredSystem));
+            long count = registeredSystems.stream()
+                .filter(registeredSystem -> systemsMatch(entrySystem, registeredSystem)).count();
 
-            if (!systemIsRegistered) {
+            if (count == 0) {
                 alarmManager.raiseSystemNotRegistered(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
                     entrySystem.metadata().orElse(null)
                 );
             }
+
+            if (count > 1) {
+                alarmManager.raiseSystemNotUniqueInSr(
+                    entrySystem.systemId(),
+                    entrySystem.systemName().orElse(null),
+                    entrySystem.metadata().orElse(null)
+                );
+            }
+
         }
 
         // For each registered system...
