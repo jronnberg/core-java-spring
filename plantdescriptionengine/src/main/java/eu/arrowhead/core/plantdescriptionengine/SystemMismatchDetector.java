@@ -166,10 +166,10 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private void raiseAlarms(List<SrSystem> registeredSystems, List<PdeSystem> pdSystems) {
         for (final var entrySystem : pdSystems) {
 
-            long count = registeredSystems.stream()
+            long numMatches = registeredSystems.stream()
                 .filter(registeredSystem -> systemsMatch(entrySystem, registeredSystem)).count();
 
-            if (count == 0) {
+            if (numMatches == 0) {
                 alarmManager.raiseSystemNotRegistered(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
@@ -177,7 +177,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
                 );
             }
 
-            if (count > 1) {
+            if (numMatches > 1) {
                 alarmManager.raiseSystemNotUniqueInSr(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
@@ -228,18 +228,22 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
             }
         }
 
-        final List<Alarm> notRegisteredAlarms = alarmManager.getActiveAlarmData(AlarmCause.systemNotRegistered);
+        final List<Alarm> notFoundInSrAlarms = alarmManager.getActiveAlarmData(List.of(
+            AlarmCause.systemNotRegistered,
+            AlarmCause.systemNotUniqueInSr
+        ));
 
-        for (final var alarm : notRegisteredAlarms) {
-            boolean presentInRegistry = registeredSystems.stream().anyMatch(system -> {
-                return alarmMatchesSystem(alarm, system);
-            });
+        for (final var alarm : notFoundInSrAlarms) {
+            long numMatches = registeredSystems.stream()
+                .filter(registeredSystem -> alarmMatchesSystem(alarm, registeredSystem))
+                .count();
+            boolean uniqueInSr = numMatches == 1;
 
             boolean presentInPd = pdSystems.stream().anyMatch(system -> {
                 return alarmMatchesSystem(alarm, system);
             });
 
-            if (presentInRegistry || !presentInPd) {
+            if (uniqueInSr || !presentInPd) {
                 alarmManager.clearAlarm(alarm);
                 break;
             }
