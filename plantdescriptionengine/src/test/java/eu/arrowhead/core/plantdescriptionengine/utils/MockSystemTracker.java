@@ -5,6 +5,7 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry
 import se.arkalix.net.http.client.HttpClient;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 /**
  * Subclass of SystemTracker used for testing purposes.
@@ -13,15 +14,7 @@ public class MockSystemTracker extends SystemTracker {
 
     public MockSystemTracker(HttpClient httpClient, InetSocketAddress serviceRegistryAddress) {
         super(httpClient, serviceRegistryAddress);
-    }
-
-    /**
-     * @param systemName Name of a system to be retrieved.
-     * @return A mock system with the specified name.
-     */
-    @Override
-    public SrSystem getSystemByName(String systemName) {
-        return systems.get(systemName);
+        initialized = true;
     }
 
     /**
@@ -30,19 +23,21 @@ public class MockSystemTracker extends SystemTracker {
      * @param system The system to add.
      */
     public void addSystem(SrSystem system) {
-        systems.put(system.systemName(), system);
+        systems.put(toKey(system), system);
         for (var listener : listeners) {
             listener.onSystemAdded(system);
         }
     }
 
     /**
-     * Removes a system from the system tracker.
+     * If a system with the specified system name and metadata is present in the
+     * system tracker, it is removed.
      *
      * @param systemName name of the system to remove.
+     * @param metadata Metadata of the system to remove.
      */
-    public void remove(String systemName) {
-        SrSystem system = systems.remove(systemName);
+    public void remove(String systemName, Map<String, String> metadata) {
+        SrSystem system = systems.remove(toKey(systemName, metadata));
         if (system == null) {
             throw new IllegalArgumentException("System '" + systemName + "' is not present in the System Tracker.");
         }
@@ -51,4 +46,12 @@ public class MockSystemTracker extends SystemTracker {
         }
     }
 
+    /**
+     * Removes the system with the given system name from the system tracker.
+     *
+     * @param systemName name of the system to remove.
+     */
+    public void remove(String systemName) {
+        remove(systemName, null);
+    }
 }

@@ -17,9 +17,9 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoToString
 public interface StoreRule {
 
-    System consumerSystem();
+    RuleSystem consumerSystem();
 
-    System providerSystem();
+    RuleSystem providerSystem();
 
     String serviceDefinitionName();
 

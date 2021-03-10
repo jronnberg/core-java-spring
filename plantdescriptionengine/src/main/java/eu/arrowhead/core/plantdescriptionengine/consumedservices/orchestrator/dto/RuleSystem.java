@@ -15,7 +15,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 @DtoToString
-public interface System {
+public interface RuleSystem {
 
     Optional<String> systemName();
 

@@ -2,6 +2,8 @@ package eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistr
 
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListDto;
+import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.arkalix.dto.DtoEncoding;
@@ -27,7 +29,7 @@ public class SystemTracker {
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
     private final int pollInterval = 5000;
-    private boolean initialized;
+    protected boolean initialized = false;
 
     /**
      * Class constructor
@@ -43,6 +45,28 @@ public class SystemTracker {
 
         this.httpClient = httpClient;
         this.serviceRegistryAddress = serviceRegistryAddress;
+    }
+
+    /**
+     * @param systemName Name of a system
+     * @param metadata Metadata describing a system
+     * @return A string uniquely identifying the system with the given
+     * name / metadata combination.
+     */
+    protected String toKey(String systemName, Map<String, String> metadata) {
+        String result = systemName;
+        if (metadata != null && !metadata.isEmpty()) {
+            result += "{" + Metadata.toString(metadata) + "}";
+        }
+        return result;
+    }
+
+    /**
+     * @param system A system found in the Service Registry.
+     * @return A string uniquely identifying the system.
+     */
+    protected String toKey(SrSystem system) {
+        return toKey(system.systemName(), system.metadata().orElse(null));
     }
 
     /**
@@ -65,7 +89,7 @@ public class SystemTracker {
                 // Replace the stored list of registered systems.
                 systems.clear();
                 for (var system : newSystems) {
-                    systems.put(system.systemName(), system);
+                    systems.put(toKey(system), system);
                 }
                 initialized = true;
                 notifyListeners(oldSystems, newSystems);
@@ -126,10 +150,24 @@ public class SystemTracker {
      * @return The desired system, if it is present in the local cache.
      */
     public SrSystem getSystemByName(String systemName) {
+        // TODO: Remove this method!
         if (!initialized) {
             throw new IllegalStateException("SystemTracker has not been initialized.");
         }
+        if (systemName == null) {
+            return null;
+        }
         return systems.get(systemName);
+    }
+
+    public SrSystem getSystem(String systemName, Map<String, String> metadata) {
+        if (!initialized) {
+            throw new IllegalStateException("SystemTracker has not been initialized.");
+        }
+        if (systemName == null) {
+            return null;
+        }
+        return systems.get(toKey(systemName, metadata));
     }
 
     public List<SrSystem> getSystems() {

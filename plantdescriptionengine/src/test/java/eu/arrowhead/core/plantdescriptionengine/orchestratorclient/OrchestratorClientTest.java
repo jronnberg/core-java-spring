@@ -698,7 +698,8 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         int newRuleId = 82;
 
-        creationResponse.status(HttpStatus.CREATED)
+        creationResponse
+            .status(HttpStatus.CREATED)
             .body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
 
         final MockClientResponse failedDeletionResponse = new MockClientResponse();

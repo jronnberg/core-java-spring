@@ -93,6 +93,43 @@ public class SystemMismatchDetectorTest {
         assertEquals(0, alarms.size());
     }
 
+    /**
+     * No alarm should be raised if two systems have the same system name, as
+     * long as there is metadata available to differentiate between them.
+     * @throws PdStoreException
+     */
+    // TODO: Add this test
+    // @Test
+    // public void shouldAllowSameSystemName() throws PdStoreException {
+
+    //     final var systemName = "System A";
+    //     final var systemA1 = new PdeSystemBuilder()
+    //         .systemId("systemA1")
+    //         .systemName(systemName)
+    //         .metadata(Map.of("x", "1"))
+    //         .build();
+    //     final var systemA2 = new PdeSystemBuilder()
+    //         .systemId("systemA2")
+    //         .systemName(systemName)
+    //         .build();
+
+    //     final var entry = new PlantDescriptionEntryBuilder()
+    //         .id(1)
+    //         .plantDescription("Plant Description 1A")
+    //         .active(true)
+    //         .systems(List.of(systemA1, systemA2))
+    //         .createdAt(Instant.now())
+    //         .updatedAt(Instant.now())
+    //         .build();
+
+    //     pdTracker.put(entry);
+    //     systemTracker.addSystem(getSrSystem(systemName));
+    //     detector.run();
+
+    //     final var alarms = alarmManager.getAlarms();
+    //     assertEquals(0, alarms.size());
+    // }
+
     @Test
     public void shouldReportNotRegistered() throws PdStoreException {
         detector.run();
@@ -560,10 +597,11 @@ public class SystemMismatchDetectorTest {
             .build();
 
         // System with matching metadata:
+        final var systemAMetadata = Map.of("a", "1", "b", "2", "c", "3");
         final var srSystemA = new SrSystemBuilder()
             .id(0)
             .systemName("System A")
-            .metadata(Map.of("a", "1", "b", "2", "c", "3"))
+            .metadata(systemAMetadata)
             .address("0.0.0.0")
             .port(5000)
             .authenticationInfo(null)
@@ -591,7 +629,7 @@ public class SystemMismatchDetectorTest {
         systemTracker.addSystem(srSystemA);
         systemTracker.addSystem(srSystemB);
         detector.run();
-        systemTracker.remove(srSystemA.systemName());
+        systemTracker.remove(srSystemA.systemName(), systemAMetadata);
 
         final var alarms = alarmManager.getAlarms();
         assertEquals(1, alarms.size());

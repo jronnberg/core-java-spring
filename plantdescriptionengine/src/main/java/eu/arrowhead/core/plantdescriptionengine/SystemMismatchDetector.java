@@ -88,19 +88,30 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     private boolean systemsMatch(PdeSystem entrySystem, SrSystem registeredSystem) {
 
+        if (entrySystem.metadata().isPresent()) {
+            if (registeredSystem.metadata().isEmpty()) {
+                return false;
+            }
+
+            final var entryMetadata = entrySystem.metadata().get();
+            final var srMetadata = registeredSystem.metadata().get();
+
+            if (!Metadata.isSubset(entryMetadata, srMetadata)) {
+                return false;
+            }
+        }
+
+        // At this point, we know that either of these two statements must hold:
+        // a) The entry system has metadata which matches that of the SR system.
+        // b) The entry system has no metadata, in which case it *must* have a
+        //    systemName (as per the spec).
+
         if (entrySystem.systemName().isPresent()) {
             String entryName = entrySystem.systemName().get();
             return entryName.equals(registeredSystem.systemName());
         }
 
-        if (entrySystem.metadata().isEmpty() || registeredSystem.metadata().isEmpty()) {
-            return false;
-        }
-
-        final var entryMetadata = entrySystem.metadata().get();
-        final var srMetadata = registeredSystem.metadata().get();
-
-        return Metadata.isSubset(entryMetadata, srMetadata);
+        return true;
     }
 
     /**

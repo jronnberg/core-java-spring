@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Metadata {
 
@@ -44,6 +45,30 @@ public class Metadata {
         }
 
         return result;
+    }
+
+    /**
+     * Create a string representation of the given metadata on the form
+     * "{keyA: valueA, keyB: valueB, ...}", with the keys appearing in
+     * alphabetical order.
+     *
+     * @param metadata A metadata object.
+     * @return A string representing the given metadata object.
+     */
+    public static String toString(Map<String, String> metadata) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // Use a tree map to get the keys in sorted order.
+        Map<String, String> sorted = new TreeMap<String, String>(metadata);
+
+        for (final var entry : sorted.entrySet()) {
+            if (stringBuilder.length() > 0) {
+             stringBuilder.append(",");
+            }
+            stringBuilder.append(entry.getKey());
+            stringBuilder.append("=");
+            stringBuilder.append(entry.getValue());
+           }
+        return stringBuilder.toString();
     }
 
 }
