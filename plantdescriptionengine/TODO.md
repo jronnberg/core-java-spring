@@ -6,3 +6,8 @@
 ## Documentation
 * Specify the cases where some fields may not be present (AR Kalix's default
   way of handling missing Optionals).
+* Add the mandatory field `systemId` to alarms, and specify that its value may
+  be the string `Unknown`.
+
+## Persistent data
+* Use MySQL instead of files to store persistent data.
