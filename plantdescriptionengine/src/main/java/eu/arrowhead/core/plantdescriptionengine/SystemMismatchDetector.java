@@ -108,19 +108,20 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      * @param system A system retrieved from the Service registry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
-    private boolean alarmMatchesSystem(Alarm alarm, SrSystem system) {
+    private boolean alarmMatchesSrSystem(Alarm alarm, SrSystem system) {
 
-        // If the alarm has a systemName, it must match that of the system:
-        if (alarm.systemName != null && !alarm.systemName.equals(system.systemName())) {
+        boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName());
+        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata.isSubset(alarm.metadata, system.metadata().get());
+
+        if (alarm.systemName != null && !namesMatch) {
             return false;
         }
 
-        // If metadata is present, it must be a *subset* of the system metadata.
-        if (alarm.metadata != null) {
-            return system.metadata().isPresent() && Metadata.isSubset(alarm.metadata, system.metadata().get());
+        if (alarm.metadata != null && !metadataMatches) {
+            return false;
         }
 
-        return true;
+        return namesMatch || metadataMatches;
     }
 
     /**
@@ -128,21 +129,24 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      * @param entrySystem A system in a Plant Description Entry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
-    private boolean alarmMatchesSystem(Alarm alarm, PdeSystem system) {
+    private boolean alarmMatchesPdSystem(Alarm alarm, PdeSystem system) {
 
-        // If systemName is present on both alarm and system, they must match.
-        if (alarm.systemName != null && system.systemName().isPresent()) {
-            if (!alarm.systemName.equals(system.systemName().get())) {
+        boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName().orElse(null));
+        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata.isSubset(system.metadata().get(), alarm.metadata);
+
+        if (system.systemName().isPresent()) {
+            if (!namesMatch) {
                 return false;
             }
         }
 
-        // If metadata is present, it must be a *superset* of the system metadata.
-        if (alarm.metadata != null) {
-            return system.metadata().isPresent() && Metadata.isSubset(system.metadata().get(), alarm.metadata);
+        if (system.metadata().isPresent()) {
+            if (!metadataMatches) {
+                return false;
+            }
         }
-        return true;
 
+        return namesMatch || metadataMatches;
     }
 
     /**
@@ -214,13 +218,13 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
         for (final var alarm : notInDescriptionAlarms) {
 
-            boolean presentInRegistry = registeredSystems.stream().anyMatch(system -> {
-                return alarmMatchesSystem(alarm, system);
-            });
+            boolean presentInRegistry = registeredSystems.stream().anyMatch(system ->
+                alarmMatchesSrSystem(alarm, system)
+            );
 
-            boolean presentInPd = pdSystems.stream().anyMatch(system -> {
-                return alarmMatchesSystem(alarm, system);
-            });
+            boolean presentInPd = pdSystems.stream().anyMatch(system ->
+                alarmMatchesPdSystem(alarm, system)
+            );
 
             if (!presentInRegistry || presentInPd) {
                 alarmManager.clearAlarm(alarm);
@@ -235,13 +239,13 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
         for (final var alarm : notFoundInSrAlarms) {
             long numMatches = registeredSystems.stream()
-                .filter(registeredSystem -> alarmMatchesSystem(alarm, registeredSystem))
+                .filter(registeredSystem -> alarmMatchesSrSystem(alarm, registeredSystem))
                 .count();
             boolean uniqueInSr = numMatches == 1;
 
-            boolean presentInPd = pdSystems.stream().anyMatch(system -> {
-                return alarmMatchesSystem(alarm, system);
-            });
+            boolean presentInPd = pdSystems.stream().anyMatch(system ->
+                alarmMatchesPdSystem(alarm, system)
+            );
 
             if (uniqueInSr || !presentInPd) {
                 alarmManager.clearAlarm(alarm);

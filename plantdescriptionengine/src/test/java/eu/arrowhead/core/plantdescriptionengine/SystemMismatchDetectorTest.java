@@ -20,6 +20,8 @@ import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,14 +53,20 @@ public class SystemMismatchDetectorTest {
             .build();
     }
 
-    private PlantDescriptionEntryDto getPdEntry(String systemName) {
-        final String systemId = "1234";
-        final var system = getSystem(systemName, systemId);
+    private PlantDescriptionEntryDto getPdEntry(String... systemNames) {
+        final List<PdeSystemDto> systems =Stream.of(systemNames).map(name ->
+             new PdeSystemBuilder()
+                .systemId(name + "-ID")
+                .systemName(name)
+                .build()
+           )
+        .collect(Collectors.toList());
+
         return new PlantDescriptionEntryBuilder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
-            .systems(List.of(system))
+            .systems(systems)
             .createdAt(Instant.now())
             .updatedAt(Instant.now())
             .build();
@@ -92,6 +100,7 @@ public class SystemMismatchDetectorTest {
         final String systemName = "System A";
         pdTracker.put(getPdEntry(systemName));
         final var alarms = alarmManager.getAlarms();
+        assertEquals(1, alarms.size());
         final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemName, alarm.systemName().get());
@@ -100,6 +109,51 @@ public class SystemMismatchDetectorTest {
         assertEquals("System named '" + systemName + "' cannot be found in the Service Registry.", alarm.description());
         assertFalse(alarm.acknowledged());
         assertFalse(alarm.clearedAt().isPresent());
+    }
+
+    @Test
+    public void shouldRaiseTwoAlarms() throws PdStoreException {
+        detector.run();
+
+        final String systemIdA = "Sys-A";
+        final String systemNameB = "System B";
+
+        final var system = new PdeSystemBuilder()
+            .systemId(systemIdA)
+            .metadata(Map.of("x", "1"))
+            .build();
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(system))
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        final var srSystem = new SrSystemBuilder()
+            .id(0)
+            .systemName("System B")
+            .address("0.0.0.0")
+            .port(5000)
+            .authenticationInfo(null)
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
+
+        systemTracker.addSystem(srSystem);
+        pdTracker.put(entry);
+
+        final var alarms = alarmManager.getAlarms();
+        assertEquals(2, alarms.size());
+        final var alarm1 = alarms.get(0);
+        final var alarm2 = alarms.get(1);
+
+        assertEquals("System named '" + systemNameB + "' is not present in the active Plant Description.", alarm1.description());
+        assertEquals("System with ID '" + systemIdA + "' cannot be found in the Service Registry.", alarm2.description());
     }
 
     @Test
@@ -118,7 +172,6 @@ public class SystemMismatchDetectorTest {
         final var alarms = alarmManager.getAlarms();
         assertEquals(1, alarms.size());
         final var alarm = alarms.get(0);
-
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameB, alarm.systemName().get());
         assertFalse(alarm.clearedAt().isPresent());
@@ -157,9 +210,8 @@ public class SystemMismatchDetectorTest {
         systemTracker.addSystem(getSrSystem(systemNameB));
 
         final var alarms = alarmManager.getAlarms();
-        final var alarm = alarms.get(0);
-
         assertEquals(1, alarms.size());
+        final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
         assertEquals(systemNameB, alarm.systemName().get());
         assertTrue(alarm.clearedAt().isPresent());
@@ -167,6 +219,45 @@ public class SystemMismatchDetectorTest {
         assertEquals("System named '" + systemNameB + "' cannot be found in the Service Registry.",
             alarm.description());
         assertFalse(alarm.acknowledged());
+    }
+
+    @Test
+    public void shouldStillReportIfOneIsCleared() throws PdStoreException {
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+
+        final var pdeEntry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems()
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        pdTracker.put(pdeEntry);
+        systemTracker.addSystem(getSrSystem(systemNameA));
+        systemTracker.addSystem(getSrSystem(systemNameB));
+
+        // System A and B are missing from PD, two alarms are created.
+        detector.run();
+
+        // System B is removed from the Service Registry, so one of the alarms
+        // should be cleared.
+        systemTracker.remove(systemNameB);
+
+        final var alarms = alarmManager.getAlarms();
+        assertEquals(2, alarms.size());
+        final var alarmA = alarms.get(0);
+        final var alarmB = alarms.get(1);
+
+        assertTrue(alarmA.systemName().isPresent());
+        assertEquals(systemNameA, alarmA.systemName().get());
+        assertTrue(alarmA.clearedAt().isEmpty());
+        assertTrue(alarmB.systemName().isPresent());
+        assertEquals(systemNameB, alarmB.systemName().get());
+        assertTrue(alarmB.clearedAt().isPresent());
     }
 
     @Test
@@ -234,29 +325,85 @@ public class SystemMismatchDetectorTest {
     @Test
     public void shouldClearWhenPdIsUpdated() throws PdStoreException {
 
+        // The systems added in the PD and Service Registry are crafted to
+        // tickle several corners of the codebase. More specifically, System C
+        // is not significant for the outcome of the test, but it helps improve
+        // code coverage.
+
         final String systemNameA = "System A";
         final String systemNameB = "System B";
+        final String systemNameC = "System C";
 
-        final var entryWithOneSystem = getPdEntry(systemNameB);
+        final var srSystemA = new SrSystemBuilder()
+            .id(0)
+            .systemName(systemNameA)
+            .metadata(Map.of("x", "1", "y", "2"))
+            .address("0.0.0.1")
+            .port(5003)
+            .authenticationInfo(null)
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
 
-        pdTracker.put(entryWithOneSystem);
+    final var srSystemC = new SrSystemBuilder()
+        .id(0)
+        .systemName(systemNameC)
+        .metadata(Map.of("x", "1", "y", "2", "z", "3"))
+        .address("0.0.0.3")
+        .port(5003)
+        .authenticationInfo(null)
+        .createdAt(Instant.now()
+            .toString())
+        .updatedAt(Instant.now()
+            .toString())
+        .build();
 
-        systemTracker.addSystem(getSrSystem(systemNameA));
-        systemTracker.addSystem(getSrSystem(systemNameB));
+    final var srSystemB = getSrSystem(systemNameB);
 
-        detector.run();
+        final var systemA = getSystem(systemNameA, "a");
+        final var systemB = new PdeSystemBuilder()
+            .systemId("Sys-B")
+            .systemName(systemNameB)
+            .build();
 
-        final var entryWithTwoSystems = new PlantDescriptionEntryBuilder().id(1)
+        // System with metadata that matches System C in the service registry,
+        // but not System A (whose metadata is only a subset).
+        final var systemC = new PdeSystemBuilder()
+            .systemId("Sys-C")
+            .metadata(Map.of("x", "1", "y", "2", "z", "3"))
+            .build();
+
+        final var entryWithTwoSystems = new PlantDescriptionEntryBuilder()
+            .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
-            .systems(List.of(getSystem(systemNameA, "a"), getSystem(systemNameB, "b")))
+            .systems(List.of(systemB, systemC))
             .createdAt(Instant.now())
             .updatedAt(Instant.now())
             .build();
 
         pdTracker.put(entryWithTwoSystems);
 
+        systemTracker.addSystem(srSystemC);
+        systemTracker.addSystem(srSystemB);
+        systemTracker.addSystem(srSystemA);
+
+        detector.run();
+
+        final var entryWithThreeSystems = new PlantDescriptionEntryBuilder().id(1)
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .systems(List.of(systemB, systemC, systemA))
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+        pdTracker.put(entryWithThreeSystems);
+
         final var alarms = alarmManager.getAlarms();
+        System.out.println(alarms);
         assertEquals(1, alarms.size());
         final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());
