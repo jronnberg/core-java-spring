@@ -73,7 +73,7 @@ public class SystemTracker {
      * @return A Future which will complete with a list of registered systems.
      * <p>
      * The retrieved systems are stored locally, and can be accessed using
-     * {@link #getSystems()} or {@link #getSystemByName(String) }.
+     * {@link #getSystems()} or {@link #getSystem(String, Map<String>, <String>) }.
      */
     private Future<Void> fetchSystems() {
         return httpClient
@@ -142,23 +142,14 @@ public class SystemTracker {
     }
 
     /**
-     * Retrieves the specified system. Note that the returned data will be stale if
-     * the system in question has changed state since the last call to
+     * Retrieves the specified system. Note that the returned data will be stale
+     * if the system in question has changed state since the last call to
      * {@link #fetchSystems()}.
      *
      * @param systemName Name of a system.
+     * @param metadata Metadata describing a system.
      * @return The desired system, if it is present in the local cache.
      */
-    public SrSystem getSystemByName(String systemName) {
-        // TODO: Remove this method!
-        if (!initialized) {
-            throw new IllegalStateException("SystemTracker has not been initialized.");
-        }
-        if (systemName == null) {
-            return null;
-        }
-        return systems.get(systemName);
-    }
 
     public SrSystem getSystem(String systemName, Map<String, String> metadata) {
         if (!initialized) {

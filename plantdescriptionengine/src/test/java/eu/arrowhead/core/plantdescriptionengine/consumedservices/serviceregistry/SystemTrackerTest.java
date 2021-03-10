@@ -27,7 +27,7 @@ public class SystemTrackerTest {
         HttpClient httpClient = new HttpClient.Builder().insecure().build();
         SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> systemTracker.getSystemByName("System A"));
+        Exception exception = assertThrows(RuntimeException.class, () -> systemTracker.getSystem("System A", null));
         assertEquals("SystemTracker has not been initialized.", exception.getMessage());
     }
 
@@ -54,7 +54,7 @@ public class SystemTrackerTest {
 
         systemTracker.start()
             .ifSuccess(result -> {
-                final var system = systemTracker.getSystemByName(systemName);
+                final var system = systemTracker.getSystem(systemName, null);
                 assertEquals(systemId, system.id());
             })
             .onFailure(Assertions::assertNull);

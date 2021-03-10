@@ -56,7 +56,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.pdTracker = pdTracker;
 
         String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
-        SrSystem orchestrator = systemTracker.getSystemByName(ORCHESTRATOR_SYSTEM_NAME);
+        SrSystem orchestrator = systemTracker.getSystem(ORCHESTRATOR_SYSTEM_NAME, null);
         Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
 
         this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
