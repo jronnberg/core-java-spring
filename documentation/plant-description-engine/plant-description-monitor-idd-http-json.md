@@ -35,6 +35,7 @@ Query params:
 | `sort_field` | sorts by the given column | no |
 | `direction` | direction of sorting | no |
 | `systemName` | filter by system name | no |
+| `systemId` | filter by system ID | no |
 | `acknowledged` | filter by acknowledged column | no |
 | `severity` | filter by severity | no |
 
@@ -77,6 +78,7 @@ Content-Type: application/json
 		{
 				"id": 1,
 				"systemName": "Example producer with metadata",
+				"systemId": "example-producer",
 				"acknowledged": false,
 				"severity": "major",
 				"description": "System not registered in Service Registry",
@@ -108,6 +110,7 @@ Content-Type: application/json
 {
 	"id": 1,
 	"systemName": "Example producer with metadata",
+	"systemId": "example-producer",
 	"acknowledged": false,
 	"severity": "major",
 	"description": "System not registered in Service Registry",
@@ -145,6 +148,7 @@ Content-Type: application/json
 {
 	"id": 1,
 	"systemName": "Example producer with metadata",
+	"systemId": "example-producer",
 	"acknowledged": true,
 	"severity": "major",
 	"description": "System not registered in Service Registry",
@@ -342,7 +346,8 @@ JSON object with the following fields:
 | Field | Type | Description | Mandatory | Default value |
 | ----- | ---- | ----------- | --------- | ------------- |
 | `id` | Integer | Id of the alarm | `true` | |
-| `systemName` | String | Identity of the system | `true` | |
+| `systemId` | String | Identity of a system within the PDE, or the string `unknown` | `true` | |
+| `systemName` | String | Name of the system | `false` | |
 | `acknowledged` | Boolean | Has the alarm been acknowledged by an operator | `true` | |
 | `severity` | String | One out of `indeterminate/critical/major/minor/warning/cleared` | `true` | |
 | `description` | String | Description of the problem | `true` | |
