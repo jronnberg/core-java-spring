@@ -98,8 +98,8 @@ public class SystemTracker {
     }
 
     /**
-     * Informs all registered listeners of which systems have been added or removed
-     * from the service registry since the last refresh.
+     * Informs all registered listeners of which systems have been added or
+     * removed from the service registry since the last refresh.
      *
      * @param oldSystems Systems that were previously present in the Service
      *                   Registry.
@@ -161,6 +161,9 @@ public class SystemTracker {
         return systems.get(toKey(systemName, metadata));
     }
 
+    /**
+     * @return All systems stored by this instance.
+     */
     public List<SrSystem> getSystems() {
         return new ArrayList<>(systems.values());
     }
@@ -168,7 +171,8 @@ public class SystemTracker {
     /**
      * Starts polling the Service Registry for registered systems.
      *
-     * @return A Future that completes on the first reply from the Service Registry.
+     * @return A Future that completes after the first reply from the Service
+     * Registry has been stored.
      */
     public Future<Void> start() {
         return fetchSystems().flatMap(result -> {

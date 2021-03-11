@@ -98,21 +98,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final PdeSystem consumer = pdTracker.getSystem(consumerId);
         final PdeSystem provider = pdTracker.getSystem(providerId);
 
-        final String consumerName = consumer.systemName().orElse(null);
-        final String providerName = provider.systemName().orElse(null);
-
         String producerPort = connection.producer().portName();
         String consumerPort = connection.consumer().portName();
 
         final Map<String, String> providerMetadata = provider.portMetadata(producerPort);
         final Map<String, String> consumerMetadata = consumer.portMetadata(consumerPort);
-
-        final SrSystem consumerSystemSrEntry = systemTracker.getSystem(consumerName, consumerMetadata);
-        final SrSystem providerSystemSrEntry = systemTracker.getSystem(providerName, providerMetadata);
-
-        if (consumerSystemSrEntry == null || providerSystemSrEntry == null) {
-            return null;
-        }
 
         String serviceDefinition = pdTracker.getServiceDefinition(producerPort);
 

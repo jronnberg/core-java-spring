@@ -32,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,6 +76,7 @@ public class OrchestratorClientTest {
     private final SrSystemDto consumerSrSystem = new SrSystemBuilder()
         .id(1)
         .systemName(consumerName)
+        .metadata(Map.of("x", "1", "y", "2"))
         .address("0.0.0.6")
         .port(5002)
         .authenticationInfo(null)
@@ -281,24 +283,6 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRuleWithMissingConsumer() throws PdStoreException {
-        systemTracker.remove(consumerName);
-        final var entry = createEntry();
-        final var connection = entry.connections().get(0);
-        pdTracker.put(entry);
-        assertNull(orchestratorClient.createRule(connection));
-    }
-
-    @Test
-    public void shouldNotCreateRuleWithMissingProvider() throws PdStoreException {
-        systemTracker.remove(producerName);
-        final var entry = createEntry();
-        final var connection = entry.connections().get(0);
-        pdTracker.put(entry);
-        assertNull(orchestratorClient.createRule(connection));
-    }
-
-    @Test
     public void shouldStoreRulesWhenAddingPd() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entry = createEntry();
@@ -347,19 +331,6 @@ public class OrchestratorClientTest {
     }
 
     @Test
-    public void shouldNotCreateRulesWhenSystemIsMissing() throws RuleStoreException, PdStoreException {
-
-        final PlantDescriptionEntryDto entry = createEntry();
-        pdTracker.put(entry);
-
-        systemTracker.remove(consumerName); // A system is now missing
-        orchestratorClient.onPlantDescriptionAdded(entry);
-
-        assertTrue(ruleStore.readRules().isEmpty());
-
-    }
-
-    @Test
     public void shouldNotCreateRulesForPdWithoutConnections() throws PdStoreException {
 
         final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
@@ -380,7 +351,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -427,7 +398,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -449,7 +420,7 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                fail(); // We should never get here.
+                fail();
             })
             .onFailure(e -> assertEquals(errorMessage, e.getMessage()));
     }
@@ -505,7 +476,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -551,7 +522,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -569,7 +540,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -601,7 +572,7 @@ public class OrchestratorClientTest {
                 assertEquals(0, ruleStore.readRules().size());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -637,7 +608,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 
@@ -678,7 +649,8 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().isEmpty());
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                e.printStackTrace();
+                fail();
             });
     }
 
@@ -715,7 +687,7 @@ public class OrchestratorClientTest {
                 assertTrue(ruleStore.readRules().contains(newRuleId));
             })
             .onFailure(e -> {
-                fail(); // We should never get here.
+                fail();
             });
     }
 }
