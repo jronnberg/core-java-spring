@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.orchestratorclient;
+package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
 
 import java.util.ArrayList;
 import java.util.List;

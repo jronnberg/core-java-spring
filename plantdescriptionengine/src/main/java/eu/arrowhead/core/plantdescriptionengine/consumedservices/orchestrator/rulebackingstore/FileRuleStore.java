@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore;
+package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.OrchestratorClient;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
-import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.FilePdStore;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PdeManagementService;

@@ -1,4 +1,4 @@
-package eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore;
+package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore;
 
 import java.util.HashSet;
 import java.util.Set;
