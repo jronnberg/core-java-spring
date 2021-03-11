@@ -4,6 +4,7 @@ import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,5 +35,8 @@ public interface SrSystem {
 
     Optional<Map<String, String>> metadata();
 
+    public default InetSocketAddress getAddress() {
+        return new InetSocketAddress(address(), port());
+    }
 
 }

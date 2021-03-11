@@ -1,14 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.orchestratorclient;
 
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.*;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStore;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.RuleStoreException;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionUpdateListener;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,36 +26,36 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final HttpClient client;
     private final InetSocketAddress orchestratorAddress;
     private final RuleStore ruleStore;
-    private final SystemTracker systemTracker;
     private final PlantDescriptionTracker pdTracker;
     private PlantDescriptionEntry activeEntry = null;
+    private final RuleCreator ruleCreator;
 
     /**
      * Class constructor.
      *
-     * @param httpClient    Object for sending HTTP messages to the Orchestrator.
-     * @param ruleStore     Object providing permanent storage for Orchestration
-     *                      rule data.
-     * @param systemTracker Object used to track registered Arrowhead systems.
+     * @param httpClient Object for sending HTTP messages to the Orchestrator.
+     * @param ruleStore  Object providing permanent storage for Orchestration
+     *                   rule data.
+     * @param pdTracker  Object used for keeping track of Plant Descriptions.
      */
-    public OrchestratorClient(HttpClient httpClient, RuleStore ruleStore, SystemTracker systemTracker,
-                              PlantDescriptionTracker pdTracker) {
+    public OrchestratorClient(
+        HttpClient httpClient,
+        RuleStore ruleStore,
+        PlantDescriptionTracker pdTracker,
+        InetSocketAddress orchestratorAddress
+    ) {
 
         Objects.requireNonNull(httpClient, "Expected HttpClient");
         Objects.requireNonNull(ruleStore, "Expected backing store");
-        Objects.requireNonNull(systemTracker, "Expected System Tracker");
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker");
+        Objects.requireNonNull(orchestratorAddress, "Expected Orchestrator address");
 
         this.client = httpClient;
-        this.systemTracker = systemTracker;
         this.ruleStore = ruleStore;
         this.pdTracker = pdTracker;
 
-        String ORCHESTRATOR_SYSTEM_NAME = "orchestrator";
-        SrSystem orchestrator = systemTracker.getSystem(ORCHESTRATOR_SYSTEM_NAME, null);
-        Objects.requireNonNull(orchestrator, "Expected Orchestrator system to be available via Service Registry.");
-
-        this.orchestratorAddress = new InetSocketAddress(orchestrator.address(), orchestrator.port());
+        this.orchestratorAddress = orchestratorAddress;
+        this.ruleCreator = new RuleCreator(pdTracker, client.isSecure());
     }
 
     /**
@@ -82,51 +78,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Create an Orchestrator rule to be passed to the Orchestrator.
-     *
-     * @param connection A connection between a producer and consumer system present
-     *                   in a Plant Description Entry.
-     * @return An Orchestrator rule that embodies the specified connection.
-     */
-    StoreRuleDto createRule(Connection connection) {
-
-        Objects.requireNonNull(connection, "Expected a connection");
-
-        final String consumerId = connection.consumer().systemId();
-        final String providerId = connection.producer().systemId();
-
-        final PdeSystem consumer = pdTracker.getSystem(consumerId);
-        final PdeSystem provider = pdTracker.getSystem(providerId);
-
-        String producerPort = connection.producer().portName();
-        String consumerPort = connection.consumer().portName();
-
-        final Map<String, String> providerMetadata = provider.portMetadata(producerPort);
-        final Map<String, String> consumerMetadata = consumer.portMetadata(consumerPort);
-
-        String serviceDefinition = pdTracker.getServiceDefinition(producerPort);
-
-        var builder = new StoreRuleBuilder()
-            .consumerSystem(new RuleSystemBuilder()
-                .systemName(consumer.systemName().orElse(null))
-                .metadata(providerMetadata)
-                .build())
-            .providerSystem(new RuleSystemBuilder()
-                .systemName(provider.systemName().orElse(null))
-                .metadata(consumerMetadata)
-                .build())
-            .serviceDefinitionName(serviceDefinition);
-
-        if (client.isSecure()) {
-            builder.serviceInterfaceName("HTTP-SECURE-JSON");
-        } else {
-            builder.serviceInterfaceName("HTTP-INSECURE-JSON");
-        }
-
-        return builder.build();
-    }
-
-    /**
      * Posts Orchestrator rules for the given Plant Description Entry.
      * <p>
      * For each connection in the given entry, a corresponding rule is posted to the
@@ -135,21 +86,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
      * @return A Future which will contain a list of the created rules.
      */
     private Future<StoreEntryListDto> postRules() {
-        var connections = pdTracker.getActiveConnections();
 
-        if (connections.isEmpty()) {
-            // Return immediately with an empty rule list:
-            return Future.success(emptyRuleList());
-        }
-
-        List<DtoWritable> rules = new ArrayList<>();
-
-        for (var connection : connections) {
-            var rule = createRule(connection);
-            if (rule != null) {
-                rules.add(rule);
-            }
-        }
+        List<DtoWritable> rules = ruleCreator.createRules();
 
         if (rules.size() == 0) {
             return Future.success(emptyRuleList());

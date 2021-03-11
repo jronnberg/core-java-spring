@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.SystemTracker;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.OrchestratorClient;
 import eu.arrowhead.core.plantdescriptionengine.orchestratorclient.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
@@ -220,8 +221,9 @@ public class PdeMain {
                 final String ruleDirectory = getProp(appProps, "orchestration_rules");
                 final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
                 final var pdTracker = new PlantDescriptionTracker(new FilePdStore(plantDescriptionsDirectory));
+                final SrSystem orchestrator = systemTracker.getSystem("orchestrator", null);
                 final var orchestratorClient = new OrchestratorClient(httpClient, new FileRuleStore(ruleDirectory),
-                    systemTracker, pdTracker);
+                    pdTracker, orchestrator.getAddress());
 
                 final ArSystem arSystem = createArSystem(appProps, serviceRegistryAddress);
                 final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
