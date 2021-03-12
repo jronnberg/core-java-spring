@@ -60,6 +60,7 @@ public class Alarm {
      */
     public PdeAlarmDto toPdeAlarm() {
         AlarmSeverity severity = (clearedAt == null) ? AlarmSeverity.warning : AlarmSeverity.cleared;
+        String systemId = this.systemId == null ? "Unknown" : this.systemId;
         return new PdeAlarmBuilder()
             .id(id)
             .systemId(systemId)

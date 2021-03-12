@@ -32,6 +32,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
+            .systemId("a")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -41,6 +42,7 @@ public class PdeAlarmTest {
             .build();
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
+            .systemId("b")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -50,6 +52,7 @@ public class PdeAlarmTest {
             .build();
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
+            .systemId("c")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -59,6 +62,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmD = new PdeAlarmBuilder()
             .id(idD)
+            .systemId("d")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -104,6 +108,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarm = new PdeAlarmBuilder()
             .id(6)
             .acknowledged(false)
+            .systemId("Some-ID")
             .severity("warning")
             .description("Something went wrong")
             .raisedAt(now)
@@ -128,6 +133,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
             .acknowledged(false)
+            .systemId("A")
             .severity("warning")
             .description("Something went wrong")
             .raisedAt(now)
@@ -136,6 +142,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
             .acknowledged(false)
+            .systemId("B")
             .severity("danger")
             .description("Something went wrong")
             .raisedAt(now)
@@ -144,6 +151,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
             .acknowledged(false)
+            .systemId("C")
             .severity("cleared")
             .description("Something went wrong")
             .raisedAt(now)
@@ -153,6 +161,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarmD = new PdeAlarmBuilder()
             .id(idD)
             .acknowledged(false)
+            .systemId("D")
             .severity("warning")
             .description("Something went wrong")
             .raisedAt(now)
@@ -182,6 +191,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
+            .systemId("a")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -190,6 +200,7 @@ public class PdeAlarmTest {
             .build();
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
+            .systemId("b")
             .acknowledged(false)
             .severity("danger")
             .description("Something went wrong")
@@ -198,6 +209,7 @@ public class PdeAlarmTest {
             .build();
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
+            .systemId("c")
             .acknowledged(false)
             .severity("cleared")
             .description("Something went wrong")
@@ -207,6 +219,7 @@ public class PdeAlarmTest {
             .build();
         final PdeAlarm alarmD = new PdeAlarmBuilder()
             .id(idD)
+            .systemId("d")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -237,6 +250,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
+            .systemId("A")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -246,6 +260,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
+            .systemId("B")
             .acknowledged(true)
             .severity("warning")
             .description("Something went wrong")
@@ -255,6 +270,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
+            .systemId("C")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -281,6 +297,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
+            .systemId("a")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -290,6 +307,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
+            .systemId("b")
             .acknowledged(true)
             .severity("warning")
             .description("Something went wrong")
@@ -299,6 +317,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
+            .systemId("c")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -326,11 +345,11 @@ public class PdeAlarmTest {
         final int idD = 9;
 
         final String systemA = "Sys-A";
-        final String systemB = "Sys-B";
 
         final PdeAlarm alarmA = new PdeAlarmBuilder()
             .id(idA)
             .systemName(systemA)
+            .systemId("A")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -341,6 +360,7 @@ public class PdeAlarmTest {
         final PdeAlarm alarmB = new PdeAlarmBuilder()
             .id(idB)
             .systemName(systemA)
+            .systemId("A")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -350,7 +370,8 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmC = new PdeAlarmBuilder()
             .id(idC)
-            .systemName(systemB)
+            .systemName("Sys-B")
+            .systemId("B")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")
@@ -360,6 +381,7 @@ public class PdeAlarmTest {
 
         final PdeAlarm alarmD = new PdeAlarmBuilder()
             .id(idD)
+            .systemId("D")
             .acknowledged(false)
             .severity("warning")
             .description("Something went wrong")

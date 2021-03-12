@@ -110,7 +110,7 @@ public interface PdeAlarm {
 
     Optional<String> systemName();
 
-    Optional<String> systemId();
+    String systemId();
 
     boolean acknowledged();
 

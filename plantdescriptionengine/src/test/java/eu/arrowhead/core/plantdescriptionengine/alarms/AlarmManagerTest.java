@@ -34,7 +34,7 @@ public class AlarmManagerTest {
 
         assertEquals(1, alarms.size());
         assertEquals(systemName, alarm.systemName().orElse(null));
-        assertFalse(alarm.systemId().isPresent());
+        assertEquals("Unknown", alarm.systemId());
     }
 
     @Test
