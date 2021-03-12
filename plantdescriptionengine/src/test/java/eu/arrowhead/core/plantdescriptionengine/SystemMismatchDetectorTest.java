@@ -440,7 +440,6 @@ public class SystemMismatchDetectorTest {
         pdTracker.put(entryWithThreeSystems);
 
         final var alarms = alarmManager.getAlarms();
-        System.out.println(alarms);
         assertEquals(1, alarms.size());
         final var alarm = alarms.get(0);
         assertTrue(alarm.systemName().isPresent());

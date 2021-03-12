@@ -31,8 +31,8 @@ public class RuleCreator {
     /**
      * Create an Orchestrator rule to be passed to the Orchestrator.
      *
-     * @param connection A connection between a producer and consumer system present
-     *                   in a Plant Description Entry.
+     * @param connection A connection between a producer and consumer system
+     *                   present in a Plant Description Entry.
      * @return An Orchestrator rule that embodies the specified connection.
      */
     StoreRuleDto createRule(Connection connection) {
@@ -46,21 +46,20 @@ public class RuleCreator {
         final PdeSystem provider = pdTracker.getSystem(providerId);
 
         String producerPort = connection.producer().portName();
-        String consumerPort = connection.consumer().portName();
 
         final Map<String, String> providerMetadata = provider.portMetadata(producerPort);
-        final Map<String, String> consumerMetadata = consumer.portMetadata(consumerPort);
+        final Map<String, String> consumerMetadata = consumer.metadata().orElse(null);
 
         String serviceDefinition = pdTracker.getServiceDefinition(producerPort);
 
         var builder = new StoreRuleBuilder()
             .consumerSystem(new RuleSystemBuilder()
                 .systemName(consumer.systemName().orElse(null))
-                .metadata(providerMetadata)
+                .metadata(consumerMetadata)
                 .build())
             .providerSystem(new RuleSystemBuilder()
                 .systemName(provider.systemName().orElse(null))
-                .metadata(consumerMetadata)
+                .metadata(providerMetadata)
                 .build())
             .serviceDefinitionName(serviceDefinition);
 
@@ -78,10 +77,7 @@ public class RuleCreator {
         var connections = pdTracker.getActiveConnections();
 
         for (var connection : connections) {
-            var rule = createRule(connection);
-            if (rule != null) {
-                rules.add(rule);
-            }
+            rules.add(createRule(connection));
         }
 
         return rules;
