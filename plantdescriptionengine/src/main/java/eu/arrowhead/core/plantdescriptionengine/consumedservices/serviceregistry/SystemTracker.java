@@ -49,7 +49,7 @@ public class SystemTracker {
 
     /**
      * @param systemName Name of a system
-     * @param metadata Metadata describing a system
+     * @param metadata   Metadata describing a system
      * @return A string uniquely identifying the system with the given
      * name / metadata combination.
      */
@@ -147,7 +147,7 @@ public class SystemTracker {
      * {@link #fetchSystems()}.
      *
      * @param systemName Name of a system.
-     * @param metadata Metadata describing a system.
+     * @param metadata   Metadata describing a system.
      * @return The desired system, if it is present in the local cache.
      */
 

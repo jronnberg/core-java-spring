@@ -62,12 +62,12 @@ public class Metadata {
 
         for (final var entry : sorted.entrySet()) {
             if (stringBuilder.length() > 0) {
-             stringBuilder.append(",");
+                stringBuilder.append(",");
             }
             stringBuilder.append(entry.getKey());
             stringBuilder.append("=");
             stringBuilder.append(entry.getValue());
-           }
+        }
         return stringBuilder.toString();
     }
 

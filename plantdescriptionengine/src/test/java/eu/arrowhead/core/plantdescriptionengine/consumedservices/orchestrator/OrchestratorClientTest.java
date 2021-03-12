@@ -419,7 +419,8 @@ public class OrchestratorClientTest {
         doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules();
 
         // We need to reinstantiate this with the mock rule store.
-        orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem.getAddress());
+        orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem
+            .getAddress());
 
         pdTracker.put(activeEntry);
         ruleStore.setRules(Set.of(12));
@@ -507,7 +508,8 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem.getAddress());
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem
+            .getAddress());
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -538,7 +540,8 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto inactiveEntry = PlantDescriptionEntry.deactivated(createEntry());
         pdTracker.put(inactiveEntry);
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem.getAddress());
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem
+            .getAddress());
         orchestratorClient.initialize()
             .ifSuccess(result -> {
                 assertTrue(ruleStore.readRules().isEmpty());
@@ -630,7 +633,8 @@ public class OrchestratorClientTest {
         final RuleStore ruleStore = new InMemoryRuleStore();
         ruleStore.setRules(Set.of(ruleId));
 
-        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem.getAddress());
+        final var orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem
+            .getAddress());
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();

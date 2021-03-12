@@ -122,7 +122,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private boolean alarmMatchesSrSystem(Alarm alarm, SrSystem system) {
 
         boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName());
-        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata.isSubset(alarm.metadata, system.metadata().get());
+        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata
+            .isSubset(alarm.metadata, system.metadata().get());
 
         if (alarm.systemName != null && !namesMatch) {
             return false;
@@ -143,7 +144,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private boolean alarmMatchesPdSystem(Alarm alarm, PdeSystem system) {
 
         boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName().orElse(null));
-        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata.isSubset(system.metadata().get(), alarm.metadata);
+        boolean metadataMatches = alarm.metadata != null && system.metadata().isPresent() && Metadata
+            .isSubset(system.metadata().get(), alarm.metadata);
 
         if (system.systemName().isPresent()) {
             if (!namesMatch) {

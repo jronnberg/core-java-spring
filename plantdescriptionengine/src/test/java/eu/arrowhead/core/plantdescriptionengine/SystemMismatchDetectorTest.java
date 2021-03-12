@@ -54,13 +54,12 @@ public class SystemMismatchDetectorTest {
     }
 
     private PlantDescriptionEntryDto getPdEntry(String... systemNames) {
-        final List<PdeSystemDto> systems =Stream.of(systemNames).map(name ->
-             new PdeSystemBuilder()
+        final List<PdeSystemDto> systems = Stream.of(systemNames).map(name ->
+            new PdeSystemBuilder()
                 .systemId(name + "-ID")
                 .systemName(name)
                 .build()
-           )
-        .collect(Collectors.toList());
+        ).collect(Collectors.toList());
 
         return new PlantDescriptionEntryBuilder()
             .id(1)
@@ -96,6 +95,7 @@ public class SystemMismatchDetectorTest {
     /**
      * No alarm should be raised if two systems have the same system name, as
      * long as there is metadata available to differentiate between them.
+     *
      * @throws PdStoreException
      */
     // TODO: Add this test
@@ -129,7 +129,6 @@ public class SystemMismatchDetectorTest {
     //     final var alarms = alarmManager.getAlarms();
     //     assertEquals(0, alarms.size());
     // }
-
     @Test
     public void shouldReportNotRegistered() throws PdStoreException {
         detector.run();
@@ -189,8 +188,10 @@ public class SystemMismatchDetectorTest {
         final var alarm1 = alarms.get(0);
         final var alarm2 = alarms.get(1);
 
-        assertEquals("System named '" + systemNameB + "' is not present in the active Plant Description.", alarm1.description());
-        assertEquals("System with ID '" + systemIdA + "' cannot be found in the Service Registry.", alarm2.description());
+        assertEquals("System named '" + systemNameB + "' is not present in the active Plant Description.", alarm1
+            .description());
+        assertEquals("System with ID '" + systemIdA + "' cannot be found in the Service Registry.", alarm2
+            .description());
     }
 
     @Test
@@ -384,20 +385,20 @@ public class SystemMismatchDetectorTest {
                 .toString())
             .build();
 
-    final var srSystemC = new SrSystemBuilder()
-        .id(0)
-        .systemName(systemNameC)
-        .metadata(Map.of("x", "1", "y", "2", "z", "3"))
-        .address("0.0.0.3")
-        .port(5003)
-        .authenticationInfo(null)
-        .createdAt(Instant.now()
-            .toString())
-        .updatedAt(Instant.now()
-            .toString())
-        .build();
+        final var srSystemC = new SrSystemBuilder()
+            .id(0)
+            .systemName(systemNameC)
+            .metadata(Map.of("x", "1", "y", "2", "z", "3"))
+            .address("0.0.0.3")
+            .port(5003)
+            .authenticationInfo(null)
+            .createdAt(Instant.now()
+                .toString())
+            .updatedAt(Instant.now()
+                .toString())
+            .build();
 
-    final var srSystemB = getSrSystem(systemNameB);
+        final var srSystemB = getSrSystem(systemNameB);
 
         final var systemA = getSystem(systemNameA, "a");
         final var systemB = new PdeSystemBuilder()

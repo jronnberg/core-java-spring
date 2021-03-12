@@ -27,8 +27,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private final InetSocketAddress orchestratorAddress;
     private final RuleStore ruleStore;
     private final PlantDescriptionTracker pdTracker;
-    private PlantDescriptionEntry activeEntry = null;
     private final RuleCreator ruleCreator;
+    private PlantDescriptionEntry activeEntry = null;
 
     /**
      * Class constructor.

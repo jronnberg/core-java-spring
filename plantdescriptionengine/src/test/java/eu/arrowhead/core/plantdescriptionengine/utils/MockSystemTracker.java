@@ -34,7 +34,7 @@ public class MockSystemTracker extends SystemTracker {
      * system tracker, it is removed.
      *
      * @param systemName name of the system to remove.
-     * @param metadata Metadata of the system to remove.
+     * @param metadata   Metadata of the system to remove.
      */
     public void remove(String systemName, Map<String, String> metadata) {
         SrSystem system = systems.remove(toKey(systemName, metadata));

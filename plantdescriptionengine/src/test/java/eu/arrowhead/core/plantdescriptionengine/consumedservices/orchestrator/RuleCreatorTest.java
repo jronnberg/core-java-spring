@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RuleCreatorTest {
 
-    private PlantDescriptionTracker pdTracker;
     final Instant now = Instant.now();
+    private PlantDescriptionTracker pdTracker;
 
     @BeforeEach
     public void initEach() throws PdStoreException {
@@ -41,21 +41,47 @@ public class RuleCreatorTest {
         final String serviceDefinitionA = "service_a";
 
         final List<PortDto> consumerPorts = List.of(
-                new PortBuilder().portName(consumerPort).serviceDefinition(serviceDefinitionA).consumer(true).build());
+            new PortBuilder()
+                .portName(consumerPort)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(true)
+                .build());
         final List<PortDto> producerPorts = List.of(
-                new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinitionA).consumer(false).build());
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).systemName(consumerName)
-                .ports(consumerPorts).build();
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).systemName(producerName)
-                .ports(producerPorts).build();
+            new PortBuilder()
+                .portName(producerPort)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(false)
+                .build());
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName(consumerName)
+            .ports(consumerPorts)
+            .build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName(producerName)
+            .ports(producerPorts)
+            .build();
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPort).build())
-                .producer(new SystemPortBuilder().systemId(producerId).portName(producerPort).build()).build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerId)
+                .portName(consumerPort)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerId)
+                .portName(producerPort)
+                .build())
+            .build());
 
         final var entry = new PlantDescriptionEntryBuilder().id(0).plantDescription("Plant Description 1A")
-                .createdAt(now).updatedAt(now).active(true).include(new ArrayList<>())
-                .systems(List.of(consumerSystem, producerSystem)).connections(connections).build();
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(List.of(consumerSystem, producerSystem))
+            .connections(connections)
+            .build();
 
         pdTracker.put(entry);
         final var ruleCreator = new RuleCreator(pdTracker, false);
@@ -82,21 +108,48 @@ public class RuleCreatorTest {
         final String serviceDefinitionA = "service_a";
 
         final List<PortDto> consumerPorts = List.of(
-                new PortBuilder().portName(consumerPort).serviceDefinition(serviceDefinitionA).consumer(true).build());
+            new PortBuilder()
+                .portName(consumerPort)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(true)
+                .build());
         final List<PortDto> producerPorts = List.of(
-                new PortBuilder().portName(producerPort).serviceDefinition(serviceDefinitionA).consumer(false).build());
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder().systemId(consumerId).systemName(consumerName)
-                .ports(consumerPorts).build();
-        final PdeSystemDto producerSystem = new PdeSystemBuilder().systemId(producerId).systemName(producerName)
-                .ports(producerPorts).build();
+            new PortBuilder()
+                .portName(producerPort)
+                .serviceDefinition(serviceDefinitionA)
+                .consumer(false)
+                .build());
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName(consumerName)
+            .ports(consumerPorts)
+            .build();
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName(producerName)
+            .ports(producerPorts)
+            .build();
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-                .consumer(new SystemPortBuilder().systemId(consumerId).portName(consumerPort).build())
-                .producer(new SystemPortBuilder().systemId(producerId).portName(producerPort).build()).build());
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerId)
+                .portName(consumerPort)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerId)
+                .portName(producerPort)
+                .build())
+            .build());
 
-        final var entry = new PlantDescriptionEntryBuilder().id(0).plantDescription("Plant Description 1A")
-                .createdAt(now).updatedAt(now).active(true).include(new ArrayList<>())
-                .systems(List.of(consumerSystem, producerSystem)).connections(connections).build();
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(0).plantDescription("Plant Description 1A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .include(new ArrayList<>())
+            .systems(List.of(consumerSystem, producerSystem))
+            .connections(connections)
+            .build();
 
         pdTracker.put(entry);
         final var ruleCreator = new RuleCreator(pdTracker, true);
