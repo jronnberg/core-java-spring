@@ -781,4 +781,97 @@ public class PlantDescriptionValidatorTest {
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
+    @Test
+    public void shouldReportInvalidSystemId() {
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(9)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(
+                new PdeSystemBuilder()
+                    .systemId("Unknown")
+                    .systemName("System XYZ")
+                    .build()
+            ))
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        String expectedErrorMessage = "<'Unknown' is not a valid system ID.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldRequireNameOrMetadata() {
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(22)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(
+                new PdeSystemBuilder()
+                    .systemId("xyz")
+                    .build()
+            ))
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        String expectedErrorMessage = "<Contains a system with neither a name nor metadata to identify it.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldTreatEmptyMetadataAsNull() {
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(22)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(
+                new PdeSystemBuilder()
+                    .systemId("xyz")
+                    .metadata(Map.of())
+                    .build()
+            ))
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        String expectedErrorMessage = "<Contains a system with neither a name nor metadata to identify it.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldAcceptSystemWithOnlyMetadata() {
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(22)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(
+                new PdeSystemBuilder()
+                    .systemId("X")
+                    .metadata(Map.of("x", "y"))
+                    .build()
+            ))
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertFalse(validator.hasError());
+    }
+
 }

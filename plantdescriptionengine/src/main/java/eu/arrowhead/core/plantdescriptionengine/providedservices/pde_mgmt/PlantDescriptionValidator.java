@@ -14,6 +14,8 @@ public class PlantDescriptionValidator {
     final Map<Integer, PlantDescriptionEntry> entries;
     private final List<String> errors = new ArrayList<>();
 
+    final List<String> blacklist = List.of("unknown");
+
     /**
      * Constructor.
      *
@@ -64,8 +66,15 @@ public class PlantDescriptionValidator {
         }
 
         for (final var system : systems) {
-            if (system.systemName().isEmpty() && system.metadata().isEmpty()) {
+            Optional<Map<String, String>> metadata = system.metadata();
+            boolean hasMetadata = metadata.isPresent() && !metadata.get().isEmpty();
+
+            if (system.systemName().isEmpty() && !hasMetadata) {
                 errors.add("Contains a system with neither a name nor metadata to identify it.");
+            }
+
+            if (blacklist.contains(system.systemId().toLowerCase())) {
+                errors.add("'" + system.systemId() + "' is not a valid system ID.");
             }
         }
 
