@@ -49,7 +49,7 @@ public class PlantDescriptionValidator {
 
         ensureIdentifiableSystems();
 
-        ensureUniquePorts();
+        validatePorts();
 
         // TODO: Check that every system has a name (Future versions will accept
         // systems with only metadata as well).
@@ -216,10 +216,30 @@ public class PlantDescriptionValidator {
     /**
      * Ensures that all entries' systems ports are unique.
      */
-    private void ensureUniquePorts() {
+    private void validatePorts() {
         for (var entry : entries.values()) {
             for (var system : entry.systems()) {
                 ensureUniquePorts(system);
+            }
+
+            // Check that no consumer port has metadata.
+            for (var system : entry.systems()) {
+                ensureNoConsumerPortMetadata(system);
+            }
+        }
+    }
+
+    /**
+     * For each consumer port in the system, ensure that no metadata is.
+     * @param system The system whose ports will be validated.
+     */
+    private void ensureNoConsumerPortMetadata(PdeSystem system) {
+        for (var port : system.ports()) {
+            if (port.consumer().orElse(false)) {
+                boolean hasMetadata = port.metadata().isPresent() && !port.metadata().get().isEmpty();
+                if (hasMetadata) {
+                    errors.add("Port '" + port.portName() + "' is a consumer port, it must not have any metadata.");
+                }
             }
         }
     }
@@ -228,8 +248,8 @@ public class PlantDescriptionValidator {
      * Ensures that the given system's ports are all unique.
      * <p>
      * The PDE must be able to differentiate between the ports of a system. When
-     * multiple ports share the same service definition, they must have different
-     * metadata. This method ensures that this property holds.
+     * multiple ports share the same service definition, they must have
+     * different metadata. This method ensures that this property holds.
      * <p>
      * TODO: Check that metadata is unique
      *

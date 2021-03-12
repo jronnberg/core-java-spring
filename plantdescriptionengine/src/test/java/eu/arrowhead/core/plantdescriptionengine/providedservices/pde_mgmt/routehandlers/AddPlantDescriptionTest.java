@@ -66,30 +66,28 @@ public class AddPlantDescriptionTest {
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new AddPlantDescription(pdTracker);
 
-        final List<PortDto> consumerPorts = List.of(
+        final List<PortDto> ports = List.of(
             new PortBuilder()
                 .portName("port_a")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataA)
-                .consumer(true)
                 .build(),
             new PortBuilder()
                 .portName("port_b")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataB)
-                .consumer(true)
                 .build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+        final PdeSystemDto system = new PdeSystemBuilder()
             .systemId("system_a")
             .systemName("System A")
-            .ports(consumerPorts)
+            .ports(ports)
             .build();
 
         final var description = new PlantDescriptionBuilder()
             .plantDescription("Plant Description 1A")
             .active(true)
-            .systems(List.of(consumerSystem))
+            .systems(List.of(system))
             .build();
 
         final HttpServiceResponse response = new MockServiceResponse();
