@@ -192,14 +192,22 @@ public class PlantDescriptionValidator {
             for (var system : systems) {
 
                 if (producerId.equals(system.systemId())) {
+                    String portName = producer.portName();
                     producerFound = true;
-                    if (!system.hasPort(producer.portName())) {
-                        errors.add("Connection refers to the missing producer port '" + producer.portName() + "'");
+                    final var port = system.getPort(portName);
+                    if (port == null) {
+                        errors.add("Connection refers to the missing producer port '" + portName + "'");
+                    } else if (port.consumer().orElse(false)) {
+                        errors.add("Invalid connection, '" + portName + "' is not a producer port.");
                     }
                 } else if (consumerId.equals(system.systemId())) {
+                    String portName = consumer.portName();
                     consumerFound = true;
-                    if (!system.hasPort(consumer.portName())) {
-                        errors.add("Connection refers to the missing consumer port '" + consumer.portName() + "'");
+                    final var port = system.getPort(portName);
+                    if (port == null) {
+                        errors.add("Connection refers to the missing consumer port '" + portName + "'");
+                    } else if (!port.consumer().orElse(false)) {
+                        errors.add("Invalid connection, '" + portName + "' is not a consumer port.");
                     }
                 }
             }
