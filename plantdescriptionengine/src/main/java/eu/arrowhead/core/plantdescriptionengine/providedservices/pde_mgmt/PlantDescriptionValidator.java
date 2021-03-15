@@ -223,8 +223,15 @@ public class PlantDescriptionValidator {
             }
 
             if (producerPort != null && consumerPort != null) {
+                // Ensure that service interfaces match
                 if (!producerPort.serviceInterface().equals(consumerPort.serviceInterface())) {
                     errors.add("The service interfaces of ports '" +
+                        consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
+                    );
+                }
+                // Ensure that service definitions match
+                if (!producerPort.serviceDefinition().equals(consumerPort.serviceDefinition())) {
+                    errors.add("The service definitions of ports '" +
                         consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
                     );
                 }
