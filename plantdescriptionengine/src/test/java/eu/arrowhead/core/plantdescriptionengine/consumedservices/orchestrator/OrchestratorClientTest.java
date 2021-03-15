@@ -291,7 +291,6 @@ public class OrchestratorClientTest {
     //     );
     //     assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
     // }
-
     @Test
     public void shouldStoreRulesWhenAddingPd() throws RuleStoreException, PdStoreException {
 

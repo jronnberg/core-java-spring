@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
 
 import java.util.*;
 
@@ -12,9 +13,8 @@ import java.util.*;
 public class PlantDescriptionValidator {
 
     final Map<Integer, PlantDescriptionEntry> entries;
-    private final List<String> errors = new ArrayList<>();
-
     final List<String> blacklist = List.of("unknown");
+    private final List<String> errors = new ArrayList<>();
 
     /**
      * Constructor.
@@ -173,8 +173,11 @@ public class PlantDescriptionValidator {
 
         for (var connection : connections) {
 
-            boolean producerFound = false;
-            boolean consumerFound = false;
+            PdeSystem consumerSystem = null;
+            PdeSystem producerSystem = null;
+
+            Port consumerPort = null;
+            Port producerPort = null;
 
             if (connection.priority().orElse(0) < 0) { // TODO: Check for max value as well.
                 errors.add("A connection has a negative priority.");
@@ -193,30 +196,38 @@ public class PlantDescriptionValidator {
 
                 if (isProducerSystem) {
                     String portName = producer.portName();
-                    producerFound = true;
-                    final var port = system.getPort(portName);
-                    if (port == null) {
+                    producerSystem = system;
+                    producerPort = system.getPort(portName);
+                    if (producerPort == null) {
                         errors.add("Connection refers to the missing producer port '" + portName + "'");
-                    } else if (port.consumer().orElse(false)) {
+                    } else if (producerPort.consumer().orElse(false)) {
                         errors.add("Invalid connection, '" + portName + "' is not a producer port.");
                     }
                 } else if (isConsumerSystem) {
                     String portName = consumer.portName();
-                    consumerFound = true;
-                    final var port = system.getPort(portName);
-                    if (port == null) {
+                    consumerSystem = system;
+                    consumerPort = system.getPort(portName);
+                    if (consumerPort == null) {
                         errors.add("Connection refers to the missing consumer port '" + portName + "'");
-                    } else if (!port.consumer().orElse(false)) {
+                    } else if (!consumerPort.consumer().orElse(false)) {
                         errors.add("Invalid connection, '" + portName + "' is not a consumer port.");
                     }
                 }
             }
 
-            if (!producerFound) {
+            if (producerSystem == null) {
                 errors.add("A connection refers to the missing system '" + producerId + "'");
             }
-            if (!consumerFound) {
+            if (consumerSystem == null) {
                 errors.add("A connection refers to the missing system '" + consumerId + "'");
+            }
+
+            if (producerPort != null && consumerPort != null) {
+                if (!producerPort.serviceInterface().equals(consumerPort.serviceInterface())) {
+                    errors.add("The service interfaces of ports '" +
+                        consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
+                    );
+                }
             }
         }
     }
@@ -239,6 +250,7 @@ public class PlantDescriptionValidator {
 
     /**
      * For each consumer port in the system, ensure that no metadata is present.
+     *
      * @param system The system whose ports will be validated.
      */
     private void ensureNoConsumerPortMetadata(PdeSystem system) {

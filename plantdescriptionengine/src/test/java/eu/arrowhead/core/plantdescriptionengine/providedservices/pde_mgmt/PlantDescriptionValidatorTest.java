@@ -35,7 +35,7 @@ public class PlantDescriptionValidatorTest {
 
         final List<PortDto> producerPortsA = List.of(new PortBuilder()
             .portName(producerPortA)
-            .serviceInterface(serviceInterface)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Monitorable")
             .consumer(false)
             .build());
@@ -185,6 +185,76 @@ public class PlantDescriptionValidatorTest {
         final String errorMessage = "<Invalid connection, '" + consumerPort +
             "' is not a producer port.>, <Invalid connection, '" +
             producerPort + "' is not a consumer port.>";
+        assertEquals(errorMessage, validator.getErrorMessage());
+    }
+
+    @Test
+    public void shouldReportServiceInterfaceMismatch() {
+
+        int entryId = 332;
+        String producerId = "Prod-A";
+        String consumerId = "Cons-A";
+        String consumerNameA = "Consumer A";
+        String producerNameA = "Producer A";
+        String consumerPort = "Cons-Port-A";
+        String producerPort = "Prod-Port-A";
+        final String serviceInterfaceA = "HTTP-SECURE-JSON";
+        final String serviceInterfaceB = "HTTP-INSECURE-JSON";
+
+        final List<PortDto> consumerPortsA = List.of(new PortBuilder()
+            .portName(consumerPort)
+            .serviceInterface(serviceInterfaceA)
+            .serviceDefinition("Monitorable")
+            .consumer(true)
+            .build());
+
+        final List<PortDto> producerPortsA = List.of(new PortBuilder()
+            .portName(producerPort)
+            .serviceInterface(serviceInterfaceB)
+            .serviceDefinition("Monitorable")
+            .consumer(false)
+            .build());
+
+        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+            .systemId(consumerId)
+            .systemName(consumerNameA)
+            .ports(consumerPortsA)
+            .build();
+
+        final PdeSystemDto producerSystem = new PdeSystemBuilder()
+            .systemId(producerId)
+            .systemName(producerNameA)
+            .ports(producerPortsA)
+            .build();
+
+        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
+            .priority(1)
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerId)
+                .portName(consumerPort)
+                .build())
+            .producer(new SystemPortBuilder()
+                .systemId(producerId)
+                .portName(producerPort)
+                .build())
+            .build());
+
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(entryId)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(consumerSystem, producerSystem))
+            .connections(connections)
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entryId, entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        final String errorMessage = "<The service interfaces of ports '" +
+            consumerPort + "' and '" + producerPort +
+            "' do not match.>";
         assertEquals(errorMessage, validator.getErrorMessage());
     }
 
@@ -979,7 +1049,7 @@ public class PlantDescriptionValidatorTest {
         Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
         final var validator = new PlantDescriptionValidator(entries);
         assertTrue(validator.hasError());
-        String expectedErrorMessage = "<Port '" + portNameB +  "' is a consumer port, it must not have any metadata.>";
+        String expectedErrorMessage = "<Port '" + portNameB + "' is a consumer port, it must not have any metadata.>";
         assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
