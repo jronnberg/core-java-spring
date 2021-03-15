@@ -401,7 +401,7 @@ JSON object with the following fields:
 | `portName` | String | Identity of the port | `true` | |
 | `serviceDefinition` | String | Service definition identity | `true` | |
 | `consumer` | Boolean | Is the port a consumer port | `false` | `false` |
-| `metadata` | Object\<String> | Metadata - key-value pairs | `false` | null |
+| `metadata` | Object\<String> | Metadata - key-value pairs. Only allowed if `consumer` is true. | `false` | null |
 
 ### SystemEntry
 JSON object with the following fields:

@@ -296,6 +296,25 @@ A system may need to provide multiple instances of the same service, where each 
 }
 ```
 
+### Prioritizing connections
+It is also possible to assign a priority to each connection. This will decide the order of the list of services that the consumer receives during orchestration. Priorities are assigned to connections as follows:
+
+```json
+[
+	{
+		"consumer": { "systemId": "a", "portName": "z" },
+		"producer": { "systemId": "b", "portName": "z" },
+		"priority": 1
+	},
+	{
+		"consumer": { "systemId": "a", "portName": "z" },
+		"producer": { "systemId": "c", "portName": "z" },
+		"priority": 2
+	}
+]
+```
+A lower value signifies a higher priority.
+
 ### Bootstrapping problem
 In the plant description above we have a bootstrapping problems. In order for the Operations Center to be allowed to use the Plant Description Management service from the PDE, a rule allowing it to do so must be added to the Orchestrator. Otherwise it will not be able to add the first plant description allowing it to use the service.
 

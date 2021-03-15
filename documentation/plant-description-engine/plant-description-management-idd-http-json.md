@@ -550,7 +550,7 @@ JSON object with the following fields:
 | ----- | ---- | ----------- | --------- | ------------- |
 | `consumer` | [SystemPort](#systemport) | The consumer end SystemPort of the connection | `true` | |
 | `producer` | [SystemPort](#systemport) | The producer end SystemPort of the connection | `true` | |
-
+| `priority` | Integer | Priority of the connection | `false` | `null` |
 
 ### PlantDescription
 JSON object with the following fields:
