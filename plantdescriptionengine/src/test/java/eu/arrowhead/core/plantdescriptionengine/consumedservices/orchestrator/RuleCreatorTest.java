@@ -146,7 +146,7 @@ public class RuleCreatorTest {
         final String producerBPort = "Prod-B-Port";
         final String producerAName = "Prod-A-Name";
         final String producerBName = "Prod-B-Name";
-        final String serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> producerAPorts = List.of(
             new PortBuilder()
                 .portName(producerAPort)

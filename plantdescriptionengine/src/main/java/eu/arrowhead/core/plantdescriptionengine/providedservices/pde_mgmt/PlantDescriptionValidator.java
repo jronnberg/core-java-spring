@@ -50,9 +50,6 @@ public class PlantDescriptionValidator {
         ensureIdentifiableSystems();
 
         validatePorts();
-
-        // TODO: Check that every system has a name (Future versions will accept
-        // systems with only metadata as well).
     }
 
     /**
@@ -166,9 +163,6 @@ public class PlantDescriptionValidator {
      */
     private void validateConnections() {
 
-        boolean producerFound = false;
-        boolean consumerFound = false;
-
         final var systems = new ArrayList<PdeSystem>();
         final var connections = new ArrayList<Connection>();
 
@@ -178,6 +172,9 @@ public class PlantDescriptionValidator {
         }
 
         for (var connection : connections) {
+
+            boolean producerFound = false;
+            boolean consumerFound = false;
 
             if (connection.priority().orElse(0) < 0) { // TODO: Check for max value as well.
                 errors.add("A connection has a negative priority.");
@@ -191,7 +188,10 @@ public class PlantDescriptionValidator {
 
             for (var system : systems) {
 
-                if (producerId.equals(system.systemId())) {
+                boolean isProducerSystem = producerId.equals(system.systemId());
+                boolean isConsumerSystem = consumerId.equals(system.systemId());
+
+                if (isProducerSystem) {
                     String portName = producer.portName();
                     producerFound = true;
                     final var port = system.getPort(portName);
@@ -200,7 +200,7 @@ public class PlantDescriptionValidator {
                     } else if (port.consumer().orElse(false)) {
                         errors.add("Invalid connection, '" + portName + "' is not a producer port.");
                     }
-                } else if (consumerId.equals(system.systemId())) {
+                } else if (isConsumerSystem) {
                     String portName = consumer.portName();
                     consumerFound = true;
                     final var port = system.getPort(portName);
@@ -238,7 +238,7 @@ public class PlantDescriptionValidator {
     }
 
     /**
-     * For each consumer port in the system, ensure that no metadata is.
+     * For each consumer port in the system, ensure that no metadata is present.
      * @param system The system whose ports will be validated.
      */
     private void ensureNoConsumerPortMetadata(PdeSystem system) {

@@ -290,6 +290,7 @@ public class PlantDescriptionValidatorTest {
         final String invalidPort = "no_such_port";
         final String serviceDefinition = "service_a";
         final String serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(consumerPort)
             .serviceInterface(serviceInterface)
@@ -556,15 +557,26 @@ public class PlantDescriptionValidatorTest {
             .ports(producerPorts)
             .build();
 
-        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder()
-                .systemId(missingId)
-                .portName(consumerPort)
-                .build())
-            .producer(new SystemPortBuilder().systemId(producerId)
-                .portName(producerPort)
-                .build())
-            .build());
+        final List<ConnectionDto> connections = List.of(
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .systemId(consumerId)
+                    .portName(consumerPort)
+                    .build())
+                .producer(new SystemPortBuilder().systemId(producerId)
+                    .portName(producerPort)
+                    .build())
+                .build(),
+            new ConnectionBuilder()
+                .consumer(new SystemPortBuilder()
+                    .systemId(missingId)
+                    .portName(consumerPort)
+                    .build())
+                .producer(new SystemPortBuilder().systemId(producerId)
+                    .portName(producerPort)
+                    .build())
+                .build()
+        );
         final var entry = new PlantDescriptionEntryBuilder()
             .id(23)
             .plantDescription("Plant Description 1A")
