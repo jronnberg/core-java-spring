@@ -458,12 +458,14 @@ public class PlantDescriptionTrackerTest {
 
         final List<PortDto> consumerPortsA = List.of(new PortBuilder()
             .portName(consumerPortA)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Monitorable")
             .consumer(true)
             .build());
 
         final List<PortDto> producerPortsA = List.of(new PortBuilder()
             .portName(producerPortA)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Monitorable")
             .consumer(false)
             .build());
@@ -508,6 +510,7 @@ public class PlantDescriptionTrackerTest {
 
         final List<PortDto> consumerPortsB = List.of(new PortBuilder()
             .portName(consumerPortB)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Monitorable")
             .consumer(true)
             .build());
@@ -574,12 +577,14 @@ public class PlantDescriptionTrackerTest {
 
         final List<PortDto> consumerPortsA = List.of(new PortBuilder()
             .portName(consumerPortA)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Service-XYZ")
             .consumer(true)
             .build());
 
         final List<PortDto> producerPortsA = List.of(new PortBuilder()
             .portName(producerPortA)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition(serviceDefinitionA)
             .consumer(false)
             .build());
@@ -613,6 +618,7 @@ public class PlantDescriptionTrackerTest {
 
         final List<PortDto> consumerPortsB = List.of(new PortBuilder()
             .portName(consumerPortB)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition("Service-ABC")
             .consumer(true)
             .build());

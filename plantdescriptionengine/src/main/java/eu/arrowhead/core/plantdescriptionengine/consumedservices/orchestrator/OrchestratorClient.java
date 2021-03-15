@@ -55,7 +55,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         this.pdTracker = pdTracker;
 
         this.orchestratorAddress = orchestratorAddress;
-        this.ruleCreator = new RuleCreator(pdTracker, client.isSecure());
+        this.ruleCreator = new RuleCreator(pdTracker);
     }
 
     /**

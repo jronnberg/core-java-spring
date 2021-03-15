@@ -21,6 +21,8 @@ public interface Port {
 
     String serviceDefinition();
 
+    String serviceInterface();
+
     Optional<Map<String, String>> metadata();
 
     /**

@@ -139,6 +139,7 @@ public class GetAllPlantDescriptionsTest {
             .consumer(isConsumer)
             .metadata(metadata)
             .portName(portName)
+            .serviceInterface("HTTP-SECURE-JSON")
             .serviceDefinition(serviceDefinition)
             .build());
 

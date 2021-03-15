@@ -66,15 +66,18 @@ public class PlantDescriptionEntryTest {
         final String producerId = "system_2";
         final String portName = "port_1";
         final String serviceDefinition = "service_a";
+        final String serviceInterface = "HTTP-SECURE-JSON";
 
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(portName)
+            .serviceInterface(serviceInterface)
             .serviceDefinition(serviceDefinition)
             .consumer(true)
             .build());
 
         final List<PortDto> producerPorts = List.of(new PortBuilder()
             .portName(portName)
+            .serviceInterface(serviceInterface)
             .serviceDefinition(serviceDefinition)
             .consumer(false)
             .build());
@@ -130,15 +133,18 @@ public class PlantDescriptionEntryTest {
         final String producerId = "system_2";
         final String portName = "port_1";
         final String serviceDefinition = "service_a";
+        final String serviceInterface = "HTTP-SECURE-JSON";
 
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(portName)
+            .serviceInterface(serviceInterface)
             .serviceDefinition(serviceDefinition)
             .consumer(true)
             .build());
 
         final List<PortDto> producerPorts = List.of(new PortBuilder()
             .portName(portName)
+            .serviceInterface(serviceInterface)
             .serviceDefinition(serviceDefinition)
             .consumer(false)
             .build());
@@ -191,23 +197,28 @@ public class PlantDescriptionEntryTest {
         final String portNameB = "port_b";
         final String portNameC = "port_c";
         final String serviceDefinition = "service_a";
+        final String serviceInterface = "HTTP-SECURE-JSON";
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder().portName(portNameA)
                 .serviceDefinition(serviceDefinition)
+                .serviceInterface(serviceInterface)
                 .consumer(true)
                 .build(),
             new PortBuilder().portName(portNameB)
                 .serviceDefinition(serviceDefinition)
+                .serviceInterface(serviceInterface)
                 .consumer(true)
                 .build(),
             new PortBuilder().portName(portNameC)
                 .serviceDefinition(serviceDefinition)
+                .serviceInterface(serviceInterface)
                 .consumer(true)
                 .build());
 
         final List<PortDto> producerPorts = List.of(new PortBuilder()
             .portName(portNameA)
+            .serviceInterface(serviceInterface)
             .serviceDefinition(serviceDefinition)
             .consumer(false)
             .build());
@@ -433,8 +444,11 @@ public class PlantDescriptionEntryTest {
         final String consumerSystemName = "Sys-A";
         final String producerSystemName = "Sys-B";
 
+        final String serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(consumerPort)
+            .serviceInterface(serviceInterface)
             .serviceDefinition("ABC")
             .consumer(true)
             .build());
@@ -442,11 +456,13 @@ public class PlantDescriptionEntryTest {
         final List<PortDto> producerPorts = List.of(
             new PortBuilder()
                 .portName(producerPortA)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionA)
                 .consumer(false)
                 .build(),
             new PortBuilder()
                 .portName(producerPortB)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionB)
                 .consumer(false)
                 .build());
@@ -506,8 +522,11 @@ public class PlantDescriptionEntryTest {
         final String consumerSystemName = "Sys-A";
         final String producerSystemName = "Sys-B";
 
+        final String serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(consumerPort)
+            .serviceInterface(serviceInterface)
             .serviceDefinition("ABC")
             .consumer(true)
             .build());
@@ -515,12 +534,14 @@ public class PlantDescriptionEntryTest {
         final List<PortDto> producerPorts = List.of(
             new PortBuilder()
                 .portName(producerPortA)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition("service_a")
                 .consumer(false)
                 .metadata(Map.of("x", "8"))
                 .build(),
             new PortBuilder()
                 .portName(producerPortB)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition("service_b")
                 .metadata(Map.of("y", "9"))
                 .consumer(false)
@@ -598,14 +619,18 @@ public class PlantDescriptionEntryTest {
         final String consumerPort = "PortA";
         final String producerPort = "PortB";
 
+        final String serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> consumerPorts = List.of(new PortBuilder()
             .portName(consumerPort)
+            .serviceInterface(serviceInterface)
             .serviceDefinition("Monitorable")
             .consumer(true)
             .build());
 
         final List<PortDto> producerPorts = List.of(new PortBuilder()
             .portName(consumerPort)
+            .serviceInterface(serviceInterface)
             .serviceDefinition("Monitorable")
             .consumer(false)
             .build());

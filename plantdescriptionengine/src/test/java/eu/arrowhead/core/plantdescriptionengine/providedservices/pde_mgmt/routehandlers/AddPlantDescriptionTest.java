@@ -69,11 +69,13 @@ public class AddPlantDescriptionTest {
         final List<PortDto> ports = List.of(
             new PortBuilder()
                 .portName("port_a")
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataA)
                 .build(),
             new PortBuilder()
                 .portName("port_b")
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataB)
                 .build());
@@ -115,11 +117,13 @@ public class AddPlantDescriptionTest {
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
                 .portName(portName)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_a")
                 .consumer(true)
                 .build(),
             new PortBuilder()
                 .portName(portName) // Duplicate port name, should be reported!
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_b")
                 .consumer(true)
                 .build());

@@ -24,21 +24,26 @@ public class PdeSystemTest {
         final var metadataB = Map.of("y", "2");
         final var metadataC = Map.of("z", "3");
 
+        final var serviceInterface = "HTTP-SECURE-JSON";
+
         final List<PortDto> ports = List.of(
             new PortBuilder()
                 .portName(portNameA)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceA)
                 .consumer(true)
                 .metadata(metadataA)
                 .build(),
             new PortBuilder()
                 .portName(portNameB)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceB)
                 .metadata(metadataB)
                 .consumer(false)
                 .build(),
             new PortBuilder()
                 .portName(portNameC)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceC)
                 .metadata(metadataC)
                 .consumer(true)
@@ -55,6 +60,9 @@ public class PdeSystemTest {
 
         assertEquals(portNameA, portA.portName());
         assertEquals(portNameB, portB.portName());
+
+        assertEquals(serviceInterface, portA.serviceInterface());
+        assertEquals(serviceInterface, portB.serviceInterface());
 
         assertTrue(portA.consumer().orElse(false));
         assertFalse(portB.consumer().orElse(true));
@@ -84,16 +92,19 @@ public class PdeSystemTest {
         final List<PortDto> ports = List.of(
             new PortBuilder()
                 .portName(portNameA)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceA)
                 .consumer(true)
                 .build(),
             new PortBuilder()
                 .portName(portNameB)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceB)
                 .consumer(false)
                 .build(),
             new PortBuilder()
                 .portName(portNameC)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceC)
                 .consumer(true)
                 .build());

@@ -27,7 +27,7 @@ public class RuleCreatorTest {
     }
 
     @Test
-    public void shouldCreateInsecureRule() throws PdStoreException {
+    public void shouldCreateRule() throws PdStoreException {
 
         final String consumerId = "system_1";
         final String producerId = "system_2";
@@ -39,16 +39,19 @@ public class RuleCreatorTest {
         final String producerPort = "port_2";
 
         final String serviceDefinitionA = "service_a";
+        final String serviceInterface = "HTTP-SECURE-JSON";
 
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
                 .portName(consumerPort)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionA)
                 .consumer(true)
                 .build());
         final List<PortDto> producerPorts = List.of(
             new PortBuilder()
                 .portName(producerPort)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionA)
                 .consumer(false)
                 .build());
@@ -84,81 +87,13 @@ public class RuleCreatorTest {
             .build();
 
         pdTracker.put(entry);
-        final var ruleCreator = new RuleCreator(pdTracker, false);
+        final var ruleCreator = new RuleCreator(pdTracker);
         var rule = ruleCreator.createRule(entry.connections().get(0));
         assertEquals(consumerName, rule.consumerSystem().systemName().orElse(null));
         assertEquals(producerName, rule.providerSystem().systemName().orElse(null));
         assertEquals(producerName, rule.providerSystem().systemName().orElse(null));
         assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-        assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
-    }
-
-    @Test
-    public void shouldCreateSecureRule() throws PdStoreException {
-
-        final String consumerId = "system_1";
-        final String producerId = "system_2";
-
-        final String consumerName = "System 1";
-        final String producerName = "System 2";
-
-        final String consumerPort = "port_1";
-        final String producerPort = "port_2";
-
-        final String serviceDefinitionA = "service_a";
-
-        final List<PortDto> consumerPorts = List.of(
-            new PortBuilder()
-                .portName(consumerPort)
-                .serviceDefinition(serviceDefinitionA)
-                .consumer(true)
-                .build());
-        final List<PortDto> producerPorts = List.of(
-            new PortBuilder()
-                .portName(producerPort)
-                .serviceDefinition(serviceDefinitionA)
-                .consumer(false)
-                .build());
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
-            .systemId(consumerId)
-            .systemName(consumerName)
-            .ports(consumerPorts)
-            .build();
-        final PdeSystemDto producerSystem = new PdeSystemBuilder()
-            .systemId(producerId)
-            .systemName(producerName)
-            .ports(producerPorts)
-            .build();
-
-        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder()
-                .systemId(consumerId)
-                .portName(consumerPort)
-                .build())
-            .producer(new SystemPortBuilder()
-                .systemId(producerId)
-                .portName(producerPort)
-                .build())
-            .build());
-
-        final var entry = new PlantDescriptionEntryBuilder()
-            .id(0).plantDescription("Plant Description 1A")
-            .createdAt(now)
-            .updatedAt(now)
-            .active(true)
-            .include(new ArrayList<>())
-            .systems(List.of(consumerSystem, producerSystem))
-            .connections(connections)
-            .build();
-
-        pdTracker.put(entry);
-        final var ruleCreator = new RuleCreator(pdTracker, true);
-        var rule = ruleCreator.createRule(entry.connections().get(0));
-        assertEquals(consumerName, rule.consumerSystem().systemName().orElse(null));
-        assertEquals(producerName, rule.providerSystem().systemName().orElse(null));
-        assertEquals(producerName, rule.providerSystem().systemName().orElse(null));
-        assertEquals(producerSystem.ports().get(0).serviceDefinition(), rule.serviceDefinitionName());
-        assertEquals("HTTP-SECURE-JSON", rule.serviceInterfaceName());
+        assertEquals(serviceInterface, rule.serviceInterfaceName());
     }
 
     /**
@@ -176,13 +111,15 @@ public class RuleCreatorTest {
         final String consumerPortA = "Cons-Port-A";
         final String consumerPortB = "Cons-Port-B";
         final String consumerName = "Consumer System";
-
+        final String serviceInterface = "HTTP-INSECURE-JSON";
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder().portName(consumerPortA)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionX)
                 .consumer(true)
                 .build(),
             new PortBuilder().portName(consumerPortB)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionY)
                 .consumer(true)
                 .build()
@@ -209,10 +146,11 @@ public class RuleCreatorTest {
         final String producerBPort = "Prod-B-Port";
         final String producerAName = "Prod-A-Name";
         final String producerBName = "Prod-B-Name";
-
+        final String serviceInterface = "HTTP-SECURE-JSON";
         final List<PortDto> producerAPorts = List.of(
             new PortBuilder()
                 .portName(producerAPort)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionX)
                 .consumer(false)
                 .build());
@@ -220,6 +158,7 @@ public class RuleCreatorTest {
         final List<PortDto> producerBPorts = List.of(
             new PortBuilder()
                 .portName(producerBPort)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinitionY)
                 .consumer(false)
                 .build());
@@ -272,7 +211,7 @@ public class RuleCreatorTest {
         pdTracker.put(entryA);
         pdTracker.put(entryB);
 
-        final var ruleCreator = new RuleCreator(pdTracker, false);
+        final var ruleCreator = new RuleCreator(pdTracker);
 
         var ruleA = ruleCreator.createRule(connectionA);
         var ruleB = ruleCreator.createRule(connectionB);
@@ -290,9 +229,12 @@ public class RuleCreatorTest {
         final String consumerId = "Cons-A-Id";
         final String consumerPort = "Cons-A-Port";
         final Map<String, String> consumerMetadata = Map.of("x", "y");
+        final String serviceInterface = "HTTP-INSECURE-JSON";
 
         final List<PortDto> consumerAPorts = List.of(
-            new PortBuilder().portName(consumerPort)
+            new PortBuilder()
+                .portName(consumerPort)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinition)
                 .consumer(true)
                 .build());
@@ -312,6 +254,7 @@ public class RuleCreatorTest {
             new PortBuilder()
                 .portName(producerPort)
                 .metadata(producerPortMetadata)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinition)
                 .consumer(false)
                 .build());
@@ -344,7 +287,7 @@ public class RuleCreatorTest {
 
         pdTracker.put(entry);
 
-        final var ruleCreator = new RuleCreator(pdTracker, false);
+        final var ruleCreator = new RuleCreator(pdTracker);
         var rule = ruleCreator.createRule(connection);
 
         assertTrue(rule.consumerSystem().systemName().isEmpty());
@@ -355,7 +298,7 @@ public class RuleCreatorTest {
 
         final var expectedProducerMetadata = Map.of("a", "1", "b", "2");
         assertEquals(expectedProducerMetadata, rule.providerSystem().metadata().orElse(null));
-        assertEquals("HTTP-INSECURE-JSON", rule.serviceInterfaceName());
+        assertEquals(serviceInterface, rule.serviceInterfaceName());
     }
 
 }

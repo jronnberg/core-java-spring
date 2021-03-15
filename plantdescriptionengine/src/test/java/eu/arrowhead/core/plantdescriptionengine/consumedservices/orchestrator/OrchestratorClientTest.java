@@ -54,14 +54,18 @@ public class OrchestratorClientTest {
     final String consumerPort = "port_1";
     final String producerPort = "port_2";
 
+    final String serviceInterface = "HTTP-SECURE-JSON";
+
     final List<PortDto> consumerPorts = List.of(new PortBuilder()
         .portName(consumerPort)
         .serviceDefinition(serviceDefinitionA)
+        .serviceInterface(serviceInterface)
         .consumer(true)
         .build());
     final List<PortDto> producerPorts = List.of(new PortBuilder()
         .portName(producerPort)
         .serviceDefinition(serviceDefinitionA)
+        .serviceInterface(serviceInterface)
         .consumer(false)
         .build());
     final PdeSystemDto consumerSystem = new PdeSystemBuilder()

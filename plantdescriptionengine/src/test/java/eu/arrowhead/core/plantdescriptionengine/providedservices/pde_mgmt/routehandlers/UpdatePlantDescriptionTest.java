@@ -125,11 +125,13 @@ public class UpdatePlantDescriptionTest {
         final List<PortDto> consumerPorts = List.of(
             new PortBuilder()
                 .portName(portName)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_a")
                 .consumer(true)
                 .build(),
             new PortBuilder()
                 .portName(portName)
+                .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_b")
                 .consumer(true)
                 .build());

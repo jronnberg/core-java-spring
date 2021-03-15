@@ -76,6 +76,7 @@ public final class DtoUtils {
 
             var portBuilder = new PortEntryBuilder()
                 .portName(port.portName())
+                .serviceInterface(port.serviceInterface())
                 .serviceDefinition(port.serviceDefinition())
                 .consumer(isConsumer)
                 .metadata(port.metadata()

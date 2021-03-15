@@ -11,6 +11,7 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dt
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
 import se.arkalix.dto.DtoWritable;
 
 /**
@@ -20,12 +21,10 @@ import se.arkalix.dto.DtoWritable;
 public class RuleCreator {
 
     private final PlantDescriptionTracker pdTracker;
-    private final boolean isSecure;
 
-    public RuleCreator(PlantDescriptionTracker pdTracker, boolean secure) {
+    public RuleCreator(PlantDescriptionTracker pdTracker) {
         Objects.requireNonNull(pdTracker, "Expected Plant Description Tracker.");
         this.pdTracker = pdTracker;
-        this.isSecure = secure;
     }
 
     /**
@@ -45,12 +44,11 @@ public class RuleCreator {
         final PdeSystem consumer = pdTracker.getSystem(consumerId);
         final PdeSystem provider = pdTracker.getSystem(providerId);
 
-        String producerPort = connection.producer().portName();
+        String producerPortName = connection.producer().portName();
+        Port producerPort = provider.getPort(producerPortName);
 
-        final Map<String, String> providerMetadata = provider.portMetadata(producerPort);
+        final Map<String, String> providerMetadata = provider.portMetadata(producerPortName);
         final Map<String, String> consumerMetadata = consumer.metadata().orElse(null);
-
-        String serviceDefinition = pdTracker.getServiceDefinition(producerPort);
 
         var builder = new StoreRuleBuilder()
             .consumerSystem(new RuleSystemBuilder()
@@ -61,13 +59,8 @@ public class RuleCreator {
                 .systemName(provider.systemName().orElse(null))
                 .metadata(providerMetadata)
                 .build())
-            .serviceDefinitionName(serviceDefinition);
-
-        if (isSecure) {
-            builder.serviceInterfaceName("HTTP-SECURE-JSON");
-        } else {
-            builder.serviceInterfaceName("HTTP-INSECURE-JSON");
-        }
+            .serviceInterfaceName(producerPort.serviceInterface())
+            .serviceDefinitionName(producerPort.serviceDefinition());
 
         return builder.build();
     }

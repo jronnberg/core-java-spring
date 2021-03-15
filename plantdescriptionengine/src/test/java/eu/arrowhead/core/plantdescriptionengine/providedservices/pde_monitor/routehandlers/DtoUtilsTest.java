@@ -30,22 +30,26 @@ public class DtoUtilsTest {
         final Map<String, String> metadata = Map.of("a", "b");
         final String portName = "Port-A";
         final String serviceDefinition = "Service-AC";
+        final String serviceInterface = "HTTP-SECURE-JSON";
         final List<PortDto> ports = List.of(
             // Port B and C will *not* be complemented by monitor info:
             new PortBuilder()
                 .metadata(Map.of("i", "j")) // Differs from service A
                 .portName("Port-C")
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinition) // Same as service A
                 .build(),
             new PortBuilder()
                 .metadata(Map.of("x", "y")) // Differs from service A
                 .portName("Port-B")
+                .serviceInterface(serviceInterface)
                 .serviceDefinition("Service-B") // Differs from service A
                 .build(),
             // Port A will be complemented by monitor info:
             new PortBuilder()
                 .metadata(metadata)
                 .portName(portName)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinition)
                 .build());
 
@@ -109,10 +113,12 @@ public class DtoUtilsTest {
         final Map<String, String> metadata = Map.of("a", "b");
         final String portName = "Port-A";
         final String serviceDefinition = "Service-A";
+        final String serviceInterface = "HTTP-SECURE-JSON";
         final List<PortDto> ports = List
             .of(new PortBuilder()
                 .metadata(metadata)
                 .portName(portName)
+                .serviceInterface(serviceInterface)
                 .serviceDefinition(serviceDefinition)
                 .build());
         final PdeSystemDto system = new PdeSystemBuilder()
@@ -139,6 +145,7 @@ public class DtoUtilsTest {
         var extendedPort = extendedSystem.ports().get(0);
         assertTrue(extendedPort.inventoryId().isEmpty());
         assertTrue(extendedPort.systemData().isEmpty());
+        assertEquals(serviceInterface, extendedPort.serviceInterface());
     }
 
     /**
