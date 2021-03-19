@@ -1035,6 +1035,39 @@ public class PlantDescriptionValidatorTest {
     }
 
     @Test
+    public void shouldReportNonUniqueSystem() {
+        String systemIdB = "Sys-B";
+        String systemName = "XYZ";
+        Map<String, String> metadata = Map.of("a", "1");
+        final var entry = new PlantDescriptionEntryBuilder()
+            .id(22)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(false)
+            .systems(List.of(
+                new PdeSystemBuilder()
+                    .systemId("Sys-A")
+                    .systemName(systemName)
+                    .metadata(metadata)
+                    .build(),
+                new PdeSystemBuilder()
+                    .systemId(systemIdB)
+                    .systemName(systemName)
+                    .metadata(metadata)
+                    .build()
+            ))
+            .build();
+
+        Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        final var validator = new PlantDescriptionValidator(entries);
+        assertTrue(validator.hasError());
+        String expectedErrorMessage = "<System with ID '" + systemIdB +
+            "' cannot be uniquely identified by its name/metadata combination.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
+    }
+
+    @Test
     public void shouldTreatEmptyMetadataAsNull() {
 
         final var entry = new PlantDescriptionEntryBuilder()

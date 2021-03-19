@@ -54,11 +54,11 @@ public class SystemTracker {
      * name / metadata combination.
      */
     protected String toKey(String systemName, Map<String, String> metadata) {
-        String result = systemName;
+        String result = systemName + "{";
         if (metadata != null && !metadata.isEmpty()) {
-            result += "{" + Metadata.toString(metadata) + "}";
+            result += Metadata.toString(metadata);
         }
-        return result;
+        return result + "}";
     }
 
     /**

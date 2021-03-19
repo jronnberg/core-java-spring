@@ -4,6 +4,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Co
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
+import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 
 import java.util.*;
 
@@ -15,6 +16,22 @@ public class PlantDescriptionValidator {
     final Map<Integer, PlantDescriptionEntry> entries;
     final List<String> blacklist = List.of("unknown");
     private final List<String> errors = new ArrayList<>();
+
+    /**
+     * @param systemName Name of a system
+     * @param metadata   Metadata describing a system
+     * @return A string uniquely identifying the system with the given
+     * name / metadata combination.
+     */
+    private String uniqueIdentifier(PdeSystem system) {
+        String systemName = system.systemName().orElse("");
+        Map<String, String> metadata = system.metadata().orElse(null);
+        String result = systemName + "{";
+        if (metadata != null && !metadata.isEmpty()) {
+            result += Metadata.toString(metadata);
+        }
+        return result + "}";
+    }
 
     /**
      * Constructor.
@@ -62,9 +79,19 @@ public class PlantDescriptionValidator {
             systems.addAll(entry.systems());
         }
 
+        Set<String> uniqueIdentifiers = new HashSet<>();
+
         for (final var system : systems) {
+
             Optional<Map<String, String>> metadata = system.metadata();
             boolean hasMetadata = metadata.isPresent() && !metadata.get().isEmpty();
+
+            String uid = uniqueIdentifier(system);
+
+            if (!uniqueIdentifiers.add(uid)) {
+                errors.add("System with ID '" + system.systemId() +
+                    "' cannot be uniquely identified by its name/metadata combination.");
+            }
 
             if (system.systemName().isEmpty() && !hasMetadata) {
                 errors.add("Contains a system with neither a name nor metadata to identify it.");
@@ -75,7 +102,6 @@ public class PlantDescriptionValidator {
             }
         }
 
-        // TODO: Check for uniqueness!
     }
 
     /**
