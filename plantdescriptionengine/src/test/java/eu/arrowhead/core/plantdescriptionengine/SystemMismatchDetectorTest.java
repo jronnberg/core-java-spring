@@ -129,6 +129,7 @@ public class SystemMismatchDetectorTest {
     //     final var alarms = alarmManager.getAlarms();
     //     assertEquals(0, alarms.size());
     // }
+
     @Test
     public void shouldReportNotRegistered() throws PdStoreException {
         detector.run();

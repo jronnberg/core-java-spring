@@ -106,7 +106,7 @@ public class DtoUtilsTest {
     }
 
     @Test
-    public void shouldExtendWithOutMonitorData() {
+    public void shouldExtendWithoutMonitorData() {
 
         final String systemName = "System A";
 
@@ -149,8 +149,76 @@ public class DtoUtilsTest {
     }
 
     /**
-     * In this test, the MonitorInfo instance contains data that can not be matched
-     * to the system itself, since its metadata differs from that of the system.
+     * Test that consumer ports are not supplemented with monitor info.
+     * In fact, Plant Descriptions with consumer ports containing metadata are
+     * not allowed. This is enforced by the
+     * {@link eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PlantDescriptionValidator}.
+     */
+    @Test
+    public void shouldNotAddMonitorDataToConsumerPort() {
+
+        final String systemName = "System A";
+
+        final Map<String, String> metadata = Map.of("a", "b");
+        final String portName = "Port-A";
+        final String serviceDefinition = "Service-AC";
+        final String serviceInterface = "HTTP-SECURE-JSON";
+        final List<PortDto> ports = List.of(
+            new PortBuilder()
+                .metadata(metadata)
+                .portName(portName)
+                .consumer(true)
+                .serviceInterface(serviceInterface)
+                .serviceDefinition(serviceDefinition)
+                .build());
+
+        final PdeSystemDto system = new PdeSystemBuilder()
+            .systemName(systemName)
+            .systemId("system_a")
+            .ports(ports)
+            .build();
+
+        final Instant now = Instant.now();
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+            .id(1)
+            .plantDescription("Plant Description 1A")
+            .active(false)
+            .include(new ArrayList<>())
+            .systems(List.of(system))
+            .connections(new ArrayList<>())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        final var provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        ServiceDescription serviceDescription = new ServiceDescription.Builder()
+            .name(serviceDefinition)
+            .metadata(metadata)
+            .uri("/abc")
+            .security(SecurityDescriptor.NOT_SECURE)
+            .provider(provider)
+            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+            .build();
+
+        final String inventoryId = "system_a_inventory_id";
+        JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+
+        final var monitorInfo = new MonitorInfo();
+        monitorInfo.putInventoryId(serviceDescription, inventoryId);
+        monitorInfo.putSystemData(serviceDescription, systemData);
+
+        var extendedEntry = DtoUtils.extend(entry, monitorInfo);
+        var extendedSystem = extendedEntry.systems().get(0);
+        var extendedPortA = extendedSystem.ports().get(0);
+
+        assertTrue(extendedPortA.inventoryId().isEmpty());
+        assertTrue(extendedPortA.inventoryId().isEmpty());
+    }
+
+    /**
+     * In this test, the MonitorInfo instance contains data that can not be
+     * matched to the system itself, since its metadata differs from that of the
+     * system.
      */
     @Test
     public void shouldNotMatchInfoToSystem() {
@@ -199,11 +267,6 @@ public class DtoUtilsTest {
         var extendedSystem = extendedEntry.systems().get(0);
         assertTrue(extendedSystem.inventoryData().isEmpty());
         assertTrue(extendedSystem.systemData().isEmpty());
-
-        // TODO: Assert that a warning has been logged.
     }
-
-    // TODO: Add test to check that monitor info is only added to ports where
-    // the system is a provider.
 
 }
