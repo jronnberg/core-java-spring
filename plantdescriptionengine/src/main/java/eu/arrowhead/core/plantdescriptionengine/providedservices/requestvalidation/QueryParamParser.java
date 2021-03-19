@@ -87,15 +87,15 @@ public class QueryParamParser {
         }
     }
 
-    void putInt(IntParameter key, Integer value) { // TODO: Rename to put
+    void put(IntParameter key, Integer value) {
         intValues.put(key, value);
     }
 
-    void putBoolean(BooleanParameter key, Boolean value) {
+    void put(BooleanParameter key, Boolean value) {
         boolValues.put(key, value);
     }
 
-    void putString(StringParameter key, String value) {
+    void put(StringParameter key, String value) {
         stringValues.put(key, value);
     }
 

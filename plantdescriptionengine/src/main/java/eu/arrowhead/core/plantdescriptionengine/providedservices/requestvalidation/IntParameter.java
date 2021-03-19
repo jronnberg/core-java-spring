@@ -75,7 +75,7 @@ public class IntParameter extends QueryParameter {
         }
 
         if (!parser.hasError()) {
-            parser.putInt(this, intValue);
+            parser.put(this, intValue);
         }
     }
 

@@ -39,7 +39,7 @@ public class StringParameter extends QueryParameter {
                 parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
-                parser.putString(this, defaultValue);
+                parser.put(this, defaultValue);
             }
             return;
         }
@@ -54,7 +54,7 @@ public class StringParameter extends QueryParameter {
             parser.report(new ParseError(value + " is not a legal value for parameter " + name + "."));
         }
 
-        parser.putString(this, value);
+        parser.put(this, value);
     }
 
     public static class Builder extends QueryParameter.Builder<Builder> {

@@ -35,7 +35,7 @@ public class BooleanParameter extends QueryParameter {
                 parser.report(new ParseError("Missing parameter '" + name + "'."));
             }
             if (defaultValue != null) {
-                parser.putBoolean(this, defaultValue);
+                parser.put(this, defaultValue);
             }
             return;
         }
@@ -49,7 +49,7 @@ public class BooleanParameter extends QueryParameter {
             parser.report(new ParseError("Query parameter '" + name + "' must be true or false, got '" + value + "'."));
         }
 
-        parser.putBoolean(this, value.equals("true"));
+        parser.put(this, value.equals("true"));
     }
 
     public static class Builder extends QueryParameter.Builder<Builder> {

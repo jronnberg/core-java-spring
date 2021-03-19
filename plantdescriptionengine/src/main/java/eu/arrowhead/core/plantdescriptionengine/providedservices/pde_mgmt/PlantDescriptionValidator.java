@@ -304,7 +304,6 @@ public class PlantDescriptionValidator {
      * multiple ports share the same service definition, they must have
      * different metadata. This method ensures that this property holds.
      * <p>
-     * TODO: Check that metadata is unique
      *
      * @param system The system whose ports will be validated.
      */
