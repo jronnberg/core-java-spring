@@ -22,7 +22,7 @@ public interface PortEntry {
 
     String serviceDefinition();
 
-    String serviceInterface();
+    Optional<String> serviceInterface();
 
     Optional<Map<String, String>> metadata();
 

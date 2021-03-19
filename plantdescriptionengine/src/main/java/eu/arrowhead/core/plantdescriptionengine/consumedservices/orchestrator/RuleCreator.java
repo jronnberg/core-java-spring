@@ -59,7 +59,7 @@ public class RuleCreator {
                 .systemName(provider.systemName().orElse(null))
                 .metadata(providerMetadata)
                 .build())
-            .serviceInterfaceName(producerPort.serviceInterface())
+            .serviceInterfaceName(producerPort.serviceInterface().orElse(null))
             .serviceDefinitionName(producerPort.serviceDefinition());
 
         return builder.build();

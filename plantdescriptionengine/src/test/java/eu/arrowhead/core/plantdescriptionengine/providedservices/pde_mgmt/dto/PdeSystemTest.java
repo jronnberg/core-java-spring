@@ -61,8 +61,8 @@ public class PdeSystemTest {
         assertEquals(portNameA, portA.portName());
         assertEquals(portNameB, portB.portName());
 
-        assertEquals(serviceInterface, portA.serviceInterface());
-        assertEquals(serviceInterface, portB.serviceInterface());
+        assertEquals(serviceInterface, portA.serviceInterface().orElse(null));
+        assertEquals(serviceInterface, portB.serviceInterface().orElse(null));
 
         assertTrue(portA.consumer().orElse(false));
         assertFalse(portB.consumer().orElse(true));

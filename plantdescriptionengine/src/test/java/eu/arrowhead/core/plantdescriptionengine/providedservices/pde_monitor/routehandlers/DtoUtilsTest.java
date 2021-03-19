@@ -145,7 +145,7 @@ public class DtoUtilsTest {
         var extendedPort = extendedSystem.ports().get(0);
         assertTrue(extendedPort.inventoryId().isEmpty());
         assertTrue(extendedPort.systemData().isEmpty());
-        assertEquals(serviceInterface, extendedPort.serviceInterface());
+        assertEquals(serviceInterface, extendedPort.serviceInterface().orElse(null));
     }
 
     /**
