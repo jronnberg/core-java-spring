@@ -723,4 +723,22 @@ public class PlantDescriptionTrackerTest {
         }
     }
 
+    @Test
+    public void shouldReturnUniqueId() throws PdStoreException {
+        int idA = 33;
+        int idB = 65;
+        int idC = idB + 1;
+        store = new InMemoryPdStore();
+        store.write(TestUtils.createEntry(idA));
+        store.write(TestUtils.createEntry(idB));
+        pdTracker = new PlantDescriptionTracker(store);
+        pdTracker.put(TestUtils.createEntry(idC));
+
+        // An earlier, naive implementation of getUniqueId would return idC at
+        // this point.
+        int nextId = pdTracker.getUniqueId();
+
+        assertEquals(idC + 1, nextId);
+    }
+
 }
