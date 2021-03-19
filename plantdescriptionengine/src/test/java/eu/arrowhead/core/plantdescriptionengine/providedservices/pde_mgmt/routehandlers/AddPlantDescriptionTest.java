@@ -8,7 +8,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessag
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.*;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
-import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,7 +28,11 @@ public class AddPlantDescriptionTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new AddPlantDescription(pdTracker);
-        final PlantDescription description = TestUtils.createDescription();
+
+        final PlantDescription description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .build();
+
         final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
@@ -41,14 +44,14 @@ public class AddPlantDescriptionTest {
                     assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
                     assertNotNull(response.body());
-
                     assertTrue(response.body().isPresent());
+
                     PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
-                    assertTrue(entry.matchesDescription(description));
+
+                    assertEquals(entry.plantDescription(), description.plantDescription());
 
                     var entryInMap = pdTracker.get(entry.id());
                     assertNotNull(entryInMap);
-                    // TODO: Compare 'entryInMap' with 'entry'.
                 })
                 .onFailure(Assertions::assertNull);
         } catch (Exception e) {
@@ -167,7 +170,10 @@ public class AddPlantDescriptionTest {
         final var pdTracker = new PlantDescriptionTracker(backingStore);
         final var handler = new AddPlantDescription(pdTracker);
 
-        final PlantDescription description = TestUtils.createDescription();
+        final PlantDescription description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .build();
+
         final HttpServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder().body(description).build();
 

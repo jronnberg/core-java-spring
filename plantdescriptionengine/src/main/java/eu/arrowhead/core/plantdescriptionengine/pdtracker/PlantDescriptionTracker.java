@@ -53,8 +53,11 @@ public class PlantDescriptionTracker {
      * @return An unused Plant Description Entry ID.
      */
     public int getUniqueId() {
-        // TODO: This method does not actually ensure that the ID is unique.
-        return nextId.getAndIncrement();
+        int result;
+        do {
+            result = nextId.getAndIncrement();
+        } while (entries.containsKey(result));
+        return result;
     }
 
     /**

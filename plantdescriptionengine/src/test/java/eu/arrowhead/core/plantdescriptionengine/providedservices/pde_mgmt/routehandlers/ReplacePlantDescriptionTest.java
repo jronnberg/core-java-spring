@@ -30,8 +30,13 @@ public class ReplacePlantDescriptionTest {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(pdTracker);
-        final PlantDescription description = TestUtils.createDescription();
         final HttpServiceResponse response = new MockServiceResponse();
+
+        final PlantDescription description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .active(true)
+            .build();
+
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of("35"))
             .body(description)
@@ -44,11 +49,10 @@ public class ReplacePlantDescriptionTest {
 
                 assertTrue(response.body().isPresent());
                 PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
-                assertTrue(entry.matchesDescription(description));
+                assertEquals(entry.plantDescription(), description.plantDescription());
 
                 var entryInMap = pdTracker.get(entry.id());
                 assertNotNull(entryInMap);
-                // TODO: Compare 'entryInMap' with 'entry'.
             }).onFailure(Assertions::assertNull);
         } catch (Exception e) {
             assertNull(e);
@@ -56,7 +60,7 @@ public class ReplacePlantDescriptionTest {
     }
 
     @Test
-    public void shouldReplaceExistingEntries() throws PdStoreException {
+    public void shouldReplaceExistingEntry() throws PdStoreException {
 
         final var pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final var handler = new ReplacePlantDescription(pdTracker);
@@ -67,9 +71,6 @@ public class ReplacePlantDescriptionTest {
         final PlantDescription description = new PlantDescriptionBuilder()
             .plantDescription(newName)
             .active(true)
-            .include(new ArrayList<>())
-            .systems(new ArrayList<>())
-            .connections(new ArrayList<>())
             .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -185,7 +186,11 @@ public class ReplacePlantDescriptionTest {
         final var backingStore = Mockito.mock(FilePdStore.class);
         final var pdTracker = new PlantDescriptionTracker(backingStore);
         final var handler = new ReplacePlantDescription(pdTracker);
-        final PlantDescription description = TestUtils.createDescription();
+
+        final PlantDescription description = new PlantDescriptionBuilder()
+            .plantDescription("Plant Description 1A")
+            .build();
+
         final HttpServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of("87"))

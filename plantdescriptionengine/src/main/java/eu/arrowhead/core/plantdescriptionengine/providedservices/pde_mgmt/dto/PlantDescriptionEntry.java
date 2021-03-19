@@ -180,46 +180,4 @@ public interface PlantDescriptionEntry {
 
     Instant updatedAt();
 
-    /**
-     * Helper function for finding service definition names.
-     *
-     * @param connectionIndex Index of a connection within this instance's
-     *                        connection list.
-     * @return Service definition name of the *producer* service of the specified
-     * connection.
-     */
-    default String serviceDefinitionName(int connectionIndex) { // TODO: Remove
-        final SystemPort producerPort = connections().get(connectionIndex).producer();
-
-        String serviceDefinitionName = null;
-
-        for (PdeSystem system : systems()) {
-            if (!system.systemId().equals(producerPort.systemId())) {
-                continue;
-            }
-            for (Port port : system.ports()) {
-                if (port.portName().equals(producerPort.portName())) {
-                    serviceDefinitionName = port.serviceDefinition();
-                }
-            }
-        }
-
-        // TODO: Remove this and instead validate all plant descriptions.
-        Objects.requireNonNull(serviceDefinitionName, "Could not find producer of connection " + connectionIndex
-            + " in Plant Description Entry '" + plantDescription() + "'");
-        return serviceDefinitionName;
-    }
-
-    /**
-     * @param description A Plant Description.
-     * @return True if the fields of the given description match those of this
-     * instance.
-     */
-    default boolean matchesDescription(PlantDescription description) {
-        return (description.plantDescription().equals(plantDescription())
-            && (description.active().orElse(false) == active())
-            // TODO: Check 'include', 'systems' and 'connections' as well.
-        );
-    }
-
 }

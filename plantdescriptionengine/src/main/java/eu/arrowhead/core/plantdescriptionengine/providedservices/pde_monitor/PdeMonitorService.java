@@ -3,11 +3,13 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.*;
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.descriptor.TransportDescriptor;
+import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.query.ServiceQuery;
@@ -85,9 +87,8 @@ public class PdeMonitorService {
             .get("/pd/#id", new GetPlantDescription(monitorInfo, pdTracker))
             .get("/alarm/#id", new GetPdeAlarm(alarmManager))
             .get("/alarm", new GetAllPdeAlarms(alarmManager))
-            .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager));
-        // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()); TODO: Add
-        // this line?
+            .patch("/alarm/#id", new UpdatePdeAlarm(alarmManager))
+            .catcher(DtoReadException.class, new DtoReadExceptionCatcher());
 
         if (secure) {
             service.accessPolicy(AccessPolicy.cloud());

@@ -74,8 +74,6 @@ public class RetrieveMonitorInfoTask extends TimerTask {
                 String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
                     + "', service '" + service.name() + "'.";
                 logger.warn(errorMessage, e);
-
-                // TODO: Raise an alarm?
             });
     }
 
@@ -100,7 +98,6 @@ public class RetrieveMonitorInfoTask extends TimerTask {
                 String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
                     + "', service '" + service.name() + "'.";
                 logger.error(errorMessage, e);
-                // TODO: Raise an alarm?
             });
     }
 

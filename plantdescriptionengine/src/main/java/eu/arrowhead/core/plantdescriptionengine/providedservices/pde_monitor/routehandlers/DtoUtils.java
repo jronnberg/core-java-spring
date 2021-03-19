@@ -94,13 +94,10 @@ public final class DtoUtils {
                     boolean matchesPort = info.matchesPortMetadata(system.metadata().orElse(null),
                         port.metadata().orElse(null));
 
-                    if (matchesServiceDefinition) { // TODO: Merge if-statements, this is just for checking test
-                        // coverage
-                        if (matchesPort) {
-                            serviceMonitorInfo = info;
-                            systemInfoList.remove(info);
-                            break;
-                        }
+                    if (matchesServiceDefinition && matchesPort) {
+                        serviceMonitorInfo = info;
+                        systemInfoList.remove(info);
+                        break;
                     }
                 }
 
@@ -126,8 +123,6 @@ public final class DtoUtils {
                 logger.warn("Unmatched data in MonitorInfo");
             }
         }
-        // TODO: What if there's unmatched data left?
-
         return systemBuilder.build();
     }
 
