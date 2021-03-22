@@ -274,6 +274,21 @@ The name of a system may not always be known at plant description design time. I
 ```
 This metadata is forwarded to the Orchestrator as part of the rules created by the PDE, and can thus be used to identify systems during orchestration.
 
+### Specifying service interfaces
+A service interface requirement can be given as part of a system port:
+
+
+```json
+{
+	"portName": "x",
+	"serviceDefinition": "X",
+	"serviceInterface": "HTTP-SECURE-JSON"
+}
+```
+
+If a service interface is specified on a port, the same service interface must be given on all ports that it is connected to. This service interface requirement is forwarded to the Orchestrator.
+
+
 ### Providing multiple instances of a service
 A system may need to provide multiple instances of the same service, where each instance should be accessible only to a specific set of consumers. This can be expressed by adding metadata to the provider system's ports:
 
