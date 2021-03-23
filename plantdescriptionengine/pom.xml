@@ -14,9 +14,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
     <kalix.version>0.4.2</kalix.version>
+    <mysql.jdbc.driver>8.0.16</mysql.jdbc.driver>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql.jdbc.driver}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
