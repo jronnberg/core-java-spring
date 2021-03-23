@@ -4,7 +4,7 @@ public enum AlarmCause {
     systemInactive("appears to be inactive."),
     systemNotRegistered("cannot be found in the Service Registry."),
     systemNotInDescription("is not present in the active Plant Description."),
-    systemNotUniqueInSr("cannot be uniquely identified in the Service Registry.");
+    multipleMatches("cannot be uniquely identified in the Service Registry.");
 
     private final String description;
 

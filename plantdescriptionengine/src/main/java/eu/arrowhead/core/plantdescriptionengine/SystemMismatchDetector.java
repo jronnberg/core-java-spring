@@ -195,7 +195,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
             }
 
             if (numMatches > 1) {
-                alarmManager.raiseSystemNotUniqueInSr(
+                alarmManager.raiseMultipleMatches(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
                     entrySystem.metadata().orElse(null)
@@ -247,7 +247,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
         final List<Alarm> notFoundInSrAlarms = alarmManager.getActiveAlarmData(List.of(
             AlarmCause.systemNotRegistered,
-            AlarmCause.systemNotUniqueInSr
+            AlarmCause.multipleMatches
         ));
 
         for (final var alarm : notFoundInSrAlarms) {

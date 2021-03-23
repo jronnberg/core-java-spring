@@ -122,9 +122,9 @@ public class AlarmManager {
         raiseAlarm(systemId, systemName, metadata, AlarmCause.systemNotRegistered);
     }
 
-    public void raiseSystemNotUniqueInSr(String systemId, String systemName, Map<String, String> metadata) {
+    public void raiseMultipleMatches(String systemId, String systemName, Map<String, String> metadata) {
         Objects.requireNonNull(systemId, "Expected system ID");
-        raiseAlarm(systemId, systemName, metadata, AlarmCause.systemNotUniqueInSr);
+        raiseAlarm(systemId, systemName, metadata, AlarmCause.multipleMatches);
     }
 
     public void raiseSystemInactive(String systemName) {
