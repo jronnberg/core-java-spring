@@ -236,4 +236,132 @@ public class GetAllPdeAlarmsTest {
         }
     }
 
+    @Test
+    public void shouldFilterBySystemName() {
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
+
+        final var alarmManager = new AlarmManager();
+
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
+        alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC, null);
+
+        final var handler = new GetAllPdeAlarms(alarmManager);
+
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("systemName", List.of(systemNameA)))
+            .build();
+
+        final HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+
+                    assertTrue(response.body().isPresent());
+                    final var alarms = (PdeAlarmList) response.body().get();
+                    assertEquals(1, alarms.count());
+
+                    assertEquals(systemNameA, alarms.data().get(0).systemName().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldFilterBySeverity() {
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
+
+        final var alarmManager = new AlarmManager();
+
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
+        alarmManager.raiseSystemInactive(systemNameC);
+        alarmManager.clearSystemInactive(systemNameC);
+
+        final var handler = new GetAllPdeAlarms(alarmManager);
+
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("severity", List.of("warning")))
+            .build();
+
+        final HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+
+                    assertTrue(response.body().isPresent());
+                    final var alarms = (PdeAlarmList) response.body().get();
+                    System.out.println(alarms.data());
+                    assertEquals(2, alarms.count());
+
+                    assertEquals(systemNameA, alarms.data().get(0).systemName().orElse(null));
+                    assertEquals(systemNameB, alarms.data().get(1).systemName().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void shouldFilterAcknowledged() {
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
+
+        final var alarmManager = new AlarmManager();
+
+        alarmManager.raiseSystemNotInDescription(systemNameA, null);
+        alarmManager.raiseSystemNotInDescription(systemNameB, null);
+        alarmManager.raiseSystemNotInDescription(systemNameC, null);
+
+        final var alarms = alarmManager.getAlarms();
+
+        alarmManager.setAcknowledged(alarms.get(0).id(), true);
+        alarmManager.setAcknowledged(alarms.get(1).id(), true);
+
+        final var handler = new GetAllPdeAlarms(alarmManager);
+
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("acknowledged", List.of("false")))
+            .build();
+
+        final HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+
+                    assertTrue(response.body().isPresent());
+                    final var result = (PdeAlarmList) response.body().get();
+                    System.out.println(result.data());
+                    assertEquals(1, result.count());
+
+                    assertEquals(systemNameC, result.data().get(0).systemName().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            assertNull(e);
+        }
+    }
+
 }
