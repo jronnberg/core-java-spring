@@ -1,10 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
+import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.json.value.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,12 +20,19 @@ public class MonitorInfo {
     private final Map<String, Bundle> infoBundles = new ConcurrentHashMap<>();
 
     /**
-     * @param service An Arrowhead Framework service, as provided by a local or
-     *                remote system.
+     * @param service An Arrowhead Framework service.
      * @return A unique identifier for the given service.
      */
-    private String getKey(final ServiceDescription service) {
-        return service.provider().name() + service.uri();
+    private String toKey(final ServiceDescription service) {
+
+        final Map<String, String> metadata = Collections.emptyMap();
+        // TODO: Replace the line above with the one below!
+        // Map<String, String> metadata = service.provider.metadata();
+
+        final String result = "name=" + service.provider().name() +
+            ",serviceUri=" + service.uri() +
+            ",metadata=" + Metadata.toString(metadata);
+        return result + "}";
     }
 
     /**
@@ -34,18 +43,30 @@ public class MonitorInfo {
      * @param inventoryId An inventory ID.
      */
     public void putInventoryId(final ServiceDescription service, final String inventoryId) {
+
         Objects.requireNonNull(service, "Expected service");
         Objects.requireNonNull(service, "Expected inventory ID");
+
         final String systemName = service.provider().name();
-        final Map<String, String> metadata = service.metadata();
-        final String key = getKey(service);
+        final Map<String, String> serviceNetadata = service.metadata();
+
+        final Map<String, String> systemMetadata = Collections.emptyMap();
+        // TODO: Replace the line above with the one below.
+        // final Map<String, String> systemMetadata = service.provider().metadata();
+
+        final String key = toKey(service);
         final Bundle oldBundle = infoBundles.get(key);
-        final Bundle newBundle;
-        if (oldBundle == null) {
-            newBundle = new Bundle(systemName, service.name(), metadata, null, inventoryId);
-        } else {
-            newBundle = new Bundle(systemName, service.name(), metadata, oldBundle.systemData, inventoryId);
-        }
+        final JsonObject systemData = (oldBundle == null) ? null : oldBundle.systemData;
+
+        final Bundle newBundle = new Bundle(
+            systemName,
+            service.name(),
+            systemMetadata,
+            serviceNetadata,
+            systemData,
+            inventoryId
+        );
+
         infoBundles.put(key, newBundle);
     }
 
@@ -57,20 +78,32 @@ public class MonitorInfo {
      * @param data    System data to be stored.
      */
     public void putSystemData(final ServiceDescription service, final JsonObject data) {
+
         Objects.requireNonNull(service, "Expected service");
         Objects.requireNonNull(data, "Expected system data");
 
-        final String key = getKey(service);
-        final String systemName = service.provider().name();
-        final Map<String, String> metadata = service.metadata();
-        final Bundle oldBundle = infoBundles.get(key);
-        final Bundle newBundle;
+        final String key = toKey(service);
+        final ProviderDescription provider = service.provider();
+        final String systemName = provider.name();
 
-        if (oldBundle == null) {
-            newBundle = new Bundle(systemName, service.name(), metadata, data, null);
-        } else {
-            newBundle = new Bundle(systemName, service.name(), metadata, data, oldBundle.inventoryId);
-        }
+        final Map<String, String> systemMetadata = Collections.emptyMap();
+        // TODO: Replace the line above with the one below!
+        // final Map<String, String> systemMetadata = provider.metadata();
+
+        final Map<String, String> serviceMetadata = service.metadata();
+        final String serviceDefinition = service.name();
+        final Bundle oldBundle = infoBundles.get(key);
+        final String inventoryId = (oldBundle == null) ? null : oldBundle.inventoryId;
+
+        final Bundle newBundle = new Bundle(
+                systemName,
+                serviceDefinition,
+                systemMetadata,
+                serviceMetadata,
+                data,
+                inventoryId
+            );
+
         infoBundles.put(key, newBundle);
     }
 
@@ -90,9 +123,9 @@ public class MonitorInfo {
 
         final List<Bundle> result = new ArrayList<>();
         for (final Bundle bundle : infoBundles.values()) {
-            if (systemName != null && systemName.equals(bundle.systemName)) {
-                result.add(bundle);
-            } else if (metadata != null && Metadata.isSubset(metadata, bundle.metadata)) {
+            final boolean namesMatch = systemName == null || systemName.equals(bundle.systemName);
+            final boolean metadataMatch = metadata == null || Metadata.isSubset(metadata, bundle.systemMetadata);
+            if (namesMatch && metadataMatch) {
                 result.add(bundle);
             }
         }
@@ -102,53 +135,38 @@ public class MonitorInfo {
     public static class Bundle {
         public final JsonObject systemData;
         public final String serviceDefinition;
-        public final Map<String, String> metadata;
+        public final Map<String, String> systemMetadata;
+        public final Map<String, String> serviceMetadata;
         public final String inventoryId;
         public final String systemName;
 
-        Bundle(final String systemName, final String serviceDefinition, final Map<String, String> metadata, final JsonObject systemData,
-               final String inventoryId) {
+        Bundle(
+            final String systemName,
+            final String serviceDefinition,
+            final Map<String, String> systemMetadata,
+            final Map<String, String> serviceMetadata,
+            final JsonObject systemData,
+            final String inventoryId
+        ) {
             this.systemData = systemData;
             this.serviceDefinition = serviceDefinition;
             this.inventoryId = inventoryId;
             this.systemName = systemName;
-            this.metadata = metadata;
-        }
-
-        /**
-         * Returns true if the given arguments match this instance's metadata.
-         * <p>
-         * More specifically, returns true if {@code portMetadata} is present,
-         * and the union of {@code systemMetadata} and {@code portMetadata} is a
-         * subset of this instance's metadata.
-         *
-         * @param systemMetadata Metadata relating to a particular system (read
-         *                       from a system in a Plant Description Entry).
-         *                       May be null.
-         * @param portMetadata   Metadata relating to a particular service (read
-         *                       from one of the ports of a system in a Plant
-         *                       Description Entry). May be null.
-         */
-        public boolean matchesPortMetadata(final Map<String, String> systemMetadata, final Map<String, String> portMetadata) {
-            if (portMetadata == null || portMetadata.isEmpty()) {
-                return false;
-            }
-
-            final Map<String, String> mergedMetadata = Metadata.merge(systemMetadata, portMetadata);
-            return Metadata.isSubset(mergedMetadata, metadata);
+            this.serviceMetadata = serviceMetadata;
+            this.systemMetadata = systemMetadata;
         }
 
         /**
          * Returns true if the given arguments match this instances metadata.
          * <p>
-         * More specifically, returns true if {@code systemMetadata} is not
-         * present, or is a superset of this instance's metadata.
+         * More specifically, returns true if {@code metadata} is not present,
+         * or is a superset of this instance's system metadata.
          *
-         * @param systemMetadata Metadata relating to a particular system (read
-         *                       from a system in a Plant Description Entry).
+         * @param metadata Metadata relating to a particular system (read from a
+         *                 system in a Plant Description Entry).
          */
-        public boolean matchesSystemMetadata(final Map<String, String> systemMetadata) {
-            if (systemMetadata == null) {
+        public boolean matchesSystemMetadata(final Map<String, String> metadata) {
+            if (metadata == null) {
                 return true;
             }
             return Metadata.isSubset(metadata, systemMetadata);

@@ -99,8 +99,6 @@ public class SystemMismatchDetectorTest {
     /**
      * No alarm should be raised if two systems have the same system name, as
      * long as there is metadata available to differentiate between them.
-     *
-     * @throws PdStoreException
      */
     // TODO: Add this test
     // @Test

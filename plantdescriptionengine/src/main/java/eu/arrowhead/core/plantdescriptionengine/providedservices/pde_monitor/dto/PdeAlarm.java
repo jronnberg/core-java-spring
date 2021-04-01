@@ -123,9 +123,6 @@ public interface PdeAlarm {
         sort(alarms, CLEARED_AT_COMPARATOR, ascending);
     }
 
-    /**
-     * @return A string used to specify that an alarm is not cleared.
-     */
     static String NOT_CLEARED = "not_cleared";
 
     int id();
