@@ -16,7 +16,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

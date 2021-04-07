@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Class that reads and writes Orchestration rules to file.
+ * Class that reads and writes Orchestration rules to an SQL database.
  * <p>
  * The PDE needs to keep track of which Orchestration rules it has created, and
  * to which Plant Description Entry each rule belongs. This information is
@@ -21,24 +21,43 @@ import java.util.Set;
  */
 public class SqlRuleStore implements RuleStore {
 
+    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS pde_rule (id INT);";
+    private final String SQL_SELECT_ALL_RULES = "select * from pde_rule;";
+    private final String SQL_INSERT_RULE = "INSERT INTO pde_rule(id) VALUES(?);";
+    private final String SQL_DELETE_ALL_RULES = "DELETE FROM pde_rule;";
+
     private Connection connection;
 
-    public void init(final String username, final String password) throws RuleStoreException {
+    /**
+     * Throws an {@code IllegalStateException} if this instance has not been'
+     * initialized.
+     */
+    private void ensureInitialized() {
+        if (connection == null) {
+            throw new IllegalStateException("SqlRuleStore has not been initialized.");
+        }
+    }
+
+    public void init(
+        final String driverName,
+        final String connectionUrl,
+        final String username,
+        final String password
+    ) throws RuleStoreException {
+
+        Objects.requireNonNull(driverName, "Expected database driver name.");
+        Objects.requireNonNull(connectionUrl, "Expected connection URL.");
+        Objects.requireNonNull(username, "Expected username.");
+        Objects.requireNonNull(password, "Expected password.");
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/arrowhead", username, password);
-
+            Class.forName(driverName);
+            connection = DriverManager.getConnection(connectionUrl, username, password);
             final Statement statement = connection.createStatement();
-            statement.execute("CREATE TABLE IF NOT EXISTS pde_rule (id INT);");
-            final ResultSet resultSet = statement.executeQuery("select * from pde_rule");
-
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("id"));
-            }
+            statement.execute(SQL_CREATE_TABLE);
 
         } catch (final ClassNotFoundException | SQLException e) {
+            System.out.println(e.getMessage());
             throw new RuleStoreException("Failed to initialize rule store", e);
         }
     }
@@ -48,10 +67,12 @@ public class SqlRuleStore implements RuleStore {
      */
     @Override
     public Set<Integer> readRules() throws RuleStoreException {
+        ensureInitialized();
+
         try {
             final Set<Integer> result = new HashSet<>();
             final Statement statement = connection.createStatement();
-            final ResultSet resultSet = statement.executeQuery("select * from pde_rule");
+            final ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL_RULES);
 
             while (resultSet.next()) {
                 result.add(resultSet.getInt("id"));
@@ -70,12 +91,10 @@ public class SqlRuleStore implements RuleStore {
     @Override
     public void setRules(final Set<Integer> rules) throws RuleStoreException {
         Objects.requireNonNull(rules, "Expected rules.");
+        ensureInitialized();
 
         try {
-
-            final String sql = "INSERT INTO pde_rule(id) VALUES(?)";
-            final PreparedStatement statement = connection.prepareStatement(sql);
-
+            final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_RULE);
             for (final Integer rule : rules) {
                 statement.setInt(1, rule);
                 statement.executeUpdate();
@@ -93,9 +112,10 @@ public class SqlRuleStore implements RuleStore {
      */
     @Override
     public void removeAll() throws RuleStoreException {
+        ensureInitialized();
         try {
             final Statement statement = connection.createStatement();
-            statement.execute("DELETE FROM pde_rule;");
+            statement.execute(SQL_DELETE_ALL_RULES);
         } catch (final SQLException e) {
             throw new RuleStoreException("Failed to delete orchestration rules", e);
         }

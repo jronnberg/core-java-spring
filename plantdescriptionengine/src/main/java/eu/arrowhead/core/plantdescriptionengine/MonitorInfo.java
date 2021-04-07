@@ -96,13 +96,13 @@ public class MonitorInfo {
         final String inventoryId = (oldBundle == null) ? null : oldBundle.inventoryId;
 
         final Bundle newBundle = new Bundle(
-                systemName,
-                serviceDefinition,
-                systemMetadata,
-                serviceMetadata,
-                data,
-                inventoryId
-            );
+            systemName,
+            serviceDefinition,
+            systemMetadata,
+            serviceMetadata,
+            data,
+            inventoryId
+        );
 
         infoBundles.put(key, newBundle);
     }

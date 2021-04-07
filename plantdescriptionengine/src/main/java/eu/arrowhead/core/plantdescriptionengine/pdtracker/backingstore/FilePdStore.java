@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class that reads and writes Plant Description Entries to file.
+ */
 public class FilePdStore implements PdStore {
 
     // File path to the directory for storing JSON representations of plant
@@ -105,7 +108,7 @@ public class FilePdStore implements PdStore {
             entry.writeJson(byteArrayWriter);
             fileWriter.write(byteArrayWriter.asByteArray());
         } catch (final DtoWriteException | IOException e) {
-            throw new PdStoreException("Failed to write rule to file", e);
+            throw new PdStoreException("Failed to write Plant Description Entry to file", e);
         }
     }
 

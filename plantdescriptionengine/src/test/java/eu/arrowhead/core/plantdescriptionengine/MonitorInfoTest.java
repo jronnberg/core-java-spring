@@ -135,7 +135,7 @@ public class MonitorInfoTest {
 
     @Test
     public void shouldThrowWhenArgsAreMissing() {
-        MonitorInfo monitorInfo = new MonitorInfo();
+        final MonitorInfo monitorInfo = new MonitorInfo();
         final Exception exception = assertThrows(IllegalArgumentException.class, () -> monitorInfo.getSystemInfo(null, null));
         assertEquals("Either system name or metadata must be present.", exception.getMessage());
     }

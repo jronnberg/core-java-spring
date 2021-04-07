@@ -164,10 +164,12 @@ public class OrchestratorClientTest {
     private PlantDescriptionEntryDto createEntry() {
 
         final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder().systemId(consumerId)
+            .consumer(new SystemPortBuilder()
+                .systemId(consumerId)
                 .portName(consumerPort)
                 .build())
-            .producer(new SystemPortBuilder().systemId(producerId)
+            .producer(new SystemPortBuilder()
+                .systemId(producerId)
                 .portName(producerPort)
                 .build())
             .build());

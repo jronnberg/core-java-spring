@@ -7,23 +7,29 @@ import java.time.Instant;
 
 public final class TestUtils {
 
+    private final static String defaultName = "Plant Description 1A";
+
     private TestUtils() {
         throw new AssertionError();
     }
 
-    public static PlantDescriptionEntryDto createEntry(final int id, final boolean active) {
+    public static PlantDescriptionEntryDto createEntry(final int id, final String name, final boolean active) {
         final Instant now = Instant.now();
         return new PlantDescriptionEntryBuilder()
             .id(id)
-            .plantDescription("Plant Description 1A")
+            .plantDescription(name)
             .active(active)
             .createdAt(now)
             .updatedAt(now)
             .build();
     }
 
+    public static PlantDescriptionEntryDto createEntry(final int id, final boolean active) {
+        return createEntry(id, defaultName, active);
+    }
+
     public static PlantDescriptionEntryDto createEntry(final int id) {
-        return createEntry(id, true);
+        return createEntry(id, defaultName, true);
     }
 
 }
