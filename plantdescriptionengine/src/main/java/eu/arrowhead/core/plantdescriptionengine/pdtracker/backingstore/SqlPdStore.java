@@ -62,7 +62,6 @@ public class SqlPdStore implements PdStore {
             statement.execute(SQL_CREATE_TABLE);
 
         } catch (final ClassNotFoundException | SQLException e) {
-            System.out.println(e.getMessage());
             throw new PdStoreException("Failed to initialize PD store", e);
         }
     }

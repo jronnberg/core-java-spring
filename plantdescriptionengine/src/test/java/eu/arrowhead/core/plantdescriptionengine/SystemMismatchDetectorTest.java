@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.List;
@@ -76,7 +75,7 @@ public class SystemMismatchDetectorTest {
     }
 
     @BeforeEach
-    public void initEach() throws PdStoreException, SSLException {
+    public void initEach() throws PdStoreException {
         pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         systemTracker = new MockSystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));

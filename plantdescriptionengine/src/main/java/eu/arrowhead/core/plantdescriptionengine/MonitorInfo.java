@@ -1,8 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
-import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.description.SystemDescription;
 import se.arkalix.dto.json.value.JsonObject;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class MonitorInfo {
         Objects.requireNonNull(data, "Expected system data");
 
         final String key = toKey(service);
-        final ProviderDescription provider = service.provider();
+        final SystemDescription provider = service.provider();
         final String systemName = provider.name();
 
         final Map<String, String> systemMetadata = Collections.emptyMap();

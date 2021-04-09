@@ -57,7 +57,6 @@ public class SqlRuleStore implements RuleStore {
             statement.execute(SQL_CREATE_TABLE);
 
         } catch (final ClassNotFoundException | SQLException e) {
-            System.out.println(e.getMessage());
             throw new RuleStoreException("Failed to initialize rule store", e);
         }
     }

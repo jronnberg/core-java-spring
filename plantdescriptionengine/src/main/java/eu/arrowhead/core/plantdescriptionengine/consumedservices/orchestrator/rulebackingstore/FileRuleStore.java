@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class FileRuleStore implements RuleStore {
 
-    private static final Logger logger = LoggerFactory.getLogger(RuleStore.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileRuleStore.class);
     private static final String ruleFileName = "orchestration_rules.txt";
 
     // File path to the directory for storing the IDs of created Orchestration

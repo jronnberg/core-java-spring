@@ -108,7 +108,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     .uri(CREATE_RULE_URI)
                     .body(DtoEncoding.JSON, rules)
                     .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
+            .flatMap(response -> response.bodyAsIfSuccess(DtoEncoding.JSON, StoreEntryListDto.class));
     }
 
     /**

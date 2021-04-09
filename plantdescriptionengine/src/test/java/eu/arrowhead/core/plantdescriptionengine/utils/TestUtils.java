@@ -7,7 +7,7 @@ import java.time.Instant;
 
 public final class TestUtils {
 
-    private final static String defaultName = "Plant Description 1A";
+    private static final String defaultName = "Plant Description 1A";
 
     private TestUtils() {
         throw new AssertionError();

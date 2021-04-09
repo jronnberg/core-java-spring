@@ -86,7 +86,7 @@ public class SystemTracker {
                 new HttpClientRequest().method(HttpMethod.GET)
                     .uri("/serviceregistry/systems")
                     .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
+            .flatMap(response -> response.bodyAsIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
                 final List<SrSystem> newSystems = systemList.data();
                 final List<SrSystem> oldSystems = new ArrayList<>(systems.values());

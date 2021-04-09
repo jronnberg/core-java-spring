@@ -25,8 +25,8 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.description.SystemDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.dto.json.value.JsonBoolean;
@@ -228,7 +228,7 @@ public class GetAllPlantDescriptionsTest {
             .build();
 
         pdTracker.put(entry);
-        final ProviderDescription provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemDescription provider = SystemDescription.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
         final ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name("service-name")
             .uri("/abc")

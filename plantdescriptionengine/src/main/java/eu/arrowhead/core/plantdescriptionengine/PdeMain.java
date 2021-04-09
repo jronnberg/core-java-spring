@@ -13,7 +13,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.Pde
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.PdeMonitorableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.arkalix.ArServiceCache;
+import se.arkalix.ArServiceDescriptionCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.core.plugin.or.OrchestrationOption;
@@ -23,7 +23,6 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
-import javax.net.ssl.SSLException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -59,28 +58,20 @@ public final class PdeMain {
      */
     static HttpClient createHttpClient(final Properties appProps) {
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
-        HttpClient client = null;
-        try {
-            if (!secureMode) {
-                client = new HttpClient.Builder().insecure()
-                    .build();
-            } else {
-                final OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.pde.key-store"),
-                    getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
-                    getProp(appProps, "server.ssl.pde.key-store-password").toCharArray());
+        if (!secureMode) {
+            return new HttpClient.Builder().insecure().build();
+        } else {
+            final OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.pde.key-store"),
+                getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
+                getProp(appProps, "server.ssl.pde.key-store-password").toCharArray());
 
-                final TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.pde.trust-store"),
-                    getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray());
+            final TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.pde.trust-store"),
+                getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray());
 
-                client = new HttpClient.Builder().identity(identity)
-                    .trustStore(trustStore)
-                    .build();
-            }
-        } catch (final SSLException e) {
-            logger.error("Failed to create PDE HTTP Client", e);
-            System.exit(1);
+            return new HttpClient.Builder().identity(identity)
+                .trustStore(trustStore)
+                .build();
         }
-        return client;
     }
 
     /**
@@ -100,7 +91,7 @@ public final class PdeMain {
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .serviceCache(ArServiceCache.withEntryLifetimeLimit(Duration.ZERO))
+            .serviceCache(ArServiceDescriptionCache.withEntryLifetimeLimit(Duration.ZERO))
             .localPort(pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder().orchestrationStrategy(strategy)
                 .serviceRegistrySocketAddress(serviceRegistryAddress)

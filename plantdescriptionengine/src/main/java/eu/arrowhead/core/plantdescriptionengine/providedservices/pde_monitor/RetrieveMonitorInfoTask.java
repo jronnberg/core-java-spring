@@ -75,7 +75,7 @@ public class RetrieveMonitorInfoTask extends TimerTask {
                     .method(HttpMethod.GET)
                     .uri(service.uri() + INVENTORY_ID_PATH)
                     .header("accept", "application/json"))
-            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
+            .flatMap(result -> result.bodyAsIfSuccess(DtoEncoding.JSON, InventoryIdDto.class))
             .ifSuccess(inventoryId -> monitorInfo.putInventoryId(service, inventoryId.id().orElse(null)))
             .onFailure(e -> {
                 final String errorMessage = "Failed to retrieve inventory ID for system '" + service.provider().name()
@@ -98,7 +98,7 @@ public class RetrieveMonitorInfoTask extends TimerTask {
                     .method(HttpMethod.GET)
                     .uri(service.uri() + SYSTEM_DATA_PATH)
                     .header("accept", "application/json"))
-            .flatMap(result -> result.bodyAsClassIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
+            .flatMap(result -> result.bodyAsIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
             .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data()))
             .onFailure(e -> {
                 final String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()

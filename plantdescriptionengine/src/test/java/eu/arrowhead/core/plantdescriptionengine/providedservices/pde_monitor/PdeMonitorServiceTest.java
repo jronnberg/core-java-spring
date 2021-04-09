@@ -9,12 +9,10 @@ import org.junit.jupiter.api.Test;
 import se.arkalix.ArSystem;
 import se.arkalix.net.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
-
 public class PdeMonitorServiceTest {
 
     @Test
-    public void shouldProvideService() throws PdStoreException, SSLException {
+    public void shouldProvideService() throws PdStoreException {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
@@ -30,7 +28,7 @@ public class PdeMonitorServiceTest {
     }
 
     @Test
-    public void shouldNotAllowSecureService() throws PdStoreException, SSLException {
+    public void shouldNotAllowSecureService() throws PdStoreException {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 

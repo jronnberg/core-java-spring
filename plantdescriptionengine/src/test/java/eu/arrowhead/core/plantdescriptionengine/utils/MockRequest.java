@@ -1,15 +1,16 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import se.arkalix.description.ConsumerDescription;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoReadable;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpVersion;
+import se.arkalix.net.http.service.HttpServiceConnection;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.util.concurrent.FutureProgress;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,12 +108,22 @@ public class MockRequest implements HttpServiceRequest {
     }
 
     @Override
-    public ConsumerDescription consumer() {
+    public HttpVersion version() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public HttpVersion version() {
+    public HttpServiceRequest clearHeaders() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FutureProgress<String> bodyAsString(final Charset charset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpServiceConnection connection() {
         throw new UnsupportedOperationException();
     }
 

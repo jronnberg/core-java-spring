@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,9 @@ public class DtoReadExceptionCatcherTest {
         final String value = "ABC";
         final int offset = 0;
 
-        final DtoReadException exception = new DtoReadException(DtoEncoding.JSON, message, value, offset);
+        final DtoReadException exception = new DtoReadException(PlantDescriptionEntryDto.class, DtoEncoding.JSON, message, value, offset);
+
+
         final MockRequest request = new MockRequest.Builder().body("Body").build();
         final MockServiceResponse response = new MockServiceResponse();
 
@@ -30,6 +33,7 @@ public class DtoReadExceptionCatcherTest {
         assertTrue(response.body().isPresent());
         final String body = response.body().get().toString();
 
-        assertEquals("ErrorMessage{error='Failed to read JSON; cause: Lorem Ipsum `ABC` at offset 0'}", body);
+        final String expectedError = "ErrorMessage{error='Failed to read eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto from JSON source; the following issue occurred when reading 'ABC' at source offset 0: Lorem Ipsum'}";
+        assertEquals(expectedError, body);
     }
 }

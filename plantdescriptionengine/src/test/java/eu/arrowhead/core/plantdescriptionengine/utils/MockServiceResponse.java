@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
+import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.dto.DtoEncoding;
 import se.arkalix.dto.DtoWritable;
 import se.arkalix.net.http.HttpHeaders;
@@ -7,6 +8,7 @@ import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -36,11 +38,6 @@ public class MockServiceResponse implements HttpServiceResponse {
         Objects.requireNonNull(data, "Expected data.");
         _body = data;
         return this;
-    }
-
-    @Override
-    public HttpServiceResponse body(final DtoEncoding encoding, final List<DtoWritable> data) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -89,12 +86,37 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpVersion version() {
+    public HttpServiceResponse header(final CharSequence name, final CharSequence value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public HttpServiceResponse body(final List<DtoWritable> arg0) {
+    public Optional<HttpVersion> version() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpServiceResponse version(final HttpVersion version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Charset> charset() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<EncodingDescriptor> encoding() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <L extends List<? extends DtoWritable>> HttpServiceResponse body(final DtoEncoding encoding, final L data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpServiceResponse body(final Charset charset, final String string) {
         throw new UnsupportedOperationException();
     }
 

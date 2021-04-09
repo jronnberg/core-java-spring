@@ -13,8 +13,8 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntry;
 import org.junit.jupiter.api.Test;
-import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.description.SystemDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.dto.json.value.JsonBoolean;
@@ -81,7 +81,7 @@ public class DtoUtilsTest {
             .updatedAt(now)
             .build();
 
-        final ProviderDescription provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemDescription provider = SystemDescription.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
         final ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name(serviceDefinition)
             .metadata(metadata)
@@ -199,7 +199,7 @@ public class DtoUtilsTest {
             .updatedAt(now)
             .build();
 
-        final ProviderDescription provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemDescription provider = SystemDescription.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
         final ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name(serviceDefinition)
             .metadata(metadata)
@@ -255,7 +255,7 @@ public class DtoUtilsTest {
             .updatedAt(now)
             .build();
 
-        final ProviderDescription provider = new ProviderDescription(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemDescription provider = SystemDescription.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
         final ServiceDescription serviceDescription = new ServiceDescription.Builder()
             .name(serviceDefinition)
             .metadata(metadata)

@@ -12,7 +12,6 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 
-import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class SystemTrackerTest {
 
     @Test
-    public void shouldThrowWhenNotInitialized() throws SSLException {
+    public void shouldThrowWhenNotInitialized() {
 
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
         final SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));

@@ -5,11 +5,13 @@ import se.arkalix.dto.DtoReadable;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.HttpVersion;
+import se.arkalix.net.http.client.HttpClientConnection;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.net.http.client.HttpClientResponse;
 import se.arkalix.util.concurrent.FutureProgress;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -88,5 +90,20 @@ public class MockClientResponse implements HttpClientResponse {
         Objects.requireNonNull(data, "Expected data.");
         _body = data;
         return this;
+    }
+
+    @Override
+    public HttpClientResponse clearHeaders() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FutureProgress<String> bodyAsString(final Charset charset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpClientConnection connection() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -1,8 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import org.junit.jupiter.api.Test;
-import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.description.SystemDescription;
 import se.arkalix.descriptor.InterfaceDescriptor;
 import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.dto.json.value.JsonBoolean;
@@ -22,7 +22,7 @@ public class MonitorInfoTest {
     private final String providerSystemName = "Provider-system";
 
     private ServiceDescription createServiceDescription(final Map<String, String> metadata) {
-        final ProviderDescription provider = new ProviderDescription(
+        final SystemDescription provider = SystemDescription.from(
             providerSystemName,
             new InetSocketAddress("0.0.0.0", 5000)
         );
@@ -65,7 +65,7 @@ public class MonitorInfoTest {
         final String systemNameA = "System-a";
         final String systemNameB = "System-b";
 
-        final ProviderDescription providerA = new ProviderDescription(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemDescription providerA = SystemDescription.from(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
         final ServiceDescription serviceA = new ServiceDescription.Builder()
             .name("service-a")
             .provider(providerA)
@@ -75,7 +75,7 @@ public class MonitorInfoTest {
             .metadata(metadataA)
             .build();
 
-        final ProviderDescription providerB = new ProviderDescription(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
+        final SystemDescription providerB = SystemDescription.from(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
         final ServiceDescription serviceB = new ServiceDescription.Builder()
             .name("service-b")
             .provider(providerB)

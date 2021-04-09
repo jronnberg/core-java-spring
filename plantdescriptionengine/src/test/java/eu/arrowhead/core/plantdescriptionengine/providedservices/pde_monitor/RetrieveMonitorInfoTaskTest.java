@@ -7,8 +7,8 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.RequestMatcher;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import se.arkalix.description.ProviderDescription;
 import se.arkalix.description.ServiceDescription;
+import se.arkalix.description.SystemDescription;
 import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.descriptor.TransportDescriptor;
 import se.arkalix.dto.json.value.JsonBoolean;
@@ -36,7 +36,7 @@ public class RetrieveMonitorInfoTaskTest {
     @Test
     public void shouldRetrieveMonitorInfo() {
 
-        final String serviceUri = "some.service.uri";
+        final String serviceUri = "http://some_service_uri";
         final String systemName = "System-xyz";
 
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
@@ -58,7 +58,7 @@ public class RetrieveMonitorInfoTaskTest {
             .body(new SystemDataBuilder()
                 .data(systemData)
                 .build());
-        final ProviderDescription provider = Mockito.mock(ProviderDescription.class);
+        final SystemDescription provider = Mockito.mock(SystemDescription.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
         when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
@@ -115,7 +115,7 @@ public class RetrieveMonitorInfoTaskTest {
     @Test
     public void shouldHandleInventoryIdFetchFailure() {
 
-        final String serviceUri = "some.service.uri";
+        final String serviceUri = "http://some-service-uri";
         final String systemName = "System-xyz";
 
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
@@ -131,7 +131,7 @@ public class RetrieveMonitorInfoTaskTest {
             .body(new SystemDataBuilder()
                 .data(systemData)
                 .build());
-        final ProviderDescription provider = Mockito.mock(ProviderDescription.class);
+        final SystemDescription provider = Mockito.mock(SystemDescription.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
         when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
@@ -169,7 +169,7 @@ public class RetrieveMonitorInfoTaskTest {
     @Test
     public void shouldHandleSystemDataFailure() {
 
-        final String serviceUri = "some.service.uri";
+        final String serviceUri = "http://some-service-uri";
         final String systemName = "System-xyz";
 
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
@@ -185,7 +185,7 @@ public class RetrieveMonitorInfoTaskTest {
                 .id("ABC")
                 .build());
 
-        final ProviderDescription provider = Mockito.mock(ProviderDescription.class);
+        final SystemDescription provider = Mockito.mock(SystemDescription.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
         when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
