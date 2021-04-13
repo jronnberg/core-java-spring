@@ -114,13 +114,8 @@ public class PdeMonitorService {
             .get(GET_ALL_ALARMS_PATH, new GetAllPdeAlarms(alarmManager))
             .get(GET_ALARM_PATH, new GetPdeAlarm(alarmManager))
             .patch(UPDATE_ALARM_PATH, new UpdatePdeAlarm(alarmManager))
-            .catcher(DtoReadException.class, new DtoReadExceptionCatcher());
-
-        if (secure) {
-            service.accessPolicy(AccessPolicy.cloud());
-        } else {
-            service.accessPolicy(AccessPolicy.unrestricted());
-        }
+            .catcher(DtoReadException.class, new DtoReadExceptionCatcher())
+            .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
 
         final Timer timer = new Timer();
 

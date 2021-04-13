@@ -6,9 +6,7 @@ import java.util.TreeMap;
 
 public final class Metadata {
 
-    private Metadata() {
-        throw new AssertionError();
-    }
+    private Metadata() {}
 
     /**
      * Returns

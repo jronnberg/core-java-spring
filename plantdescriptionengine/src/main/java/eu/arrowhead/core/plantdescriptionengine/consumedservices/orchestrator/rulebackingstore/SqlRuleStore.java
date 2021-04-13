@@ -12,12 +12,6 @@ import java.util.Set;
 
 /**
  * Class that reads and writes Orchestration rules to an SQL database.
- * <p>
- * The PDE needs to keep track of which Orchestration rules it has created, and
- * to which Plant Description Entry each rule belongs. This information is
- * stored in memory, but it also needs to be persisted to permanent storage in
- * case the PDE is restarted. This class provides that functionality, writing
- * rules and their relationship to Plant Descriptions to file.
  */
 public class SqlRuleStore implements RuleStore {
 
@@ -25,6 +19,7 @@ public class SqlRuleStore implements RuleStore {
     private final String SQL_SELECT_ALL_RULES = "select * from pde_rule;";
     private final String SQL_INSERT_RULE = "INSERT INTO pde_rule(id) VALUES(?);";
     private final String SQL_DELETE_ALL_RULES = "DELETE FROM pde_rule;";
+    private final String ID = "id";
 
     private Connection connection;
 
@@ -38,20 +33,29 @@ public class SqlRuleStore implements RuleStore {
         }
     }
 
+    /**
+     * Initializes the rule store for use by connecting to the database and
+     * creating the necessary tables.
+     *
+     * @param driverClassName The driver class for the mysql database.
+     * @param connectionUrl   URL of the database connection.
+     * @param username        Username to use when connecting to the database.
+     * @param password        Password to use when connecting to the database.
+     */
     public void init(
-        final String driverName,
+        final String driverClassName,
         final String connectionUrl,
         final String username,
         final String password
     ) throws RuleStoreException {
 
-        Objects.requireNonNull(driverName, "Expected database driver name.");
+        Objects.requireNonNull(driverClassName, "Expected database driver name.");
         Objects.requireNonNull(connectionUrl, "Expected connection URL.");
         Objects.requireNonNull(username, "Expected username.");
         Objects.requireNonNull(password, "Expected password.");
 
         try {
-            Class.forName(driverName);
+            Class.forName(driverClassName);
             connection = DriverManager.getConnection(connectionUrl, username, password);
             final Statement statement = connection.createStatement();
             statement.execute(SQL_CREATE_TABLE);
@@ -74,7 +78,7 @@ public class SqlRuleStore implements RuleStore {
             final ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL_RULES);
 
             while (resultSet.next()) {
-                result.add(resultSet.getInt("id"));
+                result.add(resultSet.getInt(ID));
             }
 
             return result;

@@ -197,7 +197,8 @@ public class GetAllPlantDescriptionsTest {
         final String nonBoolean = "Not a boolean";
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(pdTracker);
-        final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("active", List.of(nonBoolean)))
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("active", List.of(nonBoolean)))
             .build();
         final HttpServiceResponse response = new MockServiceResponse();
 

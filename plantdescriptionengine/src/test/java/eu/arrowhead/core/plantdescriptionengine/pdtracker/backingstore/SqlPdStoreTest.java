@@ -1,6 +1,5 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
-/*
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-*/
 
 /**
  * Unit test for the {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.SqlPdStore}
@@ -33,11 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class SqlPdStoreTest {
 
-    /*
-    TODO: Add these tests
-
-    private final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
-    private final String CONNECTION_URL = "jdbc:mysql://localhost/test_pde?serverTimezone=UTC";
+    private final String DRIVER_CLASS_NAME = "org.h2.Driver";
+    private final String CONNECTION_URL = "jdbc:h2:mem:testdb";
 
     private final String USERNAME = "root";
     private final String PASSWORD = "password";
@@ -56,7 +51,7 @@ public class SqlPdStoreTest {
     }
 
     @Test
-    public void shouldThrowWhenNotInitialized() {
+    public void shouldRequireInitialization() {
         final Exception exception = assertThrows(IllegalStateException.class,
             () -> new SqlPdStore().readEntries());
         assertEquals("SqlPdStore has not been initialized.", exception.getMessage());
@@ -218,5 +213,4 @@ public class SqlPdStoreTest {
             assertNotEquals(entry.id(), id0);
         }
     }
-    */
 }

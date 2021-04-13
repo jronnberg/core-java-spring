@@ -101,7 +101,7 @@ public class GetAllPdeAlarmsTest {
         final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
 
         final HttpServiceRequest ascRequest = new MockRequest.Builder()
-            .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("ASC")))
+            .queryParameters(Map.of("sort_field", List.of("raisedAt"), "direction", List.of("ASC")))
             .build();
         final HttpServiceRequest descRequest = new MockRequest.Builder()
             .queryParameters(
@@ -153,7 +153,94 @@ public class GetAllPdeAlarmsTest {
         }
     }
 
-    // TODO: Add test for sorting on "clearedAt", "updatedAt" and "".
+    @Test
+    public void shouldSortByClearedAt() {
+
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
+
+        final AlarmManager alarmManager = new AlarmManager();
+
+        alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC, null);
+
+        int systemCAlarmId = alarmManager.getAlarms().get(0).id();
+
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
+
+        alarmManager.clearAlarm(systemCAlarmId);
+
+        final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
+
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("sort_field", List.of("clearedAt"), "direction", List.of("ASC")))
+            .build();
+
+        final HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
+                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+                    final PdeAlarm firstAlarm = alarms.data().get(0);
+                    assertEquals(systemNameC, firstAlarm.systemName().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldSortByUpdatedAt() {
+
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
+
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
+
+        final AlarmManager alarmManager = new AlarmManager();
+
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
+        int systemBAlarmId = alarmManager.getAlarms().get(0).id();
+
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
+        alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC, null);
+
+        alarmManager.setAcknowledged(systemBAlarmId, true); // This changes the 'updatedAt' field
+
+        final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
+
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC")))
+            .build();
+
+        final HttpServiceResponse response = new MockServiceResponse();
+
+        try {
+            handler.handle(request, response)
+                .ifSuccess(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, response.status().orElse(null));
+                    assertTrue(response.body().isPresent());
+                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+                    final PdeAlarm firstAlarm = alarms.data().get(0);
+                    assertEquals(systemNameB, firstAlarm.systemName().orElse(null));
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            fail();
+        }
+    }
 
     @Test
     public void shouldRejectNonBooleans() {

@@ -109,10 +109,10 @@ public class DtoUtilsTest {
         assertEquals(systemData, extendedPortA.systemData().orElse(null));
 
         assertTrue(extendedPortB.inventoryId().isEmpty());
-        assertTrue(extendedPortB.inventoryId().isEmpty());
+        assertTrue(extendedPortB.systemData().isEmpty());
 
         assertTrue(extendedPortC.inventoryId().isEmpty());
-        assertTrue(extendedPortC.inventoryId().isEmpty());
+        assertTrue(extendedPortC.systemData().isEmpty());
     }
 
     @Test
@@ -267,7 +267,6 @@ public class DtoUtilsTest {
 
         final String inventoryId = "system_a_inventory_id";
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
-
         final MonitorInfo monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(serviceDescription, inventoryId);
         monitorInfo.putSystemData(serviceDescription, systemData);

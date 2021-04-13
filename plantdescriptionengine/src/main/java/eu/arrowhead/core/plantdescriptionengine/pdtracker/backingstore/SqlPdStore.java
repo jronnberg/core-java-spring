@@ -23,7 +23,10 @@ import java.util.Objects;
  */
 public class SqlPdStore implements PdStore {
 
-    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS plant_description (id INT, plant_description JSON);";
+    // TODO: We store Plant Descriptions in their raw JSON form.
+    // In the future, we'll want to create separate tables for each subfield
+    // of a Plant Description.
+    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS plant_description (id INT, plant_description TEXT);";
     private final String SQL_SELECT_ALL = "select * from plant_description;";
     private final String SQL_INSERT_PD = "INSERT INTO plant_description(id, plant_description) VALUES(?, ?);";
     private final String SQL_DELETE_ONE = "DELETE FROM plant_description where id=?;";
@@ -32,7 +35,7 @@ public class SqlPdStore implements PdStore {
     private Connection connection;
 
     /**
-     * Throws an {@code IllegalStateException} if this instance has not been'
+     * Throws an {@code IllegalStateException} if this instance has not been
      * initialized.
      */
     private void ensureInitialized() {
@@ -41,20 +44,29 @@ public class SqlPdStore implements PdStore {
         }
     }
 
+    /**
+     * Initializes the PD store for use by connecting to the database and
+     * creating the necessary tables.
+     *
+     * @param driverClassName The driver class for the mysql database.
+     * @param connectionUrl   URL of the database connection.
+     * @param username        Username to use when connecting to the database.
+     * @param password        Password to use when connecting to the database.
+     */
     public void init(
-        final String driverName,
+        final String driverClassName,
         final String connectionUrl,
         final String username,
         final String password
     ) throws PdStoreException {
 
-        Objects.requireNonNull(driverName, "Expected database driver name.");
+        Objects.requireNonNull(driverClassName, "Expected database driver name.");
         Objects.requireNonNull(connectionUrl, "Expected connection URL.");
         Objects.requireNonNull(username, "Expected username.");
         Objects.requireNonNull(password, "Expected password.");
 
         try {
-            Class.forName(driverName);
+            Class.forName(driverClassName);
 
             connection = DriverManager.getConnection(connectionUrl, username, password);
 
@@ -116,6 +128,9 @@ public class SqlPdStore implements PdStore {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(final int id) throws PdStoreException {
         ensureInitialized();
@@ -128,6 +143,9 @@ public class SqlPdStore implements PdStore {
         }
     }
 
+    /**
+     * Removes all Plant Description Entries from the store.
+     */
     public void removeAll() throws PdStoreException {
         ensureInitialized();
         try {

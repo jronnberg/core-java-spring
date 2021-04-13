@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.arkalix.description.ServiceDescription;
 import se.arkalix.dto.DtoEncoding;
+import se.arkalix.dto.json.value.JsonObject;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
@@ -99,7 +100,10 @@ public class RetrieveMonitorInfoTask extends TimerTask {
                     .uri(service.uri() + SYSTEM_DATA_PATH)
                     .header("accept", "application/json"))
             .flatMap(result -> result.bodyAsIfSuccess(DtoEncoding.JSON, SystemDataDto.class))
-            .ifSuccess(systemData -> monitorInfo.putSystemData(service, systemData.data()))
+            .ifSuccess(systemData -> {
+                JsonObject json = systemData.data().orElse(null);
+                monitorInfo.putSystemData(service, json);
+            })
             .onFailure(e -> {
                 final String errorMessage = "Failed to retrieve system data for system '" + service.provider().name()
                     + "', service '" + service.name() + "'.";

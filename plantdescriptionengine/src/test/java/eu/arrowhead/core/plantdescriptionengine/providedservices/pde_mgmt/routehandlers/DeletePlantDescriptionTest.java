@@ -67,7 +67,8 @@ public class DeletePlantDescriptionTest {
         final String invalidEntryId = "InvalidId";
 
         final HttpServiceRequest request = new MockRequest.Builder()
-            .pathParameters(List.of(invalidEntryId)).build();
+            .pathParameters(List.of(invalidEntryId))
+            .build();
 
         final HttpServiceResponse response = new MockServiceResponse();
 
@@ -93,7 +94,8 @@ public class DeletePlantDescriptionTest {
         final DeletePlantDescription handler = new DeletePlantDescription(pdTracker);
         final int nonExistentId = 392;
 
-        final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(nonExistentId)))
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .pathParameters(List.of(String.valueOf(nonExistentId)))
             .build();
 
         final HttpServiceResponse response = new MockServiceResponse();

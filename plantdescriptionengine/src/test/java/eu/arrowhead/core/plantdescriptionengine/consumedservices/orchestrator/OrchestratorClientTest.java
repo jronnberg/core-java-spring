@@ -583,7 +583,7 @@ public class OrchestratorClientTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldHandleFailedDeleteRequest() throws RuleStoreException, PdStoreException {
+    public void shouldNotRemoveRulesOnFailure() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto activeEntry = createEntry();
 

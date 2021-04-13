@@ -7,12 +7,16 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreEx
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import se.arkalix.ArSystem;
+import se.arkalix.descriptor.SecurityDescriptor;
 import se.arkalix.net.http.client.HttpClient;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PdeMonitorServiceTest {
 
     @Test
-    public void shouldProvideService() throws PdStoreException {
+    public void shouldProvideInsecureService() throws PdStoreException {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
@@ -20,15 +24,26 @@ public class PdeMonitorServiceTest {
             .name("Test System")
             .insecure()
             .build();
-        final PdeMonitorService service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), false, 1000, 1000);
+        final PdeMonitorService service = new PdeMonitorService(
+            arSystem,
+            pdTracker,
+            client,
+            new AlarmManager(),
+            false,
+            1000,
+            1000
+        );
 
         service.provide()
-            .ifSuccess(Assertions::assertNotNull)
-            .onFailure(Assertions::assertNull);
+            .ifSuccess(serviceHandle -> {
+                SecurityDescriptor security = serviceHandle.description().security();
+                assertFalse(security.isSecure());
+            })
+            .onFailure(e -> fail());
     }
 
     @Test
-    public void shouldNotAllowSecureService() throws PdStoreException {
+    public void shouldNotAllowInsecureArSystem() throws PdStoreException {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final HttpClient client = new HttpClient.Builder().build();
 
@@ -39,7 +54,7 @@ public class PdeMonitorServiceTest {
         final PdeMonitorService service = new PdeMonitorService(arSystem, pdTracker, client, new AlarmManager(), true, 1000, 1000);
 
         service.provide()
-            .ifSuccess(Assertions::assertNull)
+            .ifSuccess(e -> fail())
             .onFailure(Assertions::assertNotNull);
     }
 }

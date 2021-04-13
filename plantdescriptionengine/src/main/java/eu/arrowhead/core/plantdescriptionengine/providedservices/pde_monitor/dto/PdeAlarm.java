@@ -46,7 +46,7 @@ public interface PdeAlarm {
         return cleared1.get().compareTo(cleared2.get());
     };
 
-    final String NOT_CLEARED = "not_cleared";
+    String NOT_CLEARED = "not_cleared";
 
     /**
      * Filters out cleared/uncleared alarms from the given list.

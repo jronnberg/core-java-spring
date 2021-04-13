@@ -6,11 +6,10 @@ import java.util.Set;
  * Interface for objects that read and write Orchestration rule info to
  * permanent storage.
  * <p>
- * The PDE needs to keep track of which Orchestration rules it has created, and
- * to which Plant Description Entry each rule belongs. This information is
- * stored in memory, but it also needs to be persisted to permanent storage in
- * case the PDE is restarted. This interface defines the operations of classes
- * providing such storage.
+ * The PDE needs to keep track of which Orchestration rules it has created. This
+ * information is stored in memory, but it also needs to be persisted to
+ * permanent storage in case the PDE is restarted. This interface defines the
+ * operations of classes providing such storage.
  */
 public interface RuleStore {
 

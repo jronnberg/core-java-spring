@@ -54,7 +54,7 @@ public class PdeManagementService {
      * @return An HTTP Service used to manage Plant Descriptions.
      */
     public HttpService getService() {
-        final HttpService service = new HttpService()
+        return new HttpService()
             .name(SERVICE_NAME)
             .encodings(EncodingDescriptor.JSON)
             .basePath(BASE_PATH)
@@ -64,14 +64,8 @@ public class PdeManagementService {
             .delete(DELETE_PLANT_DESCRIPTION_PATH, new DeletePlantDescription(pdTracker))
             .put(REPLACE_PLANT_DESCRIPTION_PATH, new ReplacePlantDescription(pdTracker))
             .patch(UPDATE_PLANT_DESCRIPTION_PATH, new UpdatePlantDescription(pdTracker))
-            .catcher(DtoReadException.class, new DtoReadExceptionCatcher());
-
-        if (secure) {
-            service.accessPolicy(AccessPolicy.cloud());
-        } else {
-            service.accessPolicy(AccessPolicy.unrestricted());
-        }
-        return service;
+            .catcher(DtoReadException.class, new DtoReadExceptionCatcher())
+            .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
     }
 
 }

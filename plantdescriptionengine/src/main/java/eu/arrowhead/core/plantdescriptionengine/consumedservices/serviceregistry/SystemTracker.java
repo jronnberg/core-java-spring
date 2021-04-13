@@ -30,6 +30,7 @@ public class SystemTracker {
     protected final List<SystemUpdateListener> listeners = new ArrayList<>();
     // Map from system name to system:
     protected final Map<String, SrSystem> systems = new ConcurrentHashMap<>();
+    private final String SYSTEMS_URI = "/serviceregistry/systems";
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
     private final int pollInterval = 5000;
@@ -84,7 +85,7 @@ public class SystemTracker {
         return httpClient
             .send(serviceRegistryAddress,
                 new HttpClientRequest().method(HttpMethod.GET)
-                    .uri("/serviceregistry/systems")
+                    .uri(SYSTEMS_URI)
                     .header("accept", "application/json"))
             .flatMap(response -> response.bodyAsIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
             .flatMap(systemList -> {
