@@ -35,6 +35,8 @@ public final class PdeMain {
 
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
+    private static final String PDE_SYSTEM_NAME = "pde";
+
     /**
      * Helper class for retrieving required properties. If the specified
      * property is not present, an {@code IllegalArgumentException} is thrown.
@@ -57,21 +59,27 @@ public final class PdeMain {
      * @return HTTP client useful for consuming Arrowhead services.
      */
     static HttpClient createHttpClient(final Properties appProps) {
+
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
         if (!secureMode) {
             return new HttpClient.Builder().insecure().build();
-        } else {
-            final OwnedIdentity identity = loadIdentity(getProp(appProps, "server.ssl.pde.key-store"),
-                getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
-                getProp(appProps, "server.ssl.pde.key-store-password").toCharArray());
-
-            final TrustStore trustStore = loadTrustStore(getProp(appProps, "server.ssl.pde.trust-store"),
-                getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray());
-
-            return new HttpClient.Builder().identity(identity)
-                .trustStore(trustStore)
-                .build();
         }
+
+        final OwnedIdentity identity = loadIdentity(
+            getProp(appProps, "server.ssl.pde.key-store"),
+            getProp(appProps, "server.ssl.pde.key-password").toCharArray(),
+            getProp(appProps, "server.ssl.pde.key-store-password").toCharArray()
+        );
+
+        final TrustStore trustStore = loadTrustStore(
+            getProp(appProps, "server.ssl.pde.trust-store"),
+            getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray()
+        );
+
+        return new HttpClient.Builder()
+            .identity(identity)
+            .trustStore(trustStore)
+            .build();
     }
 
     /**
@@ -93,16 +101,14 @@ public final class PdeMain {
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
             .serviceCache(ArServiceDescriptionCache.withEntryLifetimeLimit(Duration.ZERO))
             .localPort(pdePort)
-            .plugins(new HttpJsonCloudPlugin.Builder().orchestrationStrategy(strategy)
+            .plugins(new HttpJsonCloudPlugin.Builder()
+                .orchestrationStrategy(strategy)
                 .serviceRegistrySocketAddress(serviceRegistryAddress)
                 .build());
 
         final boolean secureMode = Boolean.parseBoolean(getProp(appProps, "server.ssl.enabled"));
 
-        if (!secureMode) {
-            systemBuilder.name("pde")
-                .insecure();
-        } else {
+        if (secureMode) {
             final String trustStorePath = getProp(appProps, "server.ssl.pde.trust-store");
             final char[] trustStorePassword = getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray();
             final String keyStorePath = getProp(appProps, "server.ssl.pde.key-store");
@@ -110,6 +116,8 @@ public final class PdeMain {
             final char[] keyStorePassword = getProp(appProps, "server.ssl.pde.key-store-password").toCharArray();
             systemBuilder.identity(loadIdentity(keyStorePath, keyPassword, keyStorePassword))
                 .trustStore(loadTrustStore(trustStorePath, trustStorePassword));
+        } else {
+            systemBuilder.name(PDE_SYSTEM_NAME).insecure();
         }
 
         return systemBuilder.build();
@@ -167,7 +175,7 @@ public final class PdeMain {
         try {
             trustStore = TrustStore.read(path, password);
         } catch (final GeneralSecurityException | IOException e) {
-            logger.error("Failed to load OwnedIdentity", e);
+            logger.error("Failed to read trust store", e);
             System.exit(1);
         }
 
@@ -255,10 +263,9 @@ public final class PdeMain {
                             secureMode,
                             pingInterval,
                             fetchInterval
-                        )
-                            .provide();
+                        ).provide();
                     })
-                    .flatMap(mgmtServiceResult -> {
+                    .flatMap(monitorServiceResult -> {
                         logger.info("The PDE Monitor service is ready.");
                         logger.info("Starting the PDE Management service...");
                         final PdeManagementService pdeManagementService = new PdeManagementService(
