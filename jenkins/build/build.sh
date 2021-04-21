@@ -36,6 +36,11 @@ mkdir jenkins/build/eventhandler
 cp -f eventhandler/target/*.jar jenkins/build/eventhandler
 # cp -f eventhandler/target/*.properties jenkins/build/eventhandler
 
+# Copy the Plant Description Engine jar to the build location
+rm -rf jenkins/build/plantdescriptionengine
+mkdir jenkins/build/plantdescriptionengine
+cp -f plantdescriptionengine/target/*.jar jenkins/build/plantdescriptionengine
+
 echo "****************************"
 echo "** Building Docker Images **"
 echo "****************************"

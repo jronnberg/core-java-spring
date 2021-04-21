@@ -30,3 +30,8 @@ cp -f /var/core_system_config/gateway.properties $WORKSPACE/gateway/src/main/res
 # Event Handler
 rm -f $WORKSPACE/eventhandler/src/main/resources/application.properties
 cp -f /var/core_system_config/eventhandler.properties $WORKSPACE/eventhandler/src/main/resources/application.properties
+
+# Plant Description Engine
+rm -f $WORKSPACE/plantdescriptionengine/src/main/resources/application.properties
+cp -f /var/core_system_config/plantdescriptionengine.properties $WORKSPACE/plantdescriptionengine/src/main/resources/application.properties
+

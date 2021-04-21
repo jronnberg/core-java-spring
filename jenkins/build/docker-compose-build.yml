@@ -30,6 +30,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_EH
+  plantdescriptionengine:
+    image: "plantdescriptionengine:$BUILD_TAG"
+    build:
+      context: .
+      dockerfile: Dockerfile_PDE
 
 
 

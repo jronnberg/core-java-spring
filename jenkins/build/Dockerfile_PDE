@@ -1,0 +1,5 @@
+FROM openjdk:11-jre-slim
+
+COPY plantdescriptionengine/*.jar /plantdescriptionengine/arrowhead-plantdescriptionengine.jar
+
+CMD cd /plantdescriptionengine && java -jar arrowhead-plantdescriptionengine.jar

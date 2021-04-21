@@ -16,6 +16,7 @@ docker tag orchestrator:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/orchestrato
 docker tag gatekeeper:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/gatekeeper:$BUILD_TAG
 docker tag gateway:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/gateway:$BUILD_TAG
 docker tag eventhandler:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/eventhandler:$BUILD_TAG
+docker tag plantdescriptionengine:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/plantdescriptionengine:$BUILD_TAG
 
 
 docker tag serviceregistry:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/serviceregistry:latest
@@ -24,6 +25,7 @@ docker tag orchestrator:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/orchestrato
 docker tag gatekeeper:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/gatekeeper:latest
 docker tag gateway:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/gateway:latest
 docker tag eventhandler:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/eventhandler:latest
+docker tag plantdescriptionengine:$BUILD_TAG $NAMESPACE/$DOCKER_USER_NAMESPACE/plantdescriptionengine:latest
 
 echo "****************************"
 echo "** Pushing images to Repo **"
@@ -35,6 +37,7 @@ docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/orchestrator:$BUILD_TAG
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/gatekeeper:$BUILD_TAG
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/gateway:$BUILD_TAG
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/eventhandler:$BUILD_TAG
+docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/plantdescriptionengine:$BUILD_TAG
 
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/serviceregistry:latest
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/authorization:latest
@@ -42,3 +45,4 @@ docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/orchestrator:latest
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/gatekeeper:latest
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/gateway:latest
 docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/eventhandler:latest
+docker push $NAMESPACE/$DOCKER_USER_NAMESPACE/plantdescriptionengine:latest
