@@ -23,6 +23,7 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -36,6 +37,7 @@ public final class PdeMain {
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
     private static final String PDE_SYSTEM_NAME = "pde";
+    private static final String APP_PROPS_FILENAME=  "application.properties";
 
     /**
      * Helper class for retrieving required properties. If the specified
@@ -144,7 +146,8 @@ public final class PdeMain {
     private static OwnedIdentity loadIdentity(final String keyStorePath, final char[] keyPassword, final char[] keyStorePassword) {
         OwnedIdentity identity = null;
         try {
-            identity = new OwnedIdentity.Loader().keyStorePath(keyStorePath)
+            identity = new OwnedIdentity.Loader()
+                .keyStorePath(keyStorePath)
                 .keyPassword(keyPassword)
                 .keyStorePassword(keyStorePassword)
                 .load();
@@ -172,6 +175,7 @@ public final class PdeMain {
      */
     private static TrustStore loadTrustStore(final String path, final char[] password) {
         TrustStore trustStore = null;
+        
         try {
             trustStore = TrustStore.read(path, password);
         } catch (final GeneralSecurityException | IOException e) {
@@ -185,29 +189,48 @@ public final class PdeMain {
     }
 
     /**
+     * Loads application properties.
+     * <p>
+     * It first searches the current working directory for a file called
+     * application.properties. If not found, the application.properties file
+     * from the resources directory is used instead. If neither can be read, the
+     * application is terminated. 
+     */
+    private static Properties loadAppProps() {
+        final Properties appProps = new Properties();
+        File appPropsFile = new File(APP_PROPS_FILENAME);
+
+        if (appPropsFile.isFile()) {
+            try (FileInputStream in = new FileInputStream(appPropsFile)) {
+                appProps.load(in);
+            } catch (final IOException e) {
+                logger.error("Failed reading " + APP_PROPS_FILENAME + " from current directory.", e);
+            }
+        } else {
+            try {
+                appProps.load(ClassLoader.getSystemResourceAsStream(APP_PROPS_FILENAME));
+            } catch (IOException e) {
+                logger.error("Failed reading " + APP_PROPS_FILENAME + " from system resources.", e);
+            }
+        }
+
+        if (appProps.isEmpty()) {
+            logger.error("No valid application properties, exiting.");
+            System.exit(74);
+        }
+
+        return appProps;
+    }
+
+    /**
      * Main method of the Plant Description Engine.
      * <p>
      * Provides Plant Description management and monitoring services to the
-     * Arrowhead system.
+     * Arrowhead system of systems.
      */
     public static void main(final String[] args) {
 
-        final Properties appProps = new Properties();
-
-        try {
-            if (args.length == 1) {
-                // If a command line argument is given, interpret it as the file
-                // path to an application properties file:
-                appProps.load(new FileInputStream(args[0]));
-            } else {
-                // Otherwise, load it from app resources:
-                appProps.load(ClassLoader.getSystemResourceAsStream("application.properties"));
-            }
-
-        } catch (final IOException e) {
-            logger.error("Failed to read application.properties.", e);
-            System.exit(74);
-        }
+        final Properties appProps = loadAppProps();
 
         final String serviceRegistryIp = getProp(appProps, "service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(getProp(appProps, "service_registry.port"));
