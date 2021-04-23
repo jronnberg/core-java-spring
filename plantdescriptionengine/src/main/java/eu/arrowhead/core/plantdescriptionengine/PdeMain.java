@@ -30,6 +30,9 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
@@ -42,7 +45,7 @@ public final class PdeMain {
     private static final String APP_PROPS_FILENAME=  "application.properties";
 
     /**
-     * Helper class for retrieving required properties. If the specified
+     * Helper method for retrieving required properties. If the specified
      * property is not present, an {@code IllegalArgumentException} is thrown.
      *
      * @param appProps A set of properties.
@@ -129,17 +132,61 @@ public final class PdeMain {
     }
 
     /**
+     * Loads the keystore at the given path, using the given password.
+     * <p>
+     * {@code path} is first treated as a regular file path. If the certificate
+     * cannot be found at that location, an attempt is made to load it from
+     * resources (i.e. within the jar file). 
+     * If the keystore cannot be loaded, the application is terminated.
+     * 
+     * @param path     Keystore path.
+     * @param password Password or private key associated with the
+     *                 keystore.
+     * @return The loaded keystore.
+     */
+    private static KeyStore loadKeyStore(String path, char[] password) {
+
+        KeyStore keyStore = null; 
+        try {
+            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        } catch (KeyStoreException e) {
+            logger.error("Failed to load identity keystore", e);
+            System.exit(74); 
+        }
+        
+        File keyStoreFile = new File(path);
+        
+        if (keyStoreFile.isFile()) {
+            try (FileInputStream in = new FileInputStream(keyStoreFile)) {
+                keyStore.load(in, password);
+            } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
+                logger.error("Failed to read keystore from file", e);
+                System.exit(74);
+            }
+        } else {
+            try (InputStream in = ClassLoader.getSystemResourceAsStream(path)) {
+                keyStore.load(in, password);
+            } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
+                logger.error("Failed to load keystore from resources", e);
+                System.exit(74);
+            }
+        }
+
+        return keyStore;
+    }
+
+    /**
      * Loads the Arrowhead certificate chain and private key required to manage
      * an <i>owned</i> system or operator identity.
      * <p>
+     * If the certificate cannot be read, the entire application
+     * is terminated.
      * The provided arguments {@code keyPassword} and {@code keyStorePassword}
-     * are cleared for security reasons. If this function fails, the entire
-     * application is terminated.
+     * are cleared for security reasons.
      *
-     * @param keyStorePath     Sets path to file containing JVM-compatible key
-     *                         store.
-     * @param keyPassword      Password of private key associated with
-     *                         designated certificate in key store.
+     * @param keyStorePath     Keystore path.
+     * @param keyPassword      Password or private key associated with the
+     *                         keystore.
      * @param keyStorePassword Password of provided key store.
      * @return An object holding the Arrowhead certificate chain and private key
      * required to manage an owned system or operator identity.
@@ -149,13 +196,10 @@ public final class PdeMain {
         final char[] keyPassword,
         final char[] keyStorePassword
     ) {
+        KeyStore keyStore = loadKeyStore(keyStorePath, keyStorePassword);
         OwnedIdentity identity = null;
 
         try {
-            // TODO: Attempt to read from working directory first.
-            InputStream in = ClassLoader.getSystemResourceAsStream(keyStorePath);
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(in, keyStorePassword);
             identity = new OwnedIdentity.Loader()
                 .keyStore(keyStore)
                 .keyPassword(keyPassword)
@@ -176,24 +220,25 @@ public final class PdeMain {
     /**
      * Loads certificates associated with a <i>trusted</i> Arrowhead systems.
      * <p>
+     * The argument {@code path} is first treated as a regular file path. If it
+     * cannot be found, an attempt is made to find it in resources (i.e. within
+     * the jar file). If the certificate cannot be read, the entire application
+     * is terminated.
      * The provided argument {@code password} is cleared for security reasons.
-     * If this function fails, the entire application is terminated.
      *
-     * @param path     Filesystem path to key store to load.
-     * @param password Key store password.
+     * @param path     Truststore path.
+     * @param password Password or private key associated with the
+     *                 truststore.
      * @return Object holding certificates associated with trusted Arrowhead
      * systems, operators, clouds, companies and other authorities.
      */
     private static TrustStore loadTrustStore(final String path, final char[] password) {
+        KeyStore keyStore = loadKeyStore(path, password);
         TrustStore trustStore = null;
 
         try {
-            // TODO: Attempt to read from working directory first.
-            InputStream in = ClassLoader.getSystemResourceAsStream(path);
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(in, password);
             trustStore = TrustStore.from(keyStore);
-        } catch (final GeneralSecurityException | IOException e) {
+        } catch (KeyStoreException e) {
             logger.error("Failed to read trust store", e);
             System.exit(1);
         }
