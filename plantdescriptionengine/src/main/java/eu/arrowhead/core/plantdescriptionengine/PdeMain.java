@@ -26,8 +26,10 @@ import se.arkalix.security.identity.TrustStore;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
@@ -128,8 +130,7 @@ public final class PdeMain {
 
     /**
      * Loads the Arrowhead certificate chain and private key required to manage
-     * an
-     * <i>owned</i> system or operator identity.
+     * an <i>owned</i> system or operator identity.
      * <p>
      * The provided arguments {@code keyPassword} and {@code keyStorePassword}
      * are cleared for security reasons. If this function fails, the entire
@@ -143,17 +144,27 @@ public final class PdeMain {
      * @return An object holding the Arrowhead certificate chain and private key
      * required to manage an owned system or operator identity.
      */
-    private static OwnedIdentity loadIdentity(final String keyStorePath, final char[] keyPassword, final char[] keyStorePassword) {
+    private static OwnedIdentity loadIdentity(
+        final String keyStorePath,
+        final char[] keyPassword,
+        final char[] keyStorePassword
+    ) {
         OwnedIdentity identity = null;
+
         try {
+            // TODO: Attempt to read from working directory first.
+            InputStream in = ClassLoader.getSystemResourceAsStream(keyStorePath);
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(in, keyStorePassword);
             identity = new OwnedIdentity.Loader()
-                .keyStorePath(keyStorePath)
+                .keyStore(keyStore)
                 .keyPassword(keyPassword)
                 .keyStorePassword(keyStorePassword)
                 .load();
+
         } catch (final GeneralSecurityException | IOException e) {
             logger.error("Failed to load OwnedIdentity", e);
-            System.exit(1);
+            System.exit(74);
         }
 
         Arrays.fill(keyPassword, '\0');
@@ -175,9 +186,13 @@ public final class PdeMain {
      */
     private static TrustStore loadTrustStore(final String path, final char[] password) {
         TrustStore trustStore = null;
-        
+
         try {
-            trustStore = TrustStore.read(path, password);
+            // TODO: Attempt to read from working directory first.
+            InputStream in = ClassLoader.getSystemResourceAsStream(path);
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(in, password);
+            trustStore = TrustStore.from(keyStore);
         } catch (final GeneralSecurityException | IOException e) {
             logger.error("Failed to read trust store", e);
             System.exit(1);
