@@ -1,6 +1,8 @@
-package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore;
+package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.sql;
 
 import org.junit.jupiter.api.Test;
+
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStoreException;
 
 import java.util.Set;
 
