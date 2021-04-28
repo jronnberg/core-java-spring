@@ -12,16 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SqlRuleStoreTest {
 
-    private final String DRIVER_CLASS_NAME = "org.h2.Driver";
-    private final String CONNECTION_URL = "jdbc:h2:mem:testdb";
-
-    private final String USERNAME = "root";
-    private final String PASSWORD = "password";
-
     @Test
     public void shouldWriteRules() throws RuleStoreException {
         final SqlRuleStore store = new SqlRuleStore();
-        store.init(DRIVER_CLASS_NAME, CONNECTION_URL, USERNAME, PASSWORD);
+        store.init();
         final Set<Integer> rules = Set.of(1, 2, 3);
 
         store.setRules(rules);
@@ -33,7 +27,7 @@ public class SqlRuleStoreTest {
     @Test
     public void shouldRemoveRules() throws RuleStoreException {
         final SqlRuleStore store = new SqlRuleStore();
-        store.init(DRIVER_CLASS_NAME, CONNECTION_URL, USERNAME, PASSWORD);
+        store.init();
         final Set<Integer> rules = Set.of(1, 2, 3);
 
         store.setRules(rules);

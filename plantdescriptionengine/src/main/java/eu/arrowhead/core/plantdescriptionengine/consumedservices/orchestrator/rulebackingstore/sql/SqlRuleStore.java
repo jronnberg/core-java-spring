@@ -35,20 +35,9 @@ public class SqlRuleStore implements RuleStore {
     }
 
     /**
-     * Initializes the rule store for use by connecting to the database and
-     * creating the necessary tables.
-     *
-     * @param driverClassName The driver class for the mysql database.
-     * @param connectionUrl   URL of the database connection.
-     * @param username        Username to use when connecting to the database.
-     * @param password        Password to use when connecting to the database.
+     * Initializes the rule store for use by connecting to the database.
      */
-    public void init(
-        final String driverClassName,
-        final String connectionUrl,
-        final String username,
-        final String password
-    ) throws RuleStoreException {
+    public void init() throws RuleStoreException {
 
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
             .configure() // configures settings from hibernate.cfg.xml
@@ -85,6 +74,7 @@ public class SqlRuleStore implements RuleStore {
      */
     @Override
     public Set<Integer> readRules() throws RuleStoreException {
+        ensureInitialized();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Set<Integer> rules = queryAllRules(session).stream().map(rule -> rule.getId()).collect(Collectors.toSet());
