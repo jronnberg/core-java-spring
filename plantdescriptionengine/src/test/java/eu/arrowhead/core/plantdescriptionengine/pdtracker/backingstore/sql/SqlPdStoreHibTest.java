@@ -1,5 +1,6 @@
-package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
+package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.sql;
 
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
@@ -26,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit test for the {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.SqlPdStore}
+ * Unit test for the {@link eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.sql.SqlPdStore}
  * class.
  */
-public class SqlPdStoreTest {
+public class SqlPdStoreHibTest {
 
     private final String DRIVER_CLASS_NAME = "org.h2.Driver";
     private final String CONNECTION_URL = "jdbc:h2:mem:testdb";
@@ -37,11 +38,11 @@ public class SqlPdStoreTest {
     private final String USERNAME = "root";
     private final String PASSWORD = "password";
 
-    SqlPdStore store;
+    SqlPdStoreHib store;
 
     @BeforeEach
     public void createStore() throws PdStoreException {
-        store = new SqlPdStore();
+        store = new SqlPdStoreHib();
         store.init(DRIVER_CLASS_NAME, CONNECTION_URL, USERNAME, PASSWORD);
     }
 

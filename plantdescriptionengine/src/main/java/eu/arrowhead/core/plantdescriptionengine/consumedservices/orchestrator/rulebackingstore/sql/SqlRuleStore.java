@@ -25,7 +25,7 @@ public class SqlRuleStore implements RuleStore {
     protected SessionFactory sessionFactory = null; // TODO: Reuse the same session factory for all SQL
 
     /**
-     * Throws an {@code IllegalStateException} if this instance has not been'
+     * Throws an {@code IllegalStateException} if this instance has not been
      * initialized.
      */
     private void ensureInitialized() {
@@ -35,27 +35,10 @@ public class SqlRuleStore implements RuleStore {
     }
 
     /**
-     * Initializes the rule store for use by connecting to the database.
+     * Retrieves all orchestration rules from the database.
+     * @param session Object used to interact with the database.
+     * @return A list of all orchestration rules in the database.
      */
-    public void init() throws RuleStoreException {
-
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-            .configure() // configures settings from hibernate.cfg.xml
-            .build();
-        try {
-            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            StandardServiceRegistryBuilder.destroy(registry);
-            throw new RuleStoreException("Failed to initialize database connection.", e);
-        }
-    }
-
-    // TODO: Call this at some point.
-    public void exit() {
-        sessionFactory.close();
-    }
-
     private List<PdeRule> queryAllRules(Session session) {
 
         CriteriaQuery<PdeRule> query = session.getCriteriaBuilder().createQuery(PdeRule.class);
@@ -70,10 +53,31 @@ public class SqlRuleStore implements RuleStore {
     }
 
     /**
+     * Initializes the rule store for use by connecting to the database.
+     */
+    public void init() throws RuleStoreException {
+
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+            .configure() // configures settings from hibernate.cfg.xml
+            .build();
+        try {
+            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+            throw new RuleStoreException("Failed to initialize database connection.", e);
+        }
+    }
+
+    // TODO: Call this at some point.
+    public void exit() {
+        sessionFactory.close();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Integer> readRules() throws RuleStoreException {
+    public Set<Integer> readRules() {
         ensureInitialized();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -86,7 +90,7 @@ public class SqlRuleStore implements RuleStore {
      * {@inheritDoc}
      */
     @Override
-    public void setRules(final Set<Integer> rules) throws RuleStoreException {
+    public void setRules(final Set<Integer> rules) {
         Objects.requireNonNull(rules, "Expected rules.");
         ensureInitialized();
 
@@ -111,13 +115,13 @@ public class SqlRuleStore implements RuleStore {
      * @throws RuleStoreException
      */
     @Override
-    public void removeAll() throws RuleStoreException {
+    public void removeAll() {
         ensureInitialized();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         final List<PdeRule> rules = queryAllRules(session);
-        for (Object obj : rules) {
-            session.delete(obj);
+        for (PdeRule rule : rules) {
+            session.delete(rule);
         }
         session.getTransaction().commit();
         session.close();

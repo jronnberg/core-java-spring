@@ -1,5 +1,7 @@
-package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
+package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.sql;
 
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
+import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.dto.DtoReadException;
 import se.arkalix.dto.DtoWriteException;
