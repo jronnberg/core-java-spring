@@ -1,10 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import se.arkalix.dto.DtoReadException;
-import se.arkalix.dto.DtoWriteException;
-import se.arkalix.dto.binary.ByteArrayReader;
-import se.arkalix.dto.binary.ByteArrayWriter;
+import se.arkalix.codec.binary.ByteArrayReader;
+import se.arkalix.codec.binary.ByteArrayWriter;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -92,13 +90,13 @@ public class SqlPdStore implements PdStore {
             while (resultSet.next()) {
                 final String jsonText = resultSet.getString("plant_description");
                 final byte[] bytes = jsonText.getBytes(StandardCharsets.UTF_8);
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntryDto.readJson(new ByteArrayReader(bytes));
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntryDto.decodeJson(new ByteArrayReader(bytes));
                 result.add(entry);
             }
 
             return result;
 
-        } catch (final SQLException | DtoReadException e) {
+        } catch (final SQLException e) {
             throw new PdStoreException("Failed to read Plant Description entries", e);
         }
     }
@@ -115,7 +113,7 @@ public class SqlPdStore implements PdStore {
             final ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
             final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PD);
 
-            entry.writeJson(byteArrayWriter);
+            entry.encodeJson(byteArrayWriter);
 
             final String entryString = byteArrayWriter.toString();
 
@@ -123,7 +121,7 @@ public class SqlPdStore implements PdStore {
             statement.setString(2, entryString);
             statement.executeUpdate();
 
-        } catch (final DtoWriteException | SQLException e) {
+        } catch (final SQLException e) {
             throw new PdStoreException("Failed to write Plant Description entry to database", e);
         }
     }

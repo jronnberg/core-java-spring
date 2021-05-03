@@ -6,14 +6,11 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryP
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdate;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdateBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdateDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
@@ -44,7 +41,7 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateDto.Builder()
             .plantDescription(newName)
             .build();
         final HttpServiceResponse response = new MockServiceResponse();
@@ -134,26 +131,26 @@ public class UpdatePlantDescriptionTest {
         pdTracker.put(TestUtils.createEntry(entryId));
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName(portName)
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_a")
                 .consumer(true)
                 .build(),
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName(portName)
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_b")
                 .consumer(true)
                 .build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+        final PdeSystemDto consumerSystem = new PdeSystemDto.Builder()
             .systemId(systemId)
             .systemName("System A")
             .ports(consumerPorts)
             .build();
 
-        final PlantDescriptionUpdateDto update = new PlantDescriptionUpdateBuilder()
+        final PlantDescriptionUpdateDto update = new PlantDescriptionUpdateDto.Builder()
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(consumerSystem))
@@ -189,7 +186,7 @@ public class UpdatePlantDescriptionTest {
 
         final PlantDescriptionEntryDto entry = TestUtils.createEntry(entryId);
         final String newName = entry.plantDescription() + " modified";
-        final PlantDescriptionUpdate update = new PlantDescriptionUpdateBuilder()
+        final PlantDescriptionUpdate update = new PlantDescriptionUpdateDto.Builder()
             .plantDescription(newName)
             .build();
         final HttpServiceResponse response = new MockServiceResponse();

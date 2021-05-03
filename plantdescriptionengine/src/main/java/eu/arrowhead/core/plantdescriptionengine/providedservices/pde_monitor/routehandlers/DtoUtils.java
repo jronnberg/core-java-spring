@@ -5,15 +5,10 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Co
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemPortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import org.slf4j.Logger;
@@ -44,16 +39,16 @@ public final class DtoUtils {
         final List<ConnectionDto> result = new ArrayList<>();
 
         for (final Connection connection : connections) {
-            final SystemPortDto consumerPort = new SystemPortBuilder()
+            final SystemPortDto consumerPort = new SystemPortDto.Builder()
                 .portName(connection.consumer().portName())
                 .systemId(connection.consumer().systemId())
                 .build();
-            final SystemPortDto producerPort = new SystemPortBuilder()
+            final SystemPortDto producerPort = new SystemPortDto.Builder()
                 .portName(connection.producer().portName())
                 .systemId(connection.producer().systemId())
                 .build();
 
-            final ConnectionDto connectionCopy = new ConnectionBuilder()
+            final ConnectionDto connectionCopy = new ConnectionDto.Builder()
                 .consumer(consumerPort)
                 .producer(producerPort)
                 .build();
@@ -89,7 +84,7 @@ public final class DtoUtils {
             // 'consumer' defaults to false when no value is set:
             final boolean isConsumer = port.consumer().orElse(false);
 
-            final PortEntryBuilder portBuilder = new PortEntryBuilder()
+            final PortEntryDto.Builder portBuilder = new PortEntryDto.Builder()
                 .portName(port.portName())
                 .serviceInterface(port.serviceInterface().orElse(null))
                 .serviceDefinition(port.serviceDefinition())
@@ -121,7 +116,7 @@ public final class DtoUtils {
             ports.add(portBuilder.build());
         }
 
-        final SystemEntryBuilder systemBuilder = new SystemEntryBuilder()
+        final SystemEntryDto.Builder systemBuilder = new SystemEntryDto.Builder()
             .systemId(system.systemId())
             .metadata(system.metadata().orElse(null))
             .ports(ports);
@@ -169,7 +164,7 @@ public final class DtoUtils {
 
         final List<ConnectionDto> connections = mgmtToMonitor(entry.connections());
 
-        return new MonitorPlantDescriptionEntryBuilder()
+        return new MonitorPlantDescriptionEntryDto.Builder()
             .id(entry.id())
             .plantDescription(entry.plantDescription())
             .active(entry.active())

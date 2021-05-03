@@ -5,15 +5,11 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracke
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryList;
@@ -23,15 +19,15 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import se.arkalix.description.ServiceDescription;
-import se.arkalix.description.SystemDescription;
-import se.arkalix.descriptor.InterfaceDescriptor;
-import se.arkalix.descriptor.SecurityDescriptor;
-import se.arkalix.dto.json.value.JsonBoolean;
-import se.arkalix.dto.json.value.JsonObject;
-import se.arkalix.dto.json.value.JsonPair;
+
+import se.arkalix.ServiceRecord;
+import se.arkalix.SystemRecord;
+import se.arkalix.codec.json.JsonBoolean;
+import se.arkalix.codec.json.JsonObject;
+import se.arkalix.codec.json.JsonPair;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
 import se.arkalix.net.http.service.HttpServiceResponse;
@@ -89,18 +85,18 @@ public class GetAllPlantDescriptionsTest {
         final String consumerSystemId = "consumer-id";
         final String producerPortName = "provider-port";
         final String producerSystemId = "provider-id";
-        connections.add(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder()
+        connections.add(new ConnectionDto.Builder()
+            .consumer(new SystemPortDto.Builder()
                 .portName(consumerPortName)
                 .systemId(consumerSystemId)
                 .build())
-            .producer(new SystemPortBuilder()
+            .producer(new SystemPortDto.Builder()
                 .portName(producerPortName)
                 .systemId(producerSystemId)
                 .build())
             .build());
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(false)
@@ -153,7 +149,7 @@ public class GetAllPlantDescriptionsTest {
         final boolean isConsumer = true;
         final String portName = "Port-A";
         final String serviceDefinition = "Service-A";
-        final List<PortDto> ports = List.of(new PortBuilder()
+        final List<PortDto> ports = List.of(new PortDto.Builder()
             .consumer(isConsumer)
             .metadata(metadata)
             .portName(portName)
@@ -161,13 +157,13 @@ public class GetAllPlantDescriptionsTest {
             .serviceDefinition(serviceDefinition)
             .build());
 
-        final PdeSystemDto system = new PdeSystemBuilder()
+        final PdeSystemDto system = new PdeSystemDto.Builder()
             .systemName("System A")
             .systemId("system_a")
             .ports(ports)
             .build();
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(false)
@@ -211,12 +207,12 @@ public class GetAllPlantDescriptionsTest {
 
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final String systemName = "System A";
-        final PdeSystemDto system = new PdeSystemBuilder()
+        final PdeSystemDto system = new PdeSystemDto.Builder()
             .systemName(systemName)
             .systemId("system_a")
             .build();
         final Instant now = Instant.now();
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(false)
@@ -228,21 +224,21 @@ public class GetAllPlantDescriptionsTest {
             .build();
 
         pdTracker.put(entry);
-        final SystemDescription provider = SystemDescription.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
-        final ServiceDescription serviceDescription = new ServiceDescription.Builder()
+        final SystemRecord provider = SystemRecord.from(systemName, new InetSocketAddress("0.0.0.0", 5000));
+        final ServiceRecord ServiceRecord = new ServiceRecord.Builder()
             .name("service-name")
             .uri("/abc")
-            .security(SecurityDescriptor.NOT_SECURE)
+            // .security(SecurityDescriptor.NOT_SECURE) TODO: What to use instead?
             .provider(provider)
-            .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)
+            // .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)  TODO: What to use instead?
             .build();
 
         final String inventoryId = "system_a_inventory_id";
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
 
         final MonitorInfo monitorInfo = new MonitorInfo();
-        monitorInfo.putInventoryId(serviceDescription, inventoryId);
-        monitorInfo.putSystemData(serviceDescription, systemData);
+        monitorInfo.putInventoryId(ServiceRecord, inventoryId);
+        monitorInfo.putSystemData(ServiceRecord, systemData);
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
@@ -276,7 +272,7 @@ public class GetAllPlantDescriptionsTest {
         final Instant updatedAt2 = Instant.parse("2020-08-03T14:48:00.00Z");
         final Instant updatedAt3 = Instant.parse("2020-08-02T14:48:00.00Z");
 
-        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryDto.Builder()
             .id(32)
             .plantDescription("Plant Description 1")
             .active(false)
@@ -286,7 +282,7 @@ public class GetAllPlantDescriptionsTest {
             .createdAt(createdAt1)
             .updatedAt(updatedAt1)
             .build();
-        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryDto.Builder()
             .id(2)
             .plantDescription("Plant Description 2")
             .active(false)
@@ -296,7 +292,7 @@ public class GetAllPlantDescriptionsTest {
             .createdAt(createdAt2)
             .updatedAt(updatedAt2)
             .build();
-        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryDto.Builder()
             .id(8)
             .plantDescription("Plant Description 3")
             .active(false)
@@ -395,7 +391,7 @@ public class GetAllPlantDescriptionsTest {
 
         final MonitorInfo monitorInfo = new MonitorInfo();
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder()
+        pdTracker.put(new PlantDescriptionEntryDto.Builder()
             .id(activeEntryId)
             .plantDescription("Plant Description 1B")
             .active(true)

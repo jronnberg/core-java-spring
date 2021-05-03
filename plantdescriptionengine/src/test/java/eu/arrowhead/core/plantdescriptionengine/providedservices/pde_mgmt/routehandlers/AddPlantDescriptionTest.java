@@ -6,14 +6,11 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryP
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescription;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
@@ -41,7 +38,7 @@ public class AddPlantDescriptionTest {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final AddPlantDescription handler = new AddPlantDescription(pdTracker);
 
-        final PlantDescription description = new PlantDescriptionBuilder()
+        final PlantDescription description = new PlantDescriptionDto.Builder()
             .plantDescription("Plant Description 1A")
             .build();
 
@@ -82,26 +79,26 @@ public class AddPlantDescriptionTest {
         final AddPlantDescription handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> ports = List.of(
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName("port_a")
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataA)
                 .build(),
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName("port_b")
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition(serviceDefinition)
                 .metadata(metadataB)
                 .build());
 
-        final PdeSystemDto system = new PdeSystemBuilder()
+        final PdeSystemDto system = new PdeSystemDto.Builder()
             .systemId("system_a")
             .systemName("System A")
             .ports(ports)
             .build();
 
-        final PlantDescriptionDto description = new PlantDescriptionBuilder()
+        final PlantDescriptionDto description = new PlantDescriptionDto.Builder()
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(system))
@@ -130,26 +127,26 @@ public class AddPlantDescriptionTest {
         final AddPlantDescription handler = new AddPlantDescription(pdTracker);
 
         final List<PortDto> consumerPorts = List.of(
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName(portName)
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_a")
                 .consumer(true)
                 .build(),
-            new PortBuilder()
+            new PortDto.Builder()
                 .portName(portName) // Duplicate port name, should be reported!
                 .serviceInterface("HTTP-SECURE-JSON")
                 .serviceDefinition("service_b")
                 .consumer(true)
                 .build());
 
-        final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+        final PdeSystemDto consumerSystem = new PdeSystemDto.Builder()
             .systemId(systemId)
             .systemName("System A")
             .ports(consumerPorts)
             .build();
 
-        final PlantDescriptionDto description = new PlantDescriptionBuilder()
+        final PlantDescriptionDto description = new PlantDescriptionDto.Builder()
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(consumerSystem))
@@ -182,7 +179,7 @@ public class AddPlantDescriptionTest {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(backingStore);
         final AddPlantDescription handler = new AddPlantDescription(pdTracker);
 
-        final PlantDescription description = new PlantDescriptionBuilder()
+        final PlantDescription description = new PlantDescriptionDto.Builder()
             .plantDescription("Plant Description 1A")
             .build();
 

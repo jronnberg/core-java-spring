@@ -5,7 +5,7 @@ import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmSeverity;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmListDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.ParseError;
@@ -175,7 +175,7 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             PdeAlarm.filterAcknowledged(alarms, acknowledged.get());
         }
 
-        response.body(new PdeAlarmListBuilder()
+        response.body(new PdeAlarmListDto.Builder()
             .data(alarms)
             .count(alarms.size())
             .build());

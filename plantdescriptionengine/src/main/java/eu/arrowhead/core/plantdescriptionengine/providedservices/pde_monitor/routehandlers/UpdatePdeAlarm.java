@@ -4,7 +4,6 @@ import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateDto;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -43,7 +42,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyAs(PdeAlarmUpdateDto.class)
+        return request.bodyTo(PdeAlarmUpdateDto::decode)
             .map(newFields -> {
                 final String idString = request.pathParameter(0);
                 final int id;
@@ -52,7 +51,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
                     id = Integer.parseInt(idString);
                 } catch (final NumberFormatException e) {
                     response.status(HttpStatus.BAD_REQUEST);
-                    response.body(DtoEncoding.JSON, ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
+                    response.body(ErrorMessage.of("'" + idString + "' is not a valid PDE Alarm ID."));
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 

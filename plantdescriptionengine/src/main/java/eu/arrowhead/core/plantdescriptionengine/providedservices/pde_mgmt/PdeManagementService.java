@@ -1,15 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.AddPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.DeletePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.GetAllPlantDescriptions;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.GetPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.UpdatePlantDescription;
-import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.dto.DtoReadException;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 
@@ -56,7 +53,7 @@ public class PdeManagementService {
     public HttpService getService() {
         return new HttpService()
             .name(SERVICE_NAME)
-            .encodings(EncodingDescriptor.JSON)
+            // .encodings(EncodingDescriptor.JSON)
             .basePath(BASE_PATH)
             .get(GET_PLANT_DESCRIPTION_PATH, new GetPlantDescription(pdTracker))
             .get(GET_ALL_PLANT_DESCRIPTIONS_PATH, new GetAllPlantDescriptions(pdTracker))
@@ -64,7 +61,7 @@ public class PdeManagementService {
             .delete(DELETE_PLANT_DESCRIPTION_PATH, new DeletePlantDescription(pdTracker))
             .put(REPLACE_PLANT_DESCRIPTION_PATH, new ReplacePlantDescription(pdTracker))
             .patch(UPDATE_PLANT_DESCRIPTION_PATH, new UpdatePlantDescription(pdTracker))
-            .catcher(DtoReadException.class, new DtoReadExceptionCatcher())
+            // .catcher(DtoReadException.class, new DtoReadExceptionCatcher()) // TODO: Put back a catcher
             .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
     }
 

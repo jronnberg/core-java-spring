@@ -2,14 +2,11 @@ package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
@@ -36,7 +33,7 @@ public class SystemMismatchDetectorTest {
     private SystemMismatchDetector detector;
 
     private SrSystem getSrSystem(final String systemName) {
-        return new SrSystemBuilder()
+        return new SrSystemDto.Builder()
             .id(0)
             .systemName(systemName)
             .address("0.0.0.0")
@@ -50,7 +47,7 @@ public class SystemMismatchDetectorTest {
     }
 
     private PdeSystemDto getSystem(final String name, final String id) {
-        return new PdeSystemBuilder()
+        return new PdeSystemDto.Builder()
             .systemId(id)
             .systemName(name)
             .build();
@@ -58,13 +55,13 @@ public class SystemMismatchDetectorTest {
 
     private PlantDescriptionEntryDto getPdEntry(final String... systemNames) {
         final List<PdeSystemDto> systems = Stream.of(systemNames).map(name ->
-            new PdeSystemBuilder()
+            new PdeSystemDto.Builder()
                 .systemId(name + "-ID")
                 .systemName(name)
                 .build()
         ).collect(Collectors.toList());
 
-        return new PlantDescriptionEntryBuilder()
+        return new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
@@ -104,17 +101,17 @@ public class SystemMismatchDetectorTest {
     // public void shouldAllowSameSystemName() throws PdStoreException {
 
     //     final var systemName = "System A";
-    //     final var systemA1 = new PdeSystemBuilder()
+    //     final var systemA1 = new PdeSystemDto.Builder()
     //         .systemId("systemA1")
     //         .systemName(systemName)
     //         .metadata(Map.of("x", "1"))
     //         .build();
-    //     final var systemA2 = new PdeSystemBuilder()
+    //     final var systemA2 = new PdeSystemDto.Builder()
     //         .systemId("systemA2")
     //         .systemName(systemName)
     //         .build();
 
-    //     final var entry = new PlantDescriptionEntryBuilder()
+    //     final var entry = new PlantDescriptionEntryDto.Builder()
     //         .id(1)
     //         .plantDescription("Plant Description 1A")
     //         .active(true)
@@ -155,12 +152,12 @@ public class SystemMismatchDetectorTest {
         final String systemIdA = "Sys-A";
         final String systemNameB = "System B";
 
-        final PdeSystemDto system = new PdeSystemBuilder()
+        final PdeSystemDto system = new PdeSystemDto.Builder()
             .systemId(systemIdA)
             .metadata(Map.of("x", "1"))
             .build();
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
@@ -169,7 +166,7 @@ public class SystemMismatchDetectorTest {
             .updatedAt(Instant.now())
             .build();
 
-        final SrSystemDto srSystem = new SrSystemBuilder()
+        final SrSystemDto srSystem = new SrSystemDto.Builder()
             .id(0)
             .systemName("System B")
             .address("0.0.0.0")
@@ -230,7 +227,7 @@ public class SystemMismatchDetectorTest {
         final PdeSystemDto systemA = getSystem(systemNameA, "a");
         final PdeSystemDto systemB = getSystem(systemNameB, "b");
 
-        final PlantDescriptionEntryDto pdeEntry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto pdeEntry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
@@ -266,7 +263,7 @@ public class SystemMismatchDetectorTest {
         final String systemNameA = "System A";
         final String systemNameB = "System B";
 
-        final PlantDescriptionEntryDto pdeEntry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto pdeEntry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
@@ -373,7 +370,7 @@ public class SystemMismatchDetectorTest {
         final String systemNameB = "System B";
         final String systemNameC = "System C";
 
-        final SrSystemDto srSystemA = new SrSystemBuilder()
+        final SrSystemDto srSystemA = new SrSystemDto.Builder()
             .id(0)
             .systemName(systemNameA)
             .metadata(Map.of("x", "1", "y", "2"))
@@ -386,7 +383,7 @@ public class SystemMismatchDetectorTest {
                 .toString())
             .build();
 
-        final SrSystemDto srSystemC = new SrSystemBuilder()
+        final SrSystemDto srSystemC = new SrSystemDto.Builder()
             .id(0)
             .systemName(systemNameC)
             .metadata(Map.of("x", "1", "y", "2", "z", "3"))
@@ -402,19 +399,19 @@ public class SystemMismatchDetectorTest {
         final SrSystem srSystemB = getSrSystem(systemNameB);
 
         final PdeSystemDto systemA = getSystem(systemNameA, "a");
-        final PdeSystemDto systemB = new PdeSystemBuilder()
+        final PdeSystemDto systemB = new PdeSystemDto.Builder()
             .systemId("Sys-B")
             .systemName(systemNameB)
             .build();
 
         // System with metadata that matches System C in the service registry,
         // but not System A (whose metadata is only a subset).
-        final PdeSystemDto systemC = new PdeSystemBuilder()
+        final PdeSystemDto systemC = new PdeSystemDto.Builder()
             .systemId("Sys-C")
             .metadata(Map.of("x", "1", "y", "2", "z", "3"))
             .build();
 
-        final PlantDescriptionEntryDto entryWithTwoSystems = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryWithTwoSystems = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
@@ -431,7 +428,7 @@ public class SystemMismatchDetectorTest {
 
         detector.run();
 
-        final PlantDescriptionEntryDto entryWithThreeSystems = new PlantDescriptionEntryBuilder().id(1)
+        final PlantDescriptionEntryDto entryWithThreeSystems = new PlantDescriptionEntryDto.Builder().id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(systemB, systemC, systemA))
@@ -458,7 +455,7 @@ public class SystemMismatchDetectorTest {
 
         final String systemNameA = "System A";
 
-        final PlantDescriptionEntryDto entryWithOneSystem = new PlantDescriptionEntryBuilder().id(1)
+        final PlantDescriptionEntryDto entryWithOneSystem = new PlantDescriptionEntryDto.Builder().id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(getSystem(systemNameA, "a")))
@@ -469,7 +466,7 @@ public class SystemMismatchDetectorTest {
         pdTracker.put(entryWithOneSystem);
 
         final String systemNameB = "System B";
-        final SrSystemDto srSystemB = new SrSystemBuilder()
+        final SrSystemDto srSystemB = new SrSystemDto.Builder()
             .id(38)
             .systemName(systemNameB)
             .address("0.0.2.1")
@@ -489,12 +486,12 @@ public class SystemMismatchDetectorTest {
 
         detector.run();
 
-        final PdeSystemDto systemB = new PdeSystemBuilder()
+        final PdeSystemDto systemB = new PdeSystemDto.Builder()
             .systemId("b")
             .metadata(Map.of("b", "2")) // Subset of the SR system metadata
             .build();
 
-        final PlantDescriptionEntryDto entryWithTwoSystems = new PlantDescriptionEntryBuilder().id(1)
+        final PlantDescriptionEntryDto entryWithTwoSystems = new PlantDescriptionEntryDto.Builder().id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(getSystem(systemNameA, "a"), systemB))
@@ -522,12 +519,12 @@ public class SystemMismatchDetectorTest {
     public void shouldReportWhenSystemCannotBeUniquelyIdentified() throws PdStoreException {
 
         final String systemId = "System X";
-        final PdeSystemDto systemA = new PdeSystemBuilder()
+        final PdeSystemDto systemA = new PdeSystemDto.Builder()
             .systemId(systemId)
             .metadata(Map.of("a", "1", "b", "2"))
             .build();
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder().id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(systemA))
@@ -536,7 +533,7 @@ public class SystemMismatchDetectorTest {
             .build();
 
         // System with matching metadata:
-        final SrSystemDto srSystemA = new SrSystemBuilder()
+        final SrSystemDto srSystemA = new SrSystemDto.Builder()
             .id(0)
             .systemName("System A")
             .metadata(Map.of("a", "1", "b", "2", "c", "3"))
@@ -550,7 +547,7 @@ public class SystemMismatchDetectorTest {
             .build();
 
         // Another system with matching metadata:
-        final SrSystemDto srSystemB = new SrSystemBuilder()
+        final SrSystemDto srSystemB = new SrSystemDto.Builder()
             .id(0)
             .systemName("System B")
             .metadata(Map.of("a", "1", "b", "2", "d", "4"))
@@ -584,12 +581,12 @@ public class SystemMismatchDetectorTest {
     public void shouldClearWhenSystemBecomesUnique() throws PdStoreException {
 
         final String systemId = "System X";
-        final PdeSystemDto systemA = new PdeSystemBuilder()
+        final PdeSystemDto systemA = new PdeSystemDto.Builder()
             .systemId(systemId)
             .metadata(Map.of("a", "1", "b", "2"))
             .build();
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder().id(1)
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder().id(1)
             .plantDescription("Plant Description 1A")
             .active(true)
             .systems(List.of(systemA))
@@ -599,7 +596,7 @@ public class SystemMismatchDetectorTest {
 
         // System with matching metadata:
         final Map<String, String> systemAMetadata = Map.of("a", "1", "b", "2", "c", "3");
-        final SrSystemDto srSystemA = new SrSystemBuilder()
+        final SrSystemDto srSystemA = new SrSystemDto.Builder()
             .id(0)
             .systemName("System A")
             .metadata(systemAMetadata)
@@ -613,7 +610,7 @@ public class SystemMismatchDetectorTest {
             .build();
 
         // Another system with matching metadata:
-        final SrSystemDto srSystemB = new SrSystemBuilder()
+        final SrSystemDto srSystemB = new SrSystemDto.Builder()
             .id(0)
             .systemName("System B")
             .metadata(Map.of("a", "1", "b", "2", "d", "4"))

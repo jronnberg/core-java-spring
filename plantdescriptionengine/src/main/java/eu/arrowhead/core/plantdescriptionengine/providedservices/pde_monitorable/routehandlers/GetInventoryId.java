@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers;
 
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.InventoryIdBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.InventoryIdDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -16,7 +16,7 @@ public class GetInventoryId implements HttpRouteHandler {
     ) {
         response
             .status(HttpStatus.OK)
-            .body(new InventoryIdBuilder().build());
+            .body(new InventoryIdDto.Builder().build());
         return Future.done();
     }
 

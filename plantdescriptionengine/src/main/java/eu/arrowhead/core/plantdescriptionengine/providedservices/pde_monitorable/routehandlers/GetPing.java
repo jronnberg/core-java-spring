@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers;
 
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.PingBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.PingDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -16,7 +16,7 @@ public class GetPing implements HttpRouteHandler {
     ) {
         response
             .status(HttpStatus.OK)
-            .body(new PingBuilder().ping(true).build());
+            .body(new PingDto.Builder().ping(true).build());
         return Future.done();
     }
 

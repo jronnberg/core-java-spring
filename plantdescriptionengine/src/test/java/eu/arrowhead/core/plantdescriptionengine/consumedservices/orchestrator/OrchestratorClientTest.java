@@ -1,32 +1,26 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
 
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRule;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.InMemoryRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStoreException;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceDefinitionBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceInterfaceBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceDefinitionDto;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceInterfaceDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockSystemTracker;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,29 +70,29 @@ public class OrchestratorClientTest {
 
     final String serviceInterface = "HTTP-SECURE-JSON";
 
-    final List<PortDto> consumerPorts = List.of(new PortBuilder()
+    final List<PortDto> consumerPorts = List.of(new PortDto.Builder()
         .portName(consumerPort)
         .serviceDefinition(serviceDefinitionA)
         .serviceInterface(serviceInterface)
         .consumer(true)
         .build());
-    final List<PortDto> producerPorts = List.of(new PortBuilder()
+    final List<PortDto> producerPorts = List.of(new PortDto.Builder()
         .portName(producerPort)
         .serviceDefinition(serviceDefinitionA)
         .serviceInterface(serviceInterface)
         .consumer(false)
         .build());
-    final PdeSystemDto consumerSystem = new PdeSystemBuilder()
+    final PdeSystemDto consumerSystem = new PdeSystemDto.Builder()
         .systemId(consumerId)
         .systemName(consumerName)
         .ports(consumerPorts)
         .build();
-    final PdeSystemDto producerSystem = new PdeSystemBuilder()
+    final PdeSystemDto producerSystem = new PdeSystemDto.Builder()
         .systemId(producerId)
         .systemName(producerName)
         .ports(producerPorts)
         .build();
-    private final SrSystemDto consumerSrSystem = new SrSystemBuilder()
+    private final SrSystemDto consumerSrSystem = new SrSystemDto.Builder()
         .id(1)
         .systemName(consumerName)
         .metadata(Map.of("x", "1", "y", "2"))
@@ -108,7 +102,7 @@ public class OrchestratorClientTest {
         .createdAt(now.toString())
         .updatedAt(now.toString())
         .build();
-    private final SrSystemDto producerSrSystem = new SrSystemBuilder()
+    private final SrSystemDto producerSrSystem = new SrSystemDto.Builder()
         .id(2)
         .systemName(producerName)
         .address("0.0.0.7")
@@ -117,7 +111,7 @@ public class OrchestratorClientTest {
         .createdAt(now.toString())
         .updatedAt(now.toString())
         .build();
-    private final SrSystemDto orchestratorSrSystem = new SrSystemBuilder()
+    private final SrSystemDto orchestratorSrSystem = new SrSystemDto.Builder()
         .id(0)
         .systemName("orchestrator")
         .address("0.0.0.5")
@@ -133,7 +127,7 @@ public class OrchestratorClientTest {
     private OrchestratorClient orchestratorClient;
 
     private StoreEntryDto createStoreEntryRule(final int ruleId, final SrSystemDto provider, final SrSystemDto consumer) {
-        return new StoreEntryBuilder()
+        return new StoreEntryDto.Builder()
             .id(ruleId)
             .foreign(false)
             .providerSystem(provider)
@@ -141,18 +135,18 @@ public class OrchestratorClientTest {
             .priority(1)
             .createdAt(now.toString())
             .updatedAt(now.toString())
-            .serviceInterface(new ServiceInterfaceBuilder().id(177)
+            .serviceInterface(new ServiceInterfaceDto.Builder().id(177)
                 .interfaceName("HTTP_INSECURE_JSON")
                 .createdAt(now.toString())
                 .updatedAt(now.toString())
                 .build())
-            .serviceDefinition(new ServiceDefinitionBuilder().serviceDefinition(serviceDefinitionA)
+            .serviceDefinition(new ServiceDefinitionDto.Builder().serviceDefinition(serviceDefinitionA)
                 .build())
             .build();
     }
 
     private StoreEntryList createSingleRuleStoreList(final int ruleId, final SrSystemDto provider, final SrSystemDto consumer) {
-        return new StoreEntryListBuilder()
+        return new StoreEntryListDto.Builder()
             .count(1)
             .data(List.of(createStoreEntryRule(ruleId, provider, consumer)))
             .build();
@@ -163,18 +157,18 @@ public class OrchestratorClientTest {
      */
     private PlantDescriptionEntryDto createEntry() {
 
-        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder()
+        final List<ConnectionDto> connections = List.of(new ConnectionDto.Builder()
+            .consumer(new SystemPortDto.Builder()
                 .systemId(consumerId)
                 .portName(consumerPort)
                 .build())
-            .producer(new SystemPortBuilder()
+            .producer(new SystemPortDto.Builder()
                 .systemId(producerId)
                 .portName(producerPort)
                 .build())
             .build());
 
-        return new PlantDescriptionEntryBuilder()
+        return new PlantDescriptionEntryDto.Builder()
             .id(0)
             .plantDescription("Plant Description 1A")
             .createdAt(now)
@@ -219,7 +213,7 @@ public class OrchestratorClientTest {
         final MockClientResponse response = new MockClientResponse();
         final int ruleId = 39;
         response.status(HttpStatus.CREATED)
-            .body(new StoreEntryListBuilder()
+            .body(new StoreEntryListDto.Builder()
                 .count(1)
                 .data(List.of(createStoreEntryRule(ruleId, producerSrSystem, consumerSrSystem)))
                 .build());
@@ -261,7 +255,7 @@ public class OrchestratorClientTest {
     @Test
     public void shouldNotCreateRulesForPdWithoutConnections() throws PdStoreException {
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(0)
             .plantDescription("Plant Description 1A")
             .createdAt(now)
@@ -376,7 +370,7 @@ public class OrchestratorClientTest {
             .ifSuccess(result -> {
                 assertEquals(1, ruleStore.readRules().size());
 
-                final PlantDescriptionEntryDto entryWithoutConnections = new PlantDescriptionEntryBuilder()
+                final PlantDescriptionEntryDto entryWithoutConnections = new PlantDescriptionEntryDto.Builder()
                     .id(entry.id())
                     .plantDescription(entry.plantDescription())
                     .createdAt(entry.createdAt())
@@ -412,7 +406,7 @@ public class OrchestratorClientTest {
     public void shouldNotChangeRulesWhenRemovingInactiveEntry() throws RuleStoreException, PdStoreException {
 
         final PlantDescriptionEntryDto entryA = createEntry();
-        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description B")
             .createdAt(now)
@@ -506,14 +500,14 @@ public class OrchestratorClientTest {
     @Test
     public void shouldNotTouchRulesWhenUpdatingInactiveToInactive() throws PdStoreException {
 
-        final PlantDescriptionEntryDto entryA = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryA = new PlantDescriptionEntryDto.Builder()
             .id(0)
             .plantDescription("Plant Description A")
             .createdAt(now)
             .updatedAt(now)
             .active(false)
             .build();
-        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description B")
             .createdAt(now)

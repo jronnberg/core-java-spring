@@ -1,13 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import org.junit.jupiter.api.Test;
-import se.arkalix.description.ServiceDescription;
-import se.arkalix.description.SystemDescription;
-import se.arkalix.descriptor.InterfaceDescriptor;
-import se.arkalix.descriptor.SecurityDescriptor;
-import se.arkalix.dto.json.value.JsonBoolean;
-import se.arkalix.dto.json.value.JsonObject;
-import se.arkalix.dto.json.value.JsonPair;
+
+import se.arkalix.ServiceRecord;
+import se.arkalix.SystemRecord;
+import se.arkalix.codec.json.JsonBoolean;
+import se.arkalix.codec.json.JsonObject;
+import se.arkalix.codec.json.JsonPair;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -21,34 +20,34 @@ public class MonitorInfoTest {
 
     private final String providerSystemName = "Provider-system";
 
-    private ServiceDescription createServiceDescription(final Map<String, String> metadata) {
-        final SystemDescription provider = SystemDescription.from(
+    private ServiceRecord createServiceRecord(final Map<String, String> metadata) {
+        final SystemRecord provider = SystemRecord.from(
             providerSystemName,
             new InetSocketAddress("0.0.0.0", 5000)
         );
-        return new ServiceDescription.Builder()
+        return new ServiceRecord.Builder()
             .name("service-a")
             .provider(provider)
             .uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE)
-            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
+            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON)) TODO: Replace with what?
             .metadata(metadata)
             .build();
     }
 
-    private ServiceDescription createServiceDescription() {
-        return createServiceDescription(new HashMap<>());
+    private ServiceRecord createServiceRecord() {
+        return createServiceRecord(new HashMap<>());
     }
 
     @Test
     public void shouldStoreSystemData() {
 
         final Map<String, String> metadata = Map.of("name", "abc");
-        final ServiceDescription serviceDescription = createServiceDescription(metadata);
+        final ServiceRecord ServiceRecord = createServiceRecord(metadata);
 
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
         final MonitorInfo monitorInfo = new MonitorInfo();
-        monitorInfo.putSystemData(serviceDescription, systemData);
+        monitorInfo.putSystemData(ServiceRecord, systemData);
 
         final List<MonitorInfo.Bundle> systemInfoList = monitorInfo.getSystemInfo(providerSystemName, null);
         assertEquals(1, systemInfoList.size());
@@ -65,23 +64,23 @@ public class MonitorInfoTest {
         final String systemNameA = "System-a";
         final String systemNameB = "System-b";
 
-        final SystemDescription providerA = SystemDescription.from(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
-        final ServiceDescription serviceA = new ServiceDescription.Builder()
+        final SystemRecord providerA = SystemRecord.from(systemNameA, new InetSocketAddress("0.0.0.0", 5000));
+        final ServiceRecord serviceA = new ServiceRecord.Builder()
             .name("service-a")
             .provider(providerA)
             .uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE)
-            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            //.security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
+            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))  TODO: Replace with what?
             .metadata(metadataA)
             .build();
 
-        final SystemDescription providerB = SystemDescription.from(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
-        final ServiceDescription serviceB = new ServiceDescription.Builder()
+        final SystemRecord providerB = SystemRecord.from(systemNameB, new InetSocketAddress("0.0.0.0", 5001));
+        final ServiceRecord serviceB = new ServiceRecord.Builder()
             .name("service-b")
             .provider(providerB)
             .uri("/test")
-            .security(SecurityDescriptor.NOT_SECURE)
-            .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))
+            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
+            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON)) TODO: Replace with what?
             .metadata(metadataB)
             .build();
 
@@ -102,12 +101,12 @@ public class MonitorInfoTest {
     public void shouldRetrieveBySystemName() {
 
         final Map<String, String> metadata = Map.of("x", "y");
-        final ServiceDescription serviceDescription = createServiceDescription(metadata);
+        final ServiceRecord ServiceRecord = createServiceRecord(metadata);
 
         final String inventoryId = "id-4567";
         final MonitorInfo monitorInfo = new MonitorInfo();
-        monitorInfo.putInventoryId(serviceDescription, inventoryId);
-        final List<MonitorInfo.Bundle> systemInfoList = monitorInfo.getSystemInfo(serviceDescription.provider().name(), null);
+        monitorInfo.putInventoryId(ServiceRecord, inventoryId);
+        final List<MonitorInfo.Bundle> systemInfoList = monitorInfo.getSystemInfo(ServiceRecord.provider().name(), null);
         assertEquals(1, systemInfoList.size());
 
         final MonitorInfo.Bundle systemInfo = systemInfoList.get(0);
@@ -117,7 +116,7 @@ public class MonitorInfoTest {
     @Test
     public void shouldOverwriteData() {
 
-        final ServiceDescription service = createServiceDescription();
+        final ServiceRecord service = createServiceRecord();
         final MonitorInfo monitorInfo = new MonitorInfo();
 
         final String oldInventoryId = "id-1234";

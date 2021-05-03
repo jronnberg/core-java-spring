@@ -5,7 +5,6 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryP
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryList;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
@@ -68,7 +67,7 @@ public class GetAllPlantDescriptionsTest {
         final Instant updatedAt2 = Instant.parse("2020-08-03T14:48:00.00Z");
         final Instant updatedAt3 = Instant.parse("2020-08-02T14:48:00.00Z");
 
-        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry1 = new PlantDescriptionEntryDto.Builder()
             .id(32)
             .plantDescription("Plant Description 1")
             .active(false)
@@ -78,7 +77,7 @@ public class GetAllPlantDescriptionsTest {
             .createdAt(createdAt1)
             .updatedAt(updatedAt1)
             .build();
-        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry2 = new PlantDescriptionEntryDto.Builder()
             .id(2)
             .plantDescription("Plant Description 2")
             .active(false)
@@ -88,7 +87,7 @@ public class GetAllPlantDescriptionsTest {
             .createdAt(createdAt2)
             .updatedAt(updatedAt2)
             .build();
-        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry3 = new PlantDescriptionEntryDto.Builder()
             .id(8)
             .plantDescription("Plant Description 3")
             .active(false)
@@ -183,7 +182,7 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder()
+        pdTracker.put(new PlantDescriptionEntryDto.Builder()
             .id(activeEntryId)
             .plantDescription("Plant Description XY")
             .active(true)
@@ -228,7 +227,7 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final Instant now = Instant.now();
-        pdTracker.put(new PlantDescriptionEntryBuilder()
+        pdTracker.put(new PlantDescriptionEntryDto.Builder()
             .id(activeEntryId)
             .plantDescription("Plant Description 1B")
             .active(true)

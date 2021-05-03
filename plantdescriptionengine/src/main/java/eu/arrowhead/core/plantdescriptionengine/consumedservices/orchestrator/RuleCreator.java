@@ -1,13 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
 
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.RuleSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.RuleSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRuleDto;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
-import se.arkalix.dto.DtoWritable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +44,12 @@ public class RuleCreator {
         final String producerPortName = connection.producer().portName();
         final Port producerPort = provider.getPort(producerPortName);
 
-        final StoreRuleBuilder builder = new StoreRuleBuilder()
-            .consumerSystem(new RuleSystemBuilder()
+        final StoreRuleDto.Builder builder = new StoreRuleDto.Builder()
+            .consumerSystem(new RuleSystemDto.Builder()
                 .systemName(consumer.systemName().orElse(null))
                 .metadata(consumer.metadata().orElse(null))
                 .build())
-            .providerSystem(new RuleSystemBuilder()
+            .providerSystem(new RuleSystemDto.Builder()
                 .systemName(provider.systemName().orElse(null))
                 .metadata(provider.metadata().orElse(null))
                 .build())
@@ -62,8 +60,8 @@ public class RuleCreator {
         return builder.build();
     }
 
-    public List<DtoWritable> createRules() {
-        final List<DtoWritable> rules = new ArrayList<>();
+    public List<StoreRuleDto> createRules() {
+        final List<StoreRuleDto> rules = new ArrayList<>();
         final List<Connection> connections = pdTracker.getActiveConnections();
 
         for (final Connection connection : connections) {

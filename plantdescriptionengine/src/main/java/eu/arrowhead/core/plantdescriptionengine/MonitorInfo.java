@@ -1,9 +1,9 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
-import se.arkalix.description.ServiceDescription;
-import se.arkalix.description.SystemDescription;
-import se.arkalix.dto.json.value.JsonObject;
+import se.arkalix.ServiceRecord;
+import se.arkalix.SystemRecord;
+import se.arkalix.codec.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class MonitorInfo {
      * @param service An Arrowhead Framework service.
      * @return A unique identifier for the given service.
      */
-    private String toKey(final ServiceDescription service) {
+    private String toKey(final ServiceRecord service) {
 
         final Map<String, String> metadata = Collections.emptyMap();
         // TODO: Replace the line above with the one below!
@@ -42,7 +42,7 @@ public class MonitorInfo {
      * @param service     An Arrowhead Framework service.
      * @param inventoryId An inventory ID.
      */
-    public void putInventoryId(final ServiceDescription service, final String inventoryId) {
+    public void putInventoryId(final ServiceRecord service, final String inventoryId) {
 
         Objects.requireNonNull(service, "Expected service");
         Objects.requireNonNull(service, "Expected inventory ID");
@@ -77,13 +77,13 @@ public class MonitorInfo {
      * @param service An Arrowhead Framework service.
      * @param data    System data to be stored.
      */
-    public void putSystemData(final ServiceDescription service, final JsonObject data) {
+    public void putSystemData(final ServiceRecord service, final JsonObject data) {
 
         Objects.requireNonNull(service, "Expected service");
         Objects.requireNonNull(data, "Expected system data");
 
         final String key = toKey(service);
-        final SystemDescription provider = service.provider();
+        final SystemRecord provider = service.provider();
         final String systemName = provider.name();
 
         final Map<String, String> systemMetadata = Collections.emptyMap();

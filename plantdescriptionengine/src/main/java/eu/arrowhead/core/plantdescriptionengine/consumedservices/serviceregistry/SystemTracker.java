@@ -5,7 +5,6 @@ import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
@@ -84,10 +83,11 @@ public class SystemTracker {
     private Future<Void> fetchSystems() {
         return httpClient
             .send(serviceRegistryAddress,
-                new HttpClientRequest().method(HttpMethod.GET)
+                new HttpClientRequest()
+                    .method(HttpMethod.GET)
                     .uri(SYSTEMS_URI)
                     .header("accept", "application/json"))
-            .flatMap(response -> response.bodyAsIfSuccess(DtoEncoding.JSON, SrSystemListDto.class))
+            .flatMap(response -> response.bodyToIfSuccess(SrSystemListDto::decodeJson))
             .flatMap(systemList -> {
                 final List<SrSystem> newSystems = systemList.data();
                 final List<SrSystem> oldSystems = new ArrayList<>(systems.values());

@@ -1,16 +1,14 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.dto.DtoEncoding;
-import se.arkalix.dto.DtoWritable;
+import se.arkalix.codec.Encodable;
+import se.arkalix.codec.MediaType;
+import se.arkalix.net.BodyOutgoing;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.HttpVersion;
 import se.arkalix.net.http.service.HttpServiceResponse;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,24 +17,23 @@ import java.util.Optional;
  */
 public class MockServiceResponse implements HttpServiceResponse {
 
-    private Object _body;
+    private Encodable _body;
     private HttpStatus _status = HttpStatus.IM_A_TEAPOT;
 
     @Override
-    public Optional<Object> body() {
-        return Optional.of(_body);
+    public Optional<BodyOutgoing> body() {
+        return Optional.of(BodyOutgoing.create(_body));
     }
 
     @Override
     public HttpServiceResponse body(final byte[] byteArray) {
+        this.body();
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public HttpServiceResponse body(final DtoEncoding encoding, final DtoWritable data) {
-        Objects.requireNonNull(encoding, "Expected encoding.");
-        Objects.requireNonNull(data, "Expected data.");
-        _body = data;
+    public HttpServiceResponse body(final Encodable encodable) {
+        _body = encodable;
         return this;
     }
 
@@ -47,20 +44,14 @@ public class MockServiceResponse implements HttpServiceResponse {
 
     @Override
     public HttpServiceResponse body(final String string) {
-        _body = string;
-        return this;
+        // _body = string;
+        // return this;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public HttpServiceResponse clearBody() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public HttpServiceResponse body(final DtoWritable data) {
-        Objects.requireNonNull(data, "Expected data.");
-        _body = data;
-        return this;
     }
 
     @Override
@@ -86,7 +77,22 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpServiceResponse header(final CharSequence name, final CharSequence value) {
+    public HttpServiceResponse contentType(MediaType arg0) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<MediaType> contentType() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpServiceResponse body(BodyOutgoing arg0) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpServiceResponse header(CharSequence arg0, CharSequence arg1) {
         throw new UnsupportedOperationException();
     }
 
@@ -96,27 +102,7 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpServiceResponse version(final HttpVersion version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<Charset> charset() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<EncodingDescriptor> encoding() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <L extends List<? extends DtoWritable>> HttpServiceResponse body(final DtoEncoding encoding, final L data) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public HttpServiceResponse body(final Charset charset, final String string) {
+    public HttpServiceResponse version(HttpVersion arg0) {
         throw new UnsupportedOperationException();
     }
 

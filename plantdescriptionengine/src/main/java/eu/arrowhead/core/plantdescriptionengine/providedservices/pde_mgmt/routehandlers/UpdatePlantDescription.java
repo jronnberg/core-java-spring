@@ -9,7 +9,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionUpdateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -50,7 +49,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyAs(PlantDescriptionUpdateDto.class)
+        return request.bodyTo(PlantDescriptionUpdateDto::decode)
             .map(newFields -> {
                 final String idString = request.pathParameter(0);
                 final int id;
@@ -59,8 +58,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
                     id = Integer.parseInt(idString);
                 } catch (final NumberFormatException e) {
                     response.status(HttpStatus.BAD_REQUEST);
-                    response.body(DtoEncoding.JSON,
-                        ErrorMessage.of("'" + idString + "' is not a valid Plant Description Entry ID."));
+                    response.body(ErrorMessage.of("'" + idString + "' is not a valid Plant Description Entry ID."));
                     return response.status(HttpStatus.BAD_REQUEST);
                 }
 

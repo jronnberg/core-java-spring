@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
+import static se.arkalix.dto.DtoCodec.JSON;
 
 /**
  * Data Transfer Object (DTO) interface for plant description systems.

@@ -5,7 +5,7 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracke
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PlantDescriptionEntryListDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.BooleanParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.IntParameter;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.ParseError;
@@ -155,7 +155,7 @@ public class GetAllPlantDescriptions implements HttpRouteHandler {
         }
 
         response.status(HttpStatus.OK)
-            .body(new PlantDescriptionEntryListBuilder()
+            .body(new PlantDescriptionEntryListDto.Builder()
                 .data(extendedEntries)
                 .count(extendedEntries.size())
                 .build());

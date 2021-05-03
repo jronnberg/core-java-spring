@@ -1,15 +1,12 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.ConnectionDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystemDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortBuilder;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,10 +108,10 @@ public class SqlPdStoreTest {
         final List<Integer> include = List.of(27, 31, 19);
 
         final List<PdeSystemDto> systems = List.of(
-            new PdeSystemBuilder()
+            new PdeSystemDto.Builder()
                 .systemId(consumerId)
                 .systemName(consumerName)
-                .ports(new PortBuilder()
+                .ports(new PortDto.Builder()
                     .portName(consumerPort)
                     .consumer(true)
                     .metadata(consumerPortMetadata)
@@ -122,10 +119,10 @@ public class SqlPdStoreTest {
                     .serviceInterface(serviceInterface)
                     .build())
                 .build(),
-            new PdeSystemBuilder()
+            new PdeSystemDto.Builder()
                 .systemId(producerId)
                 .systemName(producerName)
-                .ports(new PortBuilder()
+                .ports(new PortDto.Builder()
                     .portName(producerPort)
                     .serviceDefinition(serviceDefinition)
                     .serviceInterface(serviceInterface)
@@ -133,17 +130,17 @@ public class SqlPdStoreTest {
                 .build()
         );
 
-        final List<ConnectionDto> connections = List.of(new ConnectionBuilder()
-            .consumer(new SystemPortBuilder()
+        final List<ConnectionDto> connections = List.of(new ConnectionDto.Builder()
+            .consumer(new SystemPortDto.Builder()
                 .systemId(consumerId)
                 .portName(consumerPort)
                 .build())
-            .producer(new SystemPortBuilder().systemId(producerId)
+            .producer(new SystemPortDto.Builder().systemId(producerId)
                 .portName(producerPort)
                 .build())
             .build());
 
-        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
             .id(entryId)
             .plantDescription(entryName)
             .active(false)

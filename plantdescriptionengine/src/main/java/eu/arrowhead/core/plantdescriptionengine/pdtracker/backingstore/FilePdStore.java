@@ -1,10 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import se.arkalix.dto.DtoReadException;
-import se.arkalix.dto.DtoWriteException;
-import se.arkalix.dto.binary.ByteArrayReader;
-import se.arkalix.dto.binary.ByteArrayWriter;
+import se.arkalix.codec.binary.ByteArrayReader;
+import se.arkalix.codec.binary.ByteArrayWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,8 +69,8 @@ public class FilePdStore implements PdStore {
             final byte[] bytes;
             try {
                 bytes = Files.readAllBytes(child.toPath());
-                result.add(PlantDescriptionEntryDto.readJson(new ByteArrayReader(bytes)));
-            } catch (final DtoReadException | IOException e) {
+                result.add(PlantDescriptionEntryDto.decodeJson(new ByteArrayReader(bytes)));
+            } catch (final IOException e) {
                 throw new PdStoreException(e);
             }
         }
@@ -105,9 +103,9 @@ public class FilePdStore implements PdStore {
 
         try (final FileOutputStream fileWriter = new FileOutputStream(file)) {
             final ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
-            entry.writeJson(byteArrayWriter);
+            entry.encodeJson(byteArrayWriter);
             fileWriter.write(byteArrayWriter.asByteArray());
-        } catch (final DtoWriteException | IOException e) {
+        } catch (final IOException e) {
             throw new PdStoreException("Failed to write Plant Description Entry to file", e);
         }
     }

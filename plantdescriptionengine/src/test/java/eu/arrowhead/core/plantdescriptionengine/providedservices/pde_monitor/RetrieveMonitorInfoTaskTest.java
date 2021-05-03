@@ -1,19 +1,18 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.SystemDataBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.InventoryIdDto;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.monitorable.dto.SystemDataDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.RequestMatcher;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import se.arkalix.description.ServiceDescription;
-import se.arkalix.description.SystemDescription;
-import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.descriptor.TransportDescriptor;
-import se.arkalix.dto.json.value.JsonBoolean;
-import se.arkalix.dto.json.value.JsonObject;
-import se.arkalix.dto.json.value.JsonPair;
+
+import se.arkalix.ServiceRecord;
+import se.arkalix.SystemRecord;
+import se.arkalix.codec.json.JsonBoolean;
+import se.arkalix.codec.json.JsonObject;
+import se.arkalix.codec.json.JsonPair;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
@@ -42,27 +41,28 @@ public class RetrieveMonitorInfoTaskTest {
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
         final MonitorInfo monitorInfo = new MonitorInfo();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
-        final ServiceDescription service = Mockito.mock(ServiceDescription.class);
-        final Set<ServiceDescription> services = Set.of(service);
-        final Future<Set<ServiceDescription>> resolveResult = Future.success(services);
+        final ServiceRecord service = Mockito.mock(ServiceRecord.class);
+        final Set<ServiceRecord> services = Set.of(service);
+        final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
         final String inventoryId = "ABC";
         final MockClientResponse inventoryIdResponse = new MockClientResponse()
             .status(HttpStatus.OK)
-            .body(new InventoryIdBuilder()
+            .body(new InventoryIdDto.Builder()
                 .id("ABC")
                 .build());
 
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
         final MockClientResponse systemDataResponse = new MockClientResponse()
             .status(HttpStatus.OK)
-            .body(new SystemDataBuilder()
+            .body(new SystemDataDto.Builder()
                 .data(systemData)
                 .build());
-        final SystemDescription provider = Mockito.mock(SystemDescription.class);
+        final SystemRecord provider = Mockito.mock(SystemRecord.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
+        // TODO: The lines below do not work with ar:kalix 0.6
+        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
+        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);
@@ -101,7 +101,7 @@ public class RetrieveMonitorInfoTaskTest {
         final MonitorInfo monitorInfo = new MonitorInfo();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
         final Throwable error = new Throwable("Some error");
-        final Future<Set<ServiceDescription>> resolveResult = Future.failure(error);
+        final Future<Set<ServiceRecord>> resolveResult = Future.failure(error);
         when(serviceQuery.resolveAll()).thenReturn(resolveResult);
 
 
@@ -121,21 +121,22 @@ public class RetrieveMonitorInfoTaskTest {
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
         final MonitorInfo monitorInfo = new MonitorInfo();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
-        final ServiceDescription service = Mockito.mock(ServiceDescription.class);
-        final Set<ServiceDescription> services = Set.of(service);
-        final Future<Set<ServiceDescription>> resolveResult = Future.success(services);
+        final ServiceRecord service = Mockito.mock(ServiceRecord.class);
+        final Set<ServiceRecord> services = Set.of(service);
+        final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
 
         final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
         final MockClientResponse systemDataResponse = new MockClientResponse()
             .status(HttpStatus.OK)
-            .body(new SystemDataBuilder()
+            .body(new SystemDataDto.Builder()
                 .data(systemData)
                 .build());
-        final SystemDescription provider = Mockito.mock(SystemDescription.class);
+        final SystemRecord provider = Mockito.mock(SystemRecord.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
+        // TODO: The lines below do not work with ar:kalix 0.6
+        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
+        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);
@@ -175,21 +176,22 @@ public class RetrieveMonitorInfoTaskTest {
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
         final MonitorInfo monitorInfo = new MonitorInfo();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
-        final ServiceDescription service = Mockito.mock(ServiceDescription.class);
-        final Set<ServiceDescription> services = Set.of(service);
-        final Future<Set<ServiceDescription>> resolveResult = Future.success(services);
+        final ServiceRecord service = Mockito.mock(ServiceRecord.class);
+        final Set<ServiceRecord> services = Set.of(service);
+        final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
         final String inventoryId = "ABC";
         final MockClientResponse inventoryIdResponse = new MockClientResponse()
             .status(HttpStatus.OK)
-            .body(new InventoryIdBuilder()
+            .body(new InventoryIdDto.Builder()
                 .id("ABC")
                 .build());
 
-        final SystemDescription provider = Mockito.mock(SystemDescription.class);
+        final SystemRecord provider = Mockito.mock(SystemRecord.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
+        // TODO: The lines below do not work with ar:kalix 0.6
+        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
+        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);

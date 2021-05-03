@@ -5,10 +5,9 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.RequestMatcher;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import se.arkalix.description.ServiceDescription;
-import se.arkalix.description.SystemDescription;
-import se.arkalix.descriptor.EncodingDescriptor;
-import se.arkalix.descriptor.TransportDescriptor;
+
+import se.arkalix.ServiceRecord;
+import se.arkalix.SystemRecord;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
@@ -38,16 +37,17 @@ public class PingTaskTest {
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
         final AlarmManager alarmManager = new AlarmManager();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
-        final ServiceDescription service = Mockito.mock(ServiceDescription.class);
-        final Set<ServiceDescription> services = Set.of(service);
-        final Future<Set<ServiceDescription>> resolveResult = Future.success(services);
+        final ServiceRecord service = Mockito.mock(ServiceRecord.class);
+        final Set<ServiceRecord> services = Set.of(service);
+        final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
         final MockClientResponse response = new MockClientResponse();
         response.status(HttpStatus.OK);
-        final SystemDescription provider = Mockito.mock(SystemDescription.class);
+        final SystemRecord provider = Mockito.mock(SystemRecord.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
+        // TODO: The lines below do not work with ar:kalix 0.6
+        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
+        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);
@@ -85,7 +85,7 @@ public class PingTaskTest {
         final AlarmManager alarmManager = new AlarmManager();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
         final Throwable error = new Throwable("Some error");
-        final Future<Set<ServiceDescription>> resolveResult = Future.failure(error);
+        final Future<Set<ServiceRecord>> resolveResult = Future.failure(error);
         final MockClientResponse response = new MockClientResponse();
         response.status(HttpStatus.OK);
 
@@ -115,15 +115,16 @@ public class PingTaskTest {
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
         final AlarmManager alarmManager = new AlarmManager();
         final ServiceQuery serviceQuery = Mockito.mock(ServiceQuery.class);
-        final ServiceDescription service = Mockito.mock(ServiceDescription.class);
-        final Set<ServiceDescription> services = Set.of(service);
-        final Future<Set<ServiceDescription>> resolveResult = Future.success(services);
+        final ServiceRecord service = Mockito.mock(ServiceRecord.class);
+        final Set<ServiceRecord> services = Set.of(service);
+        final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
         final MockClientResponse response = new MockClientResponse();
         response.status(HttpStatus.OK);
-        final SystemDescription provider = Mockito.mock(SystemDescription.class);
+        final SystemRecord provider = Mockito.mock(SystemRecord.class);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
+        // TODO: The lines below do not work with ar:kalix 0.6
+        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
+        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);

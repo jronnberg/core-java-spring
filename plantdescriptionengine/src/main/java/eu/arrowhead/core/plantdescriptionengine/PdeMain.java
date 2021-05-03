@@ -13,7 +13,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.Pde
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.PdeMonitorableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.arkalix.ArServiceDescriptionCache;
+import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.core.plugin.or.OrchestrationOption;
@@ -83,10 +83,16 @@ public final class PdeMain {
             getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray()
         );
 
-        return new HttpClient.Builder()
+        System.out.println("lelele");
+
+        var skam = new HttpClient.Builder()
             .identity(identity)
             .trustStore(trustStore)
             .build();
+
+        System.out.println("looorv");
+
+        return skam;
     }
 
     /**
@@ -106,7 +112,7 @@ public final class PdeMain {
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
-            .serviceCache(ArServiceDescriptionCache.withEntryLifetimeLimit(Duration.ZERO))
+            .serviceCache(ArServiceRecordCache.withEntryLifetimeLimit(Duration.ZERO))
             .localPort(pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder()
                 .orchestrationStrategy(strategy)
@@ -295,6 +301,7 @@ public final class PdeMain {
         final String serviceRegistryIp = getProp(appProps, "service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(getProp(appProps, "service_registry.port"));
         final InetSocketAddress serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
+       
         final HttpClient httpClient = createHttpClient(appProps);
 
         final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);

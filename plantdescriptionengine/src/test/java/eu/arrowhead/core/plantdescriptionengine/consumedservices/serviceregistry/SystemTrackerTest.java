@@ -1,8 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry;
 
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemBuilder;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListBuilder;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemDto;
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,8 @@ public class SystemTrackerTest {
         final int systemId = 92;
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse response = new MockClientResponse().status(HttpStatus.OK)
-            .body(new SrSystemListBuilder().count(1)
-                .data(new SrSystemBuilder()
+            .body(new SrSystemListDto.Builder().count(1)
+                .data(new SrSystemDto.Builder()
                     .id(systemId)
                     .systemName(systemName)
                     .address("0.0.0.0")

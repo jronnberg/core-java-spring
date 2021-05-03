@@ -6,7 +6,6 @@ import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryP
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStore;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.PdStoreException;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryBuilder;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
@@ -123,14 +122,14 @@ public class DeletePlantDescriptionTest {
         final int entryIdA = 23;
         final int entryIdB = 24;
 
-        final PlantDescriptionEntryDto entryA = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryA = new PlantDescriptionEntryDto.Builder()
             .id(entryIdA)
             .plantDescription("A")
             .createdAt(now)
             .updatedAt(now)
             .active(false)
             .build();
-        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryBuilder()
+        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryDto.Builder()
             .id(entryIdB)
             .plantDescription("B")
             .createdAt(now)

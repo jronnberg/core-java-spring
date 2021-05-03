@@ -7,7 +7,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.PlantD
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.arkalix.dto.DtoEncoding;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -57,7 +56,7 @@ public class DeletePlantDescription implements HttpRouteHandler {
             final String errMsg = "'" + request.pathParameter(0) + "' is not a valid Plant Description Entry ID.";
             response
                 .status(HttpStatus.BAD_REQUEST)
-                .body(DtoEncoding.JSON, ErrorMessage.of(errMsg));
+                .body(ErrorMessage.of(errMsg));
             return Future.success(response);
         }
 

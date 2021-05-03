@@ -1,6 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers;
 
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.SystemDataBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.SystemDataDto;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -16,7 +16,7 @@ public class GetSystemData implements HttpRouteHandler {
     ) {
         response
             .status(HttpStatus.OK)
-            .body(new SystemDataBuilder().build());
+            .body(new SystemDataDto.Builder().build());
         return Future.done();
     }
 

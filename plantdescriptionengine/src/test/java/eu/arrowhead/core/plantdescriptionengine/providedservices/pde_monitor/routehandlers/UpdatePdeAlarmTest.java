@@ -3,7 +3,8 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.ro
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.dto.ErrorMessage;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarm;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateBuilder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateDto.Builder;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmUpdateDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +35,7 @@ public class UpdatePdeAlarmTest {
 
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(alarm.id())))
-            .body(new PdeAlarmUpdateBuilder()
+            .body(new PdeAlarmUpdateDto.Builder()
                 .acknowledged(true)
                 .build())
             .build();
@@ -59,7 +60,7 @@ public class UpdatePdeAlarmTest {
 
         final String invalidEntryId = "Invalid ID";
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(invalidEntryId))
-            .body(new PdeAlarmUpdateBuilder()
+            .body(new PdeAlarmUpdateDto.Builder()
                 .acknowledged(true)
                 .build())
             .build();
@@ -84,7 +85,7 @@ public class UpdatePdeAlarmTest {
 
         final String nonexistentId = "31";
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(nonexistentId))
-            .body(new PdeAlarmUpdateBuilder()
+            .body(new PdeAlarmUpdateDto.Builder()
                 .acknowledged(true)
                 .build())
             .build();
@@ -115,7 +116,7 @@ public class UpdatePdeAlarmTest {
 
         final HttpServiceRequest request = new MockRequest.Builder()
             .pathParameters(List.of(String.valueOf(alarm.id())))
-            .body(new PdeAlarmUpdateBuilder().build())
+            .body(new PdeAlarmUpdateDto.Builder().build())
             .build();
         final HttpServiceResponse response = new MockServiceResponse();
         final UpdatePdeAlarm handler = new UpdatePdeAlarm(alarmManager);
