@@ -47,6 +47,7 @@
         <groupId>se.arkalix</groupId>
         <artifactId>kalix-dto-processor</artifactId>
         <version>${kalix.version}</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>se.arkalix</groupId>
