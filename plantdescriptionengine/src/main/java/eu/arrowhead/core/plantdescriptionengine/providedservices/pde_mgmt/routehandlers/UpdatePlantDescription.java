@@ -49,7 +49,7 @@ public class UpdatePlantDescription implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyTo(PlantDescriptionUpdateDto::decode)
+        return request.bodyTo(PlantDescriptionUpdateDto::decodeJson)
             .map(newFields -> {
                 final String idString = request.pathParameter(0);
                 final int id;

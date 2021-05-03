@@ -48,7 +48,7 @@ public class AddPlantDescription implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyTo(PlantDescriptionDto::decode)
+        return request.bodyTo(PlantDescriptionDto::decodeJson)
             .map(description -> {
 
                 final PlantDescriptionEntryDto entry = PlantDescriptionEntry.from(description, pdTracker.getUniqueId());

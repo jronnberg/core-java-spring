@@ -42,7 +42,7 @@ public class UpdatePdeAlarm implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyTo(PdeAlarmUpdateDto::decode)
+        return request.bodyTo(PdeAlarmUpdateDto::decodeJson)
             .map(newFields -> {
                 final String idString = request.pathParameter(0);
                 final int id;

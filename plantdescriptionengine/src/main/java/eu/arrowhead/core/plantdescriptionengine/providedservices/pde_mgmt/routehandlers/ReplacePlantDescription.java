@@ -50,7 +50,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
         Objects.requireNonNull(request, "Expected request.");
         Objects.requireNonNull(response, "Expected response.");
 
-        return request.bodyTo(PlantDescriptionDto::decode)
+        return request.bodyTo(PlantDescriptionDto::decodeJson)
             .map(description -> {
                 final int id;
 
