@@ -83,16 +83,10 @@ public final class PdeMain {
             getProp(appProps, "server.ssl.pde.trust-store-password").toCharArray()
         );
 
-        System.out.println("lelele");
-
-        var skam = new HttpClient.Builder()
+        return new HttpClient.Builder()
             .identity(identity)
             .trustStore(trustStore)
             .build();
-
-        System.out.println("looorv");
-
-        return skam;
     }
 
     /**
@@ -142,9 +136,9 @@ public final class PdeMain {
      * <p>
      * {@code path} is first treated as a regular file path. If the certificate
      * cannot be found at that location, an attempt is made to load it from
-     * resources (i.e. within the jar file). 
+     * resources (i.e. within the jar file).
      * If the keystore cannot be loaded, the application is terminated.
-     * 
+     *
      * @param path     Keystore path.
      * @param password Password or private key associated with the
      *                 keystore.
@@ -152,16 +146,16 @@ public final class PdeMain {
      */
     private static KeyStore loadKeyStore(String path, char[] password) {
 
-        KeyStore keyStore = null; 
+        KeyStore keyStore = null;
         try {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         } catch (KeyStoreException e) {
             logger.error("Failed to load identity keystore", e);
-            System.exit(74); 
+            System.exit(74);
         }
-        
+
         File keyStoreFile = new File(path);
-        
+
         if (keyStoreFile.isFile()) {
             try (FileInputStream in = new FileInputStream(keyStoreFile)) {
                 keyStore.load(in, password);
@@ -260,7 +254,7 @@ public final class PdeMain {
      * It first searches the current working directory for a file called
      * application.properties. If not found, the application.properties file
      * from the resources directory is used instead. If neither can be read, the
-     * application is terminated. 
+     * application is terminated.
      */
     private static Properties loadAppProps() {
         final Properties appProps = new Properties();
@@ -301,7 +295,7 @@ public final class PdeMain {
         final String serviceRegistryIp = getProp(appProps, "service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(getProp(appProps, "service_registry.port"));
         final InetSocketAddress serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
-       
+
         final HttpClient httpClient = createHttpClient(appProps);
 
         final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
