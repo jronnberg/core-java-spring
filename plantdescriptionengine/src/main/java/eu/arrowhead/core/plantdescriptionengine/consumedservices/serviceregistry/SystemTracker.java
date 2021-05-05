@@ -29,7 +29,7 @@ public class SystemTracker {
     protected final List<SystemUpdateListener> listeners = new ArrayList<>();
     // Map from system name to system:
     protected final Map<String, SrSystem> systems = new ConcurrentHashMap<>();
-    private final String SYSTEMS_URI = "/serviceregistry/systems";
+    private final String SYSTEMS_URI = "/serviceregistry/pull-systems";
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
     private final int pollInterval = 5000;
