@@ -1,9 +1,10 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import se.arkalix.codec.binary.ByteArrayReader;
-import se.arkalix.codec.binary.ByteArrayWriter;
-
+import se.arkalix.io.buf.Buffer;
+import se.arkalix.io.buf.BufferReader;
+import se.arkalix.io.buf.BufferWriter;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -90,7 +91,7 @@ public class SqlPdStore implements PdStore {
             while (resultSet.next()) {
                 final String jsonText = resultSet.getString("plant_description");
                 final byte[] bytes = jsonText.getBytes(StandardCharsets.UTF_8);
-                final PlantDescriptionEntryDto entry = PlantDescriptionEntryDto.decodeJson(new ByteArrayReader(bytes));
+                final PlantDescriptionEntryDto entry = PlantDescriptionEntryDto.decodeJson(Buffer.wrap(bytes));
                 result.add(entry);
             }
 
@@ -110,12 +111,11 @@ public class SqlPdStore implements PdStore {
         Objects.requireNonNull(entry, "Expected entry.");
 
         try {
-            final ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
+            final byte[] bytes = new byte[1024]; // TODO: Remove random limit
+            final BufferWriter writer = Buffer.wrap(bytes);
             final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PD);
-
-            entry.encodeJson(byteArrayWriter);
-
-            final String entryString = byteArrayWriter.toString();
+            entry.encodeJson(writer);
+            final String entryString = writer.toString();
 
             statement.setInt(1, entry.id());
             statement.setString(2, entryString);

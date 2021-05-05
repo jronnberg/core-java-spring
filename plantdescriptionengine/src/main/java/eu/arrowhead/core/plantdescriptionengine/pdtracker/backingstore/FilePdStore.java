@@ -1,9 +1,8 @@
 package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
-import se.arkalix.codec.binary.ByteArrayReader;
-import se.arkalix.codec.binary.ByteArrayWriter;
-
+import se.arkalix.io.buf.Buffer;
+import se.arkalix.io.buf.BufferWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -69,7 +68,7 @@ public class FilePdStore implements PdStore {
             final byte[] bytes;
             try {
                 bytes = Files.readAllBytes(child.toPath());
-                result.add(PlantDescriptionEntryDto.decodeJson(new ByteArrayReader(bytes)));
+                result.add(PlantDescriptionEntryDto.decodeJson(Buffer.wrap(bytes)));
             } catch (final IOException e) {
                 throw new PdStoreException(e);
             }
@@ -102,9 +101,10 @@ public class FilePdStore implements PdStore {
         }
 
         try (final FileOutputStream fileWriter = new FileOutputStream(file)) {
-            final ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
-            entry.encodeJson(byteArrayWriter);
-            fileWriter.write(byteArrayWriter.asByteArray());
+            final byte[] bytes = new byte[1024]; // TODO: Remove random limit
+            final BufferWriter writer = Buffer.wrap(bytes);
+            entry.encodeJson(writer);
+            fileWriter.write(bytes);
         } catch (final IOException e) {
             throw new PdStoreException("Failed to write Plant Description Entry to file", e);
         }
