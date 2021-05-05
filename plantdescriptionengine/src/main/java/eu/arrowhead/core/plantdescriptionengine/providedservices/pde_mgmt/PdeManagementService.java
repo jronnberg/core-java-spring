@@ -7,6 +7,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routeh
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.GetPlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.ReplacePlantDescription;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.routehandlers.UpdatePlantDescription;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 
@@ -53,7 +54,7 @@ public class PdeManagementService {
     public HttpService getService() {
         return new HttpService()
             .name(SERVICE_NAME)
-            // .encodings(EncodingDescriptor.JSON)
+            .codecs(CodecType.JSON)
             .basePath(BASE_PATH)
             .get(GET_PLANT_DESCRIPTION_PATH, new GetPlantDescription(pdTracker))
             .get(GET_ALL_PLANT_DESCRIPTIONS_PATH, new GetAllPlantDescriptions(pdTracker))

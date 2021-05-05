@@ -4,6 +4,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptio
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetInventoryId;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetPing;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetSystemData;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 
@@ -32,7 +33,7 @@ public class PdeMonitorableService {
     public HttpService getService() {
         return new HttpService()
             .name(SERVICE_NAME)
-            // .encodings(EncodingDescriptor.JSON) TODO: Replace with something
+            .codecs(CodecType.JSON)
             .basePath(BASE_PATH)
             .get(INVENTORY_ID_PATH, new GetInventoryId())
             .get(SYSTEM_DATA_PATH, new GetSystemData())
