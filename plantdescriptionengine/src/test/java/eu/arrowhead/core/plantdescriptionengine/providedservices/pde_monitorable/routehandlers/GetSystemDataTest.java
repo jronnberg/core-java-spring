@@ -20,9 +20,8 @@ public class GetSystemDataTest {
 
         handler.handle(request, response).ifSuccess(result -> {
             assertEquals(HttpStatus.OK, response.status().orElse(null));
-            assertTrue(response.body().isPresent());
 
-            final SystemData systemData = (SystemData) response.body().get();
+            final SystemData systemData = (SystemData) response.getRawBody();
             assertTrue(systemData.data().isEmpty());
         })
             .onFailure(e -> fail());

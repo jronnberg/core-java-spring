@@ -42,7 +42,7 @@ public class AddPlantDescriptionTest {
             .plantDescription("Plant Description 1A")
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -52,17 +52,15 @@ public class AddPlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertTrue(response.status().isPresent());
                     assertEquals(HttpStatus.CREATED, response.status().get());
-                    assertNotNull(response.body());
-                    assertTrue(response.body().isPresent());
 
-                    final PlantDescriptionEntry entry = (PlantDescriptionEntry) response.body().get();
+                    final PlantDescriptionEntry entry = (PlantDescriptionEntry) response.getRawBody();
 
                     assertEquals(entry.plantDescription(), description.plantDescription());
 
                     final PlantDescriptionEntryDto entryInMap = pdTracker.get(entry.id());
                     assertNotNull(entryInMap);
                 })
-                .onFailure(Assertions::assertNull);
+                .onFailure(e -> fail());
         } catch (final Exception e) {
             fail();
         }
@@ -104,7 +102,7 @@ public class AddPlantDescriptionTest {
             .systems(List.of(system))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -152,7 +150,7 @@ public class AddPlantDescriptionTest {
             .systems(List.of(consumerSystem))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder()
             .body(description)
             .build();
@@ -162,8 +160,7 @@ public class AddPlantDescriptionTest {
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     final String expectedErrorMessage = "<Duplicate port name '" + portName + "' in system '" + systemId + "'>";
-                    assertTrue(response.body().isPresent());
-                    final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(Assertions::assertNull);
@@ -183,7 +180,7 @@ public class AddPlantDescriptionTest {
             .plantDescription("Plant Description 1A")
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final MockRequest request = new MockRequest.Builder().body(description).build();
 
         doThrow(new PdStoreException("Mocked error")).when(backingStore).write(any());

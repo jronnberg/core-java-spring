@@ -20,12 +20,11 @@ public class GetPingTest {
 
         handler.handle(request, response).ifSuccess(result -> {
             assertEquals(HttpStatus.OK, response.status().orElse(null));
-            assertTrue(response.body().isPresent());
 
-            final Ping ping = (Ping) response.body().get();
+            final Ping ping = (Ping) response.getRawBody();
             assertTrue(ping.ping());
         })
-            .onFailure(e -> fail());
+        .onFailure(e -> fail());
 
     }
 }

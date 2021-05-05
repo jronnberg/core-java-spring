@@ -22,7 +22,7 @@ import eu.arrowhead.core.plantdescriptionengine.utils.TestUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
+import se.arkalix.ServiceInterface;
 import se.arkalix.ServiceRecord;
 import se.arkalix.SystemRecord;
 import se.arkalix.codec.json.JsonBoolean;
@@ -30,8 +30,7 @@ import se.arkalix.codec.json.JsonObject;
 import se.arkalix.codec.json.JsonPair;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
-
+import se.arkalix.security.access.AccessPolicyType;
 import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -60,14 +59,13 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.body().get();
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.getRawBody();
                 assertEquals(entryIds.size(), entries.count());
+                assertEquals(HttpStatus.OK, response.status().orElse(null));
             }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
             fail();
@@ -113,12 +111,12 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.body().get();
+
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.getRawBody();
                 final MonitorPlantDescriptionEntry retrievedEntry = entries.data().get(0);
                 assertEquals(1, retrievedEntry.connections().size());
 
@@ -180,12 +178,12 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.body().get();
+
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.getRawBody();
                 final MonitorPlantDescriptionEntry retrievedEntry = entries.data().get(0);
                 final SystemEntry retrievedSystem = retrievedEntry.systems().get(0);
                 assertEquals(1, retrievedSystem.ports().size());
@@ -228,9 +226,9 @@ public class GetAllPlantDescriptionsTest {
         final ServiceRecord ServiceRecord = new ServiceRecord.Builder()
             .name("service-name")
             .uri("/abc")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: What to use instead?
             .provider(provider)
-            // .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON)  TODO: What to use instead?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .build();
 
         final String inventoryId = "system_a_inventory_id";
@@ -242,12 +240,12 @@ public class GetAllPlantDescriptionsTest {
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest();
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList returnedEntries = (PlantDescriptionEntryList) response.body().get();
+
+                final PlantDescriptionEntryList returnedEntries = (PlantDescriptionEntryList) response.getRawBody();
                 final MonitorPlantDescriptionEntry returnedEntry = returnedEntries.data().get(0);
                 final SystemEntry returnedSystem = returnedEntry.systems().get(0);
                 assertTrue(returnedSystem.inventoryId().isPresent());
@@ -321,17 +319,17 @@ public class GetAllPlantDescriptionsTest {
         final HttpServiceRequest updatesDescendingRequest = new MockRequest.Builder()
             .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC")))
             .build();
-        final HttpServiceResponse response1 = new MockServiceResponse();
-        final HttpServiceResponse response2 = new MockServiceResponse();
-        final HttpServiceResponse response3 = new MockServiceResponse();
+
+        final MockServiceResponse response1 = new MockServiceResponse();
+        final MockServiceResponse response2 = new MockServiceResponse();
+        final MockServiceResponse response3 = new MockServiceResponse();
 
         try {
             handler.handle(idDescendingRequest, response1).flatMap(result -> {
                 assertTrue(response1.status().isPresent());
                 assertEquals(HttpStatus.OK, response1.status().get());
 
-                assertTrue(response1.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response1.body().get();
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response1.getRawBody();
                 assertEquals(numEntries, entries.count());
 
                 int previousId = entries.data().get(0).id();
@@ -346,8 +344,7 @@ public class GetAllPlantDescriptionsTest {
                 assertTrue(response2.status().isPresent());
                 assertEquals(HttpStatus.OK, response2.status().get());
 
-                assertTrue(response2.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response2.body().get();
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response2.getRawBody();
                 assertEquals(numEntries, entries.count());
 
                 Instant previousTimestamp = entries.data().get(0).createdAt();
@@ -362,8 +359,7 @@ public class GetAllPlantDescriptionsTest {
                 assertTrue(response3.status().isPresent());
                 assertEquals(HttpStatus.OK, response3.status().get());
 
-                assertTrue(response3.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response3.body().get();
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response3.getRawBody();
                 assertEquals(numEntries, entries.count());
 
                 Instant previousTimestamp = entries.data().get(0).updatedAt();
@@ -405,13 +401,13 @@ public class GetAllPlantDescriptionsTest {
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(monitorInfo, pdTracker);
         final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("active", List.of("true")))
             .build();
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
                 assertEquals(HttpStatus.OK, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.body().get();
+
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.getRawBody();
                 assertEquals(1, entries.count());
                 assertEquals(entries.data().get(0).id(), activeEntryId, 0);
             }).onFailure(Assertions::assertNull);
@@ -431,7 +427,7 @@ public class GetAllPlantDescriptionsTest {
         }
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final int page = 1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("sort_field", List.of("id"),
@@ -439,10 +435,9 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.OK, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
-                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.body().get();
+                final PlantDescriptionEntryList entries = (PlantDescriptionEntryList) response.getRawBody();
                 assertEquals(itemsPerPage, entries.count());
+                assertEquals(HttpStatus.OK, response.status().orElse(null));
 
                 // Sort the entry ID:s, so that their order will match that of
                 // the response data.
@@ -464,7 +459,7 @@ public class GetAllPlantDescriptionsTest {
 
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final int page = -1;
         final int itemsPerPage = 2;
         final HttpServiceRequest request = new MockRequest.Builder()
@@ -474,11 +469,10 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
                 final String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-                final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
             }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
@@ -492,7 +486,7 @@ public class GetAllPlantDescriptionsTest {
         final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(new InMemoryPdStore());
 
         final GetAllPlantDescriptions handler = new GetAllPlantDescriptions(new MonitorInfo(), pdTracker);
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final int page = 4;
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of("page", List.of(String.valueOf(page))))
@@ -500,11 +494,10 @@ public class GetAllPlantDescriptionsTest {
 
         try {
             handler.handle(request, response).ifSuccess(result -> {
-                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
                 final String expectedErrorMessage = "<Missing parameter 'item_per_page'.>";
-                final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
+                assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
 
             }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {

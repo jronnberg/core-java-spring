@@ -1,7 +1,7 @@
 package eu.arrowhead.core.plantdescriptionengine.utils;
 
-import se.arkalix.codec.Encodable;
 import se.arkalix.codec.MediaType;
+import se.arkalix.codec.MultiEncodable;
 import se.arkalix.net.BodyOutgoing;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpStatus;
@@ -17,22 +17,21 @@ import java.util.Optional;
  */
 public class MockServiceResponse implements HttpServiceResponse {
 
-    private Encodable _body;
+    private Object _body;
     private HttpStatus _status = HttpStatus.IM_A_TEAPOT;
 
     @Override
     public Optional<BodyOutgoing> body() {
-        return Optional.of(BodyOutgoing.create(_body));
-    }
-
-    @Override
-    public HttpServiceResponse body(final byte[] byteArray) {
-        this.body();
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public HttpServiceResponse body(final Encodable encodable) {
+    public HttpServiceResponse body(final byte[] byteArray) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MockServiceResponse body(final MultiEncodable encodable) {
         _body = encodable;
         return this;
     }
@@ -43,10 +42,9 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpServiceResponse body(final String string) {
-        // _body = string;
-        // return this;
-        throw new UnsupportedOperationException();
+    public MockServiceResponse body(final String string) {
+        this._body = string;
+        return this;
     }
 
     @Override
@@ -70,7 +68,7 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpServiceResponse status(final HttpStatus status) {
+    public MockServiceResponse status(final HttpStatus status) {
         Objects.requireNonNull(status, "Expected status.");
         _status = status;
         return this;
@@ -87,7 +85,7 @@ public class MockServiceResponse implements HttpServiceResponse {
     }
 
     @Override
-    public HttpServiceResponse body(BodyOutgoing arg0) {
+    public HttpServiceResponse body(BodyOutgoing body) {
         throw new UnsupportedOperationException();
     }
 
@@ -106,4 +104,7 @@ public class MockServiceResponse implements HttpServiceResponse {
         throw new UnsupportedOperationException();
     }
 
+    public Object getRawBody() {
+        return _body;
+    }
 }

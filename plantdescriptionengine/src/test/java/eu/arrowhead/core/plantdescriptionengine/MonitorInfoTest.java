@@ -1,13 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine;
 
 import org.junit.jupiter.api.Test;
-
+import se.arkalix.ServiceInterface;
 import se.arkalix.ServiceRecord;
 import se.arkalix.SystemRecord;
 import se.arkalix.codec.json.JsonBoolean;
 import se.arkalix.codec.json.JsonObject;
 import se.arkalix.codec.json.JsonPair;
-
+import se.arkalix.security.access.AccessPolicyType;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +29,8 @@ public class MonitorInfoTest {
             .name("service-a")
             .provider(provider)
             .uri("/test")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
-            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON)) TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .metadata(metadata)
             .build();
     }
@@ -69,8 +69,8 @@ public class MonitorInfoTest {
             .name("service-a")
             .provider(providerA)
             .uri("/test")
-            //.security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
-            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON))  TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .metadata(metadataA)
             .build();
 
@@ -79,8 +79,8 @@ public class MonitorInfoTest {
             .name("service-b")
             .provider(providerB)
             .uri("/test")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
-            // .interfaces(List.of(InterfaceDescriptor.HTTP_SECURE_JSON)) TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .metadata(metadataB)
             .build();
 

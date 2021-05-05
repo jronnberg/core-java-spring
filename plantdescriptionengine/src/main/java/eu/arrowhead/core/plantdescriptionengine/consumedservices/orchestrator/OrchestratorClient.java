@@ -102,6 +102,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.success(emptyRuleList());
         }
 
+        // TODO: The conversion below should not be necessary.
         List<MultiEncodable> encodableRules = new ArrayList<>();
         for (final var rule : rules) {
             encodableRules.add(rule);
@@ -112,7 +113,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 new HttpClientRequest()
                     .method(HttpMethod.POST)
                     .uri(CREATE_RULE_URI)
-                    .body(encodableRules, CodecType.JSON) // It should be possible to use rules instead
+                    .body(encodableRules, CodecType.JSON)
                     .header("accept", "application/json"))
             .flatMap(response -> response.bodyToIfSuccess(StoreEntryListDto::decodeJson));
     }
@@ -221,7 +222,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final Future<StoreEntryListDto> postRulesTask = shouldPostRules ? postRules() : Future.success(emptyRuleList());
 
-        deleteRulesTask.flatMap(result -> postRulesTask)
+        deleteRulesTask
+            .flatMap(result -> postRulesTask)
             .ifSuccess(createdRules -> {
                 if (entry.active()) {
                     activeEntry = entry;

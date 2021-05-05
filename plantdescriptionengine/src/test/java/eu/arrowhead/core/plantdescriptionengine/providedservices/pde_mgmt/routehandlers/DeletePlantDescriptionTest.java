@@ -42,7 +42,7 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(entryId)))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         // Make sure that the entry is there before we delete it.
         assertNotNull(pdTracker.get(entryId));
@@ -69,16 +69,15 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(invalidEntryId))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertTrue(response.status().isPresent());
-                    assertTrue(response.body().isPresent());
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().get());
                     final String expectedErrorMessage = "'" + invalidEntryId + "' is not a valid Plant Description Entry ID.";
-                    final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(Assertions::assertNull);
@@ -97,15 +96,14 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(nonExistentId)))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(result -> {
                     assertEquals(HttpStatus.NOT_FOUND, response.status().orElse(null));
                     final String expectedErrorMessage = "Plant Description with ID " + nonExistentId + " not found.";
-                    assertTrue(response.body().isPresent());
-                    final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(Assertions::assertNull);
@@ -144,7 +142,7 @@ public class DeletePlantDescriptionTest {
         final HttpServiceRequest request = new MockRequest.Builder().pathParameters(List.of(String.valueOf(entryIdA)))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
@@ -152,8 +150,7 @@ public class DeletePlantDescriptionTest {
                     assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                     final String expectedErrorMessage = "<Error in include list: Entry '" + entryIdA + "' is required by entry '"
                         + entryIdB + "'.>";
-                    assertTrue(response.body().isPresent());
-                    final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+                    final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                     assertEquals(expectedErrorMessage, actualErrorMessage);
                 })
                 .onFailure(Assertions::assertNull);
@@ -175,7 +172,7 @@ public class DeletePlantDescriptionTest {
             .pathParameters(List.of(String.valueOf(entryId)))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         doThrow(new PdStoreException("Mocked error")).when(backingStore).remove(anyInt());
         try {

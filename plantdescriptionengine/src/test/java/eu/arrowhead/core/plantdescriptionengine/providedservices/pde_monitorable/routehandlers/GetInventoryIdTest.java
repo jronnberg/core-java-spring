@@ -20,12 +20,10 @@ public class GetInventoryIdTest {
 
         handler.handle(request, response).ifSuccess(result -> {
             assertEquals(HttpStatus.OK, response.status().orElse(null));
-            assertTrue(response.body().isPresent());
 
-            final InventoryId inventoryId = (InventoryId) response.body().get();
+            final InventoryId inventoryId = (InventoryId) response.getRawBody();
             assertTrue(inventoryId.id().isEmpty());
         })
-            .onFailure(e -> fail());
-
+        .onFailure(e -> fail());
     }
 }

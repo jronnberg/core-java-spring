@@ -9,12 +9,13 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntry;
+import se.arkalix.ServiceInterface;
 import se.arkalix.ServiceRecord;
 import se.arkalix.SystemRecord;
 import se.arkalix.codec.json.JsonBoolean;
 import se.arkalix.codec.json.JsonObject;
 import se.arkalix.codec.json.JsonPair;
-
+import se.arkalix.security.access.AccessPolicyType;
 import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
@@ -82,9 +83,9 @@ public class DtoUtilsTest {
             .name(serviceDefinition)
             .metadata(metadata)
             .uri("/abc")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
             .provider(provider)
-            // .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON) TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .build();
 
         final String inventoryId = "system_a_inventory_id";
@@ -200,9 +201,9 @@ public class DtoUtilsTest {
             .name(serviceDefinition)
             .metadata(metadata)
             .uri("/abc")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
             .provider(provider)
-            // .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON) TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .build();
 
         final String inventoryId = "system_a_inventory_id";
@@ -256,9 +257,9 @@ public class DtoUtilsTest {
             .name(serviceDefinition)
             .metadata(metadata)
             .uri("/abc")
-            // .security(SecurityDescriptor.NOT_SECURE) TODO: Replace with what?
             .provider(provider)
-            // .interfaces(InterfaceDescriptor.HTTP_SECURE_JSON) TODO: Replace with what?
+            .accessPolicyType(AccessPolicyType.NOT_SECURE)
+            .interfaces(ServiceInterface.HTTP_SECURE_JSON)
             .build();
 
         final String inventoryId = "system_a_inventory_id";

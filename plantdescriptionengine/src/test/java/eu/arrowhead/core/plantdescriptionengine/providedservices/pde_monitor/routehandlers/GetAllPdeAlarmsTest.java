@@ -11,12 +11,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,16 +39,15 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("sort_field", List.of("id"), "direction", List.of("DESC")))
             .build();
 
-        final HttpServiceResponse ascResponse = new MockServiceResponse();
-        final HttpServiceResponse descResponse = new MockServiceResponse();
+        final MockServiceResponse ascResponse = new MockServiceResponse();
+        final MockServiceResponse descResponse = new MockServiceResponse();
 
         try {
             handler.handle(ascRequest, ascResponse)
                 .map(ascendingResult -> {
                     assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
-                    assertTrue(ascResponse.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) ascResponse.body().get();
+                    final PdeAlarmList alarms = (PdeAlarmList) ascResponse.getRawBody();
                     assertEquals(3, alarms.count());
 
                     int previousId = alarms.data().get(0).id();
@@ -65,8 +62,7 @@ public class GetAllPdeAlarmsTest {
                 .ifSuccess(descendingResult -> {
                     assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
-                    assertTrue(descResponse.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) descResponse.body().get();
+                    final PdeAlarmList alarms = (PdeAlarmList) descResponse.getRawBody();
                     assertEquals(3, alarms.count());
 
                     int previousId = alarms.data().get(0).id();
@@ -82,77 +78,72 @@ public class GetAllPdeAlarmsTest {
         }
     }
 
-    // TODO: Rewrite this test to work with ar:kalix 0.6
-    // @Test
-    // public void shouldSortByRaisedAt() {
+    @Test
+    public void shouldSortByRaisedAt() {
 
-    //     final String systemIdA = "Sys-A";
-    //     final String systemIdB = "Sys-B";
-    //     final String systemIdC = "Sys-C";
+        final String systemIdA = "Sys-A";
+        final String systemIdB = "Sys-B";
+        final String systemIdC = "Sys-C";
 
-    //     final String systemNameA = "System A";
-    //     final String systemNameB = "System B";
-    //     final String systemNameC = "System C";
+        final String systemNameA = "System A";
+        final String systemNameB = "System B";
+        final String systemNameC = "System C";
 
-    //     final AlarmManager alarmManager = new AlarmManager();
+        final AlarmManager alarmManager = new AlarmManager();
 
-    //     alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
-    //     alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
-    //     alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC, null);
-    //     final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
+        alarmManager.raiseSystemNotRegistered(systemIdA, systemNameA, null);
+        alarmManager.raiseSystemNotRegistered(systemIdB, systemNameB, null);
+        alarmManager.raiseSystemNotRegistered(systemIdC, systemNameC, null);
+        final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
 
-    //     final HttpServiceRequest ascRequest = new MockRequest.Builder()
-    //         .queryParameters(Map.of("sort_field", List.of("raisedAt"), "direction", List.of("ASC")))
-    //         .build();
-    //     final HttpServiceRequest descRequest = new MockRequest.Builder()
-    //         .queryParameters(
-    //             Map.of("sort_field", List.of("raisedAt"), "direction", List.of("DESC"))
-    //         )
-    //         .build();
+        final HttpServiceRequest ascRequest = new MockRequest.Builder()
+            .queryParameters(Map.of("sort_field", List.of("raisedAt"), "direction", List.of("ASC")))
+            .build();
+        final HttpServiceRequest descRequest = new MockRequest.Builder()
+            .queryParameters(
+                Map.of("sort_field", List.of("raisedAt"), "direction", List.of("DESC"))
+            )
+            .build();
 
-    //     final HttpServiceResponse ascResponse = new MockServiceResponse();
-    //     final HttpServiceResponse descResponse = new MockServiceResponse();
+        final MockServiceResponse ascResponse = new MockServiceResponse();
+        final MockServiceResponse descResponse = new MockServiceResponse();
 
-    //     try {
-    //         handler.handle(ascRequest, ascResponse)
-    //             .map(ascendingResult -> {
-    //                 assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
+        try {
+            handler.handle(ascRequest, ascResponse)
+                .map(ascendingResult -> {
+                    assertEquals(HttpStatus.OK, ascResponse.status().orElse(null));
 
-    //                 assertTrue(ascResponse.body().isPresent());
-    //                 final PdeAlarmList alarms = (PdeAlarmList) ascResponse.body().get();
-    //                 assertEquals(3, alarms.count());
+                    final PdeAlarmList alarms = (PdeAlarmList) ascResponse.getRawBody();
+                    assertEquals(3, alarms.count());
 
-    //                 int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-    //                 for (int i = 1; i < alarms.count(); i++) {
-    //                     final PdeAlarm alarm = alarms.data().get(i);
-    //                     assertTrue(alarm.id() >= previousId);
-    //                     previousId = alarm.id();
-    //                 }
-    //                 return handler.handle(descRequest, descResponse);
-    //             })
-    //             .ifSuccess(descendingResult -> {
-    //                 assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final PdeAlarm alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() >= previousId);
+                        previousId = alarm.id();
+                    }
+                    return handler.handle(descRequest, descResponse);
+                })
+                .ifSuccess(descendingResult -> {
+                    assertEquals(HttpStatus.OK, descResponse.status().orElse(null));
 
-    //                 assertTrue(descResponse.body().isPresent());
-    //                 final Optional<Object> body = descResponse.body();
-    //                 assertTrue(body.isPresent());
-    //                 final PdeAlarmList alarms = (PdeAlarmList) body.get();
-    //                 assertEquals(3, alarms.count());
+                    final PdeAlarmList alarms = (PdeAlarmList) descResponse.getRawBody();
+                    assertEquals(3, alarms.count());
 
-    //                 int previousId = alarms.data().get(0).id();
+                    int previousId = alarms.data().get(0).id();
 
-    //                 for (int i = 1; i < alarms.count(); i++) {
-    //                     final PdeAlarm alarm = alarms.data().get(i);
-    //                     assertTrue(alarm.id() <= previousId);
-    //                     previousId = alarm.id();
-    //                 }
-    //             })
-    //             .onFailure(Assertions::assertNull);
-    //     } catch (final Exception e) {
-    //         fail();
-    //     }
-    // }
+                    for (int i = 1; i < alarms.count(); i++) {
+                        final PdeAlarm alarm = alarms.data().get(i);
+                        assertTrue(alarm.id() <= previousId);
+                        previousId = alarm.id();
+                    }
+                })
+                .onFailure(e -> fail());
+        } catch (final Exception e) {
+            fail();
+        }
+    }
 
     @Test
     public void shouldSortByClearedAt() {
@@ -182,14 +173,14 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("sort_field", List.of("clearedAt"), "direction", List.of("ASC")))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(ascendingResult -> {
                     assertEquals(HttpStatus.OK, response.status().orElse(null));
-                    assertTrue(response.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+
+                    final PdeAlarmList alarms = (PdeAlarmList) response.getRawBody();
                     final PdeAlarm firstAlarm = alarms.data().get(0);
                     assertEquals(systemNameC, firstAlarm.systemName().orElse(null));
                 })
@@ -226,14 +217,14 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("sort_field", List.of("updatedAt"), "direction", List.of("DESC")))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(ascendingResult -> {
                     assertEquals(HttpStatus.OK, response.status().orElse(null));
-                    assertTrue(response.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+
+                    final PdeAlarmList alarms = (PdeAlarmList) response.getRawBody();
                     final PdeAlarm firstAlarm = alarms.data().get(0);
                     assertEquals(systemNameB, firstAlarm.systemName().orElse(null));
                 })
@@ -243,34 +234,31 @@ public class GetAllPdeAlarmsTest {
         }
     }
 
-    // TODO: Rewrite this test to work with ar:kalix 0.6
-    // @Test
-    // public void shouldRejectNonBooleans() {
+    @Test
+    public void shouldRejectNonBooleans() {
 
-    //     final GetAllPdeAlarms handler = new GetAllPdeAlarms(new AlarmManager());
-    //     final String nonBoolean = "Not a boolean";
-    //     final HttpServiceRequest request = new MockRequest.Builder()
-    //         .queryParameters(Map.of("acknowledged", List.of(nonBoolean) // Should be 'true' or 'false'
-    //         ))
-    //         .build();
-    //     final HttpServiceResponse response = new MockServiceResponse();
+        final GetAllPdeAlarms handler = new GetAllPdeAlarms(new AlarmManager());
+        final String nonBoolean = "Not a boolean";
+        final HttpServiceRequest request = new MockRequest.Builder()
+            .queryParameters(Map.of("acknowledged", List.of(nonBoolean) // Should be 'true' or 'false'
+            ))
+            .build();
+        final MockServiceResponse response = new MockServiceResponse();
 
-    //     try {
-    //         handler.handle(request, response)
-    //             .ifSuccess(result -> {
-    //                 assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
-    //                 final String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
-    //                     + nonBoolean + "'.>";
-    //                 final Optional<Object> body = response.body();
-    //                 assertTrue(body.isPresent());
-    //                 final String actualErrorMessage = ((ErrorMessage) body.get()).error();
-    //                 assertEquals(expectedErrorMessage, actualErrorMessage);
-    //             })
-    //             .onFailure(Assertions::assertNull);
-    //     } catch (final Exception e) {
-    //         fail();
-    //     }
-    // }
+        try {
+            handler.handle(request, response)
+                .ifSuccess(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
+                    final String expectedErrorMessage = "<Query parameter 'acknowledged' must be true or false, got '"
+                        + nonBoolean + "'.>";
+                    final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
+                    assertEquals(expectedErrorMessage, actualErrorMessage);
+                })
+                .onFailure(Assertions::assertNull);
+        } catch (final Exception e) {
+            fail();
+        }
+    }
 
     @Test
     public void shouldPaginate() {
@@ -287,7 +275,7 @@ public class GetAllPdeAlarmsTest {
         }
 
         final GetAllPdeAlarms handler = new GetAllPdeAlarms(alarmManager);
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final int page = 2;
         final int itemsPerPage = 3;
         final HttpServiceRequest request = new MockRequest.Builder().queryParameters(Map.of("sort_field", List.of("id"),
@@ -296,8 +284,8 @@ public class GetAllPdeAlarmsTest {
         try {
             handler.handle(request, response).ifSuccess(result -> {
                 assertEquals(HttpStatus.OK, response.status().orElse(null));
-                assertTrue(response.body().isPresent());
-                final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+
+                final PdeAlarmList alarms = (PdeAlarmList) response.getRawBody();
                 assertEquals(itemsPerPage, alarms.count());
                 for (int i = 0; i < itemsPerPage; i++) {
                     final int index = page * itemsPerPage + i;
@@ -316,7 +304,7 @@ public class GetAllPdeAlarmsTest {
     public void shouldRejectNegativePage() {
         final GetAllPdeAlarms handler = new GetAllPdeAlarms(new AlarmManager());
         final int page = -3;
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
         final HttpServiceRequest request = new MockRequest.Builder()
             .queryParameters(Map.of("page", List.of(String.valueOf(page)), "item_per_page", List.of(String.valueOf(4))))
             .build();
@@ -325,8 +313,8 @@ public class GetAllPdeAlarmsTest {
             handler.handle(request, response).ifSuccess(result -> {
                 assertEquals(HttpStatus.BAD_REQUEST, response.status().orElse(null));
                 final String expectedErrorMessage = "<Query parameter 'page' must be greater than 0, got " + page + ".>";
-                assertTrue(response.body().isPresent());
-                final String actualErrorMessage = ((ErrorMessage) response.body().get()).error();
+
+                final String actualErrorMessage = ((ErrorMessage) response.getRawBody()).error();
                 assertEquals(expectedErrorMessage, actualErrorMessage);
             }).onFailure(Assertions::assertNull);
         } catch (final Exception e) {
@@ -356,15 +344,14 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("systemName", List.of(systemNameA)))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(ascendingResult -> {
                     assertEquals(HttpStatus.OK, response.status().orElse(null));
 
-                    assertTrue(response.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+                    final PdeAlarmList alarms = (PdeAlarmList) response.getRawBody();
                     assertEquals(1, alarms.count());
 
                     assertEquals(systemNameA, alarms.data().get(0).systemName().orElse(null));
@@ -397,15 +384,14 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("severity", List.of("warning")))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(ascendingResult -> {
                     assertEquals(HttpStatus.OK, response.status().orElse(null));
 
-                    assertTrue(response.body().isPresent());
-                    final PdeAlarmList alarms = (PdeAlarmList) response.body().get();
+                    final PdeAlarmList alarms = (PdeAlarmList) response.getRawBody();
                     assertEquals(2, alarms.count());
 
                     assertEquals(systemNameA, alarms.data().get(0).systemName().orElse(null));
@@ -441,15 +427,15 @@ public class GetAllPdeAlarmsTest {
             .queryParameters(Map.of("acknowledged", List.of("false")))
             .build();
 
-        final HttpServiceResponse response = new MockServiceResponse();
+        final MockServiceResponse response = new MockServiceResponse();
 
         try {
             handler.handle(request, response)
                 .ifSuccess(ascendingResult -> {
                     assertEquals(HttpStatus.OK, response.status().orElse(null));
 
-                    assertTrue(response.body().isPresent());
-                    final PdeAlarmList result = (PdeAlarmList) response.body().get();
+
+                    final PdeAlarmList result = (PdeAlarmList) response.getRawBody();
                     assertEquals(1, result.count());
 
                     assertEquals(systemNameC, result.data().get(0).systemName().orElse(null));
