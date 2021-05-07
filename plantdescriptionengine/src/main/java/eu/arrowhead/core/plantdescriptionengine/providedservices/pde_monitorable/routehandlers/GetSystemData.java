@@ -29,9 +29,8 @@ public class GetSystemData implements HttpRouteHandler {
         HttpServiceRequest request,
         HttpServiceResponse response
     ) {
-
-        Objects.requireNonNull(request, "Expected request");
-        Objects.requireNonNull(response, "Expected response");
+        Objects.requireNonNull(request, "Expected request.");
+        Objects.requireNonNull(response, "Expected response.");
 
         JsonObject data = new JsonObject(new JsonPair("name", new JsonString(systemName)));
         response

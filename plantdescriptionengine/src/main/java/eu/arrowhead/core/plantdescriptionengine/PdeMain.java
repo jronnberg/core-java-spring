@@ -22,7 +22,7 @@ import se.arkalix.core.plugin.or.OrchestrationStrategy;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
-
+import se.arkalix.util.concurrent.Future;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +41,7 @@ public final class PdeMain {
 
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
-    private static final String PDE_SYSTEM_NAME = "pde";
+    private static final String PDE_SYSTEM_NAME = "plantdescriptionengine";
     private static final String APP_PROPS_FILENAME=  "application.properties";
 
     /**
@@ -361,7 +361,10 @@ public final class PdeMain {
                     .flatMap(mgmtServiceResult -> {
                         logger.info("The PDE Management service is ready.");
                         logger.info("Starting the PDE Monitorable service...");
-                        final PdeMonitorableService pdeMonitorableService = new PdeMonitorableService(secureMode);
+                        final PdeMonitorableService pdeMonitorableService = new PdeMonitorableService(
+                            PDE_SYSTEM_NAME,
+                            secureMode
+                        );
                         return arSystem.provide(pdeMonitorableService.getService());
                     });
             })

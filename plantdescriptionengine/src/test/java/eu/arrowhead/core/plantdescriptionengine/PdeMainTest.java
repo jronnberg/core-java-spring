@@ -57,7 +57,7 @@ public class PdeMainTest {
         final ArSystem arSystem = PdeMain.createArSystem(appProps, address);
 
         assertEquals(localPort, arSystem.port());
-        assertEquals("pde", arSystem.name());
+        assertEquals("plantdescriptionengine", arSystem.name());
         assertFalse(arSystem.isSecure());
     }
 
