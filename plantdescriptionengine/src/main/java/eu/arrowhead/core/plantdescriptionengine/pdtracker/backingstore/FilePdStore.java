@@ -101,9 +101,11 @@ public class FilePdStore implements PdStore {
         }
 
         try (final FileOutputStream fileWriter = new FileOutputStream(file)) {
-            final byte[] bytes = new byte[1024]; // TODO: Remove random limit
-            final BufferWriter writer = Buffer.wrap(bytes);
-            entry.encodeJson(writer);
+            final byte[] bytes = new byte[2048]; // TODO: Remove arbitrary limit
+            final Buffer buffer = Buffer.wrap(bytes);
+            buffer.clear();
+            entry.encodeJson(buffer);
+            buffer.close();
             fileWriter.write(bytes);
         } catch (final IOException e) {
             throw new PdStoreException("Failed to write Plant Description Entry to file", e);

@@ -111,14 +111,14 @@ public class SqlPdStore implements PdStore {
         Objects.requireNonNull(entry, "Expected entry.");
 
         try {
-            final byte[] bytes = new byte[1024]; // TODO: Remove random limit
-            final BufferWriter writer = Buffer.wrap(bytes);
             final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PD);
-            entry.encodeJson(writer);
-            final String entryString = writer.toString();
-
+            final byte[] bytes = new byte[2048]; // TODO: Remove arbitrary limit
+            final Buffer buffer = Buffer.wrap(bytes);
+            buffer.clear();
+            entry.encodeJson(buffer);
+            buffer.close();
             statement.setInt(1, entry.id());
-            statement.setString(2, entryString);
+            statement.setString(2, new String(bytes));
             statement.executeUpdate();
 
         } catch (final SQLException e) {
