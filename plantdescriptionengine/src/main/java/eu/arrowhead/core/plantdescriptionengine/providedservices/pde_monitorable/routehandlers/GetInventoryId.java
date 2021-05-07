@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorabl
 
 import java.util.Objects;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.dto.InventoryIdDto;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -20,7 +21,7 @@ public class GetInventoryId implements HttpRouteHandler {
 
         response
             .status(HttpStatus.OK)
-            .body(new InventoryIdDto.Builder().build());
+            .body(new InventoryIdDto.Builder().build(), CodecType.JSON);
         return Future.done();
     }
 

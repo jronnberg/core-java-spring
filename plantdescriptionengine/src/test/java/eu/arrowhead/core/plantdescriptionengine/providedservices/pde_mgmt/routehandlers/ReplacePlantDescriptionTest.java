@@ -121,7 +121,7 @@ public class ReplacePlantDescriptionTest {
                     final String expectedBody = invalidEntryId + " is not a valid Plant Description Entry ID.";
                     assertEquals(expectedBody, response.getRawBody());
                 })
-                .onFailure(Assertions::assertNull);
+                .onFailure(e -> fail());
         } catch (final Exception e) {
             fail();
         }

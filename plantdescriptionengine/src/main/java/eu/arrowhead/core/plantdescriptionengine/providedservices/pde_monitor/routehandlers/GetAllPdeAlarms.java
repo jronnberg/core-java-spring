@@ -14,6 +14,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidati
 import eu.arrowhead.core.plantdescriptionengine.providedservices.requestvalidation.StringParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -119,7 +120,10 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             parser = new QueryParamParser(null, acceptedParameters, request);
         } catch (final ParseError error) {
             logger.error("Encountered the following error(s) while parsing an HTTP request: " + error.getMessage());
-            return Future.success(response.status(HttpStatus.BAD_REQUEST).body(ErrorMessage.of(error.getMessage())));
+            response
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorMessage.of(error.getMessage()), CodecType.JSON);
+            return Future.success(response);
         }
 
         List<PdeAlarmDto> alarms = alarmManager.getAlarms();
@@ -175,11 +179,15 @@ public class GetAllPdeAlarms implements HttpRouteHandler {
             PdeAlarm.filterAcknowledged(alarms, acknowledged.get());
         }
 
-        response.body(new PdeAlarmListDto.Builder()
+        PdeAlarmListDto result = new PdeAlarmListDto.Builder()
             .data(alarms)
             .count(alarms.size())
-            .build());
-        response.status(HttpStatus.OK);
+            .build();
+
+        response
+            .status(HttpStatus.OK)
+            .body(result, CodecType.JSON);
+
         return Future.success(response);
     }
 }

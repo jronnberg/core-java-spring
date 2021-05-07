@@ -4,6 +4,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable
 import eu.arrowhead.core.plantdescriptionengine.utils.MockRequest;
 import eu.arrowhead.core.plantdescriptionengine.utils.MockServiceResponse;
 import org.junit.jupiter.api.Test;
+import se.arkalix.codec.json.JsonObject;
 import se.arkalix.net.http.HttpStatus;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +15,8 @@ public class GetSystemDataTest {
 
     @Test
     public void shouldReturnNullSystemData() {
-        final GetSystemData handler = new GetSystemData();
+        final String systemName = "xyz";
+        final GetSystemData handler = new GetSystemData(systemName);
         final MockRequest request = new MockRequest();
         final MockServiceResponse response = new MockServiceResponse();
 
@@ -22,7 +24,9 @@ public class GetSystemDataTest {
             assertEquals(HttpStatus.OK, response.status().orElse(null));
 
             final SystemData systemData = (SystemData) response.getRawBody();
-            assertTrue(systemData.data().isEmpty());
+            assertTrue(systemData.data().isPresent());
+            final JsonObject json = systemData.data().get();
+            assertEquals("{[name: " + systemName + "]}", json.toString());
         })
             .onFailure(e -> fail());
 

@@ -9,6 +9,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpRouteHandler;
 import se.arkalix.net.http.service.HttpServiceRequest;
@@ -72,7 +73,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 if (validator.hasError()) {
                     return response
                         .status(HttpStatus.BAD_REQUEST)
-                        .body(ErrorMessage.of(validator.getErrorMessage()));
+                        .body(ErrorMessage.of(validator.getErrorMessage()), CodecType.JSON);
                 }
 
                 try {
@@ -83,7 +84,7 @@ public class ReplacePlantDescription implements HttpRouteHandler {
                 }
                 return response
                     .status(HttpStatus.CREATED)
-                    .body(entry);
+                    .body(entry, CodecType.JSON);
             });
     }
 }

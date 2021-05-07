@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.utils;
 
 import se.arkalix.codec.MediaType;
 import se.arkalix.codec.MultiEncodable;
+import se.arkalix.codec.ToCodecType;
 import se.arkalix.net.BodyOutgoing;
 import se.arkalix.net.http.HttpHeaders;
 import se.arkalix.net.http.HttpStatus;
@@ -32,8 +33,7 @@ public class MockServiceResponse implements HttpServiceResponse {
 
     @Override
     public MockServiceResponse body(final MultiEncodable encodable) {
-        _body = encodable;
-        return this;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -43,9 +43,16 @@ public class MockServiceResponse implements HttpServiceResponse {
 
     @Override
     public MockServiceResponse body(final String string) {
-        this._body = string;
+        _body = string;
         return this;
     }
+
+    @Override
+    public MockServiceResponse body(final MultiEncodable encodable, final ToCodecType toCodecType) {
+        _body = encodable;
+        return this;
+    }
+
 
     @Override
     public HttpServiceResponse clearBody() {

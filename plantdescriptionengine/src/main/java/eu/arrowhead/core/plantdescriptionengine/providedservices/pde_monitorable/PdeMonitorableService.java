@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable;
 
+import java.util.Objects;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetInventoryId;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetPing;
@@ -20,10 +21,21 @@ public class PdeMonitorableService {
     private static final String PING_PATH = "/ping";
     private static final String SYSTEM_DATA_PATH = "/systemdata";
 
+    private final String systemName;
     final boolean secure;
 
-    public PdeMonitorableService(final boolean secure) {
+    /**
+     *
+     * @param systemName Name of the system running the service.
+     * @param secure     Specifies whether or not to run the service in secure
+     *                   mode.
+     */
+    public PdeMonitorableService(final String systemName, final boolean secure) {
+
+        Objects.requireNonNull(systemName, "Expected system name");
+
         this.secure = secure;
+        this.systemName = systemName;
     }
 
     /**
@@ -36,7 +48,7 @@ public class PdeMonitorableService {
             .codecs(CodecType.JSON)
             .basePath(BASE_PATH)
             .get(INVENTORY_ID_PATH, new GetInventoryId())
-            .get(SYSTEM_DATA_PATH, new GetSystemData())
+            .get(SYSTEM_DATA_PATH, new GetSystemData(systemName))
             .get(PING_PATH, new GetPing())
             // .catcher(DtoReadException.class, new DtoReadExceptionCatcher())  TODO: Replace with something
             .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
