@@ -1,15 +1,13 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
 
+import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.RuleSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreRule;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.FileRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.InMemoryRuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStore;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.rulebackingstore.RuleStoreException;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceDefinitionDto;
-import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.ServiceInterfaceDto;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemDto;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore.InMemoryPdStore;
@@ -121,31 +119,33 @@ public class OrchestratorClientTest {
         .updatedAt(now.toString())
         .build();
 
+    private final RuleSystemDto producerRuleSystem = new RuleSystemDto.Builder()
+        .systemName(producerName)
+        .build();
+
+    private final RuleSystemDto consumerRuleSystem = new RuleSystemDto.Builder()
+        .systemName(consumerName)
+        .build();
+
     private PlantDescriptionTracker pdTracker;
     private HttpClient httpClient;
     private RuleStore ruleStore;
     private OrchestratorClient orchestratorClient;
 
-    private StoreEntryDto createStoreEntryRule(final int ruleId, final SrSystemDto provider, final SrSystemDto consumer) {
+    private StoreEntryDto createStoreEntryRule(final int ruleId, final RuleSystemDto provider, final RuleSystemDto consumer) {
         return new StoreEntryDto.Builder()
             .id(ruleId)
-            .foreign(false)
             .providerSystem(provider)
             .consumerSystem(consumer)
             .priority(1)
             .createdAt(now.toString())
             .updatedAt(now.toString())
-            .serviceInterface(new ServiceInterfaceDto.Builder().id(177)
-                .interfaceName("HTTP_INSECURE_JSON")
-                .createdAt(now.toString())
-                .updatedAt(now.toString())
-                .build())
-            .serviceDefinition(new ServiceDefinitionDto.Builder().serviceDefinition(serviceDefinitionA)
-                .build())
+            .serviceInterface("HTTP_INSECURE_JSON")
+            .serviceDefinition(serviceDefinitionA)
             .build();
     }
 
-    private StoreEntryList createSingleRuleStoreList(final int ruleId, final SrSystemDto provider, final SrSystemDto consumer) {
+    private StoreEntryList createSingleRuleStoreList(final int ruleId, final RuleSystemDto provider, final RuleSystemDto consumer) {
         return new StoreEntryListDto.Builder()
             .count(1)
             .data(List.of(createStoreEntryRule(ruleId, provider, consumer)))
@@ -215,7 +215,7 @@ public class OrchestratorClientTest {
         response.status(HttpStatus.CREATED)
             .body(new StoreEntryListDto.Builder()
                 .count(1)
-                .data(List.of(createStoreEntryRule(ruleId, producerSrSystem, consumerSrSystem)))
+                .data(List.of(createStoreEntryRule(ruleId, producerRuleSystem, consumerRuleSystem)))
                 .build());
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
@@ -294,7 +294,7 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         final int newRuleId = 82;
         creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class))).thenReturn(
             Future.success(deletionResponse), Future.success(creationResponse), Future.success(deletionResponse));
@@ -363,7 +363,7 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         final int newRuleId = 82;
         creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class))).thenReturn(
             Future.success(deletionResponse), Future.success(creationResponse), Future.success(deletionResponse));
@@ -438,7 +438,7 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         final int newRuleId = 2;
         creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class)))
             .thenReturn(Future.success(deletionResponse), Future.success(creationResponse));
@@ -485,7 +485,7 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         final int newRuleId = 2;
         creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class))).thenReturn(
             Future.success(deletionResponse), Future.success(creationResponse), Future.success(deletionResponse));
@@ -562,7 +562,7 @@ public class OrchestratorClientTest {
         final MockClientResponse creationResponse = new MockClientResponse();
         final int newRuleId = 23;
         creationResponse.status(HttpStatus.CREATED);
-        creationResponse.body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+        creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         when(httpClient.send(any(InetSocketAddress.class), any(HttpClientRequest.class))).thenReturn(
             Future.success(deletionResponse), Future.success(creationResponse), Future.success(deletionResponse),
@@ -595,7 +595,7 @@ public class OrchestratorClientTest {
 
         creationResponse
             .status(HttpStatus.CREATED)
-            .body(createSingleRuleStoreList(newRuleId, producerSrSystem, consumerSrSystem));
+            .body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));
 
         final MockClientResponse failedDeletionResponse = new MockClientResponse();
         failedDeletionResponse.status(HttpStatus.INTERNAL_SERVER_ERROR);
