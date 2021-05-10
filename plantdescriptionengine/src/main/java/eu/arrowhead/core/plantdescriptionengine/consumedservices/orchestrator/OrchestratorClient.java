@@ -12,7 +12,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.arkalix.codec.CodecType;
-import se.arkalix.codec.MultiEncodable;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
@@ -102,18 +101,12 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.success(emptyRuleList());
         }
 
-        // TODO: The conversion below should not be necessary.
-        List<MultiEncodable> encodableRules = new ArrayList<>();
-        for (final var rule : rules) {
-            encodableRules.add(rule);
-        }
-
         return httpClient
             .send(orchestratorAddress,
                 new HttpClientRequest()
                     .method(HttpMethod.POST)
                     .uri(CREATE_RULE_URI)
-                    .body(encodableRules, CodecType.JSON)
+                    .body(rules, CodecType.JSON)
                     .header("accept", "application/json"))
             .flatMap(response -> response.bodyToIfSuccess(StoreEntryListDto::decodeJson));
     }
