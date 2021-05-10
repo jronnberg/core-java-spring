@@ -11,6 +11,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.rou
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
 import se.arkalix.codec.CodecType;
+import se.arkalix.net.ProtocolType;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.query.ServiceQuery;
@@ -87,8 +88,8 @@ public class PdeMonitorService {
 
         final ServiceQuery serviceQuery = arSystem.consume()
             .name(MONITORABLE_SERVICE_NAME)
-            .codecTypes(CodecType.JSON);
-            //.transports(TransportDescriptor.HTTP) // TODO: Replace with something
+            .codecTypes(CodecType.JSON)
+            .protocolTypes(ProtocolType.HTTP);
 
         pingTask = new PingTask(serviceQuery, httpClient, alarmManager);
         retrieveMonitorInfoTask = new RetrieveMonitorInfoTask(serviceQuery, httpClient, monitorInfo);
