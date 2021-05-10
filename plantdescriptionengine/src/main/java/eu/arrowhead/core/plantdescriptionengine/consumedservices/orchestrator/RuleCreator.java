@@ -17,6 +17,8 @@ import java.util.Objects;
  */
 public class RuleCreator {
 
+    private final String DEFAULT_SERVICE_INTERFACE = "HTTP-SECURE-JSON";
+
     private final PlantDescriptionTracker pdTracker;
 
     public RuleCreator(final PlantDescriptionTracker pdTracker) {
@@ -54,7 +56,7 @@ public class RuleCreator {
                 .metadata(provider.metadata().orElse(null))
                 .build())
             .serviceMetadata(producerPort.metadata().orElse(null))
-            .serviceInterfaceName(producerPort.serviceInterface().orElse(null))
+            .serviceInterfaceName(producerPort.serviceInterface().orElse(DEFAULT_SERVICE_INTERFACE))
             .serviceDefinitionName(producerPort.serviceDefinition());
 
         return builder.build();
