@@ -1,9 +1,11 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable;
 
 import java.util.Objects;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.CodecExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetInventoryId;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetPing;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetSystemData;
+import se.arkalix.codec.CodecException;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
@@ -49,7 +51,7 @@ public class PdeMonitorableService {
             .get(INVENTORY_ID_PATH, new GetInventoryId())
             .get(SYSTEM_DATA_PATH, new GetSystemData(systemName))
             .get(PING_PATH, new GetPing())
-            // .catcher(DtoReadException.class, new DtoReadExceptionCatcher())  TODO: Replace with something
+            .catcher(CodecException.class, new CodecExceptionCatcher())
             .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
     }
 

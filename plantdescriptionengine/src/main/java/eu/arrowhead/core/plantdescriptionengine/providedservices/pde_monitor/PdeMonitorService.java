@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 import eu.arrowhead.core.plantdescriptionengine.MonitorInfo;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import eu.arrowhead.core.plantdescriptionengine.pdtracker.PlantDescriptionTracker;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.CodecExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPdeAlarms;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetAllPlantDescriptions;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.GetPdeAlarm;
@@ -10,6 +11,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.rou
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.routehandlers.UpdatePdeAlarm;
 import se.arkalix.ArServiceHandle;
 import se.arkalix.ArSystem;
+import se.arkalix.codec.CodecException;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.ProtocolType;
 import se.arkalix.net.http.client.HttpClient;
@@ -112,7 +114,7 @@ public class PdeMonitorService {
             .get(GET_ALL_ALARMS_PATH, new GetAllPdeAlarms(alarmManager))
             .get(GET_ALARM_PATH, new GetPdeAlarm(alarmManager))
             .patch(UPDATE_ALARM_PATH, new UpdatePdeAlarm(alarmManager))
-            // .catcher(DtoReadException.class, new DtoReadExceptionCatcher())  TODO: Replace with something
+            .catcher(CodecException.class, new CodecExceptionCatcher())
             .accessPolicy(secure ? AccessPolicy.cloud() : AccessPolicy.unrestricted());
 
         final Timer timer = new Timer();
