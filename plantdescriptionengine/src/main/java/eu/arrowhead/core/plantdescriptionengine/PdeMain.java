@@ -22,7 +22,6 @@ import se.arkalix.core.plugin.or.OrchestrationStrategy;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
-import se.arkalix.util.concurrent.Future;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -372,8 +371,8 @@ public final class PdeMain {
                 logger.info("The PDE Monitorable service is ready.");
                 logger.info("The Plant Description Engine is up and running.");
             })
-            .onFailure(throwable -> {
-                logger.error("Failed to launch Plant Description Engine", throwable);
+            .onFailure(e -> {
+                logger.error("Failed to launch Plant Description Engine.", e);
                 System.exit(1);
             });
     }
