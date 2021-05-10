@@ -45,9 +45,6 @@ public class PingTaskTest {
         final SystemRecord provider = Mockito.mock(SystemRecord.class);
         final InetSocketAddress address = new InetSocketAddress("1.1.1.1", 8443);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        // TODO: The lines below do not work with ar:kalix 0.6
-        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);
