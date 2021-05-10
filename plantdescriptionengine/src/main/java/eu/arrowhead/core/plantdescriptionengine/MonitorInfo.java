@@ -25,13 +25,14 @@ public class MonitorInfo {
      */
     private String toKey(final ServiceRecord service) {
 
-        final Map<String, String> metadata = Collections.emptyMap();
-        // TODO: Replace the line above with the one below!
-        // Map<String, String> metadata = service.provider.metadata();
+        Map<String, String> metadata = service.provider().metadata();
+        String result = "name=" + service.provider().name() +
+            ",serviceUri=" + service.uri();
 
-        final String result = "name=" + service.provider().name() +
-            ",serviceUri=" + service.uri() +
-            ",metadata=" + Metadata.toString(metadata);
+        if (metadata != null) {
+            result += ",metadata=" + Metadata.toString(metadata);
+        }
+
         return result + "}";
     }
 
@@ -49,10 +50,7 @@ public class MonitorInfo {
 
         final String systemName = service.provider().name();
         final Map<String, String> serviceNetadata = service.metadata();
-
-        final Map<String, String> systemMetadata = Collections.emptyMap();
-        // TODO: Replace the line above with the one below.
-        // final Map<String, String> systemMetadata = service.provider().metadata();
+        final Map<String, String> systemMetadata = service.provider().metadata();
 
         final String key = toKey(service);
         final Bundle oldBundle = infoBundles.get(key);
@@ -86,10 +84,7 @@ public class MonitorInfo {
         final SystemRecord provider = service.provider();
         final String systemName = provider.name();
 
-        final Map<String, String> systemMetadata = Collections.emptyMap();
-        // TODO: Replace the line above with the one below!
-        // final Map<String, String> systemMetadata = provider.metadata();
-
+        final Map<String, String> systemMetadata = provider.metadata();
         final Map<String, String> serviceMetadata = service.metadata();
         final String serviceDefinition = service.name();
         final Bundle oldBundle = infoBundles.get(key);
@@ -124,7 +119,7 @@ public class MonitorInfo {
         final List<Bundle> result = new ArrayList<>();
         for (final Bundle bundle : infoBundles.values()) {
             final boolean namesMatch = systemName == null || systemName.equals(bundle.systemName);
-            final boolean metadataMatch = metadata == null || Metadata.isSubset(metadata, bundle.systemMetadata);
+            final boolean metadataMatch = bundle.matchesSystemMetadata(metadata);
             if (namesMatch && metadataMatch) {
                 result.add(bundle);
             }
@@ -166,8 +161,11 @@ public class MonitorInfo {
          *                 system in a Plant Description Entry).
          */
         public boolean matchesSystemMetadata(final Map<String, String> metadata) {
-            if (metadata == null) {
+            if (metadata == null || metadata.isEmpty()) {
                 return true;
+            }
+            if (systemMetadata == null || systemMetadata.isEmpty()) {
+                return false;
             }
             return Metadata.isSubset(metadata, systemMetadata);
         }
