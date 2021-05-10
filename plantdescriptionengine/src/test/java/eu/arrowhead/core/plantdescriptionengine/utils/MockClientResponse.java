@@ -27,14 +27,6 @@ public class MockClientResponse implements HttpClientResponse {
         return Future.success(castBody);
     }
 
-    // @Override
-    // public <R extends DtoReadable> FutureProgress<R> bodyAs(final DtoEncoding encoding, final Class<R> class_) {
-    //     Objects.requireNonNull(encoding, "Expected encoding.");
-    //     Objects.requireNonNull(class_, "Expected class.");
-    //     @SuppressWarnings("unchecked") final R castBody = (R) _body;
-    //     return new MockFutureProgress<>(castBody);
-    // }
-
     @Override
     public HttpHeaders headers() {
         throw new UnsupportedOperationException();

@@ -1,7 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable;
 
 import java.util.Objects;
-import eu.arrowhead.core.plantdescriptionengine.providedservices.DtoReadExceptionCatcher;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetInventoryId;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetPing;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitorable.routehandlers.GetSystemData;
