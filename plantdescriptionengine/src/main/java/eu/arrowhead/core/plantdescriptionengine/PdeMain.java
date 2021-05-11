@@ -96,6 +96,7 @@ public final class PdeMain {
      */
     static ArSystem createArSystem(final Properties appProps, final InetSocketAddress serviceRegistryAddress) {
 
+        final String pdeHostname = getProp(appProps, "server.hostname");
         final int pdePort = Integer.parseInt(getProp(appProps, "server.port"));
 
         final OrchestrationStrategy strategy = new OrchestrationStrategy(
@@ -106,7 +107,7 @@ public final class PdeMain {
 
         final ArSystem.Builder systemBuilder = new ArSystem.Builder()
             .serviceCache(ArServiceRecordCache.withEntryLifetimeLimit(Duration.ZERO))
-            .localPort(pdePort)
+            .localHostnamePort(pdeHostname, pdePort)
             .plugins(new HttpJsonCloudPlugin.Builder()
                 .orchestrationStrategy(strategy)
                 .serviceRegistrySocketAddress(serviceRegistryAddress)
@@ -299,7 +300,7 @@ public final class PdeMain {
 
         final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
 
-        logger.info("Start polling Service Registry for systems...");
+        logger.info("Contacting Service Registry...");
         systemTracker.start()
             .flatMap(result -> {
 
