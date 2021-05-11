@@ -2,9 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.io.buf.Buffer;
-import se.arkalix.io.buf.BufferReader;
-import se.arkalix.io.buf.BufferWriter;
-import java.nio.channels.UnsupportedAddressTypeException;
+
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -77,9 +75,6 @@ public class SqlPdStore implements PdStore {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
         ensureInitialized();
@@ -102,9 +97,6 @@ public class SqlPdStore implements PdStore {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void write(final PlantDescriptionEntryDto entry) throws PdStoreException {
         ensureInitialized();
@@ -126,9 +118,6 @@ public class SqlPdStore implements PdStore {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(final int id) throws PdStoreException {
         ensureInitialized();

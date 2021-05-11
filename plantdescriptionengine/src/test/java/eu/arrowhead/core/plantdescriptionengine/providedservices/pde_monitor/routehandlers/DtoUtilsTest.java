@@ -9,6 +9,7 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.MonitorPlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PortEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.SystemEntry;
+import org.junit.jupiter.api.Test;
 import se.arkalix.ServiceInterface;
 import se.arkalix.ServiceRecord;
 import se.arkalix.SystemRecord;
@@ -16,7 +17,6 @@ import se.arkalix.codec.json.JsonBoolean;
 import se.arkalix.codec.json.JsonObject;
 import se.arkalix.codec.json.JsonPair;
 import se.arkalix.security.access.AccessPolicyType;
-import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 import java.time.Instant;

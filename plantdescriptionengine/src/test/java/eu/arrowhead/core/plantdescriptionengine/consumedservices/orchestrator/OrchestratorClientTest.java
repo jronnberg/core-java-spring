@@ -285,7 +285,7 @@ public class OrchestratorClientTest {
 
         final int ruleId = 65;
 
-        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
+        ruleStore.writeRules(activeEntry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -340,7 +340,7 @@ public class OrchestratorClientTest {
             .getAddress());
 
         pdTracker.put(activeEntry);
-        ruleStore.setRules(activeEntry.id(), Set.of(12));
+        ruleStore.writeRules(activeEntry.id(), Set.of(12));
 
         orchestratorClient.initialize()
             .ifSuccess(result -> fail())
@@ -354,7 +354,7 @@ public class OrchestratorClientTest {
 
         pdTracker.put(entry);
         final int ruleId = 65;
-        ruleStore.setRules(entry.id(), Set.of(ruleId));
+        ruleStore.writeRules(entry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -422,7 +422,7 @@ public class OrchestratorClientTest {
         final int ruleId = 65;
 
         final RuleStore ruleStore = new InMemoryRuleStore();
-        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
+        ruleStore.writeRules(activeEntry.id(), Set.of(ruleId));
 
         final OrchestratorClient orchestratorClient = new OrchestratorClient(
             httpClient,
@@ -477,7 +477,7 @@ public class OrchestratorClientTest {
 
         pdTracker.put(activeEntry);
         final int ruleId = 512;
-        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
+        ruleStore.writeRules(activeEntry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -547,7 +547,7 @@ public class OrchestratorClientTest {
         final int ruleId = 25;
 
         final RuleStore ruleStore = new InMemoryRuleStore();
-        ruleStore.setRules(entry.id(), Set.of(ruleId));
+        ruleStore.writeRules(entry.id(), Set.of(ruleId));
 
         final OrchestratorClient orchestratorClient = new OrchestratorClient(
             httpClient,
@@ -588,7 +588,7 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
         pdTracker.put(activeEntry);
-        ruleStore.setRules(activeEntry.id(), Set.of(65));
+        ruleStore.writeRules(activeEntry.id(), Set.of(65));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();

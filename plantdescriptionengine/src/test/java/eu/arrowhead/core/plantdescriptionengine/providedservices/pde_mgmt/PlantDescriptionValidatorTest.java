@@ -6,7 +6,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pl
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortDto;
-
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -1062,36 +1061,36 @@ public class PlantDescriptionValidatorTest {
 
     @Test
     public void shouldReportNonUniqueSystem() {
-    // TODO: Put back when validator is fixed
-    //     final String systemIdB = "Sys-B";
-    //     final String systemName = "XYZ";
-    //     final Map<String, String> metadata = Map.of("a", "1");
-    //     final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
-    //         .id(22)
-    //         .plantDescription("Plant Description A")
-    //         .createdAt(now)
-    //         .updatedAt(now)
-    //         .active(false)
-    //         .systems(List.of(
-    //             new PdeSystemDto.Builder()
-    //                 .systemId("Sys-A")
-    //                 .systemName(systemName)
-    //                 .metadata(metadata)
-    //                 .build(),
-    //             new PdeSystemDto.Builder()
-    //                 .systemId(systemIdB)
-    //                 .systemName(systemName)
-    //                 .metadata(metadata)
-    //                 .build()
-    //         ))
-    //         .build();
+        // TODO: Put back when validator is fixed
+        //     final String systemIdB = "Sys-B";
+        //     final String systemName = "XYZ";
+        //     final Map<String, String> metadata = Map.of("a", "1");
+        //     final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
+        //         .id(22)
+        //         .plantDescription("Plant Description A")
+        //         .createdAt(now)
+        //         .updatedAt(now)
+        //         .active(false)
+        //         .systems(List.of(
+        //             new PdeSystemDto.Builder()
+        //                 .systemId("Sys-A")
+        //                 .systemName(systemName)
+        //                 .metadata(metadata)
+        //                 .build(),
+        //             new PdeSystemDto.Builder()
+        //                 .systemId(systemIdB)
+        //                 .systemName(systemName)
+        //                 .metadata(metadata)
+        //                 .build()
+        //         ))
+        //         .build();
 
-    //     final Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
-    //     final PlantDescriptionValidator validator = new PlantDescriptionValidator(entries);
-    //     assertTrue(validator.hasError());
-    //     final String expectedErrorMessage = "<System with ID '" + systemIdB +
-    //         "' cannot be uniquely identified by its name/metadata combination.>";
-    //     assertEquals(expectedErrorMessage, validator.getErrorMessage());
+        //     final Map<Integer, PlantDescriptionEntry> entries = Map.of(entry.id(), entry);
+        //     final PlantDescriptionValidator validator = new PlantDescriptionValidator(entries);
+        //     assertTrue(validator.hasError());
+        //     final String expectedErrorMessage = "<System with ID '" + systemIdB +
+        //         "' cannot be uniquely identified by its name/metadata combination.>";
+        //     assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
     @Test

@@ -8,6 +8,7 @@ import se.arkalix.codec.json.JsonBoolean;
 import se.arkalix.codec.json.JsonObject;
 import se.arkalix.codec.json.JsonPair;
 import se.arkalix.security.access.AccessPolicyType;
+
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;

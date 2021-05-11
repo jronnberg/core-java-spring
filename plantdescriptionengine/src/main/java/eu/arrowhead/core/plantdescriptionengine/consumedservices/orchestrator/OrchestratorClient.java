@@ -81,7 +81,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         return deleteRulesTask
             .flatMap(deletionResult -> (activeEntry == null) ? Future.done() : postRules().flatMap(createdRules -> {
-                ruleStore.setRules(activeEntry.id(), createdRules.getIds());
+                ruleStore.writeRules(activeEntry.id(), createdRules.getIds());
                 logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                 return Future.done();
             }));
@@ -174,7 +174,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                 ruleStore.removeRules(plantDescriptionId);
                 logger.info(
                     "Deleted all orchestrator rules created for Plant Description with ID "
-                    + plantDescriptionId + "."
+                        + plantDescriptionId + "."
                 );
                 return Future.done();
             });
@@ -228,7 +228,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .ifSuccess(createdRules -> {
                 if (entry.active()) {
                     activeEntry = entry;
-                    ruleStore.setRules(entry.id(), createdRules.getIds());
+                    ruleStore.writeRules(entry.id(), createdRules.getIds());
                     logEntryActivated(entry, createdRules);
 
                 } else if (wasDeactivated) {

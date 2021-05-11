@@ -2,6 +2,7 @@ package eu.arrowhead.core.plantdescriptionengine.pdtracker.backingstore;
 
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import se.arkalix.io.buf.Buffer;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -41,9 +42,6 @@ public class FilePdStore implements PdStore {
         return Paths.get(descriptionDirectory, entryId + ".json");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PlantDescriptionEntryDto> readEntries() throws PdStoreException {
         final File directory = new File(descriptionDirectory);
@@ -75,9 +73,6 @@ public class FilePdStore implements PdStore {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void write(final PlantDescriptionEntryDto entry) throws PdStoreException {
         Objects.requireNonNull(entry, "Expected entry.");
@@ -111,9 +106,6 @@ public class FilePdStore implements PdStore {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(final int entryId) throws PdStoreException {
         final Path filepath = getFilePath(entryId);

@@ -3,7 +3,6 @@ package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor;
 import eu.arrowhead.core.plantdescriptionengine.alarms.AlarmManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import se.arkalix.ServiceRecord;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.client.HttpClient;

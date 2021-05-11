@@ -10,7 +10,6 @@ import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Pd
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntryDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PortDto;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPortDto;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

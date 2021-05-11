@@ -5,7 +5,6 @@ import eu.arrowhead.core.plantdescriptionengine.utils.MockClientResponse;
 import eu.arrowhead.core.plantdescriptionengine.utils.RequestMatcher;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import se.arkalix.ServiceRecord;
 import se.arkalix.SystemRecord;
 import se.arkalix.net.http.HttpMethod;
@@ -119,9 +118,6 @@ public class PingTaskTest {
         response.status(HttpStatus.OK);
         final SystemRecord provider = Mockito.mock(SystemRecord.class);
         when(serviceQuery.name("monitorable")).thenReturn(serviceQuery);
-        // TODO: The lines below do not work with ar:kalix 0.6
-        // when(serviceQuery.transports(TransportDescriptor.HTTP)).thenReturn(serviceQuery);
-        // when(serviceQuery.encodings(EncodingDescriptor.JSON)).thenReturn(serviceQuery);
         when(service.provider()).thenReturn(provider);
         when(service.uri()).thenReturn(serviceUri);
         when(provider.name()).thenReturn(systemName);

@@ -22,6 +22,7 @@ import se.arkalix.core.plugin.or.OrchestrationStrategy;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public final class PdeMain {
     private static final Logger logger = LoggerFactory.getLogger(PdeMain.class);
 
     private static final String PDE_SYSTEM_NAME = "plantdescriptionengine";
-    private static final String APP_PROPS_FILENAME=  "application.properties";
+    private static final String APP_PROPS_FILENAME = "application.properties";
 
     /**
      * Helper method for retrieving required properties. If the specified
