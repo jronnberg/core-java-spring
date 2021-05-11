@@ -91,7 +91,10 @@ public class PlantDescriptionTracker {
         if (entry.active() && anotherEntryIsActive) {
             // Deactivate the currently active entry:
             final PlantDescriptionEntryDto deactivatedEntry = PlantDescriptionEntry.deactivated(currentlyActive);
+
             entries.put(deactivatedEntry.id(), deactivatedEntry);
+            backingStore.write(deactivatedEntry);
+
             for (final PlantDescriptionUpdateListener listener : listeners) {
                 listener.onPlantDescriptionUpdated(deactivatedEntry);
             }
