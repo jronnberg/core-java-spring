@@ -77,9 +77,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
-        return deleteActiveRules()
+        final Future<Void> deleteRulesTask = activeEntry == null ? Future.done() : deleteRules(activeEntry.id());
+
+        return deleteRulesTask
             .flatMap(deletionResult -> (activeEntry == null) ? Future.done() : postRules().flatMap(createdRules -> {
-                ruleStore.setRules(createdRules.getIds());
+                ruleStore.setRules(activeEntry.id(), createdRules.getIds());
                 logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                 return Future.done();
             }));
@@ -127,8 +129,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private Future<Void> deleteRule(final int id) {
         return httpClient
             .send(orchestratorAddress,
-                new HttpClientRequest().method(HttpMethod.DELETE)
-                    .uri(DELETE_RULE_URI_BASE + id))
+                new HttpClientRequest()
+                    .method(HttpMethod.DELETE)
+                    .uri(DELETE_RULE_URI_BASE + id)
+                    .header("accept", "application/json"))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
                     // TODO: Throw some other type of Exception.
@@ -139,15 +143,17 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
     }
 
     /**
-     * Deletes all orchestrator rules created by the Orchestrator client.
+     * Deletes all orchestrator rules created by the Orchestrator client for the
+     * given Plant Description.
      *
+     * @param plantDescriptionId ID of a Plant Description.
      * @return A Future that performs the deletions.
      */
-    private Future<Void> deleteActiveRules() {
+    private Future<Void> deleteRules(int plantDescriptionId) {
 
         final Set<Integer> rules;
         try {
-            rules = ruleStore.readRules();
+            rules = ruleStore.readRules(plantDescriptionId);
         } catch (final RuleStoreException e) {
             return Future.failure(e);
         }
@@ -165,8 +171,11 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         return Futures.serialize(deletions)
             .flatMap(result -> {
-                ruleStore.removeAll();
-                logger.info("Deleted all orchestrator rules created by the Orchestrator client.");
+                ruleStore.removeRules(plantDescriptionId);
+                logger.info(
+                    "Deleted all orchestrator rules created for Plant Description with ID "
+                    + plantDescriptionId + "."
+                );
                 return Future.done();
             });
     }
@@ -211,8 +220,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         final boolean shouldPostRules = entry.active() && numConnections > 0;
         final boolean shouldDeleteCurrentRules = entry.active() || wasDeactivated;
 
-        final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteActiveRules() : Future.done();
-
+        final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteRules(entry.id()) : Future.done();
         final Future<StoreEntryListDto> postRulesTask = shouldPostRules ? postRules() : Future.success(emptyRuleList());
 
         deleteRulesTask
@@ -220,7 +228,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .ifSuccess(createdRules -> {
                 if (entry.active()) {
                     activeEntry = entry;
-                    ruleStore.setRules(createdRules.getIds());
+                    ruleStore.setRules(entry.id(), createdRules.getIds());
                     logEntryActivated(entry, createdRules);
 
                 } else if (wasDeactivated) {
@@ -261,7 +269,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         }
 
         // Otherwise, all of its Orchestration rules should be deleted:
-        deleteActiveRules()
+        deleteRules(entry.id())
             .ifSuccess(result -> logger.info("Deleted all Orchestrator rules belonging to Plant Description Entry '"
                 + entry.plantDescription() + "'"))
             .onFailure(throwable -> logger.error(

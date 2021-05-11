@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpServiceRequest;
-import se.arkalix.net.http.service.HttpServiceResponse;
 
 import java.time.Instant;
 import java.util.ArrayList;

@@ -224,7 +224,7 @@ public class OrchestratorClientTest {
         orchestratorClient.onPlantDescriptionAdded(entry);
 
         // Verify that the rule was stored correctly:
-        assertTrue(ruleStore.readRules().contains(ruleId));
+        assertTrue(ruleStore.readRules(entry.id()).contains(ruleId));
 
         // Verify that the HTTP client was passed correct data:
         final ArgumentCaptor<InetSocketAddress> addressCaptor = ArgumentCaptor.forClass(InetSocketAddress.class);
@@ -272,7 +272,7 @@ public class OrchestratorClientTest {
         orchestratorClient.initialize()
             .ifSuccess(result -> {
                 verify(httpClient, never()).send(any(), any());
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(entry.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -285,7 +285,7 @@ public class OrchestratorClientTest {
 
         final int ruleId = 65;
 
-        ruleStore.setRules(Set.of(ruleId));
+        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -301,7 +301,7 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                assertEquals(1, ruleStore.readRules().size());
+                assertEquals(1, ruleStore.readRules(activeEntry.id()).size());
                 orchestratorClient.onPlantDescriptionRemoved(activeEntry);
 
                 // Verify that the HTTP client was passed correct data:
@@ -320,7 +320,7 @@ public class OrchestratorClientTest {
                 final String expectedUri = "/orchestrator/store/flexible/" + newRuleId + "?";
                 final String capturedUri = capturedRequest.uri().get().toString();
                 assertEquals(expectedUri, capturedUri);
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(activeEntry.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -333,14 +333,14 @@ public class OrchestratorClientTest {
         ruleStore = Mockito.mock(FileRuleStore.class);
 
         final String errorMessage = "Mocked exception";
-        doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules();
+        doThrow(new RuleStoreException(errorMessage)).when(ruleStore).readRules(activeEntry.id());
 
         // We need to reinstantiate this with the mock rule store.
         orchestratorClient = new OrchestratorClient(httpClient, ruleStore, pdTracker, orchestratorSrSystem
             .getAddress());
 
         pdTracker.put(activeEntry);
-        ruleStore.setRules(Set.of(12));
+        ruleStore.setRules(activeEntry.id(), Set.of(12));
 
         orchestratorClient.initialize()
             .ifSuccess(result -> fail())
@@ -354,7 +354,7 @@ public class OrchestratorClientTest {
 
         pdTracker.put(entry);
         final int ruleId = 65;
-        ruleStore.setRules(Set.of(ruleId));
+        ruleStore.setRules(entry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -370,7 +370,7 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                assertEquals(1, ruleStore.readRules().size());
+                assertEquals(1, ruleStore.readRules(entry.id()).size());
 
                 final PlantDescriptionEntryDto entryWithoutConnections = new PlantDescriptionEntryDto.Builder()
                     .id(entry.id())
@@ -398,7 +398,7 @@ public class OrchestratorClientTest {
                 final String capturedUri = capturedRequest.uri().get().toString();
                 final String expectedUri = "/orchestrator/store/flexible/" + newRuleId + "?";
                 assertEquals(expectedUri, capturedUri);
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(entry.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -407,8 +407,8 @@ public class OrchestratorClientTest {
     @Test
     public void shouldNotChangeRulesWhenRemovingInactiveEntry() throws RuleStoreException, PdStoreException {
 
-        final PlantDescriptionEntryDto entryA = createEntry();
-        final PlantDescriptionEntryDto entryB = new PlantDescriptionEntryDto.Builder()
+        final PlantDescriptionEntryDto activeEntry = createEntry();
+        final PlantDescriptionEntryDto inactiveEntry = new PlantDescriptionEntryDto.Builder()
             .id(1)
             .plantDescription("Plant Description B")
             .createdAt(now)
@@ -416,13 +416,13 @@ public class OrchestratorClientTest {
             .active(false)
             .build();
 
-        pdTracker.put(entryA);
-        pdTracker.put(entryB);
+        pdTracker.put(activeEntry);
+        pdTracker.put(inactiveEntry);
 
         final int ruleId = 65;
 
         final RuleStore ruleStore = new InMemoryRuleStore();
-        ruleStore.setRules(Set.of(ruleId));
+        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
 
         final OrchestratorClient orchestratorClient = new OrchestratorClient(
             httpClient,
@@ -445,9 +445,10 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                orchestratorClient.onPlantDescriptionRemoved(entryB);
-                assertEquals(1, ruleStore.readRules().size());
-                assertTrue(ruleStore.readRules().contains(newRuleId));
+                orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
+                final Set<Integer> rules = ruleStore.readRules(activeEntry.id());
+                assertEquals(1, rules.size());
+                assertTrue(rules.contains(newRuleId));
             })
             .onFailure(e -> fail());
     }
@@ -462,9 +463,9 @@ public class OrchestratorClientTest {
             .getAddress());
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(inactiveEntry.id()).isEmpty());
                 orchestratorClient.onPlantDescriptionRemoved(inactiveEntry);
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(inactiveEntry.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -476,7 +477,7 @@ public class OrchestratorClientTest {
 
         pdTracker.put(activeEntry);
         final int ruleId = 512;
-        ruleStore.setRules(Set.of(ruleId));
+        ruleStore.setRules(activeEntry.id(), Set.of(ruleId));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -494,7 +495,7 @@ public class OrchestratorClientTest {
             .ifSuccess(result -> {
                 final PlantDescriptionEntryDto deactivatedEntry = PlantDescriptionEntry.deactivated(activeEntry);
                 orchestratorClient.onPlantDescriptionUpdated(deactivatedEntry);
-                assertEquals(0, ruleStore.readRules().size());
+                assertEquals(0, ruleStore.readRules(deactivatedEntry.id()).size());
             })
             .onFailure(e -> fail());
     }
@@ -528,7 +529,8 @@ public class OrchestratorClientTest {
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionUpdated(entryB);
                 verify(httpClient, never()).send(any(), any());
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(entryA.id()).isEmpty());
+                assertTrue(ruleStore.readRules(entryB.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -537,13 +539,15 @@ public class OrchestratorClientTest {
     @Test
     public void rulesShouldBeEmptyAfterFailedPost() throws RuleStoreException, PdStoreException {
 
+        // TODO: I don't understand this test.
+
         final PlantDescriptionEntryDto entry = createEntry();
 
         pdTracker.put(entry);
         final int ruleId = 25;
 
         final RuleStore ruleStore = new InMemoryRuleStore();
-        ruleStore.setRules(Set.of(ruleId));
+        ruleStore.setRules(entry.id(), Set.of(ruleId));
 
         final OrchestratorClient orchestratorClient = new OrchestratorClient(
             httpClient,
@@ -572,7 +576,7 @@ public class OrchestratorClientTest {
         orchestratorClient.initialize()
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionUpdated(entry);
-                assertTrue(ruleStore.readRules().isEmpty());
+                assertTrue(ruleStore.readRules(entry.id()).isEmpty());
             })
             .onFailure(e -> fail());
     }
@@ -584,7 +588,7 @@ public class OrchestratorClientTest {
         final PlantDescriptionEntryDto activeEntry = createEntry();
 
         pdTracker.put(activeEntry);
-        ruleStore.setRules(Set.of(65));
+        ruleStore.setRules(activeEntry.id(), Set.of(65));
 
         // Create some fake data for the HttpClient to respond with:
         final MockClientResponse deletionResponse = new MockClientResponse();
@@ -607,7 +611,7 @@ public class OrchestratorClientTest {
             .ifSuccess(result -> {
                 orchestratorClient.onPlantDescriptionRemoved(activeEntry);
                 // The rule should not have been removed.
-                assertTrue(ruleStore.readRules().contains(newRuleId));
+                assertTrue(ruleStore.readRules(activeEntry.id()).contains(newRuleId));
             })
             .onFailure(e -> fail());
     }
