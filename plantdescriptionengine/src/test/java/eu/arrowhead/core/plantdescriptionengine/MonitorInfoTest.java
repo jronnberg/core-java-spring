@@ -46,7 +46,7 @@ public class MonitorInfoTest {
         final Map<String, String> metadata = Map.of("name", "abc");
         final ServiceRecord ServiceRecord = createServiceRecord(metadata);
 
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
         final MonitorInfo monitorInfo = new MonitorInfo();
         monitorInfo.putSystemData(ServiceRecord, systemData);
 

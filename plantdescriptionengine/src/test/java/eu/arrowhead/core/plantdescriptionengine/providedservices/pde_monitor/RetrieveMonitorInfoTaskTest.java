@@ -50,7 +50,7 @@ public class RetrieveMonitorInfoTaskTest {
                 .id("ABC")
                 .build());
 
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
         final MockClientResponse systemDataResponse = new MockClientResponse()
             .status(HttpStatus.OK)
             .body(new SystemDataDto.Builder()
@@ -121,7 +121,7 @@ public class RetrieveMonitorInfoTaskTest {
         final Set<ServiceRecord> services = Set.of(service);
         final Future<Set<ServiceRecord>> resolveResult = Future.success(services);
 
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
         final MockClientResponse systemDataResponse = new MockClientResponse()
             .status(HttpStatus.OK)
             .body(new SystemDataDto.Builder()

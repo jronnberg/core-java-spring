@@ -89,7 +89,7 @@ public class DtoUtilsTest {
             .build();
 
         final String inventoryId = "system_a_inventory_id";
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
 
         final MonitorInfo monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(ServiceRecord, inventoryId);
@@ -207,7 +207,7 @@ public class DtoUtilsTest {
             .build();
 
         final String inventoryId = "system_a_inventory_id";
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
 
         final MonitorInfo monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(ServiceRecord, inventoryId);
@@ -263,7 +263,7 @@ public class DtoUtilsTest {
             .build();
 
         final String inventoryId = "system_a_inventory_id";
-        final JsonObject systemData = new JsonObject(List.of(new JsonPair("a", JsonBoolean.TRUE)));
+        final JsonObject systemData = new JsonObject(new JsonPair("a", JsonBoolean.TRUE));
         final MonitorInfo monitorInfo = new MonitorInfo();
         monitorInfo.putInventoryId(ServiceRecord, inventoryId);
         monitorInfo.putSystemData(ServiceRecord, systemData);

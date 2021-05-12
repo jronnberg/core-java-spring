@@ -28,7 +28,6 @@ public class PlantDescriptionValidator {
     // This way, we can implement validateConnections and
     // ensureIdentifiableSystems properly.
 
-
     /**
      * Constructor.
      *
