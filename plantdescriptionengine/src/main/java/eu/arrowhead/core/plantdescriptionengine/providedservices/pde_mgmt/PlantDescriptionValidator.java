@@ -1,69 +1,126 @@
 package eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt;
 
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Connection;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PdeSystem;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.PlantDescriptionEntry;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.Port;
+import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_mgmt.dto.SystemPort;
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * Class for validating the Plant Descriptions.
+ * Class for validating Plant Descriptions.
  */
 public class PlantDescriptionValidator {
 
-    final Map<Integer, ? extends PlantDescriptionEntry> entries;
     final List<String> blacklist = List.of("unknown");
     private final List<String> errors = new ArrayList<>();
-
-    // TODO: Change constructor to:
-    // public PlantDescriptionValidator(final Map<Integer, ? extends PlantDescriptionEntry> existingEntries, final PlantDescriptionEntry newEntry) {
-    // This way, we can implement validateConnections and
-    // ensureIdentifiableSystems properly.
-
     /**
      * Constructor.
      *
-     * @param entries Object mapping ID:s to Plant Description Entries.
+     * @param entries Plant Description entries to be validated.
      */
     public PlantDescriptionValidator(final Map<Integer, ? extends PlantDescriptionEntry> entries) {
 
         Objects.requireNonNull(entries, "Expected entries.");
 
-        this.entries = entries;
+        for (PlantDescriptionEntry entry : entries.values()) {
+            validateInIsolation(entry);
+        }
 
-        checkSelfReferencing();
         if (hasError()) {
             return;
         }
 
-        ensureInclusionsExist();
-        if (hasError()) {
+        // Find the currently active Plant Description, if any.
+        PlantDescriptionEntry activeEntry = entries.values().stream()
+            .filter(entry -> entry.active())
+            .findAny()
+            .orElse(null);
+
+        if (activeEntry == null) {
             return;
         }
 
-        checkForDuplicateInclusions();
-        if (hasError()) {
+        final Set<PlantDescriptionEntry> activeEntries;
+        try {
+            activeEntries = getIncludeChain(activeEntry, entries);
+        } catch (ValidationException e) {
+            errors.add(e.getMessage());
             return;
         }
 
-        checkInclusionCycles();
-        if (hasError()) {
-            return;
+        ensureIdentifiableSystems(activeEntries);
+        validateConnections(activeEntries);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param entries Plant Description entries to be validated.
+     */
+    public PlantDescriptionValidator(final PlantDescriptionEntry... entries) {
+        this(Arrays.asList(entries)
+            .stream()
+            .collect(Collectors.toMap(PlantDescriptionEntry::id, entry -> entry)));
+    }
+
+    /**
+     * Perform all validation checks that can be performed on a Plant
+     * Description entry in isolation.
+     *
+     * @param entry A Plant Description entry to validate.
+     */
+    private void validateInIsolation(final PlantDescriptionEntry entry) {
+        checkSelfReferencing(entry);
+        checkForDuplicateInclusions(entry);
+        validatePorts(entry);
+        validate(entry.systems());
+    }
+
+    private void validate(final List<PdeSystem> systems) {
+        for (final PdeSystem system : systems) {
+            checkIfIdentifiable(system);
+            verifyLegalSystemName(system);
+        }
+    }
+
+    /**
+     * Report an error if the given system does not contain a valid identifier
+     * (either metadata or system name)
+     *
+     * @param system A system to validate.
+     */
+    private void checkIfIdentifiable(final PdeSystem system) {
+        final Optional<Map<String, String>> metadata = system.metadata();
+
+        final boolean hasMetadata = metadata.isPresent() && !metadata.get().isEmpty();
+        if (system.systemName().isEmpty() && !hasMetadata) {
+            errors.add("Contains a system with neither a name nor metadata to identify it.");
         }
 
-        validateConnections();
+    }
 
-        ensureIdentifiableSystems();
-
-        validatePorts();
+    /**
+     * Report an error if the given system's name is illegal.
+     *
+     * @param system A system to validate.
+     */
+    private void verifyLegalSystemName(final PdeSystem system) {
+        if (blacklist.contains(system.systemId().toLowerCase())) {
+            errors.add("'" + system.systemId() + "' is not a valid system ID.");
+        }
     }
 
     /**
@@ -82,220 +139,209 @@ public class PlantDescriptionValidator {
     }
 
     /**
-     * Ensure that each system in every entry is uniquely identifiable, either
-     * by a name or by metadata.
+     * Ensure that each system in every given entry is uniquely identifiable,
+     * either by a name or by metadata.
+     *
+     * @param entries A set of Plant Description Entries.
      */
-    private void ensureIdentifiableSystems() {
-        // TODO: Implement correctly. The version below did not allow the same
-        // system to be used in separate Plant Descriptions.
-        //
+    private void ensureIdentifiableSystems(final Set<PlantDescriptionEntry> entries) {
 
-        // final ArrayList<PdeSystem> systems = new ArrayList<>();
-        // for (final PlantDescriptionEntry entry : entries.values()) {
-        //     systems.addAll(entry.systems());
-        // }
+        final ArrayList<PdeSystem> systems = new ArrayList<>();
+        for (final PlantDescriptionEntry entry : entries) {
+            systems.addAll(entry.systems());
+        }
 
-        // final Set<String> uniqueIdentifiers = new HashSet<>();
+        final Set<String> uniqueIdentifiers = new HashSet<>();
 
-        // for (final PdeSystem system : systems) {
-
-        //     final Optional<Map<String, String>> metadata = system.metadata();
-        //     final boolean hasMetadata = metadata.isPresent() && !metadata.get().isEmpty();
-
-        //     final String uid = uniqueIdentifier(system);
-
-        //     if (!uniqueIdentifiers.add(uid)) {
-        //         errors.add("System with ID '" + system.systemId() +
-        //             "' cannot be uniquely identified by its name/metadata combination.");
-        //     }
-
-        //     if (system.systemName().isEmpty() && !hasMetadata) {
-        //         errors.add("Contains a system with neither a name nor metadata to identify it.");
-        //     }
-
-        //     if (blacklist.contains(system.systemId().toLowerCase())) {
-        //         errors.add("'" + system.systemId() + "' is not a valid system ID.");
-        //     }
-        // }
+        for (final PdeSystem system : systems) {
+            final String uid = uniqueIdentifier(system);
+            if (!uniqueIdentifiers.add(uid)) {
+                errors.add("System with ID '" + system.systemId() +
+                    "' cannot be uniquely identified by its name/metadata combination.");
+            }
+        }
     }
 
     /**
-     * Any inclusion cycles originating from the given entry is reported.
+     * Retrieves the complete include chain of the specified entry from among
+     * the given list of all entries.
+     *
+     * @param entry      Plant Description entry whose include chain will be
+     *                   retrieved.
+     * @param allEntries A list containing all Plant Description entries in
+     *                   which to search for included entries.
+     * @return
+     * @throws ValidationException If there is an include cycle, or if an
+     *                             included entry is not present in
+     *                             {@code allEntries}.
      */
-    private void checkInclusionCycles() {
-        for (final PlantDescriptionEntry entry : entries.values()) {
-            if (cycleOriginatesAtEntry(entry)) {
-                errors.add("Contains cycle.");
+    private Set<PlantDescriptionEntry> getIncludeChain(
+        final PlantDescriptionEntry entry,
+        final Map<Integer, ? extends PlantDescriptionEntry> allEntries
+    ) throws ValidationException {
+
+        final HashSet<PlantDescriptionEntry> visitedEntries = new HashSet<>();
+        final LinkedList<PlantDescriptionEntry> queue = new LinkedList<>();
+
+        queue.add(entry);
+
+        while (!queue.isEmpty()) {
+            final PlantDescriptionEntry nextEntry = queue.pop();
+
+            if (!visitedEntries.add(nextEntry)) {
+                throw new ValidationException("Error in include list: Cycle detected.");
+            }
+
+            for (final Integer includedId : nextEntry.include()) {
+                if (!allEntries.containsKey(includedId)) {
+                    throw new ValidationException("Error in include list: Entry '" + includedId + "' is required by entry '" + nextEntry.id() + "'.");
+                }
+                final var includedEntry = allEntries.get(includedId);
+                queue.add(includedEntry);
+            }
+        }
+
+        return visitedEntries;
+    }
+
+    /**
+     * If the given entry lists its own ID in its include list, this is reported
+     * as an error.
+     */
+    private void checkSelfReferencing(final PlantDescriptionEntry entry) {
+        for (final int id : entry.include()) {
+            if (id == entry.id()) {
+                errors.add("Entry includes itself.");
                 return;
             }
         }
     }
 
-    private boolean cycleOriginatesAtEntry(final PlantDescriptionEntry entry) {
+    private void checkForDuplicateInclusions(final PlantDescriptionEntry entry) {
+        final List<Integer> includes = entry.include();
 
-        final HashSet<Integer> visitedEntries = new HashSet<>();
-        final LinkedList<PlantDescriptionEntry> queue = new LinkedList<>();
+        // Check for duplicates
+        final HashSet<Integer> uniqueIds = new HashSet<>();
+        final HashSet<Integer> duplicates = new HashSet<>();
 
-        queue.add(entry);
-        while (!queue.isEmpty()) {
-            final PlantDescriptionEntry nextEntry = queue.pop();
-            if (!visitedEntries.add(nextEntry.id())) {
-                return true;
-            }
-            for (final Integer included : nextEntry.include()) {
-                queue.add(entries.get(included));
+        for (final int id : includes) {
+            if (!uniqueIds.add(id)) {
+                duplicates.add(id);
             }
         }
-        return false;
+
+        for (final int id : duplicates) {
+            errors.add("Entry with ID '" + id + "' is included more than once.");
+        }
     }
 
     /**
-     * If any entry lists its own ID in its include list, this is reported as an
-     * error.
+     * Validates the connections present in the given list of Plant Description
+     * entries.
+     *
+     * @param entries A set of Plant Description entries.
      */
-    private void checkSelfReferencing() {
-        for (final PlantDescriptionEntry entry : entries.values()) {
-            for (final int id : entry.include()) {
-                if (id == entry.id()) {
-                    errors.add("Entry includes itself.");
-                    return;
+    private void validateConnections(final Set<PlantDescriptionEntry> entries) {
+
+        final ArrayList<PdeSystem> systems = new ArrayList<>();
+        final ArrayList<Connection> connections = new ArrayList<>();
+
+        for (final PlantDescriptionEntry entry : entries) {
+            systems.addAll(entry.systems());
+            connections.addAll(entry.connections());
+        }
+
+        for (final Connection connection : connections) {
+            validateConnections(connection, systems);
+        }
+    }
+
+    /**
+     * Validates a single connection between a service producer and a consumer.
+     *
+     * @param connection A connection to validate.
+     * @param systems    List of systems that the connection may refer to.
+     */
+    private void validateConnections(final Connection connection, final ArrayList<PdeSystem> systems) {
+        PdeSystem consumerSystem = null;
+        PdeSystem producerSystem = null;
+
+        Port consumerPort = null;
+        Port producerPort = null;
+
+        if (connection.priority().orElse(0) < 0) { // TODO: Check for max value as well.
+            errors.add("A connection has a negative priority.");
+        }
+
+        final SystemPort producer = connection.producer();
+        final SystemPort consumer = connection.consumer();
+
+        final String producerId = producer.systemId();
+        final String consumerId = consumer.systemId();
+
+        for (final PdeSystem system : systems) {
+
+            final boolean isProducerSystem = producerId.equals(system.systemId());
+            final boolean isConsumerSystem = consumerId.equals(system.systemId());
+
+            if (isProducerSystem) {
+                final String portName = producer.portName();
+                producerSystem = system;
+                producerPort = system.getPort(portName);
+                if (producerPort == null) {
+                    errors.add("Connection refers to the missing producer port '" + portName + "'");
+                } else if (producerPort.consumer().orElse(false)) {
+                    errors.add("Invalid connection, '" + portName + "' is not a producer port.");
+                }
+            } else if (isConsumerSystem) {
+                final String portName = consumer.portName();
+                consumerSystem = system;
+                consumerPort = system.getPort(portName);
+                if (consumerPort == null) {
+                    errors.add("Connection refers to the missing consumer port '" + portName + "'");
+                } else if (!consumerPort.consumer().orElse(false)) {
+                    errors.add("Invalid connection, '" + portName + "' is not a consumer port.");
                 }
             }
         }
-    }
 
-    /**
-     * If any of the Plant Description ID:s in the entries' include lists is not
-     * present in the list of entries, this is reported as an error.
-     */
-    private void ensureInclusionsExist() {
-        for (final PlantDescriptionEntry entry : entries.values()) {
-            for (final int includedId : entry.include()) {
-                if (!entries.containsKey(includedId)) {
-                    errors.add(
-                        "Error in include list: Entry '" + includedId + "' is required by entry '" + entry.id() + "'.");
-                }
-            }
+        if (producerSystem == null) {
+            errors.add("A connection refers to the missing system '" + producerId + "'");
         }
-    }
+        if (consumerSystem == null) {
+            errors.add("A connection refers to the missing system '" + consumerId + "'");
+        }
 
-    private void checkForDuplicateInclusions() {
-        for (final PlantDescriptionEntry entry : entries.values()) {
-            final List<Integer> includes = entry.include();
-
-            // Check for duplicates
-            final HashSet<Integer> uniqueIds = new HashSet<>();
-            final HashSet<Integer> duplicates = new HashSet<>();
-
-            for (final int id : includes) {
-                if (!uniqueIds.add(id)) {
-                    duplicates.add(id);
-                }
+        if (producerPort != null && consumerPort != null) {
+            // Ensure that service interfaces match
+            if (!producerPort.serviceInterface().equals(consumerPort.serviceInterface())) {
+                errors.add("The service interfaces of ports '" +
+                    consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
+                );
             }
-
-            for (final int id : duplicates) {
-                errors.add("Entry with ID '" + id + "' is included more than once.");
+            // Ensure that service definitions match
+            if (!producerPort.serviceDefinition().equals(consumerPort.serviceDefinition())) {
+                errors.add("The service definitions of ports '" +
+                    consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
+                );
             }
         }
     }
 
     /**
-     * Validates the connections of a Plant Description Entry.
+     * Ensures that all system ports in the given Plant Description entry are
+     * valid.
+     *
+     * @param entry A Plant Description entry.
      */
-    private void validateConnections() {
+    private void validatePorts(final PlantDescriptionEntry entry) {
+        for (final PdeSystem system : entry.systems()) {
+            ensureUniquePorts(system);
+        }
 
-        // TODO: Only check connections belonging to the active entry and its
-        // included entry.
-
-        // final ArrayList<PdeSystem> systems = new ArrayList<>();
-        // final ArrayList<Connection> connections = new ArrayList<>();
-
-        // for (final PlantDescriptionEntry entry : entries.values()) {
-        //     systems.addAll(entry.systems());
-        //     connections.addAll(entry.connections());
-        // }
-
-        // for (final Connection connection : connections) {
-
-        //     PdeSystem consumerSystem = null;
-        //     PdeSystem producerSystem = null;
-
-        //     Port consumerPort = null;
-        //     Port producerPort = null;
-
-        //     if (connection.priority().orElse(0) < 0) { // TODO: Check for max value as well.
-        //         errors.add("A connection has a negative priority.");
-        //     }
-
-        //     final SystemPort producer = connection.producer();
-        //     final SystemPort consumer = connection.consumer();
-
-        //     final String producerId = producer.systemId();
-        //     final String consumerId = consumer.systemId();
-
-        //     for (final PdeSystem system : systems) {
-
-        //         final boolean isProducerSystem = producerId.equals(system.systemId());
-        //         final boolean isConsumerSystem = consumerId.equals(system.systemId());
-
-        //         if (isProducerSystem) {
-        //             final String portName = producer.portName();
-        //             producerSystem = system;
-        //             producerPort = system.getPort(portName);
-        //             if (producerPort == null) {
-        //                 errors.add("Connection refers to the missing producer port '" + portName + "'");
-        //             } else if (producerPort.consumer().orElse(false)) {
-        //                 errors.add("Invalid connection, '" + portName + "' is not a producer port.");
-        //             }
-        //         } else if (isConsumerSystem) {
-        //             final String portName = consumer.portName();
-        //             consumerSystem = system;
-        //             consumerPort = system.getPort(portName);
-        //             if (consumerPort == null) {
-        //                 errors.add("Connection refers to the missing consumer port '" + portName + "'");
-        //             } else if (!consumerPort.consumer().orElse(false)) {
-        //                 errors.add("Invalid connection, '" + portName + "' is not a consumer port.");
-        //             }
-        //         }
-        //     }
-
-        //     if (producerSystem == null) {
-        //         errors.add("A connection refers to the missing system '" + producerId + "'");
-        //     }
-        //     if (consumerSystem == null) {
-        //         errors.add("A connection refers to the missing system '" + consumerId + "'");
-        //     }
-
-        //     if (producerPort != null && consumerPort != null) {
-        //         // Ensure that service interfaces match
-        //         if (!producerPort.serviceInterface().equals(consumerPort.serviceInterface())) {
-        //             errors.add("The service interfaces of ports '" +
-        //                 consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
-        //             );
-        //         }
-        //         // Ensure that service definitions match
-        //         if (!producerPort.serviceDefinition().equals(consumerPort.serviceDefinition())) {
-        //             errors.add("The service definitions of ports '" +
-        //                 consumerPort.portName() + "' and '" + producerPort.portName() + "' do not match."
-        //             );
-        //         }
-        //     }
-        // }
-    }
-
-    /**
-     * Ensures that all entries' systems ports are unique.
-     */
-    private void validatePorts() {
-        for (final PlantDescriptionEntry entry : entries.values()) {
-            for (final PdeSystem system : entry.systems()) {
-                ensureUniquePorts(system);
-            }
-
-            // Check that no consumer port has metadata.
-            for (final PdeSystem system : entry.systems()) {
-                ensureNoConsumerPortMetadata(system);
-            }
+        // Check that no consumer port has metadata.
+        for (final PdeSystem system : entry.systems()) {
+            ensureNoConsumerPortMetadata(system);
         }
     }
 
@@ -381,7 +427,7 @@ public class PlantDescriptionValidator {
     }
 
     /**
-     * @return A human-readable description of any errors in the Plant
+     * @return A human-readable description of any errors in a Plant
      * Description.
      */
     public String getErrorMessage() {
@@ -394,6 +440,14 @@ public class PlantDescriptionValidator {
 
     public boolean hasError() {
         return !errors.isEmpty();
+    }
+
+    private class ValidationException extends Exception {
+
+        ValidationException(String msg) {
+            super(msg);
+        }
+
     }
 
 }

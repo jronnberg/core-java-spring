@@ -131,7 +131,7 @@ public class DeletePlantDescriptionTest {
             .plantDescription("B")
             .createdAt(now)
             .updatedAt(now)
-            .active(false)
+            .active(true)
             .include(List.of(entryIdA))
             .build();
 
