@@ -92,7 +92,7 @@ public class PlantDescriptionValidator {
     private void validate(final List<PdeSystem> systems) {
         for (final PdeSystem system : systems) {
             checkIfIdentifiable(system);
-            verifyLegalSystemName(system);
+            ensureLegalSystemName(system);
         }
     }
 
@@ -109,7 +109,6 @@ public class PlantDescriptionValidator {
         if (system.systemName().isEmpty() && !hasMetadata) {
             errors.add("Contains a system with neither a name nor metadata to identify it.");
         }
-
     }
 
     /**
@@ -117,7 +116,7 @@ public class PlantDescriptionValidator {
      *
      * @param system A system to validate.
      */
-    private void verifyLegalSystemName(final PdeSystem system) {
+    private void ensureLegalSystemName(final PdeSystem system) {
         if (blacklist.contains(system.systemId().toLowerCase())) {
             errors.add("'" + system.systemId() + "' is not a valid system ID.");
         }
@@ -147,6 +146,7 @@ public class PlantDescriptionValidator {
     private void ensureIdentifiableSystems(final Set<PlantDescriptionEntry> entries) {
 
         final ArrayList<PdeSystem> systems = new ArrayList<>();
+
         for (final PlantDescriptionEntry entry : entries) {
             systems.addAll(entry.systems());
         }
@@ -217,6 +217,12 @@ public class PlantDescriptionValidator {
         }
     }
 
+    /**
+     * If the given Plant Description entry has duplicate entries in its include
+     * list, this is reported as an error.
+     *
+     * @param entry A Plant Description entry to investigate.
+     */
     private void checkForDuplicateInclusions(final PlantDescriptionEntry entry) {
         final List<Integer> includes = entry.include();
 
@@ -230,9 +236,7 @@ public class PlantDescriptionValidator {
             }
         }
 
-        for (final int id : duplicates) {
-            errors.add("Entry with ID '" + id + "' is included more than once.");
-        }
+        duplicates.forEach(id -> errors.add("Entry with ID '" + id + "' is included more than once."));
     }
 
     /**
@@ -252,7 +256,7 @@ public class PlantDescriptionValidator {
         }
 
         for (final Connection connection : connections) {
-            validateConnections(connection, systems);
+            validateConnection(connection, systems);
         }
     }
 
@@ -262,7 +266,7 @@ public class PlantDescriptionValidator {
      * @param connection A connection to validate.
      * @param systems    List of systems that the connection may refer to.
      */
-    private void validateConnections(final Connection connection, final ArrayList<PdeSystem> systems) {
+    private void validateConnection(final Connection connection, final ArrayList<PdeSystem> systems) {
         PdeSystem consumerSystem = null;
         PdeSystem producerSystem = null;
 
@@ -335,14 +339,8 @@ public class PlantDescriptionValidator {
      * @param entry A Plant Description entry.
      */
     private void validatePorts(final PlantDescriptionEntry entry) {
-        for (final PdeSystem system : entry.systems()) {
-            ensureUniquePorts(system);
-        }
-
-        // Check that no consumer port has metadata.
-        for (final PdeSystem system : entry.systems()) {
-            ensureNoConsumerPortMetadata(system);
-        }
+        entry.systems().forEach(system -> ensureUniquePorts(system));
+        entry.systems().forEach(system -> ensureNoConsumerPortMetadata(system));
     }
 
     /**
@@ -354,11 +352,19 @@ public class PlantDescriptionValidator {
     private void ensureNoConsumerPortMetadata(final PdeSystem system) {
         for (final Port port : system.ports()) {
             if (port.consumer().orElse(false)) {
-                final boolean hasMetadata = port.metadata().isPresent() && !port.metadata().get().isEmpty();
-                if (hasMetadata) {
-                    errors.add("Port '" + port.portName() + "' is a consumer port, it must not have any metadata.");
-                }
+                ensureNoMetadata(port);
             }
+        }
+    }
+
+    /**
+     * Report an error if the given port has metadata.
+     * @param port A system port.
+     */
+    private void ensureNoMetadata(Port port) {
+        final Optional<Map<String, String>> metadata = port.metadata();
+        if (metadata.isPresent() && !metadata.get().isEmpty()) {
+            errors.add("Port '" + port.portName() + "' is a consumer port, it must not have any metadata.");
         }
     }
 
@@ -431,23 +437,14 @@ public class PlantDescriptionValidator {
      * Description.
      */
     public String getErrorMessage() {
-        final List<String> errorMessages = new ArrayList<>();
-        for (final String error : errors) {
-            errorMessages.add("<" + error + ">");
-        }
+        final List<String> errorMessages = errors.stream()
+            .map(error -> "<" + error + ">")
+            .collect(Collectors.toList());
         return String.join(", ", errorMessages);
     }
 
     public boolean hasError() {
         return !errors.isEmpty();
-    }
-
-    private class ValidationException extends Exception {
-
-        ValidationException(String msg) {
-            super(msg);
-        }
-
     }
 
 }
