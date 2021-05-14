@@ -309,7 +309,7 @@ public final class PdeMain {
                 final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
                 final PdStore pdStore = new FilePdStore(plantDescriptionsDirectory);
                 final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(pdStore);
-                final SrSystem orchestrator = systemTracker.getSystem("orchestrator", null);
+                final SrSystem orchestrator = systemTracker.getSystem("orchestrator");
 
                 if (orchestrator == null) {
                     throw new RuntimeException("Could not find Orchestrator in the Service Registry.");

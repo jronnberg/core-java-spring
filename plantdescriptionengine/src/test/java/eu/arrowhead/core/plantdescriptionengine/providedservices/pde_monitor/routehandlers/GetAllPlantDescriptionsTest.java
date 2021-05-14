@@ -190,7 +190,7 @@ public class GetAllPlantDescriptionsTest {
 
                 final PortEntry retrievedPort = retrievedSystem.ports().get(0);
                 assertEquals(isConsumer, retrievedPort.consumer().orElse(false));
-                assertEquals(metadata, retrievedPort.metadata().orElse(null));
+                assertEquals(metadata, retrievedPort.metadata());
                 assertEquals(portName, retrievedPort.portName());
                 assertEquals(serviceDefinition, retrievedPort.serviceDefinition());
 

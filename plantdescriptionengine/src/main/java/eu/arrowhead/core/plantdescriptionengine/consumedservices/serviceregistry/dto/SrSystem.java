@@ -33,7 +33,7 @@ public interface SrSystem {
 
     Optional<String> updatedAt();
 
-    Optional<Map<String, String>> metadata();
+    Map<String, String> metadata();
 
     default InetSocketAddress getAddress() {
         return new InetSocketAddress(address(), port());

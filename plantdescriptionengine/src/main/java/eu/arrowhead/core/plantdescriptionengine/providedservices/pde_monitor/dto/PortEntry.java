@@ -24,13 +24,13 @@ public interface PortEntry {
 
     Optional<String> serviceInterface();
 
-    Optional<Map<String, String>> metadata();
+    Map<String, String> metadata();
 
     Optional<JsonObject> systemData();
 
     Optional<String> inventoryId();
 
-    Optional<Map<String, String>> inventoryData();
+    Map<String, String> inventoryData();
 
     /**
      * Indicates whether this port is used to consume or produce services.

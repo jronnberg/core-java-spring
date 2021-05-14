@@ -177,7 +177,7 @@ public class SqlPdStoreTest {
         final var retrievedConsumerPort = retrievedConsumer.ports().get(0);
         assertEquals(consumerPort, retrievedConsumerPort.portName());
         assertEquals(true, retrievedConsumerPort.consumer().orElse(false));
-        assertEquals(consumerPortMetadata, retrievedConsumerPort.metadata().orElse(null));
+        assertEquals(consumerPortMetadata, retrievedConsumerPort.metadata());
 
         final PdeSystem retrievedProducer = retrievedEntry.systems().get(1);
         assertEquals(producerName, retrievedProducer.systemName().orElse(null));

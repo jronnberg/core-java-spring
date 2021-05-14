@@ -97,17 +97,8 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     private boolean systemsMatch(final PdeSystem entrySystem, final SrSystem registeredSystem) {
 
-        if (entrySystem.metadata().isPresent()) {
-            if (registeredSystem.metadata().isEmpty()) {
-                return false;
-            }
-
-            final Map<String, String> entryMetadata = entrySystem.metadata().get();
-            final Map<String, String> srMetadata = registeredSystem.metadata().get();
-
-            if (!Metadata.isSubset(entryMetadata, srMetadata)) {
-                return false;
-            }
+        if (!Metadata.isSubset(entrySystem.metadata(), registeredSystem.metadata())) {
+            return false;
         }
 
         // At this point, we know that either of these two statements must hold:
@@ -131,8 +122,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     private boolean alarmMatchesSrSystem(final Alarm alarm, final SrSystem system) {
 
         final boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName());
-        final boolean metadataMatches = alarm.getMetadata() != null && system.metadata().isPresent() && Metadata
-            .isSubset(alarm.getMetadata(), system.metadata().get());
+        final boolean metadataMatches = alarm.getMetadata() != null && Metadata.isSubset(alarm.getMetadata(), system.metadata());
 
         if (alarm.systemName != null && !namesMatch) {
             return false;
@@ -155,20 +145,17 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
         final String systemName = system.systemName().orElse(null);
         final boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(systemName);
 
-        final boolean metadataMatches = alarm.getMetadata() != null &&
-            system.metadata().isPresent() &&
-            Metadata.isSubset(system.metadata().get(), alarm.getMetadata());
-
         if (system.systemName().isPresent()) {
             if (!namesMatch) {
                 return false;
             }
         }
 
-        if (system.metadata().isPresent()) {
-            if (!metadataMatches) {
-                return false;
-            }
+        final boolean noMetadata = alarm.getMetadata() == null && system.metadata().isEmpty();
+        final boolean metadataMatches = noMetadata || Metadata.isSubset(system.metadata(), alarm.getMetadata());
+
+        if (!metadataMatches) {
+            return false;
         }
 
         return namesMatch || metadataMatches;
@@ -205,7 +192,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
                 alarmManager.raiseSystemNotRegistered(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
-                    entrySystem.metadata().orElse(null)
+                    entrySystem.metadata()
                 );
             }
 
@@ -213,7 +200,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
                 alarmManager.raiseMultipleMatches(
                     entrySystem.systemId(),
                     entrySystem.systemName().orElse(null),
-                    entrySystem.metadata().orElse(null)
+                    entrySystem.metadata()
                 );
             }
 
@@ -227,10 +214,7 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
             );
 
             if (!presentInPd) {
-                alarmManager.raiseSystemNotInDescription(
-                    registeredSystem.systemName(),
-                    registeredSystem.metadata().orElse(null)
-                );
+                alarmManager.raiseSystemNotInDescription(registeredSystem.systemName(), registeredSystem.metadata());
             }
         }
     }

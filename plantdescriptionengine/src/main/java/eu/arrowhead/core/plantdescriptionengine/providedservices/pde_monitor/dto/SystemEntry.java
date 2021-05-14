@@ -20,7 +20,7 @@ public interface SystemEntry {
 
     Optional<String> systemName();
 
-    Optional<Map<String, String>> metadata();
+    Map<String, String> metadata();
 
     List<PortEntry> ports();
 

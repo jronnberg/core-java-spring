@@ -103,10 +103,7 @@ public class PlantDescriptionValidator {
      * @param system A system to validate.
      */
     private void checkIfIdentifiable(final PdeSystem system) {
-        final Optional<Map<String, String>> metadata = system.metadata();
-
-        final boolean hasMetadata = metadata.isPresent() && !metadata.get().isEmpty();
-        if (system.systemName().isEmpty() && !hasMetadata) {
+        if (system.systemName().isEmpty() && system.metadata().isEmpty()) {
             errors.add("Contains a system with neither a name nor metadata to identify it.");
         }
     }
@@ -129,9 +126,9 @@ public class PlantDescriptionValidator {
      */
     private String uniqueIdentifier(final PdeSystem system) {
         final String systemName = system.systemName().orElse("");
-        final Map<String, String> metadata = system.metadata().orElse(null);
+        final Map<String, String> metadata = system.metadata();
         String result = systemName + "{";
-        if (metadata != null && !metadata.isEmpty()) {
+        if (!metadata.isEmpty()) {
             result += Metadata.toString(metadata);
         }
         return result + "}";
@@ -362,8 +359,8 @@ public class PlantDescriptionValidator {
      * @param port A system port.
      */
     private void ensureNoMetadata(Port port) {
-        final Optional<Map<String, String>> metadata = port.metadata();
-        if (metadata.isPresent() && !metadata.get().isEmpty()) {
+        final Map<String, String> metadata = port.metadata();
+        if (!metadata.isEmpty()) {
             errors.add("Port '" + port.portName() + "' is a consumer port, it must not have any metadata.");
         }
     }
@@ -403,8 +400,8 @@ public class PlantDescriptionValidator {
                 metadataPerService.put(serviceDefinition, new ArrayList<>());
             }
 
-            if (port.metadata().isPresent()) {
-                metadataPerService.get(serviceDefinition).add(port.metadata().get());
+            if (!port.metadata().isEmpty()) {
+                metadataPerService.get(serviceDefinition).add(port.metadata());
             }
         }
 
