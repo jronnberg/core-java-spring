@@ -1025,34 +1025,34 @@ public class PlantDescriptionValidatorTest {
 
     @Test
     public void shouldReportNonUniqueSystem() {
-            final String systemIdB = "Sys-B";
-            final String systemName = "XYZ";
-            final Map<String, String> metadata = Map.of("a", "1");
-            final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
-                .id(22)
-                .plantDescription("Plant Description A")
-                .createdAt(now)
-                .updatedAt(now)
-                .active(true)
-                .systems(List.of(
-                    new PdeSystemDto.Builder()
-                        .systemId("Sys-A")
-                        .systemName(systemName)
-                        .metadata(metadata)
-                        .build(),
-                    new PdeSystemDto.Builder()
-                        .systemId(systemIdB)
-                        .systemName(systemName)
-                        .metadata(metadata)
-                        .build()
-                ))
-                .build();
+        final String systemIdB = "Sys-B";
+        final String systemName = "XYZ";
+        final Map<String, String> metadata = Map.of("a", "1");
+        final PlantDescriptionEntryDto entry = new PlantDescriptionEntryDto.Builder()
+            .id(22)
+            .plantDescription("Plant Description A")
+            .createdAt(now)
+            .updatedAt(now)
+            .active(true)
+            .systems(List.of(
+                new PdeSystemDto.Builder()
+                    .systemId("Sys-A")
+                    .systemName(systemName)
+                    .metadata(metadata)
+                    .build(),
+                new PdeSystemDto.Builder()
+                    .systemId(systemIdB)
+                    .systemName(systemName)
+                    .metadata(metadata)
+                    .build()
+            ))
+            .build();
 
-            final PlantDescriptionValidator validator = new PlantDescriptionValidator(entry);
-            assertTrue(validator.hasError());
-            final String expectedErrorMessage = "<System with ID '" + systemIdB +
-                "' cannot be uniquely identified by its name/metadata combination.>";
-            assertEquals(expectedErrorMessage, validator.getErrorMessage());
+        final PlantDescriptionValidator validator = new PlantDescriptionValidator(entry);
+        assertTrue(validator.hasError());
+        final String expectedErrorMessage = "<System with ID '" + systemIdB +
+            "' cannot be uniquely identified by its name/metadata combination.>";
+        assertEquals(expectedErrorMessage, validator.getErrorMessage());
     }
 
     @Test
