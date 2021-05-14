@@ -77,10 +77,12 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         pdTracker.addListener(this);
         activeEntry = pdTracker.activeEntry();
 
-        final Future<Void> deleteRulesTask = activeEntry == null ? Future.done() : deleteRules(activeEntry.id());
+        if (activeEntry == null) {
+            return Future.done();
+        }
 
-        return deleteRulesTask
-            .flatMap(deletionResult -> (activeEntry == null) ? Future.done() : postRules().flatMap(createdRules -> {
+        return deleteRules(activeEntry.id())
+            .flatMap(deletionResult -> postRules().flatMap(createdRules -> {
                 ruleStore.writeRules(activeEntry.id(), createdRules.getIds());
                 logger.info("Created rules for Plant Description Entry '" + activeEntry.plantDescription() + "'.");
                 return Future.done();
@@ -217,14 +219,15 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
 
         final int numConnections = pdTracker.getActiveConnections().size();
         final boolean wasDeactivated = !entry.active() && activeEntry != null && activeEntry.id() == entry.id();
-        final boolean shouldPostRules = entry.active() && numConnections > 0;
         final boolean shouldDeleteCurrentRules = entry.active() || wasDeactivated;
 
         final Future<Void> deleteRulesTask = shouldDeleteCurrentRules ? deleteRules(entry.id()) : Future.done();
-        final Future<StoreEntryListDto> postRulesTask = shouldPostRules ? postRules() : Future.success(emptyRuleList());
 
         deleteRulesTask
-            .flatMap(result -> postRulesTask)
+            .flatMap(deletionResult -> {
+                final boolean shouldPostRules = entry.active() && numConnections > 0;
+                return shouldPostRules ? postRules() : Future.success(emptyRuleList());
+            })
             .ifSuccess(createdRules -> {
                 if (entry.active()) {
                     activeEntry = entry;
