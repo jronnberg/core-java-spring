@@ -82,31 +82,42 @@ public class PlantDescriptionTracker {
     public void put(final PlantDescriptionEntryDto entry) throws PdStoreException {
         Objects.requireNonNull(entry, "Expected entry.");
 
-        backingStore.write(entry);
+        final PlantDescriptionEntry previouslyActiveEntry;
+        final boolean anotherEntryWasActive;
+        final boolean isNew;
+        final PlantDescriptionEntry oldEntry;
+        final PlantDescriptionEntryDto deactivatedEntry;
 
-        final boolean isNew = !entries.containsKey(entry.id());
-        final PlantDescriptionEntry currentlyActive = activeEntry();
+        synchronized(this) {
 
-        final boolean anotherEntryIsActive = (currentlyActive != null && currentlyActive.id() != entry.id());
-        if (entry.active() && anotherEntryIsActive) {
-            // Deactivate the currently active entry:
-            final PlantDescriptionEntryDto deactivatedEntry = PlantDescriptionEntry.deactivated(currentlyActive);
+            backingStore.write(entry);
 
-            entries.put(deactivatedEntry.id(), deactivatedEntry);
-            backingStore.write(deactivatedEntry);
+            previouslyActiveEntry = activeEntry();
+            anotherEntryWasActive = previouslyActiveEntry != null && previouslyActiveEntry.id() != entry.id();
+            isNew = !entries.containsKey(entry.id());
+            oldEntry = isNew ? null : entries.get(entry.id());
+            entries.put(entry.id(), entry);
 
-            for (final PlantDescriptionUpdateListener listener : listeners) {
-                listener.onPlantDescriptionUpdated(deactivatedEntry);
+            if (entry.active() && anotherEntryWasActive) {
+                deactivatedEntry = PlantDescriptionEntry.deactivated(previouslyActiveEntry);
+                entries.put(deactivatedEntry.id(), deactivatedEntry);
+                backingStore.write(deactivatedEntry);
+            } else {
+                deactivatedEntry = null;
             }
         }
 
-        entries.put(entry.id(), entry);
+        if (deactivatedEntry != null) {
+            for (final PlantDescriptionUpdateListener listener : listeners) {
+                listener.onPlantDescriptionUpdated(deactivatedEntry, previouslyActiveEntry);
+            }
+        }
 
         for (final PlantDescriptionUpdateListener listener : listeners) {
             if (isNew) {
                 listener.onPlantDescriptionAdded(entry);
             } else {
-                listener.onPlantDescriptionUpdated(entry);
+                listener.onPlantDescriptionUpdated(entry, oldEntry);
             }
         }
     }

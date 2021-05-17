@@ -62,9 +62,12 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
     }
 
     @Override
-    public void onPlantDescriptionUpdated(final PlantDescriptionEntry entry) {
-        Objects.requireNonNull(entry, "Expected entry.");
-        logger.debug("Entry '" + entry.plantDescription() + "' updated, checking for inconsistencies...");
+    public void onPlantDescriptionUpdated(
+        final PlantDescriptionEntry updatedEntry,
+        final PlantDescriptionEntry oldEntry
+    ) {
+        Objects.requireNonNull(updatedEntry, "Expected entry.");
+        logger.debug("Entry '" + updatedEntry.plantDescription() + "' updated, checking for inconsistencies...");
         updateAlarms();
     }
 

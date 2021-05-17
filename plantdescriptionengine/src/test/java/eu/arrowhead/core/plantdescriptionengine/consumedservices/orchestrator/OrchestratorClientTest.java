@@ -379,8 +379,9 @@ public class OrchestratorClientTest {
                     .updatedAt(now)
                     .active(true)
                     .build();
+
                 pdTracker.put(entryWithoutConnections);
-                orchestratorClient.onPlantDescriptionUpdated(entryWithoutConnections);
+                pdTracker.put(entryWithoutConnections);
 
                 // Verify that the HTTP client was passed correct data:
                 final ArgumentCaptor<InetSocketAddress> addressCaptor = ArgumentCaptor.forClass(InetSocketAddress.class);
@@ -494,7 +495,7 @@ public class OrchestratorClientTest {
         orchestratorClient.initialize()
             .ifSuccess(result -> {
                 final PlantDescriptionEntryDto deactivatedEntry = PlantDescriptionEntry.deactivated(activeEntry);
-                orchestratorClient.onPlantDescriptionUpdated(deactivatedEntry);
+                pdTracker.put(deactivatedEntry);
                 assertEquals(0, ruleStore.readRules(deactivatedEntry.id()).size());
             })
             .onFailure(e -> fail());
@@ -527,7 +528,7 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                orchestratorClient.onPlantDescriptionUpdated(entryB);
+                pdTracker.put(entryB);
                 verify(httpClient, never()).send(any(), any());
                 assertTrue(ruleStore.readRules(entryA.id()).isEmpty());
                 assertTrue(ruleStore.readRules(entryB.id()).isEmpty());
@@ -575,7 +576,7 @@ public class OrchestratorClientTest {
 
         orchestratorClient.initialize()
             .ifSuccess(result -> {
-                orchestratorClient.onPlantDescriptionUpdated(entry);
+                pdTracker.put(entry);
                 assertTrue(ruleStore.readRules(entry.id()).isEmpty());
             })
             .onFailure(e -> fail());

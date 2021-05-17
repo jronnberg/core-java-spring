@@ -758,15 +758,18 @@ public class PlantDescriptionTrackerTest {
         }
 
         @Override
-        public void onPlantDescriptionUpdated(final PlantDescriptionEntry entry) {
-            lastUpdated = entry;
-            numUpdated++;
-        }
-
-        @Override
         public void onPlantDescriptionRemoved(final PlantDescriptionEntry entry) {
             lastRemoved = entry;
             numRemoved++;
+        }
+
+        @Override
+        public void onPlantDescriptionUpdated(
+            PlantDescriptionEntry updatedEntry,
+            PlantDescriptionEntry oldEntry
+        ) {
+            lastUpdated = updatedEntry;
+            numUpdated++;
         }
     }
 

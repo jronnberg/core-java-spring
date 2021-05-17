@@ -28,15 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class SqlPdStoreTest {
 
-    private int maxPdBytes = 200000;
-
     private final String DRIVER_CLASS_NAME = "org.h2.Driver";
     private final String CONNECTION_URL = "jdbc:h2:mem:testdb";
-
     private final String USERNAME = "root";
     private final String PASSWORD = "password";
-
     SqlPdStore store;
+    private int maxPdBytes = 200000;
 
     @BeforeEach
     public void createStore() throws PdStoreException {
