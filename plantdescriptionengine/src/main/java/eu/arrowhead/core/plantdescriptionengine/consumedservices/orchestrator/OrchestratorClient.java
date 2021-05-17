@@ -136,8 +136,7 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
                     .header("accept", "application/json"))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
-                    // TODO: Throw some other type of Exception.
-                    return Future.failure(new RuntimeException("Failed to delete store rule with ID " + id));
+                    return Future.failure(OrchestratorRequestException.ruleDeletionFailure(id));
                 }
                 return Future.done();
             });
