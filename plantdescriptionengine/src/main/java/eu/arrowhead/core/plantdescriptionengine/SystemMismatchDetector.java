@@ -121,14 +121,16 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
      */
     private boolean alarmMatchesSrSystem(final Alarm alarm, final SrSystem system) {
 
-        final boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(system.systemName());
-        final boolean metadataMatches = alarm.getMetadata() != null && Metadata.isSubset(alarm.getMetadata(), system.metadata());
+        final String alarmSystemName = alarm.getSystemName();
+        final Map<String, String> alarmMetadata = alarm.getMetadata();
+        final boolean namesMatch = alarmSystemName != null && alarmSystemName.equals(system.systemName());
+        final boolean metadataMatches = Metadata.isSubset(alarmMetadata, system.metadata());
 
-        if (alarm.systemName != null && !namesMatch) {
+        if (alarmSystemName != null && !namesMatch) {
             return false;
         }
 
-        if (alarm.getMetadata() != null && !metadataMatches) {
+        if (!alarmMetadata.isEmpty() && !metadataMatches) {
             return false;
         }
 
@@ -137,28 +139,22 @@ public class SystemMismatchDetector implements PlantDescriptionUpdateListener, S
 
     /**
      * @param alarm  An alarm.
-     * @param system A system in a Plant Description Entry.
+     * @param system A system as described by a Plant Description Entry.
      * @return True if the alarm refers to the given system, false otherwise.
      */
     private boolean alarmMatchesPdSystem(final Alarm alarm, final PdeSystem system) {
 
-        final String systemName = system.systemName().orElse(null);
-        final boolean namesMatch = alarm.systemName != null && alarm.systemName.equals(systemName);
-
-        if (system.systemName().isPresent()) {
-            if (!namesMatch) {
+        String alarmSystemName = alarm.getSystemName();
+        if (alarmSystemName != null && system.systemName().isPresent()) {
+            if (!alarmSystemName.equals(system.systemName().get())) {
                 return false;
             }
         }
 
-        final boolean noMetadata = alarm.getMetadata() == null && system.metadata().isEmpty();
-        final boolean metadataMatches = noMetadata || Metadata.isSubset(system.metadata(), alarm.getMetadata());
+        Map<String, String> alarmMetadata = alarm.getMetadata();
 
-        if (!metadataMatches) {
-            return false;
-        }
+        return system.metadata().isEmpty() || Metadata.isSubset(system.metadata(), alarmMetadata);
 
-        return namesMatch || metadataMatches;
     }
 
     /**

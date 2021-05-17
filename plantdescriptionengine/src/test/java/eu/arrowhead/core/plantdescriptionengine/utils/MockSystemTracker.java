@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class MockSystemTracker extends SystemTracker {
 
     private final List<SystemUpdateListener> listeners = new ArrayList<>();
-    private List<SrSystem> systems = new ArrayList<>();
+    private final List<SrSystem> systems = new ArrayList<>();
 
     public MockSystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
         super(
@@ -53,12 +53,11 @@ public class MockSystemTracker extends SystemTracker {
     }
 
     /**
-     * Return true if the specified system can be described by the given systemn
+     * Return true if the specified system can be described by the given system
      * name and metadata combination.
      * @param system An Arrowhead system.
      * @param systemName Name of a system.
      * @param metadata Metadata describing a system.
-     * @return
      */
     private boolean systemMatches(final SrSystem system, String systemName, Map<String, String> metadata) {
         if (systemName != null && !systemName.equals(system.systemName())) {

@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +44,7 @@ public class PlantDescriptionValidator {
 
         // Find the currently active Plant Description, if any.
         PlantDescriptionEntry activeEntry = entries.values().stream()
-            .filter(entry -> entry.active())
+            .filter(PlantDescriptionEntry::active)
             .findAny()
             .orElse(null);
 
@@ -71,8 +70,7 @@ public class PlantDescriptionValidator {
      * @param entries Plant Description entries to be validated.
      */
     public PlantDescriptionValidator(final PlantDescriptionEntry... entries) {
-        this(Arrays.asList(entries)
-            .stream()
+        this(Arrays.stream(entries)
             .collect(Collectors.toMap(PlantDescriptionEntry::id, entry -> entry)));
     }
 
@@ -167,7 +165,6 @@ public class PlantDescriptionValidator {
      *                   retrieved.
      * @param allEntries A list containing all Plant Description entries in
      *                   which to search for included entries.
-     * @return
      * @throws ValidationException If there is an include cycle, or if an
      *                             included entry is not present in
      *                             {@code allEntries}.
@@ -336,8 +333,8 @@ public class PlantDescriptionValidator {
      * @param entry A Plant Description entry.
      */
     private void validatePorts(final PlantDescriptionEntry entry) {
-        entry.systems().forEach(system -> ensureUniquePorts(system));
-        entry.systems().forEach(system -> ensureNoConsumerPortMetadata(system));
+        entry.systems().forEach(this::ensureUniquePorts);
+        entry.systems().forEach(this::ensureNoConsumerPortMetadata);
     }
 
     /**

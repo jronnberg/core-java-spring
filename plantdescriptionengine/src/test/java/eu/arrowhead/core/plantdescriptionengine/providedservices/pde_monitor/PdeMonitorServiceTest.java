@@ -33,9 +33,7 @@ public class PdeMonitorServiceTest {
         );
 
         service.provide()
-            .ifSuccess(serviceHandle -> {
-                assertFalse(serviceHandle.description().accessPolicyType().isSecure());
-            })
+            .ifSuccess(serviceHandle -> assertFalse(serviceHandle.description().accessPolicyType().isSecure()))
             .onFailure(e -> fail());
     }
 

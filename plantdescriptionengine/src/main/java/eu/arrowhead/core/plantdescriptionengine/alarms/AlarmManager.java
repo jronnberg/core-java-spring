@@ -3,6 +3,7 @@ package eu.arrowhead.core.plantdescriptionengine.alarms;
 import eu.arrowhead.core.plantdescriptionengine.providedservices.pde_monitor.dto.PdeAlarmDto;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class AlarmManager {
      */
     private Alarm getAlarmData(final int id) {
         for (final Alarm alarm : activeAlarms) {
-            if (alarm.id == id) {
+            if (alarm.getId() == id) {
                 return alarm;
             }
         }
@@ -52,7 +53,7 @@ public class AlarmManager {
     public List<Alarm> getActiveAlarmData(final AlarmCause cause) {
         Objects.requireNonNull(cause, "Expected alarm cause.");
         return activeAlarms.stream()
-            .filter(alarm -> cause == alarm.cause)
+            .filter(alarm -> cause == alarm.getCause())
             .collect(Collectors.toList());
     }
 
@@ -64,7 +65,7 @@ public class AlarmManager {
     public List<Alarm> getActiveAlarmData(final List<AlarmCause> causes) {
         Objects.requireNonNull(causes, "Expected alarm causes.");
         return activeAlarms.stream()
-            .filter(alarm -> causes.contains(alarm.cause))
+            .filter(alarm -> causes.contains(alarm.getCause()))
             .collect(Collectors.toList());
     }
 
@@ -104,14 +105,15 @@ public class AlarmManager {
         final AlarmCause cause
     ) {
         // TODO: Concurrency handling
+        final Map<String, String> nonNullMetadata = metadata == null ? Collections.emptyMap() : metadata;
 
         // Check if this alarm has already been raised:
         for (final Alarm alarm : activeAlarms) {
-            if (alarm.matches(systemId, systemName, metadata, cause)) {
+            if (alarm.matches(systemId, systemName, nonNullMetadata, cause)) {
                 return;
             }
         }
-        activeAlarms.add(new Alarm(systemId, systemName, metadata, cause));
+        activeAlarms.add(new Alarm(systemId, systemName, nonNullMetadata, cause));
     }
 
     public void clearAlarm(final Alarm alarm) {
@@ -177,7 +179,7 @@ public class AlarmManager {
      */
     public void raiseSystemInactive(final String systemName) {
         Objects.requireNonNull(systemName, "Expected system name.");
-        raiseAlarm(null, systemName, null, AlarmCause.SYSTEM_INACTIVE);
+        raiseAlarm(null, systemName, Collections.emptyMap(), AlarmCause.SYSTEM_INACTIVE);
     }
 
     /**
@@ -190,8 +192,8 @@ public class AlarmManager {
 
         final List<Alarm> cleared = activeAlarms.stream()
             .filter(alarm ->
-                alarm.cause == AlarmCause.SYSTEM_INACTIVE &&
-                    alarm.systemName.equals(systemName)
+                alarm.getCause() == AlarmCause.SYSTEM_INACTIVE &&
+                    systemName.equals(alarm.getSystemName())
             )
             .collect(Collectors.toList());
 

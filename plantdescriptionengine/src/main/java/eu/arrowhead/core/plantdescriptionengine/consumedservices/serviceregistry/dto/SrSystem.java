@@ -21,7 +21,7 @@ public interface SrSystem {
 
     Integer id();
 
-    String systemName();
+    String systemName(); // TODO: Should this be optional?
 
     String address();
 
