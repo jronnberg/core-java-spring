@@ -163,14 +163,10 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             return Future.done();
         }
 
-        // Delete any rules previously created by the Orchestrator client:
-        final ArrayList<Future<Void>> deletions = new ArrayList<>();
-
-        for (final int rule : rules) {
-            deletions.add(deleteRule(rule));
-        }
-
-        return Futures.serialize(deletions)
+        // TODO: Previously, the deletion tasks were created before the call
+        // to Futures.serialize. Deletions of multiple rules did not work that
+        // way. Investigate why.
+        return Futures.serialize(rules.stream().map(this::deleteRule))
             .flatMap(result -> {
                 ruleStore.removeRules(plantDescriptionId);
                 logger.info(
@@ -222,7 +218,6 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
         deleteRulesTask
             .flatMap(deletionResult -> {
                 final boolean activeConnectionsExist = !pdTracker.getActiveConnections().isEmpty();
-                System.out.println(activeConnectionsExist);
                 final boolean shouldPostRules = updated.active() && activeConnectionsExist;
                 return shouldPostRules ? postRules() : Future.success(emptyRuleList());
             })
