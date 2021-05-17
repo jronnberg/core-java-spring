@@ -20,6 +20,10 @@ import java.util.Objects;
  */
 public class SqlPdStore implements PdStore {
 
+    // Initial size of the buffer used for writing Plant Descriptions.
+    private final int INITIAL_BUFFER_SIZE = 1000;
+    private final int maxPdBytes;
+
     // TODO: We store Plant Descriptions in their raw JSON form.
     // In the future, we'll want to create separate tables for each subfield
     // of a Plant Description.
@@ -30,6 +34,16 @@ public class SqlPdStore implements PdStore {
     private final String SQL_DELETE_ALL = "DELETE FROM plant_description;";
 
     private Connection connection;
+
+    /**
+     * Class constructor.
+     *
+     * @param maxPdBytes The maximum allowed size of a Plant Description, in
+     *                   bytes.
+     */
+    public SqlPdStore(int maxPdBytes) {
+        this.maxPdBytes = maxPdBytes;
+    }
 
     /**
      * Throws an {@code IllegalStateException} if this instance has not been
@@ -103,12 +117,14 @@ public class SqlPdStore implements PdStore {
         Objects.requireNonNull(entry, "Expected entry.");
 
         try {
-            final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PD);
-            final byte[] bytes = new byte[2048]; // TODO: Remove arbitrary limit
-            final Buffer buffer = Buffer.wrap(bytes);
+            final Buffer buffer = Buffer.allocate(INITIAL_BUFFER_SIZE, maxPdBytes);
             buffer.clear();
             entry.encodeJson(buffer);
+            final byte[] bytes = new byte[buffer.readableBytes()];
+            buffer.read(bytes);
             buffer.close();
+
+            final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PD);
             statement.setInt(1, entry.id());
             statement.setString(2, new String(bytes));
             statement.executeUpdate();

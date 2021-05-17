@@ -19,6 +19,10 @@ import java.util.Objects;
  */
 public class FilePdStore implements PdStore {
 
+    // Initial size of the buffer used for writing Plant Descriptions.
+    private final int INITIAL_BUFFER_SIZE = 1000;
+    private final int maxPdBytes;
+
     // File path to the directory for storing JSON representations of plant
     // descriptions:
     private final String descriptionDirectory;
@@ -28,10 +32,13 @@ public class FilePdStore implements PdStore {
      *
      * @param descriptionDirectory File path to the directory for storing Plant
      *                             Description.
+     * @param maxPdBytes           The maximum allowed size of a Plant
+     *                             Description, in bytes.
      */
-    public FilePdStore(final String descriptionDirectory) {
+    public FilePdStore(final String descriptionDirectory, int maxPdBytes) {
         Objects.requireNonNull(descriptionDirectory, "Expected path to Plant Description Entry directory");
         this.descriptionDirectory = descriptionDirectory;
+        this.maxPdBytes = maxPdBytes;
     }
 
     /**
@@ -95,12 +102,15 @@ public class FilePdStore implements PdStore {
         }
 
         try (final FileOutputStream fileWriter = new FileOutputStream(file)) {
-            final byte[] bytes = new byte[2048]; // TODO: Remove arbitrary limit
-            final Buffer buffer = Buffer.wrap(bytes);
+
+            final Buffer buffer = Buffer.allocate(INITIAL_BUFFER_SIZE, maxPdBytes);
             buffer.clear();
             entry.encodeJson(buffer);
+            final byte[] bytes = new byte[buffer.readableBytes()];
+            buffer.read(bytes);
             buffer.close();
             fileWriter.write(bytes);
+
         } catch (final IOException e) {
             throw new PdStoreException("Failed to write Plant Description Entry to file", e);
         }

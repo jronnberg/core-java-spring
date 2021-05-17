@@ -27,11 +27,11 @@ public class SystemTracker {
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
     private final List<SystemUpdateListener> listeners = new ArrayList<>();
-    private List<SrSystem> systems = Collections.emptyList();
     private final String SYSTEMS_URI = "/serviceregistry/pull-systems";
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
     private final int pollInterval = 5000;
+    private List<SrSystem> systems = Collections.emptyList();
     private boolean initialized;
 
     /**

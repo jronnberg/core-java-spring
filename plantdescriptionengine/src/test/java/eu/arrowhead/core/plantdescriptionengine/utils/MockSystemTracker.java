@@ -55,9 +55,10 @@ public class MockSystemTracker extends SystemTracker {
     /**
      * Return true if the specified system can be described by the given system
      * name and metadata combination.
-     * @param system An Arrowhead system.
+     *
+     * @param system     An Arrowhead system.
      * @param systemName Name of a system.
-     * @param metadata Metadata describing a system.
+     * @param metadata   Metadata describing a system.
      */
     private boolean systemMatches(final SrSystem system, String systemName, Map<String, String> metadata) {
         if (systemName != null && !systemName.equals(system.systemName())) {

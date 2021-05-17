@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class SqlPdStoreTest {
 
+    private int maxPdBytes = 200000;
+
     private final String DRIVER_CLASS_NAME = "org.h2.Driver";
     private final String CONNECTION_URL = "jdbc:h2:mem:testdb";
 
@@ -38,7 +40,7 @@ public class SqlPdStoreTest {
 
     @BeforeEach
     public void createStore() throws PdStoreException {
-        store = new SqlPdStore();
+        store = new SqlPdStore(maxPdBytes);
         store.init(DRIVER_CLASS_NAME, CONNECTION_URL, USERNAME, PASSWORD);
     }
 
@@ -50,7 +52,7 @@ public class SqlPdStoreTest {
     @Test
     public void shouldRequireInitialization() {
         final Exception exception = assertThrows(IllegalStateException.class,
-            () -> new SqlPdStore().readEntries());
+            () -> new SqlPdStore(maxPdBytes).readEntries());
         assertEquals("SqlPdStore has not been initialized.", exception.getMessage());
     }
 

@@ -25,6 +25,7 @@ public class PlantDescriptionValidator {
 
     final List<String> blacklist = List.of("unknown");
     private final List<String> errors = new ArrayList<>();
+
     /**
      * Constructor.
      *
@@ -353,6 +354,7 @@ public class PlantDescriptionValidator {
 
     /**
      * Report an error if the given port has metadata.
+     *
      * @param port A system port.
      */
     private void ensureNoMetadata(Port port) {

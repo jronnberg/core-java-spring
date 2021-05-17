@@ -307,7 +307,8 @@ public final class PdeMain {
 
                 final String ruleDirectory = getProp(appProps, "orchestration_rules");
                 final String plantDescriptionsDirectory = getProp(appProps, "plant_descriptions");
-                final PdStore pdStore = new FilePdStore(plantDescriptionsDirectory);
+                final int maxPdBytes = Integer.parseInt(getProp(appProps, "plant_description_max_size"));
+                final PdStore pdStore = new FilePdStore(plantDescriptionsDirectory, maxPdBytes);
                 final PlantDescriptionTracker pdTracker = new PlantDescriptionTracker(pdStore);
                 final SrSystem orchestrator = systemTracker.getSystem("orchestrator");
 
