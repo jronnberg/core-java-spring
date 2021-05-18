@@ -296,10 +296,10 @@ public final class PdeMain {
         final String serviceRegistryIp = getProp(appProps, "service_registry.address");
         final int serviceRegistryPort = Integer.parseInt(getProp(appProps, "service_registry.port"));
         final InetSocketAddress serviceRegistryAddress = new InetSocketAddress(serviceRegistryIp, serviceRegistryPort);
+        final int systemPollInterval = Integer.parseInt(getProp(appProps, "system_poll_interval"));
 
         final HttpClient httpClient = createHttpClient(appProps);
-
-        final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress);
+        final SystemTracker systemTracker = new SystemTracker(httpClient, serviceRegistryAddress, systemPollInterval);
 
         logger.info("Contacting Service Registry...");
         systemTracker.start()

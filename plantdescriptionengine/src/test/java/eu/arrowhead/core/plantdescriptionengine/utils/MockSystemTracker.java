@@ -27,7 +27,8 @@ public class MockSystemTracker extends SystemTracker {
     public MockSystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
         super(
             Objects.requireNonNull(httpClient, "Expected HTTP client"),
-            Objects.requireNonNull(serviceRegistryAddress, "Expected Service Registry address")
+            Objects.requireNonNull(serviceRegistryAddress, "Expected Service Registry address"),
+            5000
         );
     }
 

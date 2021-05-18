@@ -30,7 +30,7 @@ public class SystemTracker {
     private final String SYSTEMS_URI = "/serviceregistry/pull-systems";
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
-    private final int pollInterval = 5000;
+    private final int pollInterval;
     private List<SrSystem> systems = Collections.emptyList();
     private boolean initialized;
 
@@ -40,14 +40,21 @@ public class SystemTracker {
      * @param httpClient             Object for communicating with the Service
      *                               Registry.
      * @param serviceRegistryAddress Address of the Service Registry.
+     * @param pollInterval           Time between each system poll request sent
+     *                               to the Service registry, in milliseconds.
      */
-    public SystemTracker(final HttpClient httpClient, final InetSocketAddress serviceRegistryAddress) {
+    public SystemTracker(
+        final HttpClient httpClient,
+        final InetSocketAddress serviceRegistryAddress,
+        final int pollInterval
+        ) {
 
         Objects.requireNonNull(httpClient, "Expected HTTP client");
         Objects.requireNonNull(serviceRegistryAddress, "Expected service registry address");
 
         this.httpClient = httpClient;
         this.serviceRegistryAddress = serviceRegistryAddress;
+        this.pollInterval = pollInterval;
     }
 
     /**

@@ -26,7 +26,11 @@ public class SystemTrackerTest {
     public void shouldThrowWhenNotInitialized() {
 
         final HttpClient httpClient = new HttpClient.Builder().insecure().build();
-        final SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemTracker systemTracker = new SystemTracker(
+            httpClient,
+            new InetSocketAddress("0.0.0.0", 5000),
+            5000
+        );
 
         final Exception exception = assertThrows(RuntimeException.class, () -> systemTracker.getSystem("System A"));
         assertEquals("SystemTracker has not been initialized.", exception.getMessage());
@@ -36,7 +40,11 @@ public class SystemTrackerTest {
     public void shouldFindSystemByName() {
 
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
-        final SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemTracker systemTracker = new SystemTracker(
+            httpClient,
+            new InetSocketAddress("0.0.0.0", 5000),
+            5000
+        );
         final String systemName = "Sys-A";
         final int systemId = 92;
         // Create some fake data for the HttpClient to respond with:
@@ -65,7 +73,11 @@ public class SystemTrackerTest {
     public void shouldFindSystemsByMetadata() {
 
         final HttpClient httpClient = Mockito.mock(HttpClient.class);
-        final SystemTracker systemTracker = new SystemTracker(httpClient, new InetSocketAddress("0.0.0.0", 5000));
+        final SystemTracker systemTracker = new SystemTracker(
+            httpClient,
+            new InetSocketAddress("0.0.0.0", 5000),
+            5000
+        );
         final String systemName = "Sys-A";
         final int systemId1 = 92;
         final int systemId2 = 93;
