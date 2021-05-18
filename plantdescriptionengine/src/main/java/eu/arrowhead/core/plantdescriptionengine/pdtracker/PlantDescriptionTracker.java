@@ -88,7 +88,7 @@ public class PlantDescriptionTracker {
         final PlantDescriptionEntry oldEntry;
         final PlantDescriptionEntryDto deactivatedEntry;
 
-        synchronized(this) {
+        synchronized (this) {
 
             backingStore.write(entry);
 
@@ -285,8 +285,8 @@ public class PlantDescriptionTracker {
         final PlantDescriptionEntry entry = get(entryId);
 
         Objects.requireNonNull(
-            entry, "Plant Description with ID " + entryId + " is not present in the Plant Description Tracker."
-        );
+            entry, "Plant Description with ID " + entryId
+                + " is not present in the Plant Description Tracker.");
 
         final List<Connection> connections = new ArrayList<>(entry.connections());
 

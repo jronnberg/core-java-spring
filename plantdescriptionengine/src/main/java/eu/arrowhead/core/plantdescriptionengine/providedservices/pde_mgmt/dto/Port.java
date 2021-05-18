@@ -27,6 +27,7 @@ public interface Port {
 
     /**
      * Indicates whether this port is used to consume or produce services.
+     * When false or not present, the port is assumed to be a producer.
      */
     Optional<Boolean> consumer();
 }

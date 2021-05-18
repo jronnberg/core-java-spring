@@ -33,7 +33,7 @@ public class SqlPdStoreTest {
     private final String USERNAME = "root";
     private final String PASSWORD = "password";
     SqlPdStore store;
-    private int maxPdBytes = 200000;
+    private final int maxPdBytes = 200000;
 
     @BeforeEach
     public void createStore() throws PdStoreException {

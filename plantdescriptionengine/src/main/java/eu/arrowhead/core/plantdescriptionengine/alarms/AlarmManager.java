@@ -172,27 +172,73 @@ public class AlarmManager {
     }
 
     /**
-     * Raise an alarm indicating that a system required by the active Plant
-     * Description is inactive.
+     * Raise an alarm indicating that a supposedly monitorable system does not
+     * seem to provide a 'Monitorable' service.
      *
-     * @param systemName Name of a Plant Description system.
+     * @param systemId   ID of a Plant Description system.
+     * @param systemName Name of a Plant Description system, or null.
+     * @param metadata   Metadata of a Plant Description system, or null.
      */
-    public void raiseSystemInactive(final String systemName) {
-        Objects.requireNonNull(systemName, "Expected system name.");
-        raiseAlarm(null, systemName, Collections.emptyMap(), AlarmCause.SYSTEM_INACTIVE);
+    public void raiseSystemNotMonitorable(
+        final String systemId,
+        final String systemName,
+        final Map<String, String> metadata
+    ) {
+        Objects.requireNonNull(systemId, "Expected system ID");
+        raiseAlarm(systemId, systemName, metadata, AlarmCause.NOT_MONITORABLE);
     }
 
     /**
-     * Clear any alarms indicating that the given system is not active.
+     * Clear any alarms indicating that the system matching the given arguments
+     * does not provide a 'Monitorable' service.
+     *
+     * @param systemId   ID of a Plant Description system.
+     * @param systemName Name of a Plant Description system, or null.
+     * @param metadata   Metadata of a Plant Description system, or null.
+     */
+    public void clearSystemNotMonitorable(
+        final String systemId,
+        final String systemName,
+        final Map<String, String> metadata
+    ) {
+        Objects.requireNonNull(systemId, "Expected system ID");
+        final List<Alarm> cleared = activeAlarms.stream()
+            .filter(alarm ->
+                alarm.getCause() == AlarmCause.NOT_MONITORABLE &&
+                Objects.equals(systemId, alarm.getSystemId()) &&
+                Objects.equals(systemName, alarm.getSystemName()) &&
+                Objects.equals(metadata, alarm.getMetadata())
+            )
+            .collect(Collectors.toList());
+
+        for (final Alarm alarm : cleared) {
+            clearAlarm(alarm);
+        }
+    }
+
+    /**
+     * Raise an alarm indicating that a monitorable system did not respond to
+     * a ping request.
      *
      * @param systemName Name of a Plant Description system.
      */
-    public void clearSystemInactive(final String systemName) {
+    public void raiseNoPingResponse(final String systemName) {
+        Objects.requireNonNull(systemName, "Expected system name.");
+        raiseAlarm(null, systemName, Collections.emptyMap(), AlarmCause.NO_PING_RESPONSE);
+    }
+
+    /**
+     * Clear any alarms indicating that the given system did not respond to a
+     * ping request.
+     *
+     * @param systemName Name of a Plant Description system.
+     */
+    public void clearNoPingResponse(final String systemName) {
         Objects.requireNonNull(systemName, "Expected system name.");
 
         final List<Alarm> cleared = activeAlarms.stream()
             .filter(alarm ->
-                alarm.getCause() == AlarmCause.SYSTEM_INACTIVE &&
+                alarm.getCause() == AlarmCause.NO_PING_RESPONSE &&
                     systemName.equals(alarm.getSystemName())
             )
             .collect(Collectors.toList());
