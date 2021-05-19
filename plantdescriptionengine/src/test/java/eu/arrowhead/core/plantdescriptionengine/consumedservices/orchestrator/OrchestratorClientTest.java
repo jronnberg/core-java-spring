@@ -236,7 +236,7 @@ public class OrchestratorClientTest {
         final HttpClientRequest capturedRequest = requestCaptor.getValue();
 
         assertEquals(HttpMethod.POST, capturedRequest.method().orElse(null));
-        final String expectedUri = "/orchestrator/store/flexible?"; // TODO: Check why a question mark is appended
+        final String expectedUri = "/orchestrator/store/flexible?";
         assertTrue(capturedRequest.uri().isPresent());
         assertEquals(expectedUri, capturedRequest.uri().get().toString());
         assertEquals(orchestratorSrSystem.address(), capturedAddress.getAddress().getHostAddress());
@@ -540,8 +540,6 @@ public class OrchestratorClientTest {
     @Test
     public void rulesShouldBeEmptyAfterFailedPost() throws RuleStoreException, PdStoreException {
 
-        // TODO: I don't understand this test.
-
         final PlantDescriptionEntryDto entry = createEntry();
 
         pdTracker.put(entry);
@@ -565,6 +563,7 @@ public class OrchestratorClientTest {
         failedCreationResponse.status(HttpStatus.INTERNAL_SERVER_ERROR);
 
         final MockClientResponse creationResponse = new MockClientResponse();
+
         final int newRuleId = 23;
         creationResponse.status(HttpStatus.CREATED);
         creationResponse.body(createSingleRuleStoreList(newRuleId, producerRuleSystem, consumerRuleSystem));

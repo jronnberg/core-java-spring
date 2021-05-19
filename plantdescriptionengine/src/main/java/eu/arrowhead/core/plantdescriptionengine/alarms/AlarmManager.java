@@ -104,16 +104,17 @@ public class AlarmManager {
         final Map<String, String> metadata,
         final AlarmCause cause
     ) {
-        // TODO: Concurrency handling
-        final Map<String, String> nonNullMetadata = metadata == null ? Collections.emptyMap() : metadata;
+        synchronized (this) {
+            final Map<String, String> nonNullMetadata = metadata == null ? Collections.emptyMap() : metadata;
 
-        // Check if this alarm has already been raised:
-        for (final Alarm alarm : activeAlarms) {
-            if (alarm.matches(systemId, systemName, nonNullMetadata, cause)) {
-                return;
+            // Check if this alarm has already been raised:
+            for (final Alarm alarm : activeAlarms) {
+                if (alarm.matches(systemId, systemName, nonNullMetadata, cause)) {
+                    return;
+                }
             }
+            activeAlarms.add(new Alarm(systemId, systemName, nonNullMetadata, cause));
         }
-        activeAlarms.add(new Alarm(systemId, systemName, nonNullMetadata, cause));
     }
 
     public void clearAlarm(final Alarm alarm) {

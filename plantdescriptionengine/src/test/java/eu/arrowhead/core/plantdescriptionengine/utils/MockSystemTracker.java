@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 // TODO: Find a better way to mock the system tracker, this class
-// is to convoluted.
+// is too convoluted.
 
 /**
  * Subclass of SystemTracker used for testing purposes.

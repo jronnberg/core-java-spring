@@ -102,7 +102,6 @@ public final class PdeMain {
 
         final OrchestrationStrategy strategy = new OrchestrationStrategy(
             new OrchestrationPattern().isIncludingService(true)
-                .option(OrchestrationOption.METADATA_SEARCH, false)
                 .option(OrchestrationOption.PING_PROVIDERS, true)
                 .option(OrchestrationOption.OVERRIDE_STORE, false));
 

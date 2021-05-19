@@ -215,9 +215,6 @@ public class PlantDescriptionTracker {
             return result;
         }
 
-        // TODO: In what order do we want entries to be investigated? If we
-        // don't allow duplicate systems, which we probably shouldn't, the order
-        // doesn't matter.
         for (final int i : entry.include()) {
             final PlantDescriptionEntry includedEntry = get(i);
             result = getSystem(includedEntry, systemId);
