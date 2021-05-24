@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator;
 
+import eu.arrowhead.core.plantdescriptionengine.ApiConstants;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntry;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryList;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.orchestrator.dto.StoreEntryListDto;
@@ -28,10 +29,6 @@ import java.util.Set;
 
 public class OrchestratorClient implements PlantDescriptionUpdateListener {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorClient.class);
-
-    private static final String ECHO_URI = "/orchestrator/echo";
-    private static final String CREATE_RULE_URI = "/orchestrator/store/flexible";
-    private static final String DELETE_RULE_URI_BASE = "/orchestrator/store/flexible/";
 
     private final HttpClient httpClient;
     private final InetSocketAddress orchestratorAddress;
@@ -109,8 +106,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .send(orchestratorAddress,
                 new HttpClientRequest()
                     .method(HttpMethod.GET)
-                    .uri(ECHO_URI)
-                    .header("accept", "application/json"))
+                    .uri(ApiConstants.ORCHESTRATOR_ECHO_PATH)
+                    .header(ApiConstants.HEADER_ACCEPT, ApiConstants.APPLICATION_JSON))
             .flatMap(response -> Future.done());
     }
 
@@ -126,9 +123,9 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .send(orchestratorAddress,
                 new HttpClientRequest()
                     .method(HttpMethod.POST)
-                    .uri(CREATE_RULE_URI)
+                    .uri(ApiConstants.ORCHESTRATOR_STORE_PATH)
                     .body(rules, CodecType.JSON)
-                    .header("accept", "application/json"))
+                    .header(ApiConstants.HEADER_ACCEPT, ApiConstants.APPLICATION_JSON))
             .flatMap(response -> response.bodyToIfSuccess(StoreEntryListDto::decodeJson));
     }
 
@@ -150,8 +147,8 @@ public class OrchestratorClient implements PlantDescriptionUpdateListener {
             .send(orchestratorAddress,
                 new HttpClientRequest()
                     .method(HttpMethod.DELETE)
-                    .uri(DELETE_RULE_URI_BASE + id)
-                    .header("accept", "application/json"))
+                    .uri(ApiConstants.ORCHESTRATOR_STORE_PATH + "/" + id)
+                    .header(ApiConstants.HEADER_ACCEPT, ApiConstants.APPLICATION_JSON))
             .flatMap(response -> {
                 if (response.status() != HttpStatus.OK) {
                     return Future.failure(OrchestratorRequestException.ruleDeletionFailure(id));

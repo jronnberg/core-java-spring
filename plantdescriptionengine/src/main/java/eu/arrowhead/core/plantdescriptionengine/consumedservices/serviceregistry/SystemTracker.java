@@ -1,5 +1,6 @@
 package eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry;
 
+import eu.arrowhead.core.plantdescriptionengine.ApiConstants;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystem;
 import eu.arrowhead.core.plantdescriptionengine.consumedservices.serviceregistry.dto.SrSystemListDto;
 import eu.arrowhead.core.plantdescriptionengine.utils.Metadata;
@@ -28,7 +29,6 @@ public class SystemTracker {
     // List of instances that need to be informed when systems are added or
     // removed from the service registry.
     private final List<SystemUpdateListener> listeners = new ArrayList<>();
-    private final String SYSTEMS_URI = "/serviceregistry/pull-systems";
     private final HttpClient httpClient;
     private final InetSocketAddress serviceRegistryAddress;
     private final int pollInterval;
@@ -71,8 +71,8 @@ public class SystemTracker {
             .send(serviceRegistryAddress,
                 new HttpClientRequest()
                     .method(HttpMethod.GET)
-                    .uri(SYSTEMS_URI)
-                    .header("accept", "application/json"))
+                    .uri(ApiConstants.SERVICE_REGISTRY_SYSTEMS_PATH)
+                    .header(ApiConstants.HEADER_ACCEPT, ApiConstants.APPLICATION_JSON))
             .flatMap(response -> response.bodyToIfSuccess(SrSystemListDto::decodeJson))
             .flatMap(systemList -> {
                 List<SrSystem> oldSystems = Collections.unmodifiableList(systems);
@@ -204,9 +204,7 @@ public class SystemTracker {
             @Override
             public void run() {
                 fetchSystems()
-                    .onFailure(error -> logger.error(
-                        "Failed to retrieve registered systems",
-                        error));
+                    .onFailure(error -> logger.error("Failed to retrieve registered systems", error));
             }
         }, pollInterval, pollInterval);
     }
