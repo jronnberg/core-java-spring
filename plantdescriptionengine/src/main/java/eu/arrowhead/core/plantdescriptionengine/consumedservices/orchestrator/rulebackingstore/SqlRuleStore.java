@@ -20,11 +20,11 @@ public class SqlRuleStore implements RuleStore {
 
     private static final Logger logger = LoggerFactory.getLogger(RuleStore.class);
 
-    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `pde_rule` (`id` bigint(20) PRIMARY KEY, `plant_description` bigint(20) NOT NULL ) ENGINE = InnoDB DEFAULT CHARSET = utf8";
+    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `pde_rule` (`id` bigint(20) PRIMARY KEY, `plant_description_id` bigint(20) NOT NULL ) ENGINE = InnoDB DEFAULT CHARSET = utf8";
 
-    private final String SQL_SELECT_RULES = "select id from pde_rule where plant_description=?;";
-    private final String SQL_REPLACE_RULE = "REPLACE INTO pde_rule(id, plant_description) VALUES(?, ?);";
-    private final String SQL_DELETE_RULES = "DELETE FROM pde_rule where plant_description=?;";
+    private final String SQL_SELECT_RULES = "select id from pde_rule where plant_description_id=?;";
+    private final String SQL_REPLACE_RULE = "REPLACE INTO pde_rule(id, plant_description_id) VALUES(?, ?);";
+    private final String SQL_DELETE_RULES = "DELETE FROM pde_rule where plant_description_id=?;";
     private final String ID = "id";
 
     private Connection connection;
